@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy2FawZj/aW93Uqq5t4Z7Y8E9eV5dW6fn" crossorigin="anonymous">
+
+    <title>Property Survey Form</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ecf0f1;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #fff; /* White */
+            color: #2ecc71; /* Emerald Green text color */
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Changes made to make tabs continuous and Android-friendly */
+        .tabs {
+            display: flex;
+            overflow: hidden;
+            background: #fdfdfd;
+            overflow: auto;
+            display: flex;
+            padding: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            justify-content: center; /* Center tabs */
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            color: #26cf6d; /* Green text color */
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        table {
+            border-collapse:separate;
+            overflow-x: auto;
+        }
+        th, td{
+            text-align: left;
+            padding: 8px;
+        }
+
+        .tabs button {
+            background: #f0f0f0;
+            color: #000000;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px; /* Adjust font size */
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s ease, transform 0.2s ease-in-out;
+            margin: 0 5px; /* Add some margin for separation */
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.5s ease-in-out;
+            animation: fadeIn 0.8s ease-in-out;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .popup-container {
+            display: none;
+            overflow-x: auto;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            max-width: 89%;
+            width: auto; 
+        }
+        .overlay {
+            position: center;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+           
+        }
+
+        /* Style the close button */
+        .close-btn {
+            position:fixed;
+            top: 10px;
+            right: 10px;
+            cursor:pointer;
+        }
+
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Common style for all forms, optimizing the width */
+        .common-form {
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input[type="text"],
+        select,
+        button {
+            width: calc(100% - 60px); /* Set input field width same as picklist minus padding and border */
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        select:focus,
+        button:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        button {
+            background: #2ecc71;
+            color: #fff;
+            border: none;
+            padding: 15px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.3s ease, transform 0.2s ease-in-out;
+        }
+
+        button:hover {
+            color: white    ;
+            background: green;
+            transform: scale(1.1);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .mandatory::after {
+            content: " *";
+            color: red;
+            display: inline-block;
+            margin-left: 5px;
+            transform: scale(1.2);
+        }
+
+        @media screen and (max-width: 600px) {
+            .tabs {
+                flex-wrap: wrap; 
+            }
+
+            .tabs button {
+                flex: 1; /* Make tabs take equal width */
+                margin: 5px; /* Add some margin for separation */
+            }
+            .popup-container {
+                max-width: 100%;
+            }
+        }
+
+        #MainTabContent {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation Tabs -->
+<div class="tabs">
+    <button onclick="openTab('Main')">Main</button>
+    <button onclick="openTab('Property')">Property</button>
+    <button onclick="openTab('Unit')">Unit</button>
+    <button onclick="openTab('Additional')">Additional</button>
+</div>
+
+<!--	<div id="content">-->
+<!--        <p id="mainContent"></p>-->
+<!--        <p id="propertyContent"></p>-->
+<!--        <p id="unitContent"></p>-->
+<!--        <p id="additionalContent"></p>-->
+<!--    </div>-->
+
+<!-- ... Your HTML content ... -->
+
+
+<form action="/survey/submit" method="post">
+    <!-- MainTabContent Tab Content -->
+
+    <div id="MainTabContent" class="tab-content">
+        <!-- Form content for the Main tab -->
+        <form>
+            <label for="zone" class="mandatory">Zone:</label>
+            <select id="zone" name="zone">
+                <!-- Options for the Zone picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="oldWard">Old Ward:</label>
+            <select id="oldWard" name="oldWard">
+                <!-- Options for the Old Ward picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="Ward" class="mandatory">Ward:</label>
+            <select id="ward" name="ward">
+                <!-- Options for the Ward picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="citySurveyNo">City Survey No.:</label>
+            <input type="text" id="citySurveyNo" name="citySurveyNo"><br>
+
+            <label for="oldPropertyNo">Old Property No.:</label>
+            <input type="text" id="oldPropertyNo" name="oldPropertyNo"><br>
+
+            <label for="surveyPropNo" class="mandatory">Survey Prop No.:</label>
+            <input type="text" id="surveyPropNo" name="surveyPropNo"><br>
+
+            <label for="sequenceNo">Sequence No.:</label>
+            <input type="text" id="sequenceNo" name="sequenceNo"><br>
+
+            <label for="layoutName">Layout Name:</label>
+            <input type="text" id="layoutName" name="layoutName"><br>
+
+            <label for="layoutNo">Layout No.:</label>
+            <input type="text" id="layoutNo" name="layoutNo"><br>
+
+            <label for="khasraNo">Khasra No.:</label>
+            <input type="text" id="khasraNo" name="khasraNo"><br>
+
+            <label for="plotNo">Plot No.:</label>
+            <input type="text" id="plotNo" name="plotNo"><br>
+
+            <label for="ownerName" class="mandatory">Owner Name:</label>
+            <input type="text" id="ownerName" name="ownerName"><br>
+
+            <label for="occupierName">Occupier Name:</label>
+            <input type="text" id="occupierName" name="occupierName"><br>
+
+            <label for="address" class="mandatory">Address:</label>
+            <input type="text" id="address" name="address"><br>
+
+            <label for="ownerType" class="mandatory">Owner Type:</label>
+            <select id="ownerType" name="ownerType">
+                <!-- Options for the Owner Type picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="buildingStatus">Building Status:</label>
+            <select id="buildingStatus" name="buildingStatus">
+                <!-- Options for the Building Status picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br><br>
+
+
+            <button type="button" onclick="Next('Property')">Next</button>
+        </form>
+    </div>
+
+    <!-- Property Tab Content -->
+
+    <div id="PropertyTabContent" class="tab-content">
+        <!-- Form content for the Property tab -->
+        <form>
+
+            <!-- Owner details section -->
+            <fieldset>
+                <legend>Owner details</legend>
+                <label for="panNo" class="mandatory">Pan No.:</label>
+                <input type="text" id="panNo" name="panNo"><br>
+
+                <label for="aadharNo" class="mandatory">Aadhar No.:</label>
+                <input type="text" id="aadharNo" name="aadharNo"><br>
+
+                <label for="mobileNo" class="mandatory">Mobile No.:</label>
+                <input type="text" id="ownermobileNo" name="mobileNo"><br>
+
+                <label for="category" class="mandatory">Category:</label>
+                <select id="category" name="category">
+                    <option value="Owner">Owner(मालक)</option>
+                    <option value="Tenant">Tenant(भाडेकरू)</option>
+                    <option value="Owner/Tenant">Owner/Tenant(मालक/भाडेकरू)</option>
+                    <option value="Occupier">Occupier(भोगवटदार)</option>
+                    <option value="Encroacher">Encroacher(अतिक्रमणकारी)</option>
+                </select><br>
+
+                <label for="propertyName">Property Name:</label>
+                <input type="text" id="propertyName" name="propertyName"><br>
+
+                <label for="buildingValue">Building Value:</label>
+                <input type="text" id="buildingValue" name="buildingValue"><br>
+
+                <label for="plotValue">Plot Value:</label>
+                <input type="text" id="plotValue" name="plotValue"><br>
+            </fieldset>
+
+            <!-- Property information section -->
+            <fieldset>
+                <legend>Property information</legend>
+
+                <label for="propertyType" class="mandatory">Property Type:</label>
+                <select id="propertyType" name="propertyType">
+                    <!-- Options for the Property Type picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="propertySubType" class="mandatory">Property Sub Type:</label>
+                <select id="propertySubType" name="propertySubType">
+                    <!-- Options for the Property Sub Type picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="propertyusageType" class="mandatory">Usage Type:</label>
+                <select id="propertyusageType" name="propertyusageType">
+                    <!-- Options for the Usage Type picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="propertyusageSubType" class="mandatory">Usage Sub Type:</label>
+                <select id="propertyusageSubType" name="propertyusageSubType">
+                    <!-- Options for the Usage Sub Type picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="buildingType">Building Type:</label>
+                <select id="buildingType" name="buildingType">
+                    <!-- Options for the Building Type picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="buildingSubType">Building Sub Type:</label>
+                <select id="buildingSubType" name="buildingSubType">
+                    <!-- Options for the Building Sub Type picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="constYear" class="mandatory">Const. Year:</label>
+                <select id="constYear" name="constYear">
+                    <!-- Options for the Const. Year picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="constAge">Const Age:</label>
+                <input type="text" id="constAge" name="constAge"><br>
+
+                <label for="ageFactor">Age Factor:</label>
+                <select id="ageFactor" name="ageFactor">
+                    <!-- Options for the Age Factor picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="permission">Permission:</label>
+                <select id="permission" name="permission">
+                    <!-- Options for the Permission picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="stair">Stair:</label>
+                <select id="stair" name="stair">
+                    <!-- Options for the Stair picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="lift">Lift:</label>
+                <select id="lift" name="lift">
+                    <!-- Options for the Lift picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="roadWidth">Road Width (in meter):</label>
+                <input type="text" id="roadWidth" name="roadWidth"><br>
+            </fieldset>
+
+
+            <!-- Other information section -->
+            <fieldset>
+                <legend>Other information</legend>
+
+                <label for="toilet">Toilet:</label>
+                <select id="toilet" name="toilet">
+                    <!-- Options for the Toilet picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="sewerage">Sewerage:</label>
+                <select id="sewerage" name="sewerage">
+                    <!-- Options for the Sewerage picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="sewerageType">Sewerage type:</label>
+                <select id="sewerageType" name="sewerageType">
+                    <!-- Options for the Sewerage type picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="waterCon">Water Con:</label>
+                <select id="waterCon" name="waterCon">
+                    <!-- Options for the Water Con picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="solar">Solar:</label>
+                <select id="solar" name="solar">
+                    <!-- Options for the Solar picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="rainWaterHarvesting">Rain water Harvesting:</label>
+                <select id="rainWaterHarvesting" name="rainWaterHarvesting">
+                    <!-- Options for the Rain water Harvesting picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+            </fieldset>
+
+            <!-- Total Area section -->
+            <fieldset>
+                <legend>Total Area</legend>
+
+                <label for="plotArea">Plot Area:</label>
+                <input type="text" id="plotArea" name="plotArea"><br>
+
+                <label for="builtUpArea">Built up Area:</label>
+                <input type="text" id="builtUpArea" name="builtUpArea"><br>
+
+                <label for="carpetArea">Carpet Area:</label>
+                <input type="text" id="carpetArea" name="carpetArea"><br>
+
+                <label for="exemptedArea">Exempted Area:</label>
+                <input type="text" id="exemptedArea" name="exemptedArea"><br>
+
+                <label for="assessableArea">Assessable Area:</label>
+                <input type="text" id="assessableArea" name="assessableArea"><br>
+
+                <label for="areaLetout">Area Letout:</label>
+                <input type="text" id="areaLetout" name="areaLetout"><br>
+
+                <label for="areaNotLetout">Area Not Letout:</label>
+                <input type="text" id="areaNotLetout" name="areaNotLetout"><br>
+
+                <label for="currentAssmtDate">Current Assmt Date:</label>
+                <input type="text" id="currentAssmtDate" name="currentAssmtDate"><br>
+
+                <label for="lastAssmtDate">Last Assmt Date:</label>
+                <select id="lastAssmtDate" name="lastAssmtDate">
+                    <!-- Options for the Last Assmt Date picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+                <label for="naDetails">NA Details:</label>
+                <select id="naDetails" name="naDetails">
+                    <!-- Options for the NA Details picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="tdDetails">TD Details:</label>
+                <select id="tdDetails" name="tdDetails">
+                    <!-- Options for the TD Details picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="tpDetails">TP Details:</label>
+                <select id="tpDetails" name="tpDetails">
+                    <!-- Options for the TP Details picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="saleDeed">Sale Deed:</label>
+                <select id="saleDeed" name="saleDeed">
+                    <!-- Options for the Sale Deed picklist -->
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <!-- Add more options as needed -->
+                </select><br>
+
+                <label for="oldRV">Old R.V.:</label>
+                <input type="text" id="oldRV" name="oldRV"><br>
+            </fieldset>
+
+            <!-- Property Images section -->
+            <fieldset>
+                <legend>Property Images</legend>
+
+                <label for="propertyImage">Property Image:</label>
+                <input type="file" id="propertyImage" name="propertyImage" accept="image/*"><br>
+
+                <label for="propertyImage2">Property Image 2:</label>
+                <input type="file" id="propertyImage2" name="propertyImage2" accept="image/*"><br>
+            </fieldset>
+
+            <!-- House Plans section -->
+            <fieldset>
+                <legend>House Plans</legend>
+
+                <label for="housePlan1">House Plan 1:</label>
+                <input type="file" id="housePlan1" name="housePlan1" accept="image/*"><br>
+
+                <label for="housePlan2">House Plan 2:</label>
+                <input type="file" id="housePlan2" name="housePlan2" accept="image/*"><br>
+            </fieldset>
+            <br><br><br>
+
+            <div class="button-container">
+                <button type="button" onclick="Back('Main')">Back</button>
+                <button type="button" onclick="Next('Unit')">Next</button>
+            </div>
+
+
+        </form>
+
+
+
+    </div>
+
+
+    <!-- UnitTabContent Tab Content -->
+
+    <div id="UnitTabContent" class="tab-content">
+        <!-- Form content for the Unit tab -->
+        <form>
+            <label for="floorNo" class="mandatory">Floor No:</label>
+            <select id="floorNo" name="floorNo">
+                <!-- Options for the Floor No picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="unitNo" class="mandatory">Unit No.:</label>
+            <input type="text" id="unitNo" name="unitNo"><br>
+
+            <label for="occupancy" class="mandatory">Occupancy:</label>
+            <select id="occupancy" name="occupancy">
+                <!-- Options for the Occupancy picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="mobileNo">Mobile No:</label>
+            <input type="text" id="mobileNo" name="mobileNo"><br>
+
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email"><br>
+
+            <label for="unitusageType" class="mandatory">Usage Type:</label>
+            <select id="unitusageType" name="unitusageType">
+                <!-- Options for the Usage Type picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="unitusageSubType" class="mandatory">Usage Sub Type:</label>
+            <select id="unitusageSubType" name="unitusageSubType">
+                <!-- Options for the Usage Sub Type picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="classOfProperty" class="mandatory">Class Of Property:</label>
+            <select id="classOfProperty" name="classOfProperty">
+                <!-- Options for the Class Of Property picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="establishmentName">Establishment Name:</label>
+            <input type="text" id="establishmentName" name="establishmentName"><br>
+
+            <label for="constructionYear">Construction Year:</label>
+            <select id="constructionYear" name="constructionYear">
+                <!-- Options for the Construction Year picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="constructionAge">Construction Age:</label>
+            <input type="text" id="constructionAge" name="constructionAge"><br>
+
+            <label for="constAgeFactor">Const. Age Factor:</label>
+            <select id="constAgeFactor" name="constAgeFactor">
+                <!-- Options for the Const. Age Factor picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="unitArea">Unit Area:</label>
+            <input type="text" id="unitArea" name="unitArea" onclick="openPopup()"><br>
+
+            <label for="remark">Remark:</label>
+            <select id="remark" name="remark">
+                <!-- Options for the Remark picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br><br>
+
+            <div class="button-container">
+                <button type="button" onclick="Back('Property')">Back</button>
+                <button type="button" onclick="Next('Additional')">Next</button>
+            </div>
+        </form>
+    </div>
+
+
+    <!-- AdditionalTabContent Tab Content -->
+
+    <div id="AdditionalTabContent" class="tab-content">
+        <!-- Form content for the Additional tab -->
+        <form>
+            <label for="additionalName">Name:</label>
+            <input type="text" id="additionalName" name="additionalName"><br>
+
+            <label for="qualification">Qualification:</label>
+            <select id="qualification" name="qualification">
+                <!-- Options for the Qualification picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="occupation">Occupation:</label>
+            <input type="text" id="occupation" name="occupation"><br>
+
+            <label for="noOfAdults">No. Of Adults:</label>
+            <input type="text" id="noOfAdults" name="noOfAdults"><br>
+
+            <label for="noOfChildren">No. of children:</label>
+            <input type="text" id="noOfChildren" name="noOfChildren"><br>
+
+            <label for="currentTaxDetails">Current Tax Details:</label>
+            <select id="currentTaxDetails" name="currentTaxDetails">
+                <!-- Options for the Current Tax Details picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="taxAmount">Tax Amount:</label>
+            <input type="text" id="taxAmount" name="taxAmount"><br>
+
+            <label for="roadType">Road Type:</label>
+            <select id="roadType" name="roadType">
+                <!-- Options for the Road Type picklist -->
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <!-- Add more options as needed -->
+            </select><br>
+
+            <label for="roadName">Road Name:</label>
+            <input type="text" id="roadName" name="roadName"><br>
+
+            <label for="selectedMembers">Selected Members:</label>
+            <select id="selectedMembers" name="selectedMembers">
+                <option value="member1">Member 1</option>
+                <option value="member2">Member 2</option>
+                <option value="member2">Member 3</option>
+                <option value="member2">Member 4</option>
+                <option value="member2">Member 5</option>
+                <option value="member2">Member 6</option>
+                <option value="member2">Member 7</option>
+                <option value="member2">Member 8</option>
+                <option value="member2">Member 9</option>
+                <option value="member2">Member 10</option>
+                <option value="member2">Member 11</option>
+                <option value="member2">Member 12</option>
+                <!-- Add more options as needed -->
+            </select><br>
+            <!-- Add more checkboxes as needed -->
+
+            <br><br>
+
+            <div class="button-container">
+                <button type="button" onclick="Back('Unit')">Back</button>
+                <button type="button" onclick="Submit()">Submit</button>
+            </div>
+        </form>
+    </div>
+</form>
+
+
+
+
+
+
+
+<!-- drashan addup -->
+<!--Total Area Of Unit Section-->
+<div id="popup" class="popup-container">
+    <span class="close-btn" onclick="closePopup()">&times;</span>
+    <center>
+        <div style="padding-top: 8px; font-size: 32px; line-height: 0%;">
+          <h2>Flat Details</h2>
+          <h7>All Dimensions in <b>Meters</b>only</h7>
+        </div>
+      </center><br>
+    <div>
+        <from>
+            <div id="tableContainer">
+                <table style="max-width: auto;max-height: 100px;overflow-x: auto;">
+                        <div>
+                            <tr style="background-color:green; color: white;">
+                                <td colspan="3">Use</td>
+                                <td colspan="3">Inner/<br>Outter</td>
+                                <td>Length</td>
+                                <td>Breadth</td>
+                                <td>Carpet Area</td>
+                                <td>Exemption</td>
+                                <td>Exemption<br>Length</td>
+                                <td>Exemption<br>Breadth</td>
+                                <td>Exemption<br>Area</td>
+                                <td>Assumption Area</td>
+                                <td>Legal/illegal</td>
+                                <td>Legal Assmt <br> Area</td>
+                                <td>Illegal Assmt <br> Area</td>
+                                <td>Remove</td>
+                            </tr>
+                        </div>
+                    <tr style="background-color:whitesmoke; border: 0cap; width: auto;">
+                        <!--Use-->
+                        <td colspan="3">
+                            <select id="use" name="select" style="background-color: white; size: 10px; border-color:white;width: 100px;">
+                                <option value="select">select</option>
+                                <option value="balcony">Balcony</option>
+                                <option value="Bed Room">Bed Room</option>
+                                <option value="Child Bed Room">Child Bed Room</option>
+                                <option value="Class Room">Class Room</option>
+                            </select>
+                        </td>
+                        <!--Inner/outter-->
+                        <td colspan="3">
+                            <select style="background-color: white; border-color:white; width: 100px;">
+                                <option>select</option>
+                                <option>Inner</option>
+                                <option>Outer</option>
+                            </select>
+                        </td>
+                        <!--Length-->
+                        <td>
+                            <input type="number" id="Length" style="width: 50px; padding: 0px; background-color: white; border-color:white;">
+                        </td>
+                        <!--Breadth-->
+                        <td>
+                            <input type="number" id="Breadth" style="width: 50px; padding: 0px; background-color: white; border-color:white;">
+                        </td>
+                        <!--Carpet Area-->
+                        <td>
+                            <input type="number" id="CarpetArea" style="width: 55px; padding: 0px; background-color: white; border-color:white;">
+                        </td> 
+  
+  
+                        <!--Exemption-->
+                        <td>
+                            <select style="background-color: white; border-color:white;width: 100px;">
+                                <option>select</option>
+                                <option>Yes</option>
+                                <option>No</option>
+                            </select>
+                        </td>
+                        <!--Exemption Length-->
+                        <td>
+                            <input type="number" id="Exemption Length" style="width: 78px; padding: 0px; background-color: white; border-color:white;">
+                        </td>
+                        <!--Exemption Breadth-->
+                        <td>
+                            <input type="number" id="Exemption Breadth" style="width: 78px; padding: 0px; background-color: white; border-color:white;">
+                        </td>
+                        <!--Exemption Area-->
+                        <td>
+                            <input type="number" id="Exemption Area" style="width: 78px; padding: 0px; background-color: white; border-color:white;">
+                            
+                        </td>
+                        <!--Assumption Area-->
+                        <td>
+                            <input type="number" id="Assumption Area" style="width: 78px; padding: 0px; background-color: white; border-color:white;">
+                        </td>
+                        <!--Legal/illegal-->
+                        <td>
+                           <select style="background-color: white; border-color:white ;width: 100px;"> 
+                            <option>select</option>
+                            <option>Legal</option>
+                            <option>Illegal</option>
+                           </select>
+                        </td>
+                        <!--Legal Assmt Area-->
+                        <td>
+                            <input type="number" id="LegalAssmtArea" style="width: 78px; padding: 0px; background-color: white; border-color:white;">
+                        </td>
+                        <!--Illegeal Assmt Area-->
+                        <td>
+                            <input type="number" id="Illegal Assmt Area" style="width: 78px; padding: 0px; background-color: white; border-color:white;">
+                        </td>
+                        <!--Remove-->
+                        <td><button  onclick="handleDelete(this)">&#x1F5D1;</button></td>
+                    </tr>
+                    <tr style="background-color: whitesmoke">
+                        <!--Use-->
+                        <td colspan="8"><center>Total Area</center></td>
+                        <!--Carpet Area-->
+                        <td>
+                            <input type="text" id="CarpetArea1" style="width: 50px; padding: 0px; background-color: white; border-color:white;">
+                        </td>
+                        <!--Exemption-->
+                        <td>
+                        </td>
+                        <!--Exemption Length-->
+                        <td>
+                            
+                        </td>
+                        <!--Exemption Breadth-->
+                        <td>
+                           
+                        </td>
+                        <!--Exemption Area-->
+                        <td>
+                            <input type="text" id="ExemptionArea1" style="width: 78px; padding: 0px; background-color: white; border-color:white;">
+                        </td>
+                        <!--Assumption Area-->
+                        <td>
+                            <input type="text" id="AssArea1" style="width: 78px; padding: 0px; background-color: white; border-color:white;">
+                        </td>
+                        <!--Legal/illegal-->
+                        <td>
+                           
+                        </td>
+                        <!--Legal Assmt Area-->
+                        <td>
+                            <input type="number" id="LegalAssmtArea1" style="width: 78px; padding: 0px; background-color: white; border-color:white;">
+                        </td>
+                        <!--Illegeal Assmt Area-->
+                        <td>
+                            <input type="number" id="Illegal Assmt Area" style="width: 78px; padding: 0px; background-color: white; border-color:white;">
+                        </td>
+                        <!--Remove-->
+                        <td></td>
+                    </tr>
+                </table><br>
+                <button id="addAreaButton" style="background-color: green; width: 100px; height: 40px; border-radius: 5px; color: white; text-align: center;">Add Area</button>
+            </div>
+        </from>
+    </div>
+  </div>
+  
+  <div id="overlay" class="overlay" onclick="closePopup()"></div>
+  
+  <!-- ... Rest of your HTML content ... -->
+  
+  
+  
+  
+
+<script>
+    function openTab(tabName) {
+
+  // Hide all tab contents
+
+  var tabContents = document.getElementsByClassName("tab-content");
+
+  for (var i = 0; i < tabContents.length; i++) {
+
+    tabContents[i].style.display = "none";
+
+  }
+
+  // Show the selected tab content
+
+  document.getElementById(tabName + "TabContent").style.display = "block";
+
+}
+
+function Next(tabName) {
+
+  // Add any validation or logic before moving to the next tab
+
+  openTab(tabName);
+
+}
+
+function Back(tabName) {
+
+  // Add any logic to go back to the previous tab
+
+  openTab(tabName);
+
+}
+
+function Submit() {
+
+  // Add any form submission logic here
+
+}
+
+function openPopup() {
+      document.getElementById('popup').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+}
+
+// Function to close the popup
+function closePopup() {
+    document.getElementById('popup').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
+
+ //area script for carpet area
+
+   // Function to calculate and display carpet area
+   function calculateCarpetArea() {
+    // Get user input values
+    var length = parseFloat(document.getElementById('Length').value);
+    var breadth = parseFloat(document.getElementById('Breadth').value);
+  
+    // Basic validation to ensure inputs are numbers
+    if (!isNaN(length) && !isNaN(breadth)) {
+      // Calculate area
+      var area = length * breadth;
+  
+      // Set the calculated area in the carpetArea input
+      document.getElementById('CarpetArea').value = area.toFixed(2);
+      document.getElementById('CarpetArea1').value = area.toFixed(2);
+    }
+  }
+  
+  // Event listener for when the user inputs a value in either the Length or Breadth fields
+  document.getElementById('Length').addEventListener('input', calculateCarpetArea);
+  document.getElementById('Breadth').addEventListener('input', calculateCarpetArea);
+
+
+    // Function to calculate and display the assumption area
+function calculateExemptioArea() {
+    // Get the user input values
+    var length = parseFloat(document.getElementById('Exemption Length').value);
+    var breadth = parseFloat(document.getElementById('Exemption Breadth').value);
+  
+    // Check if both inputs are numbers and calculate the area
+    if (!isNaN(length) && !isNaN(breadth)) {
+      var area = length * breadth;
+  
+      // Display the area in the assumption area field
+      document.getElementById('Exemption Area').value = area.toFixed(2); 
+      document.getElementById('ExemptionArea1').value = area.toFixed(2);// Rounded to two decimal places for better display
+    }
+  }
+  
+  // This code assumes that the calculate assumption area functionality should be triggered by some user action, 
+  // such as clicking a button or unfocusing the input field ('change' event). 
+  // You would need to bind the function to that event, for example:
+  
+  // Event listener for changes in the exemption length input
+  document.getElementById('Exemption Length').addEventListener('change', calculateExemptioArea);
+  
+  // Event listener for changes in the exemption breadth input
+  document.getElementById('Exemption Breadth').addEventListener('change', calculateExemptioArea);
+
+
+
+
+  // Function to calculate and display the assumption area
+
+  // Function to calculate and display the assumption area
+// Function to calculate assumption area
+function calculateAssumptionArea() {
+    // Get the values of length, breadth, exemption length, and exemption breadth
+    const length = parseFloat(document.getElementById('Length').value) || 0;
+    const breadth = parseFloat(document.getElementById('Breadth').value) || 0;
+    const exemptionLength = parseFloat(document.getElementById('Exemption Length').value) || 0;
+    const exemptionBreadth = parseFloat(document.getElementById('Exemption Breadth').value) || 0;
+  
+    // Calculate the assumption area
+    const assumptionArea = (length * breadth) - (exemptionLength * exemptionBreadth);
+  
+    // Display the result in the assumption area field
+    document.getElementById('Assumption Area').value = assumptionArea.toFixed(2);
+    document.getElementById('AssArea1').value = assumptionArea.toFixed(2);
+    document.getElementById('LegalAssmtArea').value = assumptionArea.toFixed(2);
+    document.getElementById('LegalAssmtArea1').value = assumptionArea.toFixed(2);
+    
+  }
+  
+  // Add event listener to trigger the calculation when the input fields change
+  document.getElementById('Length').addEventListener('input', calculateAssumptionArea);
+  document.getElementById('Breadth').addEventListener('input', calculateAssumptionArea);
+  document.getElementById('Exemption Length').addEventListener('input', calculateAssumptionArea);
+  document.getElementById('Exemption Breadth').addEventListener('input', calculateAssumptionArea);
+  
+  
+
+// delete icon function
+
+
+function handleDelete(button) {
+    // Navigate up the DOM to find the parent <tr> element of the <button>
+    var row = button.closest('tr');
+  
+    // Retrieve all input elements in the row and clear their values
+    var inputs = row.querySelectorAll('input');
+    inputs.forEach(function(input) {
+      input.value = ''; // Clears the input
+    });
+  
+    // Retrieve all <select> elements in the row and reset their selected index
+    var selects = row.querySelectorAll('select');
+    selects.forEach(function(select) {
+      select.selectedIndex = 0; // Resets the select element to its first option
+    });
+  
+    // Optional: remove the row entirely
+    // row.remove();
+  }
+  
+    
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+
+
+</html>

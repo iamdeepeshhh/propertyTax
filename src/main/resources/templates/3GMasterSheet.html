@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3G Associates</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+
+  <style>
+
+    /* Custom CSS */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: offwhite; /* White background */
+      color: #006400; /* Green text color */
+      padding: 20px;
+    }
+    .h1{
+      font-family: "Alata", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+
+    }
+    label {
+      margin-bottom: 5px;
+      display: block;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #006400;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #004d00;
+    }
+    section {
+      display: none; /* Hide all sections by default */
+    }
+
+    /* Navbar color customization */
+    .navbar {
+        display: flex;
+        justify-content: flex-start;
+        background: rgb(219, 255, 223); /* Dark green navbar */
+      }
+    .navbar-nav .nav-link {
+      color: black !important; /* White text color for navbar links */
+    }
+    .navbar-nav .nav-link:hover {
+      color: rgb(23, 135, 94)!important; /* Light green text color on hover for navbar links */
+    }
+    .dropdown-menu .dropdown-item:hover {
+      background-color: #006400; /* Dark green background color on hover for dropdown items */
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>3G Associates</h1>
+</header>
+
+<nav class="navbar navbar-expand-lg navbar-light ">
+  <div class="container">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showTab('home')">Home</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownPropertyDetails" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Property Details
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownPropertyDetails">
+            <a class="dropdown-item" href="#" onclick="showTab('zone')">Zone</a>
+            <a class="dropdown-item" href="#" onclick="showTab('building-status')">Building Status</a>
+            <a class="dropdown-item" href="#" onclick="showTab('owner-type')">Owner Type</a>
+            <a class="dropdown-item" href="#" onclick="showTab('owner-category')">Owner Category</a>
+            <a class="dropdown-item" href="#" onclick="showTab('water-connection')">Water Connection</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownWardTypes" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Ward Types
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownWardTypes">
+            <a class="dropdown-item" href="#" onclick="showTab('ward-no')">Ward no</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownPropertyTypes" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Property Types
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownPropertyTypes">
+            <a class="dropdown-item" href="#" onclick="showTab('property-type')">Property Type</a>
+            <a class="dropdown-item" href="#" onclick="showTab('property-sub-type')">Property Sub Type</a>
+            <a class="dropdown-item" href="#" onclick="showTab('property-usage-type')">Property Usage Type</a>
+            <a class="dropdown-item" href="#" onclick="showTab('property-usage-sub-type')">Property Usage sub Type</a>
+
+
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownBuildingTypes" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Building Types
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownBuildingTypes">
+            <a class="dropdown-item" href="#" onclick="showTab('building-types')">Building Types</a>
+            <a class="dropdown-item" href="#" onclick="showTab('building-sub-type')">Building Sub Type</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownSewerageTypes" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Sewerage Types
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownSewerageTypes">
+            <a class="dropdown-item" href="#" onclick="showTab('sewerage')">Sewerage</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUnitTypes" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Unit Types
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownUnitTypes">
+            <a class="dropdown-item" href="#" onclick="showTab('unit-number')">Unit Number</a>
+            <a class="dropdown-item" href="#" onclick="showTab('unit-floor-no')">Unit Floor no</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUnitUsageTypes" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Unit Usage Types
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownUnitUsageTypes">
+            <a class="dropdown-item" href="#" onclick="showTab('unit-usage-type')">Unit Usage Type</a>
+            <a class="dropdown-item" href="#" onclick="showTab('unit-usage-sub-type')">Unit Usage SubType</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownPropertyDetails" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Construction
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownPropertyDetails">
+              <a class="dropdown-item" href="#" onclick="showTab('construction-class')">Construction-class</a>
+              <a class="dropdown-item" href="#" onclick="showTab('Construction-Age-Factor')">Construction Age Factor</a>
+
+            </div>
+          </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownPropertyDetails" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Rate Chart
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownPropertyDetails">
+              <a class="dropdown-item" href="#" onclick="showTab('Tax-Depreciation')">Tax-Depreciation</a>
+              <a class="dropdown-item" href="#" onclick="showTab('Property-Rate')">Property-Rate</a>
+            </div>
+          </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Content goes here -->
+
+
+
+<section id="home">
+  <h2>Home Content</h2>
+  <p>This is the content of the Home section.</p>
+</section>
+
+
+<!-- Zone -->
+<section id="zone">
+  <div class="container mt-5">
+    <h2>Zone No.</h2>
+    <form action="/3g/addZones" method="post">
+      <div class="form-group">
+        <label for="ZoneNo">Zone Number:</label>
+        <input type="number" id="ZoneNo" name="ZoneNo" class="form-control" placeholder="Enter Zone number" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+    <!-- Existing Zones Display Section -->
+    <div class="mt-5">
+      <h3>Existing Zones</h3>
+      <div th:if="${zones != null && !zones.isEmpty()}">
+        <ul class="list-group">
+          <li th:each="zone : ${zones}" class="list-group-item">
+            <span th:text="${zone.ZoneNo}">Zone Number</span>
+          </li>
+        </ul>
+      </div>
+      <div th:if="${zones == null || zones.isEmpty()}">
+        <p>No zones found.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="building-status">
+  <div class="container mt-5">
+    <h2>Building Status</h2>
+    <form action="/3g/addBuildStatus" method="post">
+      <div class="form-group">
+        <label for="buildStatus">Building Status:</label>
+        <input type="text" id="buildStatus" name="buildStatus" class="form-control" placeholder="Enter building status" required>
+      </div>
+      <div class="form-row">
+      </div>
+      <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+    <!-- Existing Building Statuses Display Section -->
+    <div class="mt-5">
+      <h3>Existing Building Statuses</h3>
+      <div th:if="${buildingStatuses != null && !buildingStatuses.isEmpty()}">
+        <ul class="list-group">
+          <li th:each="status : ${buildingStatuses}" class="list-group-item">
+            <span th:text="${status.buildStatus}">Building Status</span> -
+            <span th:text="${status.buildStatusLocal}">Building Status Local</span>
+          </li>
+        </ul>
+      </div>
+      <div th:if="${buildingStatuses == null || buildingStatuses.isEmpty()}">
+        <p>No building statuses found.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="owner-type">
+  <div class="container mt-5">
+    <h2>Add Owner Type</h2>
+    <form action="/3g/addOwnerType" method="post">
+      <div class="form-group">
+        <label for="ownerType">Owner Type:</label>
+        <input type="text" id="ownerType" name="ownerType" class="form-control" placeholder="Enter owner type" required>
+      </div>
+      <div class="form-row align-items-center">
+        <div class="form-group col-md-6">
+          <label for="language">Select Language:</label>
+          <select id="language" name="language" class="form-control">
+            <option value="english">English</option>
+            <option value="hindi">Hindi</option>
+            <option value="marathi">Marathi</option>
+            <!-- Add more language options if needed -->
+          </select>
+        </div>
+        <div class="form-group col-md-6">
+          <label for="ownerTypeLocal">Owner Type (Local):</label>
+          <input type="text" id="ownerTypeLocal" name="ownerTypeLocal" class="form-control" placeholder="Enter owner type in local language" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+    <!-- Existing Owner Types Display Section -->
+    <div class="mt-5">
+      <h3>Existing Owner Types</h3>
+      <div th:if="${ownerTypes != null && !ownerTypes.isEmpty()}">
+        <ul class="list-group">
+          <li th:each="type : ${ownerTypes}" class="list-group-item">
+            <span th:text="${type.ownerType}">Owner Type</span> -
+            <span th:text="${type.ownerTypeLocal}">Owner Type Local</span>
+          </li>
+        </ul>
+      </div>
+      <div th:if="${ownerTypes == null || ownerTypes.isEmpty()}">
+        <p>No owner types found.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section id="owner-category">
+  <div class="container mt-5">
+    <h2>Add Owner Category</h2>
+    <form th:action="@{/3g/addOwnerCategory}" method="post">
+      <div class="form-group">
+        <label for="ownerCategory">Owner Category:</label>
+        <input type="text" id="ownerCategory" name="ownerCategory" class="form-control" placeholder="Enter owner category" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="oc-language-select">Select Language:</label>
+          <select id="oc-language-select" class="form-control" name="language">
+            <option value="english">English</option>
+            <option value="hindi">Hindi</option>
+            <option value="marathi">Marathi</option>
+            <!-- Add more language options if needed -->
+          </select>
+        </div>
+        <div class="form-group col-md-6">
+          <label for="ownerCategoryMarathi">Owner Category (Local):</label>
+          <input type="text" id="ownerCategoryMarathi" name="ownerCategoryMarathi" class="form-control" placeholder="Enter owner category in local language" required>
+        </div>
+      </div>
+      <div>
+        <button type="submit" class="btn btn-primary">Add</button>
+      </div>
+    </form>
+    <div class="mt-5">
+      <h3>Existing Owner Categories</h3>
+      <div th:if="${ownerCategories != null and !ownerCategories.isEmpty()}">
+        <ul class="list-group">
+          <li th:each="category : ${ownerCategories}" class="list-group-item">
+            <span th:text="${category.ownerCategory}">Owner Category</span> -
+            <span th:text="${category.ownerCategoryMarathi}">Owner Category Marathi</span>
+          </li>
+        </ul>
+      </div>
+      <div th:if="${ownerCategories == null or ownerCategories.isEmpty()}">
+        <p>No owner categories found.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="water-connection">
+  <div class="container mt-5">
+    <h2>Water Connection</h2>
+    <!-- Ensure the action attribute matches the @PostMapping in your controller -->
+    <form action="/3g/addWaterConnection" method="post">
+      <div class="form-group">
+        <label for="water-connection-input">Water Connection:</label>
+        <input type="text" id="water-connection-input" name="waterConnection" class="form-control" placeholder="Enter water connection details" required>
+      </div>
+     <div class="form-group" style="display:none;">
+        <label for="water-connection-select">Select Language:</label>
+        <select id="water-connection-select" name="language" class="form-control">
+          <option value="hindi">Hindi</option>
+          <option value="marathi" selected>Marathi</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="water-connection-local-input">Water Connection (Local):</label>
+        <input type="text" id="water-connection-local-input" name="waterConnectionMarathi" class="form-control" placeholder="Enter water connection in local language" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+  </div>
+</section>
+    <!-- Existing Water Connections Display Section -->
+<!--    <div class="mt-5">-->
+<!--      <h3>Existing Water Connections</h3>-->
+<!--      &lt;!&ndash; Adjusted Thymeleaf conditionals and variable names to match expected controller method outputs &ndash;&gt;-->
+<!--&lt;!&ndash;      <div th:if="${!waterConnections.empty}">&ndash;&gt;-->
+<!--        <ul class="list-group">-->
+<!--          <li th:each="connection : ${waterConnections}" class="list-group-item">-->
+<!--            <span th:text="${connection.waterconnection}">Water Connection</span> - -->
+<!--            <span th:text="${connection.waterconnectionMarathi}">Water Connection Local</span>-->
+<!--          </li>-->
+<!--        </ul>-->
+<!--      </div>-->
+<!--      <div th:if="${waterConnections.empty}">-->
+<!--        <p>No water connections found.</p>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+
+
+
+
+
+<form action="/3g/addPropertyType" method="POST">
+  <section id="property-type">
+    <div class="container mt-5">
+      <h2>Property Type</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="property-type-name">Property Type Name:</label>
+            <input type="text" id="property-type-name" name="propertyTypeName" class="form-control" placeholder="Enter property type name" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="language-select">Select Language:</label>
+            <select id="language-select-property-type" name="language" class="form-control">
+              <option value="english">English</option>
+              <option value="pramukhindic-hindi">Hindi</option>
+              <option value="pramukhindic-marathi">Marathi</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="local-property-type-name">Local Property Type Name:</label>
+        <input type="text" id="local-property-type-name" name="localPropertyTypeName" class="form-control" placeholder="Enter local property type name" required>
+      </div>
+      <div class="form-group">
+        <label for="building-inp">Building Input:</label>
+        <input type="text" id="building-inp" name="buildingInp" class="form-control" placeholder="Enter Building" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Add</button>
+    </div>
+    <div class="container mt-5">
+      <h3>Existing Property Types</h3>
+      <div th:if="${existingPropertyTypes != null and !existingPropertyTypes.isEmpty()}">
+        <ul class="list-group">
+          <li th:each="propertyType : ${existingPropertyTypes}" class="list-group-item">
+            <span th:text="${propertyType.name}">Property Type Name</span>
+          </li>
+        </ul>
+      </div>
+      <div th:if="${existingPropertyTypes == null or existingPropertyTypes.isEmpty()}">
+        <p>No existing property types found.</p>
+      </div>
+    </div>
+  </section>
+</form>
+
+
+
+<section id="property-sub-type">
+  <div class="container mt-5">
+    <h2>Property Subtype</h2>
+    <form action="#" th:action="@{/3g/addPropertySubtypes}" method="post" th:object="${propertySubtypeDTO}">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="property-type-select">Property Type:</label>
+          <select id="property-type-select" class="form-control" name="propertyTypeId" onclick="initializePropertyTypesAndCaptureSelection('property-type-select', 'propertytypes')">
+            <!-- Populate this dropdown with property types -->
+            <option value="">Select</option>
+            <option th:each="classification : ${classifications}" th:value="${classification.pcmClassidI}" th:text="${classification.pcmProptypellVc}">Type 1</option>
+            <!-- Add more options as needed -->
+          </select>
+        </div>
+        <div class="form-group col-md-6">
+          <label for="property-subtype-name">Property Subtype Name:</label>
+          <input type="text" id="property-subtype-name" class="form-control" placeholder="Enter property subtype name" name="propertySubtypeName">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="language-select">Select Language:</label>
+          <select id="language-select-property-subtype" class="form-control" name="language">
+            <option value="english">English</option>
+            <option value="hindi">Hindi</option>
+            <option value="marathi">Marathi</option>
+            <!-- Add more language options if needed -->
+          </select>
+        </div>
+        <div class="form-group col-md-6">
+          <label for="local-property-subtype-name">Local Property Subtype Name:</label>
+          <input type="text" id="local-property-subtype-name" class="form-control" placeholder="Enter local property subtype name" name="localPropertySubtypeName">
+        </div>
+      </div>
+      <button class="btn btn-primary">Add</button>
+    </form>
+  </div>
+
+  <!-- Existing Property Subtypes Display Section -->
+  <div class="container mt-5">
+    <h3>Existing Property Subtypes</h3>
+    <div th:if="${existingPropertySubtypes != null and !existingPropertySubtypes.isEmpty()}">
+      <ul class="list-group">
+        <li th:each="subtype : ${existingPropertySubtypes}" class="list-group-item">
+          <span th:text="${subtype.name}">Property Subtype Name</span>
+        </li>
+      </ul>
+    </div>
+    <div th:if="${existingPropertySubtypes == null or existingPropertySubtypes.isEmpty()}">
+      <p>No existing property subtypes found.</p>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section id="property-usage-type">
+  <div class="container mt-5">
+    <h2>Property Usage Type</h2>
+    <form action="addUsageTypes" method="post">
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="puc-property-type-select">Property Type:</label>
+        <select id="puc-property-type-select" class="form-control" onclick="initializePropertyTypesAndCaptureSelection('puc-property-type-select', 'propertytypes')">
+          <!-- Populate this dropdown with property types -->
+          <option value="">Select</option>
+          <option th:each="classification : ${classifications}" th:value="${classification.pcmClassidI}" th:text="${classification.pcmProptypellVc}">Type 1</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="puc-property-subtype-select">Property Subtype:</label>
+        <select id="puc-property-subtype-select" class="form-control" name="propertySubTypeId" onclick="initializePropertySubtypesBasedOnType('puc-property-type-select', 'puc-property-subtype-select', 'propertySubtypes')">
+          <!-- Populate this dropdown with property subtypes based on the selected property type -->
+          <option value="">Select Property SubType</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="property-usage-type-name">Property Usage Type Name:</label>
+        <input type="text" id="property-usage-type-name" name="usageTypeName" class="form-control" placeholder="Enter property usage type name">
+      </div>
+      <div class="form-group col-md-6">
+        <label for="language-select">Select Language:</label>
+        <select id="language-select" class="form-control">
+          <option value="english">English</option>
+          <option value="hindi">Hindi</option>
+          <option value="marathi">Marathi</option>
+          <!-- Add more language options if needed -->
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="local-property-usage-subtype-name">Local Property Usage Subtype Name:</label>
+      <input type="text" id="local-property-usage-subtype-name" name="localUsageSubtypeName" class="form-control" placeholder="Enter local property usage subtype name">
+    </div>
+    <button class="btn btn-primary">Add</button>
+  </form>
+  </div>
+
+  <!-- Existing Property Usage Types Display Section -->
+  <div class="container mt-5">
+    <h3>Existing Property Usage Types</h3>
+    <div th:if="${existingPropertyUsageTypes != null and !existingPropertyUsageTypes.isEmpty()}">
+      <ul class="list-group">
+        <li th:each="usageType : ${existingPropertyUsageTypes}" class="list-group-item">
+          <span th:text="${usageType.name}">Property Usage Type Name</span>
+        </li>
+      </ul>
+    </div>
+    <div th:if="${existingPropertyUsageTypes == null or existingPropertyUsageTypes.isEmpty()}">
+      <p>No existing property usage types found.</p>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section id="property-usage-sub-type">
+  <div class="container mt-5">
+    <h2>Property Usage Subtype</h2>
+  <form action="addPropertySubUsageTypes" method="post">
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <label for="pusc-property-type-select">Property Type:</label>
+        <select id="pusc-property-type-select" class="form-control" onclick="initializePropertyTypesAndCaptureSelection('pusc-property-type-select', 'propertytypes')">
+          <!-- Populate this dropdown with property types -->
+          <option value="">Select</option>
+          <option th:each="classification : ${classifications}" th:value="${classification.pcmClassidI}" th:text="${classification.pcmProptypellVc}">Type 1</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+      <div class="form-group col-md-4">
+        <label for="pusc-property-subtype-select">Property Subtype:</label>
+        <select id="pusc-property-subtype-select" class="form-control" onclick="initializePropertySubtypesBasedOnType('pusc-property-type-select', 'pusc-property-subtype-select', 'propertySubtypes')">
+          <!-- Populate this dropdown with property subtypes based on the selected property type -->
+          <option value="subtype1">Subtype 1</option>
+          <option value="subtype2">Subtype 2</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+      <div class="form-group col-md-4">
+        <label for="pusc-property-usage-type-select">Property Usage Type:</label>
+        <select id="pusc-property-usage-type-select" name="usageId" class="form-control" onclick="initializePropertyUsageTypesBasedOnSubtype('pusc-property-subtype-select','pusc-property-usage-type-select','usageTypes')">
+          <!-- Populate this dropdown with property usage types based on the selected property type and subtype -->
+          <option value="usage1">Usage 1</option>
+          <option value="usage2">Usage 2</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="property-usage-type-name">Property Usage Subtype Name:</label>
+        <input type="text" id="usageTypeEng" name="usageTypeEng" class="form-control" placeholder="Enter property usage type name">
+      </div>
+      <div class="form-group col-md-6">
+        <label for="language-select">Select Language:</label>
+        <select id="language-select" class="form-control">
+          <option value="english">English</option>
+          <option value="hindi">Hindi</option>
+          <option value="marathi">Marathi</option>
+          <!-- Add more language options if needed -->
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="local-property-usage-subtype-name">Local Property Usage Subtype Name:</label>
+      <input type="text" id="usageTypeLocal" name="usageTypeLocal" class="form-control" placeholder="Enter local property usage subtype name">
+    </div>
+    <div class="form-group">
+      <label for="tax-type">Tax Type:</label>
+      <input type="text" id="taxType" name="taxType" class="form-control" placeholder="Enter tax type">
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+   </div>
+  </form>
+  <!-- Existing Property Usage Subtypes Display Section -->
+  <div class="container mt-5">
+    <h3>Existing Property Usage Subtypes</h3>
+    <div th:if="${existingPropertyUsageSubtypes != null and !existingPropertyUsageSubtypes.isEmpty()}">
+      <ul class="list-group">
+        <li th:each="subtype : ${existingPropertyUsageSubtypes}" class="list-group-item">
+          <span th:text="${subtype.name}">Property Usage Subtype Name</span>
+        </li>
+      </ul>
+    </div>
+    <div th:if="${existingPropertyUsageSubtypes == null or existingPropertyUsageSubtypes.isEmpty()}">
+      <p>No existing property usage subtypes found.</p>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="building-types">
+ <div class="container mt-5">
+    <h2>Building Types</h2>
+   <form action="addBuildingTypes" method="post">
+    <div class="form-group">
+      <label for="bt-property-type-select">Property Type:</label>
+      <select id="bt-property-type-select" name="temcustom" class="form-control" onclick="initializePropertyTypesAndCaptureSelection('bt-property-type-select', 'propertytypes')">
+        <!-- Populate this dropdown with property types -->
+        <option value="">Select</option>
+        <option th:each="classification : ${classifications}" th:value="${classification.pcmClassidI + ',' + classification.pcmProptypellVc}" th:text="${classification.pcmProptypellVc}">Type 1</option>
+        <!-- Add more options as needed -->
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="btBuildingtypeengVc">Building Type Name:</label>
+      <input type="text" id="btBuildingtypeengVc" name="btBuildingtypeengVc"  class="form-control" placeholder="Enter building type name">
+    </div>
+    <div class="form-group">
+      <label for="bt-language-select">Select Language:</label>
+      <select id="bt-language-select" class="form-control">
+        <option value="english">English</option>
+        <option value="hindi">Hindi</option>
+        <option value="marathi">Marathi</option>
+        <!-- Add more language options if needed -->
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="btBuildingtypellVc">Local Building Type Name:</label>
+      <input type="text" id="btBuildingtypellVc" name="btBuildingtypellVc" class="form-control" placeholder="Enter local building type name">
+    </div>
+    <button onclick="addBuildingType()" class="btn btn-primary">Add</button>
+   </form>
+</div>
+
+  <!-- Existing Building Types Display Section -->
+  <div class="container mt-5">
+    <h3>Existing Building Types</h3>
+    <div th:if="${existingBuildingTypes != null and !existingBuildingTypes.isEmpty()}">
+      <ul class="list-group">
+        <li th:each="buildingType : ${existingBuildingTypes}" class="list-group-item">
+          <span th:text="${buildingType.name}">Building Type Name</span>
+        </li>
+      </ul>
+    </div>
+    <div th:if="${existingBuildingTypes == null or existingBuildingTypes.isEmpty()}">
+      <p>No existing building types found.</p>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section id="building-sub-type">
+  <div class="container mt-5">
+    <h2>Building Subtype</h2>
+  <form id="building-subtype-form" action="/3g/addBuildingSubTypes" method="post">
+    <div class="form-group">
+      <label for="building-type-select">Building Type Name:</label>
+      <select id="building-type-select" name="temcustomb" class="form-control" onclick="initializeBuildingTypesAndCaptureSelection('building-type-select', 'getBuildingTypes')">
+        <!-- Populate this dropdown with building types -->
+        <option value="type1">Type 1</option>
+        <option value="type2">Type 2</option>
+        <!-- Add more options as needed -->
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="building-subtype-name">Building Subtype Name:</label>
+      <input type="text" id="building-subtype-name" name="bstBuildingsubtypeengVc" class="form-control" placeholder="Enter building subtype name">
+    </div>
+    <div class="form-group">
+      <label for="language-select">Select Language:</label>
+      <select id="language-select" class="form-control">
+        <option value="english">English</option>
+        <option value="hindi">Hindi</option>
+        <option value="marathi">Marathi</option>
+        <!-- Add more language options if needed -->
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="local-building-subtype-name">Local Building Subtype Name:</label>
+      <input type="text" id="local-building-subtype-name" name="bstBuildingsubtypellVc" class="form-control" placeholder="Enter local building subtype name">
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+  </form>
+  </div>
+
+  <!-- Existing Building Subtypes Display Section -->
+  <div class="container mt-5">
+    <h3>Existing Building Subtypes</h3>
+    <div th:if="${existingBuildingSubtypes != null and !existingBuildingSubtypes.isEmpty()}">
+      <ul class="list-group">
+        <li th:each="subtype : ${existingBuildingSubtypes}" class="list-group-item">
+          <span th:text="${subtype.name}">Building Subtype Name</span>
+        </li>
+      </ul>
+    </div>
+    <div th:if="${existingBuildingSubtypes == null or existingBuildingSubtypes.isEmpty()}">
+      <p>No existing building subtypes found.</p>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="sewerage">
+  <div class="container mt-5">
+    <h2>Sewerage Types</h2>
+    <!-- Adjusted form for submission -->
+    <form id="sewerageForm" th:action="@{/3g/addSewerage}" method="post">
+      <div class="form-group">
+        <label for="sewerage-input">Sewerage:</label>
+        <!-- Ensure the input name matches the DTO field -->
+        <input type="text" id="sewerage-input" name="sewerage" class="form-control" placeholder="Enter sewerage type" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+  </div>
+
+  <!-- Existing Sewerage Types Display Section -->
+  <div class="container mt-5">
+    <h3>Existing Sewerage Types</h3>
+<!--    <div th:if="${!existingSewerageTypes.isEmpty()}">-->
+<!--      <ul class="list-group">-->
+<!--        <li th:each="sewerageType : ${existingSewerageTypes}" class="list-group-item">-->
+<!--          <span th:text="${sewerageType.sewerageType}">Sewerage Type Name</span>-->
+<!--        </li>-->
+<!--      </ul>-->
+<!--    </div>-->
+<!--    <div th:if="${existingSewerageTypes.isEmpty()}">-->
+<!--      <p>No existing sewerage types found.</p>-->
+<!--    </div>-->
+<!--  </div>-->
+</section>
+
+
+
+
+<form action="/3g/addUnitNo" method="post">
+  <section id="unit-number">
+    <div class="container mt-5">
+      <h2>Unit No.</h2>
+      <div class="form-group">
+        <label for="unitno">Unit No:</label>
+        <input type="text" id="unitno" name="unitno" class="form-control" placeholder="Enter unit number">
+      </div>
+      <button type="submit" class="btn btn-primary">Add</button>
+    </div>
+
+    <!-- Existing Unit Numbers Display Section -->
+    <div class="container mt-5">
+      <h3>Existing Unit Numbers</h3>
+      <div th:if="${existingUnitNumbers != null and !existingUnitNumbers.isEmpty()}">
+        <ul class="list-group">
+          <li th:each="unitNumber : ${existingUnitNumbers}" class="list-group-item">
+            <span th:text="${unitNumber.number}">Unit Number</span>
+          </li>
+        </ul>
+      </div>
+      <div th:if="${existingUnitNumbers == null or existingUnitNumbers.isEmpty()}">
+        <p>No existing unit numbers found.</p>
+      </div>
+    </div>
+  </section>
+</form>
+
+
+<section id="unit-floor-no">
+  <div class="container mt-5">
+    <h2>Unit Floor No.</h2>
+    <form action="/3g/addUnitFloorNo" method="post">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="unit-floor-input">Unit Floor No:</label>
+            <input type="text" id="unit-floor-input" name="unitfloorno" class="form-control" placeholder="Enter unit floor number">
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+  </div>
+
+  <!-- Existing Unit Floor Numbers Display Section -->
+  <div class="container mt-5">
+    <h3>Existing Unit Floor Numbers</h3>
+    <div th:if="${existingUnitFloorNumbers != null and !existingUnitFloorNumbers.isEmpty()}">
+      <ul class="list-group">
+        <li th:each="floorNumber : ${existingUnitFloorNumbers}" class="list-group-item">
+          <span th:text="${floorNumber.number}">Unit Floor Number</span>
+        </li>
+      </ul>
+    </div>
+    <div th:if="${existingUnitFloorNumbers == null or existingUnitFloorNumbers.isEmpty()}">
+      <p>No existing unit floor numbers found.</p>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section id="unit-usage-type">
+  <div class="container mt-5">
+    <h2>Unit Usage Type</h2>
+    <form action="/3g/addUnitUsageType" method="post">
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="uuc-property-type-select">Property Type Name:</label>
+        <select id="uuc-property-type-select" class="form-control" onclick="initializePropertyTypesAndCaptureSelection('uuc-property-type-select', 'propertytypes')">
+          <!-- Populate this dropdown with property types -->
+          <option value="">Select</option>
+          <option th:each="classification : ${classifications}" th:value="${classification.pcmClassidI}" th:text="${classification.pcmProptypellVc}">Type 1</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="uuc-property-subtype-select">Property Subtype Name:</label>
+        <select id="uuc-property-subtype-select" class="form-control" onclick="initializePropertySubtypesBasedOnType('uuc-property-type-select', 'uuc-property-subtype-select', 'propertySubtypes')">
+          <!-- Populate this dropdown with property subtypes -->
+          <option value="subtype1">Subtype 1</option>
+          <option value="subtype2">Subtype 2</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="uuc-property-usage-type-select">Property Usage Type Name:</label>
+        <select id="uuc-property-usage-type-select" name="pum_usageid_i" class="form-control" onclick="initializeUnitUsageTypesBasedOnPropertyUsage('uuc-property-subtype-select','uuc-property-usage-type-select','usageTypes')">
+          <!-- Populate this dropdown with property usage types -->
+          <option value="usage1">Usage 1</option>
+          <option value="usage2">Usage 2</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="unit-usage-name">Unit Usage Name:</label>
+        <input type="text" id="unit-usage-name"  name="uum_usagetypeeng_vc" class="form-control" placeholder="Enter unit usage name">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="language-select">Select Language:</label>
+        <select id="language-select" class="form-control">
+          <option value="english">English</option>
+          <option value="hindi">Hindi</option>
+          <option value="marathi">Marathi</option>
+          <!-- Add more language options if needed -->
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="local-unit-usage-name">Local Unit Usage Name:</label>
+        <input type="text" id="local-unit-usage-name" name="uum_usagetypell_vc" class="form-control" placeholder="Enter local unit usage name">
+      </div>
+      <div class="form-group col-md-6">
+        <label for="Abbrevation">Abbrevation:</label>
+        <input type="text" id="Abbrevation" name="uum_abbr_vc" class="form-control" placeholder="Abbrevation">
+      </div>
+      <div class="form-group col-md-6">
+        <label for="Rate Value Type">Rate Value Type:</label>
+        <input type="text" id="Rate Value Type" name="uum_rvtype_vc" class="form-control" placeholder="Enter Rate Value Type">
+      </div>
+      <div class="form-group col-md-6">
+        <label for="UUM-Type">UUM Type:</label>
+        <input type="text" id="UUM-Type" name="uum_type_vc" class="form-control" placeholder="Enter Rate Value Type">
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+  </form>
+  </div>
+
+  <!-- Existing Unit Usage Types Display Section -->
+  <div class="container mt-5">
+    <h3>Existing Unit Usage Types</h3>
+    <div th:if="${existingUnitUsageTypes != null and !existingUnitUsageTypes.isEmpty()}">
+      <ul class="list-group">
+        <li th:each="usageType : ${existingUnitUsageTypes}" class="list-group-item">
+          <span th:text="${usageType.name}">Unit Usage Type</span> -
+          <span th:text="${usageType.localName}">Local Unit Usage Name</span>
+        </li>
+      </ul>
+    </div>
+    <div th:if="${existingUnitUsageTypes == null or existingUnitUsageTypes.isEmpty()}">
+      <p>No existing unit usage types found.</p>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section id="unit-usage-sub-type" class="container mt-5">
+  <h2>Unit Usage Subtype</h2>
+  <form action="/3g/addUnitUsageSub" method="post">
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="uusc-property-type-select">Property Type Name:</label>
+        <select id="uusc-property-type-select" class="form-control" onclick="initializePropertyTypesAndCaptureSelection('uusc-property-type-select', 'propertytypes')">
+          <option value="">Select</option>
+          <!-- Options populated from API -->
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="uusc-property-subtype-select">Property Subtype Name:</label>
+        <select id="uusc-property-subtype-select" class="form-control" onclick="initializePropertySubtypesBasedOnType('uusc-property-type-select', 'uusc-property-subtype-select', 'propertySubtypes')">
+          <!-- Options for subtypes -->
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="uusc-property-usage-type-select">Property Usage Type Name:</label>
+        <select id="uusc-property-usage-type-select" class="form-control" onclick="initializePropertyUsageTypesBasedOnSubtype('uusc-property-subtype-select','uusc-property-usage-type-select','usageTypes')">
+          <!-- Options for usage types -->
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="uusc-unit-usage-type-select">Unit Usage Type Name:</label>
+        <select id="uusc-unit-usage-type-select" class="form-control" name="uum_usageclassid_i" onclick="initializeUnitUsageTypesBasedOnPropertyUsage('uusc-property-usage-type-select', 'uusc-unit-usage-type-select', 'getUnitUsageByPropUsageId')">
+          <!-- Options for unit usage types -->
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="unit-usage-subtype-name">Unit Usage Subtype Name:</label>
+        <input type="text" id="unit-usage-subtype-name" name="usm_usagetypeeng_vc" class="form-control" placeholder="Enter unit usage subtype name">
+      </div>
+      <div class="form-group col-md-6">
+        <label for="language-select">Select Language:</label>
+        <select id="language-select" class="form-control">
+          <!-- Language options -->
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="local-unit-usage-subtype-name">Local Unit Usage Subtype Name:</label>
+        <input type="text" id="local-unit-usage-subtype-name" name="usm_usagetypell_vc" class="form-control" placeholder="Enter local unit usage subtype name">
+      </div>
+      <div class="form-group col-md-6">
+        <label for="tax-type-input">Tax Type:</label>
+        <input type="text" id="tax-type-input" name="usm_taxtype_i" class="form-control" placeholder="Enter tax type">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="tax-amount-input">Tax Amount:</label>
+        <input type="text" id="tax-amount-input" name="usm_taxamt_i" class="form-control" placeholder="Enter tax amount">
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+  </form> 
+    <!-- Existing Unit Usage Subtypes Display Section -->
+    <div class="container mt-5">
+      <h3>Existing Unit Usage Subtypes</h3>
+      <div id="existing-unit-usage-subtypes">
+        <!-- This div is intended to dynamically display unit usage subtypes -->
+        <div th:if="${existingUnitUsageSubTypes != null && !existingUnitUsageSubTypes.isEmpty()}">
+          <ul class="list-group">
+            <li th:each="subtype : ${existingUnitUsageSubTypes}" class="list-group-item">
+              <span th:text="${subtype.name}">Unit Usage Subtype Name</span> -
+              <span th:text="${subtype.localName}">Local Unit Usage Subtype Name</span> -
+              <span th:text="${subtype.taxType}">Tax Type</span> -
+              <span th:text="${subtype.taxAmount}">Tax Amount</span>
+            </li>
+          </ul>
+        </div>
+        <div th:if="${existingUnitUsageSubTypes == null || existingUnitUsageSubTypes.isEmpty()}">
+          <p>No existing unit usage subtypes found.</p>
+        </div>
+      </div>
+    </div>
+  </form>
+</section>
+
+
+
+
+
+<section id="ward-no">
+  <div class="container mt-5">
+    <h2>Ward No.</h2>
+    <form action="/3g/addWards" method="post">
+      <div class="form-group">
+        <label for="wardNo">Ward Number:</label>
+        <input type="number" id="wardNo" name="wardNo" class="form-control" placeholder="Enter ward number" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+    <!-- Existing Wards Display Section -->
+    <div class="mt-5">
+      <h3>Existing Wards</h3>
+      <div th:if="${wards != null && !wards.isEmpty()}">
+        <ul class="list-group">
+          <li th:each="ward : ${wards}" class="list-group-item">
+            <span th:text="${ward.wardNo}">Ward Number</span>
+          </li>
+        </ul>
+      </div>
+      <div th:if="${wards == null || wards.isEmpty()}">
+        <p>No wards found.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+                                                                                <!-- constrduction strats here -->
+<section id="construction-class" class="container mt-5">
+  <h2>Construction Class</h2>
+  <form action="/your-backend-endpoint" method="post"> <!-- Update action attribute with your backend endpoint -->
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="construction-class-input">Construction Class:</label>
+        <input type="text" id="construction-class-input" name="ConstructionClass" class="form-control" placeholder="Enter Construction Class">
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+  </form>
+  <div class="container mt-5">
+    <!-- Existing Construction Classes Display Section -->
+    <h3>Existing Construction Classes</h3>
+    <div id="existing-construction-classes">
+      <!-- This div is intended to dynamically display construction classes -->
+      <div th:if="${existingConstructionClasses != null && !existingConstructionClasses.isEmpty()}">
+        <ul class="list-group">
+          <li th:each="class : ${existingConstructionClasses}" class="list-group-item">
+            <span th:text="${class.name}">Construction Class Name</span>
+          </li>
+        </ul>
+      </div>
+      <div th:if="${existingConstructionClasses == null || existingConstructionClasses.isEmpty()}">
+        <p>No existing construction classes found.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<section id="Construction-Age-Factor" class="container mt-5">
+  <h2>Construction Age Factor</h2>
+  <form action="/3g/addZones" method="post" class="mt-3">
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="Construction-Age-Factor">Construction Age Factor:</label>
+        <input type="text" id="Construction-Age-Factor" name="Construction-Age-Factor" class="form-control" placeholder="Enter Construction Age Factor">
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+  </form>
+</section>
+
+                                                                                        <!-- Rate Chart -->
+  <section id="Tax-Depreciation">
+    <h2>Tax-Depreciation</h2>
+    <form action="/3g/addZones" method="post">                                         <!-- in action link change  backend-->
+      <div>
+        <label for="Tax-Depreciation">Tax-Depreciation:</label>
+        <input type="text" id="Tax-Depreciation" name="Tax-Depreciation" placeholder="Enter Tax-Depreciation">
+      </div>
+      <button type="submit">Add</button>
+    </form>
+  </section>
+
+
+  <section id="Property-Rate">
+    <h2>Property-Rate</h2>
+    <form action="/3g/greeting">          <!-- in action link change   backend -->
+      <div>
+        <label for="ZoneNo">Property Rate:</label>
+        <input type="text" id="Property Rate" name="Property Rate" placeholder="Enter Property-Rate">
+      </div>
+      <button type="submit">Add</button>
+    </form>
+  </section>
+
+
+
+
+
+<!-- Bootstrap JS and jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+  // JavaScript function to show the content of the selected tab
+  function showTab(tabId) {
+    // Hide all sections
+    document.querySelectorAll('section').forEach(section => {
+      section.style.display = 'none';
+    });
+    // Show the selected section
+    document.getElementById(tabId).style.display = 'block';
+  }
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializePropertyTypesAndCaptureSelection('property-type-select', '/3g/propertytypes');
+    initializeBuildingTypesAndCaptureSelection('bt-property-type-select', '/3g/getBuildingTypes');
+    initializeBuildingTypesAndCaptureSelection('building-type-select', 'getBuildingTypes');
+    initializePropertyTypesAndCaptureSelection('puc-property-type-select', 'propertytypes');
+    initializePropertyTypesAndCaptureSelection('pusc-property-type-select', 'propertytypes');
+    initializePropertySubtypesBasedOnType('pusc-property-type-select', 'pusc-property-subtype-select', 'propertySubtypes');
+    initializePropertySubtypesBasedOnType('pusc-property-type-select', 'pusc-property-subtype-select', 'propertySubtypes');
+    initializePropertyUsageTypesBasedOnSubtype('pusc-property-subtype-select','pusc-property-usage-type-select','usageTypes');
+    initializePropertySubtypesBasedOnType('puc-property-type-select', 'puc-property-subtype-select', 'propertySubtypes');
+});
+
+async function initializePropertyTypesAndCaptureSelection(selectId, apiUrl) {
+    const selectElement = document.getElementById(selectId);
+
+    // Fetch the property types from the API and populate the select element.
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error('Failed to fetch data');
+        const propertyTypes = await response.json();
+
+        let optionsHtml = '<option value="">Select a property type</option>';
+        propertyTypes.forEach(type => {
+            // Apply specific format for "Building Type" dropdown or others as needed
+            if (selectId === 'bt-property-type-select') {
+                // For "Building Type", concatenate the value and name
+                optionsHtml += `<option value="${type.value},${type.name}">${type.name}</option>`;
+            } else {
+                // For other dropdowns, just use the ID or another appropriate attribute
+                optionsHtml += `<option value="${type.value}">${type.name}</option>`;
+            }
+        });
+        selectElement.innerHTML = optionsHtml;
+
+    }catch (error) {
+        console.error(`Error initializing property types for select #${selectId}:`, error);
+    }
+
+    // Attempt to reapply saved selection from localStorage
+    const savedValue = localStorage.getItem(`${selectId}-value`);
+    if (savedValue) {
+        selectElement.value = savedValue;
+    }
+
+    // Listen for changes to the select element, log the selected option's ID and name, and save them to localStorage.
+    selectElement.addEventListener('change', function() {
+      const selectedOption = this.options[this.selectedIndex];
+        const value = selectedOption.value;
+        let selectedId, selectedName;
+
+        // Special handling for the "Building Type" section
+        if (selectId === 'bt-property-type-select') {
+          console.log("i am in");
+            // Assuming the value is in the format "id,name" for the "Building Type" section
+            [selectedId, selectedName] = selectedOption.value.split(',');
+            // Additional logic for "Building Type", if necessary
+        } else {
+            // For other select elements, handle the value as just an ID
+            selectedId = selectedOption.value;
+            selectedName = selectedOption.text; // Using .text to get the visible name
+        }
+
+        console.log(`Selected ID: ${selectedId}, Name: ${selectedName}`);
+
+        // Save the selection ID (and name if applicable) to localStorage
+        localStorage.setItem(`${selectId}-id`, selectedId);
+        localStorage.setItem(`${selectId}-name`, selectedName);
+        localStorage.setItem(`${selectId}-value`, value);
+      
+    });
+}
+
+async function initializePropertySubtypesBasedOnType(propertyTypeId, subtypeSelectId, apiUrl) {
+    const propertyTypeSelectElement = document.getElementById(propertyTypeId);
+    const subtypeSelectElement = document.getElementById(subtypeSelectId);
+
+    // Listen for changes in the property type select element to fetch and populate subtypes.
+    propertyTypeSelectElement.addEventListener('change', async function() {
+        const selectedPropertyTypeId = this.value;
+
+        if (!selectedPropertyTypeId) {
+            subtypeSelectElement.innerHTML = '<option value="">Select a property subtype</option>';
+            return;
+        }
+
+        try {
+            // Fetch the property subtypes based on the selected property type ID.
+            const response = await fetch(`${apiUrl}/${selectedPropertyTypeId}`);
+            if (!response.ok) throw new Error('Failed to fetch property subtypes');
+            const propertySubtypes = await response.json();
+
+            // Populate the subtype select element with options based on the fetched data.
+            let optionsHtml = '<option value="">Select a property subtype</option>';
+            propertySubtypes.forEach(subtype => {
+                optionsHtml += `<option value="${subtype.value}">${subtype.name}</option>`;
+            });
+            subtypeSelectElement.innerHTML = optionsHtml;
+
+            // Reapply the saved subtype selection from localStorage if available.
+            const savedSubtypeSelectionId = localStorage.getItem(`${subtypeSelectId}-id`);
+            if (savedSubtypeSelectionId) {
+                subtypeSelectElement.value = savedSubtypeSelectionId;
+            }
+
+        } catch (error) {
+            console.error(`Error fetching property subtypes for ${subtypeSelectId}:`, error);
+        }
+    });
+
+    // Listen for changes to the subtype select element to save the selection to localStorage.
+    subtypeSelectElement.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const selectedId = selectedOption.value;
+        const selectedName = selectedOption.text;
+        console.log(`Selected Property Subtype ID: ${selectedId}, Name: ${selectedName}`);
+
+        // Save selection ID and name to localStorage.
+        localStorage.setItem(`${subtypeSelectId}-id`, selectedId);
+        localStorage.setItem(`${subtypeSelectId}-name`, selectedName);
+    });
+}
+
+async function initializePropertyUsageTypesBasedOnSubtype(propertySubtypeId, usageTypeSelectId, apiUrl) {
+    const propertySubtypeSelectElement = document.getElementById(propertySubtypeId);
+    const usageTypeSelectElement = document.getElementById(usageTypeSelectId);
+
+    // Listen for changes in the property subtype select element to fetch and populate usage types.
+    propertySubtypeSelectElement.addEventListener('change', async function() {
+        const selectedPropertySubtypeId = this.value;
+
+        if (!selectedPropertySubtypeId) {
+            usageTypeSelectElement.innerHTML = '<option value="">Select a property usage type</option>';
+            return;
+        }
+
+        try {
+            // Fetch the property usage types based on the selected property subtype ID.
+            const response = await fetch(`${apiUrl}/${selectedPropertySubtypeId}`);
+            console.log(response);
+            if (!response.ok) throw new Error('Failed to fetch property usage types');
+            const propertyUsageTypes = await response.json();
+
+            // Populate the usage type select element with options based on the fetched data.
+            let optionsHtml = '<option value="">Select a property usage type</option>';
+            propertyUsageTypes.forEach(usageType => {
+                optionsHtml += `<option value="${usageType.value}">${usageType.name}</option>`;
+            });
+            usageTypeSelectElement.innerHTML = optionsHtml;
+
+            // Reapply the saved usage type selection from localStorage if available.
+            const savedUsageTypeSelectionId = localStorage.getItem(`${usageTypeSelectId}-id`);
+            if (savedUsageTypeSelectionId) {
+                usageTypeSelectElement.value = savedUsageTypeSelectionId;
+            }
+
+        } catch (error) {
+            console.error(`Error fetching property usage types for ${usageTypeSelectId}:`, error);
+        }
+    });
+
+    // Listen for changes to the usage type select element to save the selection to localStorage.
+    usageTypeSelectElement.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const selectedId = selectedOption.value;
+        const selectedName = selectedOption.text;
+        console.log(`Selected Property Usage Type ID: ${selectedId}, Name: ${selectedName}`);
+
+        // Save selection ID and name to localStorage.
+        localStorage.setItem(`${usageTypeSelectId}-id`, selectedId);
+        localStorage.setItem(`${usageTypeSelectId}-name`, selectedName);
+    });
+}
+
+async function initializeUnitUsageTypesBasedOnPropertyUsage(propertyUsageId, unitUsageTypeSelectId, apiUrl) {
+    const propertyUsageSelectElement = document.getElementById(propertyUsageId);
+    const unitUsageTypeSelectElement = document.getElementById(unitUsageTypeSelectId);
+    console.log("i am in intialization");
+    // Listen for changes in the property usage type select element to fetch and populate unit usage types.
+    propertyUsageSelectElement.addEventListener('change', async function() {
+        const selectedPropertyUsageId = this.value;
+
+        if (!selectedPropertyUsageId) {
+            unitUsageTypeSelectElement.innerHTML = '<option value="">Select a unit usage type</option>';
+            return;
+        }
+
+        try {
+            // Fetch the unit usage types based on the selected property usage type ID.
+            const response = await fetch(`${apiUrl}/${selectedPropertyUsageId}`);
+            if (!response.ok) throw new Error('Failed to fetch unit usage types');
+            const unitUsageTypes = await response.json();
+
+            // Populate the unit usage type select element with options based on the fetched data.
+            let optionsHtml = '<option value="">Select a unit usage type</option>';
+            unitUsageTypes.forEach(usageType => {
+                optionsHtml += `<option value="${usageType.value}">${usageType.name}</option>`;
+            });
+            unitUsageTypeSelectElement.innerHTML = optionsHtml;
+
+            // Reapply the saved unit usage type selection from localStorage if available.
+            const savedUnitUsageTypeSelectionId = localStorage.getItem(`${unitUsageTypeSelectId}-id`);
+            if (savedUnitUsageTypeSelectionId) {
+                unitUsageTypeSelectElement.value = savedUnitUsageTypeSelectionId;
+            }
+
+        } catch (error) {
+            console.error(`Error fetching unit usage types for ${unitUsageTypeSelectId}:`, error);
+        }
+    });
+
+    // Listen for changes to the unit usage type select element to save the selection to localStorage.
+    unitUsageTypeSelectElement.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const selectedId = selectedOption.value;
+        const selectedName = selectedOption.text;
+        console.log(`Selected Unit Usage Type ID: ${selectedId}, Name: ${selectedName}`);
+
+        // Save selection ID and name to localStorage.
+        localStorage.setItem(`${unitUsageTypeSelectId}-id`, selectedId);
+        localStorage.setItem(`${unitUsageTypeSelectId}-name`, selectedName);
+    });
+}
+
+async function initializeBuildingTypesAndCaptureSelection(selectId, apiUrl) {
+    const selectElement = document.getElementById(selectId);
+
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error('Failed to fetch data');
+        const buildingTypes = await response.json();
+
+        // Populate options
+        let optionsHtml = '<option value="">Select a building type</option>';
+        buildingTypes.forEach(type => {
+            // Use type.value as the identifier, concatenated with type.name for the option's value
+            optionsHtml += `<option value="${type.value},${type.name}">${type.name}</option>`;
+        });
+        selectElement.innerHTML = optionsHtml;
+
+        // Attempt to reapply saved selection based on both value and name
+        const savedSelectionValue = localStorage.getItem(`${selectId}-value`);
+        if (savedSelectionValue) {
+            // Iterate over options to find a match for reapplication
+            for (let option of selectElement.options) {
+                if (option.value === savedSelectionValue) {
+                    selectElement.value = option.value;
+                    break;
+                }
+            }
+        }
+
+        // Listen for changes and save new selection
+        selectElement.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            // Assuming value is in the format "value,name"
+            const selectedValue = selectedOption.value;
+            console.log(`Selected Building Type Value: ${selectedValue}`);
+            // Save the combined value (id,name) to localStorage to preserve both pieces of information
+            localStorage.setItem(`${selectId}-value`, selectedValue);
+        });
+    } catch (error) {
+        console.error(`Error initializing building types for select #${selectId}:`, error);
+    }
+}
+
+</script>
+
+</body>
+</html>
