@@ -1,0 +1,526 @@
+<html>
+    <head>
+        <title>Calculation Sheet</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="/3GViewCalculationSheet/css/styles.css" rel="stylesheet">
+    </head>
+    <body>
+    <form class="form" style="max-width: none; width: 99%;">
+        <div id="maindiv">
+            <div id="firstDiv" class="t-a-c">
+                <table align="center" border="0">
+                    <tr border="0">
+                        <td style="text-align:right;width:25%; border:none!important;">
+                            <img id="councilLogo" src="https://example.com/default-image.png" alt="Council Logo" style="height: 80px; width: 80px;">
+                        </td>
+                        <td style="text-align: center;width:59%;border:none!important;">
+                            <span style="color: black; font-size: 25px;" id="councilName">नगर परिषद SiteName/Municipal Council SiteName</span><br>
+                            (नमुना ४३ नियम ७४ पहा)/(Form No. 43 See Rule No. 74)<br>
+                            सन <span class="yearRangeDev">year range</span> या वर्षाकरिता कर आकारणीस पात्र असलेल्या इमारती व जमीन यांची आकारणी सूची/Assessment List of Buildings and Lands for the Year of <span class="yearRangeEng">year range</span>
+                        </td>
+                        <td style="text-align: center;width:26%;  border:none!important;"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="width:70%; border-top:1px solid black;"></div>
+
+            <div id="secondDiv" style="margin-top:4px; border: 1px solid black;background-color:#F5F6CE;">
+                <table style="border-radius: 1px;">
+                    <tr>
+                        <td style="width: 25%;" class=" t-a-l b-n">आर्थिक वर्ष/F.Y.: <span id="financialYear"></span></td>
+                        <td style="width: 30%;" class="t-a-l b-n">दिनांक/Date: <span id="assessmentDate"></span></td>
+                        <td style="width: 30%;" class="t-a-c b-n">वेळ/Time: <span id="assessmentTime"></span></td>
+                        <td style="width: 15%;" class="t-a-l b-n">पान क्र./Page No.: <span id="pageNo"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="f-w-b t-a-l b-n">नविन मालमत्ता क्र./New Property No.: <span class="pdFinalpropnoVc"></span></td>
+                        <td style="" class="t-a-l b-n">वार्ड क्र./Ward No.: <span class="pdWardI"></span></td>
+                        <td style="" class="t-a-c b-n">झोन क्र./Zone No.: <span class="pdZoneI"></span></td>
+                        <td style="" class="t-a-l b-n">जुना मालमत्ता क्र./Property No.: <span id="pdOldpropnoVc"></span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <table style="margin-top:2px; border:1px solid black; border-radius:1px;">
+                <tr height="4" style="background-color:#F6CECE">
+                    <td colspan="16" class="p-l-8 f-w-b">&gt;&gt;Property Information/मालमत्तेची माहिती&lt;&lt;</td>
+                </tr>
+                <tr style="background-color: #CEF6CE;" class="t-a-c">
+                    <td>सर्वे मालमत्ता क्र.</td>
+                    <td>इंडेक्स क्र</td>
+                    <td>मालमत्ता धारकाचे नाव</td>
+                    <td>भोगवटदाराचे नाव</td>
+                    <td>मालमत्तेचा पत्ता</td>
+                    <td>मालमत्तेचे नाव</td>
+                    <td>ले-आउटचे नाव</td>
+                    <td>शेत/खसरा क्र.</td>
+                    <td>भूखंड क्र.</td>
+                    <td>ग्रिड नं.</td>
+                    <td>पार्सल आयडी</td>
+                    <td>रोड आयडी</td>
+                    <td>अकृषि क.</td>
+                    <td>अकृ.आ.दि</td>
+                    <td>अकृ.आ.क्र</td>
+                    <td>नगर रचना</td>
+                </tr>
+                <tr class="t-a-c h-25">
+                    <td id="pdSurypropnoVc"></td>
+                    <td id="pdIndexnoVc"></td>
+                    <td id="pdOwnernameVc"></td>
+                    <td id="pdOccupinameF"></td>
+                    <td id="pdPropertyaddressVc"></td>
+                    <td id="pdPropertynameVc"></td>
+                    <td id="pdLayoutnameVc"></td>
+                    <td id="pdKhasranoVc"></td>
+                    <td id="pdPlotnoVc"></td>
+                    <td id="pdGrididVc"></td>
+                    <td id="pdParcelidVc"></td>
+                    <td id="pdRoadidVc"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <table style="margin-top:2px; border:1px solid black; border-radius:1px;">
+                <tr style="background-color: #CEF6CE;" class="t-a-c">
+                    <td>न.र.मं.दि.</td>
+                    <td>न.र.मं.क्र</td>
+                    <td>शौचालय</td>
+                    <td>सांडपाणी व्यवस्था</td>
+                    <td>व्यवस्था प्रकार</td>
+                    <td>पाण्याचे स्त्रोत</td>
+                    <td>न.प. जोडणी</td>
+                    <td>मिटर क्र.</td>
+                    <td>उपभोक्ता क्र.</td>
+                    <td>जोडणी दिनांक</td>
+                    <td>पाईप साईझ</td>
+                    <td>बांध.परवानगी</td>
+                    <td>परवानगी क्र.</td>
+                    <td>परवानगी दि.</td>
+                    <td>रे.वा.हार्वेस्टिंग</td>
+                    <td>सोलर युनिट</td>
+                    <td>पायऱ्या</td>
+                    <td>लिफ्ट</td>
+                    <td>धारकाचा मो. क्र</td>
+                </tr>
+                <tr class="t-a-c h-25">
+                    <td></td>
+                    <td></td>
+                    <td id="pdToiletsI"></td>
+                    <td id="pdSeweragesVc"></td>
+                    <td id="pdSeweragesType"></td>
+                    <td id="pdWaterconntypeVc"></td>
+                    <td id="pdMcconnectionVc"></td>
+                    <td id="pdMeternoVc"></td>
+                    <td id="pdConsumernoVc"></td>
+                    <td id="pdConnectiondateDt"></td>
+                    <td id="pdPipesizeF"></td>
+                    <td id="pdPermissionstatusVc"></td>
+                    <td id="pdPermissionnoVc"></td>
+                    <td id="pdPermissiondateDt"></td>
+                    <td id="pdRainwaterhaverstVc"></td>
+                    <td id="pdSolarunitVc"></td>
+                    <td id="pdStairVc"></td>
+                    <td id="pdLiftVc"></td>
+                    <td id="pdContactnoVc"></td>
+                </tr>
+            </table>
+
+            <table style="margin-top:2px; border:1px solid black; border-radius:1px;">
+                <tr height="5" style="background-color:#F6CECE">
+                    <td colspan="14" class="f-w-b p-l-8">&gt;&gt;Old Details of Property/मालमत्तेचा जुना तपशील&lt;&lt;</td>
+                    <td colspan="2" style="border-left:2px solid" class="f-w-b p-l-8">&gt;&gt;Assessment Date/कर आकारणी दिनांक&lt;&lt;</td>
+                </tr>
+                <tr style="background-color: #CEF6CE;" class="t-a-c">
+                    <td>वार्ड क्र.</td>
+                    <td>झोन क्र.</td>
+                    <td>मालमत्ता क्र.</td>
+                    <td>मालमत्ता प्रकार</td>
+                    <td>मालमत्ता उपप्रकार</td>
+                    <td>वापर प्रकार</td>
+                    <td>वापर उपप्रकार</td>
+                    <td>वास्तव्य</td>
+                    <td>बांधकाम प्रकार</td>
+                    <td>क.यो.क्षेत्रफळ</td>
+                    <td>ए.क.यो.मुल्य</td>
+                    <td>निवासी</td>
+                    <td>अनिवासी</td>
+                    <td>एकूण कर</td>
+                    <td style="border-left:2px solid">मागील आकारणी दी.</td>
+                    <td>चालू कर आकारणी दी.</td>
+                </tr>
+                <tr class="t-a-c h-25">
+                    <td id="oldWardNoVc"></td>
+                    <td id="oldZoneNoVc"></td>
+                    <td id="pdOldpropnoVc"></td>
+                    <td id="oldPropertyTypeVc"></td>
+                    <td id="oldPropertySubTypeVc"></td>
+                    <td id="oldUsageTypeVc"></td>
+                    <td id="oldConstructionTypeVc"></td>
+                    <td id="pdCategoryI"></td>
+                    <td id="oldAssessmentAreaFl"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td id="previousAssessmentDateDt" style="border-left:2px solid"></td>
+                    <td id="currentAssessmentDateDt"></td>
+                </tr>
+            </table>
+
+            <table style="margin-top:2px; border:1px solid black; border-radius:1px;">
+                <tr height="5" style="background-color:#F6CECE">
+                    <td colspan="25" class="p-l-8 f-w-b">&gt;&gt;New Details of Property/मालमत्तेचा नविन तपशील&lt;&lt;</td>
+                </tr>
+                <tr style="background-color: #CEF6CE;" class="t-a-c">
+                    <td>मालमत्ता प्रकार</td>
+                    <td>मालमत्ता उप प्रकार</td>
+                    <td>उपयोग प्रकार</td>
+                    <td>उपयोग उपप्रकार</td>
+                    <td>ईमारत प्रकार</td>
+                    <td>ईमारत उपप्रकार</td>
+                    <td>ईमारत स्थिती</td>
+                    <td>मालकाचा प्रकार</td>
+                    <td>वास्तव्य</td>
+                    <td>इमारत वय</td>
+                    <td>भूखंड क्षेत्रफळ</td>
+                    <td>बांधकाम क्षेत्रफळ</td>
+                    <td>ए.चटई क्षेत्रफळ</td>
+                    <td>सूट योग्य क्षेत्रफळ</td>
+                    <td>एकूण कर योग्य क्षेत्र</td>
+                    <td>भाड्याने दिलेले क्षेत्र</td>
+                    <td>भाड्याने न दिलेले क्षेत्र</td>
+                    <td>एकूण खोल्या</td>
+                    <td>एकूण मजले</td>
+                    <td>भाड्याने दिलेलेचे वा.भा. मुल्य</td>
+                    <td>भाड्याने न दिलेलेचे वा.भा. मुल्य</td>
+                    <td>विचारात घेतले जाणारे वार्षिक भाडे मुल्य</td>
+                    <td>वजा 10% देखभाल दुरुस्ती रक्कम</td>
+                    <td>भाड्याने दिलेलेचे कर योग्य मुल्य</td>
+                    <td>भाड्याने न दिलेलेचे कर योग्य मुल्य</td>
+                </tr>
+                <tr class="t-a-c h-25">
+                    <td id="pdPropertytypeI"></td>
+                    <td id="pdPropertysubtypeI"></td>
+                    <td id="pdUsagetypeI"></td>
+                    <td id="pdUsagesubtypeI"></td>
+                    <td id="pdBuildingtypeI"></td>
+                    <td id="pdBuildingsubtypeI"></td>
+                    <td id="pdStatusbuildingVc"></td>
+                    <td id="pdOwnertypeVc"></td>
+                    <td id="pdCategoryI"></td>
+                    <td id="pdConstAgeI"></td>
+                    <td id="pdPlotareaF"></td>
+                    <td id="pdTotbuiltupareaF"></td>
+                    <td id="pdTotcarpetareaF"></td>
+                    <td id="pdTotalexempareaF"></td>
+                    <td id="pdAssesareaF"></td>
+                    <td id="pdArealetoutF"></td>
+                    <td id="pdAreanotletoutF"></td>
+                    <td id="pdNoofroomsI"></td>
+                    <td id="pdNooffloorsI"></td>
+                    <td id="calculatedAnnualRentalValueFl"></td>
+                    <td id="calculatedAnnualUnRentalValueFl"></td>
+                    <td id="calculatedTaxableValueToConsiderFl"></td>
+                    <td id="calculatedMaintenanceRepairAmountFl"></td>
+                    <td id="calculatedTaxableValueRented"></td>
+                    <td id="calculatedTaxableValueUnRented"></td>
+                </tr>
+            </table>
+
+            <table id="unitDetailsTable" style="margin-top:2px;">
+                <thead>
+                <tr height="5" style="background-color:#F6CECE">
+                    <td colspan="31" class="f-w-b p-l-8">&gt;&gt;Property Unit Details/मालमत्ता युनिट तपशील&lt;&lt;</td>
+                </tr>
+                <tr style="background-color: #CEF6CE;" class="t-a-c">
+                    <td rowspan="2">युनिट क्र</td>
+                    <td rowspan="2">मजला</td>
+                    <td rowspan="2">वास्तव्य</td>
+                    <td rowspan="2">वापर प्रकार</td>
+                    <td rowspan="2">उप प्रकार</td>
+                    <td rowspan="2">बांधकाम प्रकार</td>
+                    <td rowspan="2">बांधकाम वर्ष</td>
+                    <td rowspan="2">बांधकाम वय (वर्ष)</td>
+                    <td rowspan="2">वय गट</td>
+                    <td rowspan="2">बांध. क्षेत्र.</td>
+                    <td rowspan="2">चटई क्षेत्र</td>
+                    <td rowspan="2">भूखंड क्षेत्र</td>
+                    <td rowspan="2">सुट योग्य क्षेत्र</td>
+                    <td rowspan="2">कर योग्य क्षेत्र</td>
+                    <td colspan="7" class="b-n p-n">
+                        <span class="f-w-b">भाडे मुल्य दरानुसार कर योग्य मुल्य गणना</span>
+                    </td>
+                    <td colspan="5" style="padding:0px!important;border-left:3px solid black!important">
+                        <span class="f-w-b p-n">प्रत्यक्ष भाड्यानुसार कर योग्य मुल्य गणना (भाडेकरू असल्यास)</span>
+                    </td>
+                    <td rowspan="2" class="f-w-b">विचारात घेतले जाणारे कर योग्य मुल्य</td>
+                </tr>
+                <tr style="background-color:#b6ecfc;text-align: center;">
+                    <td style="border-left:0px!important;" class="bb-n">प्रती चौ. मी दर</td>
+                    <td class="bb-n">दर नुसार भाडे मुल्य</td>
+                    <td class="bb-n">घसारा दर (टक्के)</td>
+                    <td class="bb-n">घसारा रक्कम</td>
+                    <td class="bb-n">घसारा नंतर वा. भा. मुल्य</td>
+                    <td class="bb-n">दरानुसार 10% देखभाल दुरुस्ती</td>
+                    <td class="bb-n " style="font-weight: bold;">दरानुसार कर योग्य मुल्य</td>
+                    <td style="padding:0px!important;border-left:3px solid black!important;">भाडेकरूचे नाव</td>
+                    <td class="bb-n">प्रत्यक्ष मासिक भाडे</td>
+                    <td class="bb-n">प्रत्यक्ष वार्षिक भाडे</td>
+                    <td class="bb-n">वजा 10% देखभाल दुरुस्ती रक्कम</td>
+                    <td class="bb-n" style="font-weight:bold;">प्रत्यक्ष भाड्या नुसार कर योग्य मुल्य</td>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+                <!-- <tr class="t-a-c h-25">
+                    <td>1</td>
+                    <td>G</td>
+                    <td>मालक</td>
+                    <td>औद्योगिक</td>
+                    <td>कारखाना/फॅक्टरी</td>
+                    <td>A</td>
+                    <td>30-10-1985</td>
+                    <td>38</td>
+                    <td style="width: 31px;">31-40</td>
+                    <td>----</td>
+                    <td>15823.1</td>
+                    <td>---</td>
+                    <td>0</td>
+                    <td>12658.48</td>
+                    <td>360</td>
+                    <td>4557053</td>
+                    <td>40</td>
+                    <td>1822821.2</td>
+                    <td>2734231.8</td>
+                    <td>273423</td>
+                    <td style="border-right:3px solid black !important;">2460809</td>
+                    <td></td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>2460809</td>
+                </tr> -->
+            </table>
+
+            <div style="margin-top:2px;">
+                <table id="leftTable" style="width:80%;">
+                    <tr height="5">
+                        <td colspan="15" style="background-color:#F6CECE" class="f-w-b p-l-8">&gt;&gt; Proposed Ratable Value Details/प्रस्तावित कर योग्य मुल्य तपशील &lt;&lt;</td>
+                    </tr>
+                    <tr style="background-color: #CEF6CE;font-weight:bold;" class="t-a-c">
+                        <td rowspan="2">निवासी</td>
+                        <td rowspan="2">वाणिज्य</td>
+                        <td rowspan="2">धार्मिक</td>
+                        <td class="p-n" colspan="6">
+                            <span>खुला भूखंड</span>
+                        </td>
+                        <td rowspan="2">शैक्ष.व वैधा संस्थान</td>
+                        <td rowspan="2">शासकीय</td>
+                        <td rowspan="2">औद्योगिक</td>
+                        <td rowspan="2">मोबाईल टॉवर</td>
+                        <td rowspan="2">इलेक्ट्रिक सब-स्टेशन</td>
+                        <td rowspan="2" class="f-w-b">एकूण</td>
+                    </tr>
+                    <tr style="background-color:#F8E0F7;" class="t-a-c">
+                        <td style="border-left:0px!important;" class="bb-n">निवासी</td>
+                        <td style="border-left:0px!important;border-right:0px!important;" class="bb-n">वाणिज्य</td>
+                        <td>धार्मिक</td>
+                        <td>शैक्ष.व वैधा संस्थान</td>
+                        <td>शासकीय</td>
+                        <td>औद्योगिक</td>
+                    </tr>
+                    <tr class="h-25 t-a-c">
+                        <td id="proposedResidentFl"></td>
+                        <td id="proposedCommercialFl"></td>
+                        <td id="proposedReligiousFl"></td>
+                        <td id="proposedOpenPlotResidentialFl"></td>
+                        <td id="proposedOpenPlotCommercialFl"></td>
+                        <td id="proposedOpenPlotReligiousFl"></td>
+                        <td id="proposedOpenPlotEducationFl"></td>
+                        <td id="proposedOpenPlotGovernmentFl"></td>
+                        <td id="proposedOpenPlotIndustrialFl"></td>
+                        <td id="proposedEducationFl"></td>
+                        <td id="proposedGovernmentFl"></td>
+                        <td id="proposedIndustrialFl"></td>
+                        <td id="proposedMobileTowerFl"></td>
+                        <td id="proposedElectricSubstationFl"></td>
+                        <td id="proposedTotalFl"></td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <table id="rightTable" style="margin-top:2px;width:64%;">
+                    <tr height="5">
+                        <td colspan="12" style="background-color:#F6CECE;" class="f-w-b p-l-8">&gt;&gt;Consolidate Tax Details/एकत्रित कराचे तपशील&lt;&lt;</td>
+                    </tr>
+                    <tr height="5" style="background-color: #CEF6CE;" class="t-a-c">
+                        <td rowspan="2">मालमत्ता कर</td>
+                        <td colspan="3" class="p-n">शिक्षण कर</td>
+                        <td rowspan="2">रो.ह.यो .कर</td>
+                        <td rowspan="2">वृक्ष कर</td>
+                        <td rowspan="2">पर्यावरण कर</td>
+                        <td rowspan="2">स्वच्छता कर</td>
+                        <td rowspan="2">दिवाबत्ती कर</td>
+                        <td rowspan="2">अग्निशमन कर</td>
+                        <td rowspan="2">उपयोग कर्ता शुल्क व ईतर</td>
+                        <td rowspan="2" class="f-w-b">एकूण</td>
+                    </tr>
+                    <tr style="background-color:#F8E0F7" class="t-a-c">
+                        <td style="border-left:0px!important;" class="bb-n">निवासी</td>
+                        <td class="bb-n">अनिवासी</td>
+                        <td style="border-left:0px!important;border-bottom:0px!important;" class="f-w-b bb-n">एकूण कर</td>
+                    </tr>
+                    <tr class="h-25 t-a-c">
+                        <td id="propertyTax"></td>
+                        <td id="educationTaxResidential"></td>
+                        <td id="educationTaxNonResidential"></td>
+                        <td id="educationTaxTotal"></td>
+                        <td id="egcTax"></td>
+                        <td id="treeTax"></td>
+                        <td id="environmentTax"></td>
+                        <td id="cleannessTax"></td>
+                        <td id="lightTax"></td>
+                        <td id="fireTax"></td>
+                        <td id="userChargesTax"></td>
+                        <td id="totalTax"></td>
+                    </tr>
+                </table>
+            </div>
+            <br>
+            <table class="f-w-b b-n m-t-50">
+                <tr>
+                    <td colspan="6" class="t-a-l b-n">Tax Inspector M.C. <span class="siteNameStd">SiteName</span></td>
+                    <td colspan="6" class="b-n t-a-r">Chief Officer, M.C. <span class="siteNameStd">SiteName</span></td>
+                </tr>
+                <tr>
+                    <td colspan="6" class="t-a-l b-n">(कर निरीक्षक, न.प. <span class="siteNameLocal">SiteName</span>)</td>
+                    <td colspan="6" class="b-n t-a-r">(मुख्याधिकारी, न.प. <span class="siteNameLocal">SiteName</span>)</td>
+                </tr>
+            </table>
+            <div class="breakhere"></div>
+            <div id="thirdDiv" style="height:380px;">
+                <table align="center" border="0">
+                    <tr border="0">
+                        <td style="text-align:right;width:25%; border:none!important;">
+                            <img id="councilLogo1" src="https://example.com/default-image.png" alt="Council Logo" style="height: 80px; width: 80px;">
+                        </td>
+                        <td style="text-align: center;width:59%;border:none!important;">
+                            <span style="color: black; font-size: 25px;" id="councilName1">नगर परिषद SiteName/Municipal Council SiteName</span><br>
+                            (नमुना ४३ नियम ७४ पहा)/(Form No. 43 See Rule No. 74)<br>
+                            सन <span class="yearRangeDev">year range</span> या वर्षाकरिता कर आकारणीस पात्र असलेल्या इमारती व जमीन यांची आकारणी सूची/Assessment List of Buildings and Lands for the Year of <span class="yearRangeEng">year range</span>
+                        </td>
+                        <td style="text-align: center;width:26%;  border:none!important;"></td>
+                    </tr>
+                </table>
+                <div style="width:99%; border-top:1px solid black;"></div>
+                <div id="secondDiv" style="margin-top:8px; border: 1px solid black;background-color:#F5F6CE;">
+                    <table style="border-radius: 1px;">
+                        <tr>
+                            <td style="width: 25%;" class=" t-a-l b-n">आर्थिक वर्ष/F.Y.: </td>
+                            <td style="width: 30%;" class="t-a-l b-n">दिनांक/Date: </td>
+                            <td style="width: 30%;" class="t-a-c b-n">वेळ/Time: </td>
+                            <td style="width: 15%;" class="t-a-l b-n">पान क्र./Page No.: 02 of 02</td>
+                        </tr>
+                        <tr>
+                            <td class="f-w-b t-a-l b-n">नविन मालमत्ता क्र./New Property No.: <span class="pdFinalpropnoVc"></span></td>
+                            <td style="" class="t-a-l b-n">वार्ड क्र./Ward No.: <span class="pdWardI"></td>
+                            <td style="" class="t-a-c b-n">झोन क्र./Zone No.: <span class="pdZoneI"></td>
+                            <td style="" class="t-a-l b-n">जुना मालमत्ता क्र./Property No.: </td>
+                        </tr>
+                    </table>
+                </div>
+                <table style="border:1px solid black;background-color:#F6CECE;margin-top:4px;">
+                    <tr>
+                        <td class="t-a-l p-l-8 f-w-b">&gt;&gt;Ratable Value Approved by Authorized Valuation Officer/प्राधिकृत मुल्यांकन अधिकारी यांनी मंजूर केलेले कर योग्य मुल्य&lt;&lt;</td>
+                    </tr>
+                </table>
+                <div>
+                    <table id="leftTable" style="width:60%;margin-top:4px;">
+                        <tr height="5">
+                            <td colspan="15" style="background-color:#F6CECE" class="f-w-b p-l-8">&gt;&gt; Proposed Ratable Value Details/प्रस्तावित कर योग्य मुल्य तपशील &lt;&lt;</td>
+                        </tr>
+                        <tr style="background-color: #CEF6CE;font-weight:bold;" class="t-a-c">
+                            <td rowspan="2">निवासी</td>
+                            <td rowspan="2">वाणिज्य</td>
+                            <td rowspan="2">धार्मिक</td>
+                            <td class="p-n" colspan="6">
+                                <span>खुला भूखंड</span>
+                            </td>
+                            <td rowspan="2">शैक्ष.व वैधा संस्थान</td>
+                            <td rowspan="2">शासकीय</td>
+                            <td rowspan="2">औद्योगिक</td>
+                            <td rowspan="2">मोबाईल टॉवर</td>
+                            <td rowspan="2">इलेक्ट्रिक सब-स्टेशन</td>
+                            <td rowspan="2" class="f-w-b">एकूण</td>
+                        </tr>
+                        <tr style="background-color:#F8E0F7;" class="t-a-c">
+                            <td style="border-left:0px!important;" class="bb-n">निवासी</td>
+                            <td style="border-left:0px!important;border-right:0px!important;" class="bb-n">वाणिज्य</td>
+                            <td>धार्मिक</td>
+                            <td>शैक्ष.व वैधा संस्थान</td>
+                            <td>शासकीय</td>
+                            <td>औद्योगिक</td>
+                        </tr>
+                        <tr class="h-25 t-a-c">
+                            <td id="proposedResidentFl1"></td>
+                            <td id="proposedCommercialFl1"></td>
+                            <td id="proposedReligiousFl1"></td>
+                            <td id="proposedOpenPlotResidentialFl1"></td>
+                            <td id="proposedOpenPlotCommercialFl1"></td>
+                            <td id="proposedOpenPlotReligiousFl1"></td>
+                            <td id="proposedOpenPlotEducationFl1"></td>
+                            <td id="proposedOpenPlotGovernmentFl1"></td>
+                            <td id="proposedOpenPlotIndustrialFl1"></td>
+                            <td id="proposedEducationFl1"></td>
+                            <td id="proposedGovernmentFl1"></td>
+                            <td id="proposedIndustrialFl1"></td>
+                            <td id="proposedMobileTowerFl1"></td>
+                            <td id="proposedElectricSubstationFl1"></td>
+                            <td id="proposedTotalFl1"></td>
+                        </tr>
+                    </table>
+                </div>
+                <br><br><br><br>
+                <table class="b-n">
+                    <tr>
+                        <td class="f-w-b b-n t-a-r">Town Planner/Asst. Director, Town Planning Office <span class="districtNameStd">districtNameStd</span> &amp; Authorized Valuation Officer, MC <span class="siteNameStd">SiteName</span></td>
+                    </tr>
+                    <tr class="p-r-10">
+                        <td class="f-w-b b-n t-a-r">नगर रचनाकार/सहा.संचालक, नगर रचना कार्यालय <span class="districtNameLocal">districtNameLocal</span> तथा प्राधिकृत मुल्यांकन अधिकारी, न.प.<span class="siteNameLocal">SiteName</span></td>
+                    </tr>
+                </table>
+            </div>
+            <br>
+            <div id="fourDiv" style="height:500px;margin-top:10px;">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="width:43%;">
+                            <img id="pdPropimageT" style="width: 100%; height: 500px; object-fit: fill; border: 1px solid #000;" src="">
+                        </td>
+                        <td style="width:5%;text-align:center;font-size:20px;font-weight:bold;">
+                            <i class="fa fa-arrow-left" aria-hidden="true"></i><br>P<br>R<br>O<br>P<br>E<br>R<br>T<br>Y<br> <br>P<br>H<br>O<br>T<br>O<br><br>
+                        </td>
+                        <td style="width:3%;border:none!important;"></td>
+                        <td style="width:5%;text-align:center;font-size:20px;font-weight:bold;">
+                            <i class="fa fa-arrow-left" aria-hidden="true"></i><br>F<br>L<br>O<br>O<br>R<br><br>P<br>L<br>A<br>N<br>
+                            <i class="fa fa-arrow-left" aria-hidden="true"></i><br>
+                        </td>
+                        <td style="width:43%;">
+                            <img id="pdHouseplan2T" style="width: 100%; height: 500px; object-fit: fill; border: 1px solid #000;" src="">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </form>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/3GViewCalculationSheet/js/scripts.js"></script>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Registration</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-5">
+    <!-- Registration Section -->
+    <div class="mb-4">
+        <h2 class="mb-3">Start a New Property Registration</h2>
+        <button id="newRegistrationButton" class="btn btn-primary">New Registration</button>
+    </div>
+
+    <hr>
+
+    <!-- Search Section -->
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title mb-4">Search for a Property</h3>
+            <div class="form-row align-items-end">
+                <div class="col-md-4">
+                    <label for="wardInput" class="form-label">Ward:</label>
+                    <select id="wardInput" class="form-control">
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="oldPropertyNumberInput" class="form-label">Old Property Number:</label>
+                    <input type="text" id="oldPropertyNumberInput" class="form-control" placeholder="Enter Old Property Number...">
+                </div>
+                <div class="col-md-4">
+                    <label for="ownerNameInput" class="form-label">Owner Name:</label>
+                    <input type="text" id="ownerNameInput" class="form-control" placeholder="Enter Owner Name...">
+                </div>
+            </div>
+            <div class="mt-3">
+                <button id="searchButton" class="btn btn-success">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Results Section -->
+    <div class="mt-4">
+        <div id="searchResults"></div>
+    </div>
+</div>
+
+<!-- jQuery and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="/3GNewOrOldRegistration/js/scripts.js"></script>
+</body>
+</html>

@@ -1,0 +1,976 @@
+<html><head>
+    <title>Survey Report</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link href="/3GViewSurveyForm/css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<form class="form" style="max-width: none; width: 99%;">
+    <div style="border: 2px solid black;padding-right:3px !important;padding-left:3px !important;
+padding-bottom:3px !important;padding-top:15px !important;  ">
+
+        <div id="headDiv" style="font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 20px;">
+            
+            <img id="councilLogo" src="https://example.com/default-image.png" alt="Council Logo" style="height: 80px; width: 80px;">
+            
+            <div id="headingDiv" style="text-align: left;">
+                <label class="councilName">नगर परिषद कार्यालयी</label><br>
+                <div style="font-size: 16px; font-weight: bold;">मालमत्ता विवरण प्रपत्र</div>
+            </div>
+
+        </div>
+
+        <!-- <table id="testtable" style='font-size: 20px; font-weight: bold; text-align:center; border: 0px solid white !important;'>
+            <tr style="border: 0px solid white;"><td  style='width:44.5%; text-align:right; border: 0px solid white;padding-top:5px;'><img src="https://wani.3gassociate.com/propertytax/public/image/ghatanji.png" height=80;width=80;></td>
+                <td style='width:20%; text-align:center; border: 0px solid white;'><label>नगर परिषद कार्यालय, घाटंजी</label><div style=" text-align:center;font-size: 16px; font-weight: bold;">मालमत्ता विवरण प्रपत्र</div></td>
+                <td style='width:35.5%; text-align:left; border: 0px solid white;'></td>
+            </tr>
+        </table> -->
+
+        <div style="width: 99%;">
+            <div style="font-size: 14px; float: left; padding-left: 20px;">
+                <label>महाराष्ट्र नगरपरिषदा, नगर पंचायती व औद्योगिक</label><br>
+                <label>नगरी अधिनियम, १९६५ कलम ११५(२) अन्वये संदर्भ</label>
+            </div>
+            <div style="font-size: 14px; float:right; position: relative;">
+                पान क्र.: 01 of 02
+            </div>
+        </div>
+        <table style="margin-top: 10px;width: 99.8%">
+            <tbody>
+            <tr style="background-color: #EDEDED;text-align: center">
+                <td>पार्सल आयडी</td>
+                <td>रोड आयडी</td>
+                <td>ग्रिड नं</td>
+                <td>अक्षांश(Lat)</td>
+                <td>रेखांश(Long)</td>
+                <td>प्रभाग क्र</td>
+                <td>झोन क्र</td>
+                <td>सर्व्हे मालमत्ता क्र</td>
+                <td>नविन मालमत्ता क्र</td>
+                <td>मालमत्ता क्र</td>
+                <td>जुना माल. क्र</td>
+                <td>जू वार्ड क्र</td>
+                <td>धारकाचा मो. क्र</td>
+            </tr>
+            <tr height="30" style="font-size: 14px;">
+                <td align="center"></td>
+                <td align="center"></td>
+                <td align="center"></td>
+
+                <td align="center">
+
+                </td>
+                <td align="center">
+
+                </td>
+
+                <td id="wardNo" align="center"></td>
+                <td id="zoneNo" align="center"></td>
+                <td id="spn" align="center"></td>
+                <td id="finalPropNo" align="center"></td>
+
+
+                <td id="olduniquepropno" align="center">
+                
+                </td>
+                <td id="oldpropno" align="center"></td>
+                <td id="oldWard" align="center"></td>
+
+                <td id="ownerMobileNo" align="center"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <table style="width: 99.8%">
+
+            <tbody><tr height="5"><td colspan="11"></td></tr>
+            <tr style="background-color: #EDEDED;text-align: center">
+                <td>चालू आकारणी दि</td>
+                <td>प्रथम आकारणी दि</td>
+                <td>मागील आकारणी दि</td>
+                <td>बांधकाम वर्ष</td>
+                <td>जुने कर</td>
+                <td>जु क.यो मुल्य</td>
+
+                <td>ले-आऊट / सर्व्हे क्र.</td>
+                <td>सिटी सर्व्हे क्र.</td>
+                <td>खसरा क्र</td>
+                <td>
+                    भुखंड/प्लॉट क्र</td>
+            </tr>
+
+            <tr height="30" style="font-size: 14px;">
+                <td id="currentassmtdate" align="center">
+                                          </td>
+                <td id="firstassmtdate" align="center">
+                    
+                </td>
+                <td id="recentlastassmtdate" align="center"></td>
+                <td id="constructionyear" align="center"></td>
+
+                <td id="oldtax" align="center"></td>
+                <td id="oldpropertytax" align="center"></td>
+                <td id="layoutno" align="center"></td>
+                <td id="citysurveyno" align="center">
+                </td>
+                <td id="khasrano" align="center">
+                </td>
+
+                <td id="plotno" align="center">
+                </td>
+            </tr>
+            </tbody></table>
+
+        <table style="width: 99.8%">
+            <tbody><tr height="5"><td colspan="12"></td></tr>
+            <tr style="background-color: #EDEDED;text-align: center">
+                <td>मालकाचा प्रकार</td>
+                <td>वास्तव्य</td>
+                <td>मालमत्ता प्रकार</td>
+                <td>मालमत्ता उपप्रकार</td>
+                <td>उपयोग प्रकार</td>
+                <td>उपयोग उपप्रकार</td>
+                <td>ईमारत प्रकार</td>
+                <td>उपप्रकार</td>
+                <td>ईमारत स्तिथी</td>
+                <td>रे.वा.हार्वे.</td>
+                <td>सोलर यु.</td>
+                <td>ई-मेल </td>
+            </tr>
+
+            <tr height="30" style="font-size: 14px;">
+                <td id="ownertype" align="center">
+                                            </td>
+
+                <td id="ownercategory" align="center"></td>
+                <td id="propertytype" align="center">
+                                        </td>
+
+                <td id="propertysubtype" align="center">
+                    
+                </td>
+
+                <td id="usagetype" align="center">
+                                        </td>
+
+                <td id="usagesubtype" align="center">
+                    
+                </td>
+
+                <td id="buildingtype" align="center">
+                                            </td>
+                <td id="buildingsubtype" align="center">
+                                            </td>
+                <td id="buildstatus" align="center">
+                                            </td>
+                <td id="rainhar" align="center">
+                                            </td>
+                <td id="solar" align="center">
+                                                </td>
+                <td id="email" align="left"> </td>
+            </tr>
+            </tbody></table>
+
+
+
+        <table style="width: 99.8%;font-size: 14px">
+            <!-- <tr height='5'><td colspan='11'></td></tr> -->
+            <tbody><tr>
+                <td colspan="3" style="background-color: #EDEDED;">मालमत्ता धारकाचे/मालकाचे नाव:⇩</td>
+                <td colspan="2">
+                    <div style="float: left;">भुखंड : </div>
+                    <div style="float:right;" id="totalplotarea"> चौ.मी</div>
+                    <div class="clear"></div>
+                </td>
+                <td colspan="3" width="22%">
+                    <div style="float: left;">एकूण मजल्यांची संख्या :  </div>
+                    <div style="float:right;" id="totalnooffloors">
+                                                      </div>
+                </td>
+
+                <td>
+                    <div style="float: left;">एकूण खोल्यांची संख्या : </div>
+                    <div style="float:right;" id="totalnoofrooms"></div>
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td id="ownername" align="left" colspan="3" width="250"><b>
+                </b></td>
+
+                <td colspan="2">
+                    <div style="float: left;">बांधकाम क्षेत्रफळ: </div>
+                    <div style="float:right;" id="builtuparea">
+                    
+                    </div>
+                    <div class="clear"></div>
+                </td>
+                <td colspan="3">
+                    <div style="float: left;">पाण्याचे स्त्रोत :</div>
+                    <div style="float:right;" id="watercontype">                         </div>
+                </td>
+                <td colspan="3" width="22%">
+
+                    <div style="float: left;">बांधकाम परवानगी : </div>
+                    <div style="float:right;" id="permission"></div>
+
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="3" width="250">नवीन मालकाचे नाव:
+                    <b id="newownername"></b></td>
+                <td colspan="2">
+                    <div style="float: left;">भाडयाने दिलेले क्षे.: </div>
+                    <div style="float:right;" id="arealetout">
+                                                   </div>
+                    <div class="clear"></div>
+                </td>
+                <td colspan="3">
+                    <div style="float: left;">न.प. नळ :</div>
+                    <div style="float:right;" id="waterconauth">
+                                             </div>
+                </td>
+                <td colspan="3">
+                    <div style="float: left;">परवानगी क्र. : </div><div style="float:right;" id="permissionno"> permission no </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="3" width="250" rowspan="2">भोगवटदाराचे नाव: <b id="occupiername"></b></td>
+                <td colspan="2">
+                    <div style="float: left;">भाड्याने न दिलेले क्षे.:</div>
+                    <div style="float:right;" id="areanotletout">
+                        </div>
+
+                    <div class="clear"></div>
+                </td>
+                <td colspan="3">
+                    <div style="float:left;">न.प. मीटर क्र.: </div>
+                    <div style="float:right;" id="napameternumber"> 
+                    </div>
+                </td>
+
+                <td colspan="3">
+                    <div style="float: left;">इलेक्ट्रिक कनेक्शन : </div>
+                    <div style="float:right;" id="electricconnection">
+                         </div>
+                </td>
+
+
+            </tr>
+
+            <tr>
+                <td colspan="2">
+                    <div style="float: left;">एकूण कर योग्य क्षे.: </div>
+                    <div style="float:right;" id="totassesarea"></div>
+                    <div class="clear"></div>
+                </td>
+                <td colspan="3">
+                    <div style="float: left;">उपभोक्ता क्र. : </div>
+                    <div style="float: right;" id="napaconsumerno">  </div>
+                </td>
+
+
+                <td colspan="3">
+                    <div style="float:left;">मीटर क्र. : </div>
+                    <div style="float:right;" id="electricmeterno">
+                         </div>
+                </td>
+
+
+            </tr>
+
+            <tr>
+                <td colspan="3"><div style="float: left;">मालमत्ता धारकाचे व्यवसाय:</div>
+                    <div style="float:right;" id="owneroccupation">
+                    </div>
+                </td>
+
+                <td colspan="2">
+                    <div style="float: left;">रस्त्याची रुंदी : </div>
+                    <div style="float:right;" id="roadwidth"></div>
+                    <div class="clear"></div>
+                </td>
+                <td colspan="3" width="209" align="left"><div style="float: left;">नळ जोडणी दि. : </div>
+                    <div style="float: right;" id="napacondate">
+                    </div>
+                </td>
+
+                <td colspan="3"><div style="float: left;">उपभोक्ता क्र. : </div>
+                    <div style="float: right;" id="electricconsumerNumber">
+                                             </div>
+                </td>
+
+            </tr>
+
+
+
+
+
+
+            <tr>
+                <td colspan="3"><div style="float: left;">मालमत्ता धारकाचे शिक्षण:</div>
+                    <div style="float:right;" id="qualification">
+                        
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div style="float: left;">रस्त्याचा प्रकार : </div>
+                    <div style="float:right;" id="roadtype">
+                                    
+                    </div>
+                </td>
+                <td colspan="3">
+                    <div style="float: left;">पाईपची साईझ : </div>
+                    <div style="float: right;" id="napapipesize">  </div>
+                </td>
+
+                <td colspan="3" width="240">
+                    <div style="float: left;">पायऱ्या : </div>
+                    <div style="float: right;" id="stairs">
+                          </div>
+                </td>
+
+            </tr>
+
+
+            <tr>
+                <td colspan="3"><div style="float: left;">मालमत्तेचे नाव: </div>
+                    <div style="float: right;" id="propertyname"></div></td>
+                <td colspan="2">
+                    <div style="float: left;">चालू कर भरणा केला : </div>
+                    <div style="float:right;" id="currenttaxpaid">
+                    </div>
+                </td>
+                <td width="209" colspan="3"><div style="float: left;">सांडपाणी व्यवस्था : </div>
+                    <div style="float: right;" id="sewerage">  </div>
+                </td>
+                <td colspan="3"><div style="float: left;">लिफ्ट : </div>
+                    <div style="float: right;" id="lift"> </div>
+                </td>
+
+
+            </tr>
+            <tr>
+                <td colspan="3" width="250">
+                    <div style="float: left;">पॅन नं :</div>
+                    <div style="float:right;" id="panno">pan no</div>
+                </td>
+                <td colspan="2" width="194"><div style="float: left;">चालू कराची रक्कम:</div>
+                    <div style="float: right;" id="currenttaxamount"> </div></td>
+
+                <td colspan="3"><div style="float: left;">भूमिगत/खुल्या गटारी : </div>
+                    <div style="float: right;" id="seweragetype"> sewerage type
+                    </div> </td>
+                <td colspan="3"> <div style="float: left;"><b>कुटुंब सदस्य संख्या : </b></div>
+                    <div style="float: right;" id="totalmembers">  </div></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <div style="float: left;">आधार नं.:</div>
+                    <div style="float:right;" id="aadharno"></div>
+                </td>
+                <td colspan="2" rowspan="2">
+                    <div style="float: left;">ले-आउट चे नाव: </div>
+                    <div style="float: right;" id="layoutname"> layout name </div>
+                </td>
+                <td colspan="3">
+                    <div style="float: left;">शौचालय : </div>
+                    <div style="float: right;" id="toilet">
+                                          </div>
+                </td>
+                <td colspan="3">
+                    <div style="float: left;">प्रौढांची संख्या :</div>
+                    <div style="float: right;" id="no of adults"> </div>
+                </td>
+            </tr>
+            <tr>
+                <td align="left" colspan="3" style="background-color: #EDEDED;">मालमत्तेचा/मालमत्ता धारकाचा पत्ता: ⇩ <br></td>
+                <td colspan="3">
+                    <div style="float: left;">शौचालय संख्या : </div>
+                    <div style="float: right;" id="nooftoilets">                        </div>
+                </td>
+                <td colspan="3">
+                    <div style="float: left;">मुलांची संख्या : </div>
+                    <div style="float: right;" id="noofchildren">  </div>
+                </td>
+            </tr>
+            <tr>
+                <td align="left" rowspan="3" colspan="3"><b id="owneraddress"></b></td>
+                <td colspan="2" width="194">
+                    <div style="float: left;">अकृषिक जमीन(N/A): </div>
+                    <div style="float: right;" id="naland">
+                      </div>
+                </td>
+                <td colspan="3">
+                    <div style="float: left;">नगररचना योजना(T/P): </div>
+                    <div style="float: right;" id="tpdetails">
+                         </div>
+                </td>
+                <td width="240" colspan="3">
+                    <div style="float: left;">तळेगाव दाभाडे(T/D):</div>
+                    <div style="float: right;" id="tddetails">
+                                                      </div>
+
+                </td>
+
+            </tr>
+
+            <tr>
+                <td colspan="2" width="194">
+                    <div style="float: left;">अकृषिक जमीन दि: </div>
+                    <div style="float: right;" id="nadate"> </div>
+                </td>
+                <td colspan="3">
+                    <div style="float: left;">नगररचना योजना दि:</div>
+                    <div style="float: right;" id="tpdate">  </div>
+                </td>
+                <td colspan="3" width="240">
+                    <div style="float: left;">तळेगाव दाभाडे दि:</div>
+                    <div style="float: right;" id="tddate"> </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2" width="194">
+                    <div style="float: left;">अकृषिक जमीन न:</div>
+                    <div style="float: right;" id="naorder"> </div>
+                </td>
+
+                <td colspan="3">
+                    <div style="float: left;">नगररचना योजना न: </div>
+                    <div style="float: right;" id="tporder">
+                     </div>
+                </td>
+                <td colspan="3" width="240">
+                    <div style="float: left;">तळेगाव दाभाडे न:</div>
+                    <div style="float: right;" id="tdorder"> </div>
+                </td>
+            </tr>
+
+
+
+            </tbody>
+        </table>
+
+        <!-- unit table   -->
+        
+        <table id="unitsTable" style="width: 99.8%; margin-top:6px; font-size: 16px">
+            <thead>
+                <tr style="background-color: #EDEDED; text-align: center">
+                    <th>अ. क्र.</th>
+                    <th>मजला</th>
+                    <th>बांधकाम वर्ष</th>
+                    <th>ईमारत वय (वर्ष)</th>
+                    <th>मालमत्ता वर्ग</th>
+                    <th>वापर प्रकार</th>
+                    <th>वापराचा उपप्रकार</th>
+                    <th>बांधकाम क्षेत्रफळ</th>
+                    <th>चटई क्षेत्र. चौ.मी</th>
+                    <th>भूखंड क्षेत्रफळ</th>
+                    <th>सुट यो. क्षेत्र.</th>
+                    <th>कर यो.क्षेत्र.  चौ.मी.</th>
+                    <th>मालक/ भाडेकरू</th>
+                    <th>भाडेकरूचे नाव</th>
+                    <th>प्रत्यक्ष मासिकभाडे</th>
+                    <th>भाडेकरूची सही</th>
+                    <th>स्थापनेचे नाव</th>
+                </tr>
+            </thead>
+            <tbody>
+            <!-- <tr height="30" style="background-color: #EDEDED;">
+                <th></th>
+                <td colspan="6" align="left">&nbsp;&nbsp;&nbsp;एकूण क्षेत्रफळ  &nbsp;</td>
+                <td align="center">
+                    37.64&nbsp;चौ.मी
+                    </td>
+                <td align="center">0&nbsp;चौ.मी</td>
+                <td align="center">37.64&nbsp;चौ.मी</td>
+                <td align="center"></td>
+                <td align="center"></td>
+                <td align="center"></td>
+                <td align="center"></td>
+                <td></td>
+            </tr> -->
+            </tbody>
+        </table>
+
+        <table border="0" width="99.8%">
+            <tbody>
+            <tr height="5"></tr>
+            <tr height="100">
+                <td style="border-right: 1px solid white;"></td>
+                <td style="text-align:center;border-right: 1px solid white;"><img style="margin-top:20px;margin-left:10px;" src="/3GViewSurveyForm/images/logo.png" width="100" height="100">
+                    <img src="/3GViewSurveyForm/images/anil_sign.png" style="margin-top:2px;margin-left:10px;" width="75%" height="75"></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr height="30">
+                <td align="center" width="25%">मालमत्ता धारकाची सही</td>
+                <td align="center" width="25%">एजेन्सी</td>
+                <td align="center" width="25%">कर अधिक्षक/निरीक्षक/संग्राहक <br> <span class="councilName"></span></td>
+                <td align="center" width="25%">मुख्याधिकारी <br> <span class="councilName"></span></td>
+            </tr>
+            <!-- <tr height='5'><td colspan='4'></td></tr> -->
+            </tbody>
+        </table>
+
+        <div class="txtcontent"><p style="margin-top:0px;margin-bottom: 0px">बांधकाम प्रकार:A -(RCC) आर सी सी स्लेबची घरे, विटा सिमेंटच्या भिंती, B– (LBS) विटा सिमेंटची भारवाहू संरचना, लोडबेअरींग, C – विटा सिमेंटच्या भिंती व टीन/कवेलूचे छत (ध्याब्याची छत), D – विटा/मातीच्या भिंती व टीन/कवेलूचे छत, (ध्याब्याची छत), E–(TEMP) अस्थाई कुडाचे/लाकडी फाट्याचे कच्चे बांधकाम, F–(Open Plot) खुला भूखंड, G–(Other) ईतर</p></div>
+        <div class="txtcontent"><p style="margin-top:0px;margin-bottom: 0px">वापराचा प्रकार :R - निवासी, C– वाणिज्यिक, E&amp;M– शैक्षणिक व वैद्यकीय संस्थान, RG– धार्मिक/धर्मदाय संस्था, OP– खुला भूखंड (Open Plot), COP – वाणिज्यिक खुला भूखंड (Commercial OP), RGOP – धर्मादाय  खुला भूखंड,CG– केंद्र शासकीय मालमत्ता (Central Govt), SG– राज्य शासकीय मालमत्ता (State Govt), SMG–निम शासकीय मालमत्ता (SemiGovt), GOVT – ईतरशासकीय मालमत्ता, CGOP– केंद्र शासकीय खुला भूखंड (Central Govt OP), SGOP– राज्य शासकीय खुला भूखंड (State Govt OP), SMGOP– निम शासकीय खुला भूखंड (Semi Govt OP), GOP – ईतरशासकीय खुले भूखंड, VL – मोकळ्या जागा ( Vacant Land), PUL – सार्वजनिक उपयोगातील जमीन (Public Utility Land), ULB – नगर परिषद मालमत्ता, ULBOP – नगर परिषद खुले भूखंड(ULB’s OP), E&amp;MOP– शैक्षणिक व वैद्यकीय संस्थानखुला भूखंड, OOP– ईतर खुला भूखंड (Other Open Plot),PP – सार्वजनिक मालमत्ता (Public Properties), MT – मोबाईल टॉवर (Mobile Tower), IND – औद्योगिक (Industries), ES – इलेक्ट्रिक सब-स्टेशन (Electric Sub-station), OTP – ईतर सार्वजनिक (Other Public), OULB – ईतर न.प. मालमत्ता (Other ULB’s),मिश्र</p></div>
+
+
+        <table style="margin-top: 10px" width="99.8%">
+            <tbody>
+            <tr height="30" style="background-color: #EDEDED;">
+                <td align="center">Activity</td>
+                <td align="center" width="30%">Name</td>
+                <td align="center" width="20%">Sign</td>
+                <td align="center">Date</td>
+                <td align="center">Time Start/End</td>
+                <td align="center">Visit Details</td>
+            </tr>
+            <tr height="30">
+                <td>Surveyed By</td>
+                <td align="center">
+                </td>
+                <td></td>
+                <td align="center" id="creationdate">
+                                        </td>
+                <td align="center" id="creationtime">
+                                        </td>
+                <th></th>
+            </tr>
+            <tr height="30">
+                <td>Checked By</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+        <br>
+    </div>
+
+    <div class="breakhere"></div>
+
+
+    <div id="headDiv" style="font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 20px;">
+            
+        <img id="councilLogo1" src="https://example.com/default-image.png" alt="Council Logo" style="height: 80px; width: 80px;">
+        
+        <div id="headingDiv" style="text-align: left;">
+            <label class="councilName">नगर परिषद कार्यालयी</label><br>
+            <div style="font-size: 16px; font-weight: bold;">मालमत्ता विवरण प्रपत्र</div>
+        </div>
+
+    </div>
+
+        <!-- <table id="testtable" style='font-size: 20px; font-weight: bold; text-align:center; border: 0px solid white !important;'>
+            <tr style="border: 0px solid white;"><td  style='width:44.5%; text-align:right; border: 0px solid white;padding-top:5px;'><img src="https://wani.3gassociate.com/propertytax/public/image/ghatanji.png" height=80;width=80;></td>
+                <td style='width:18%; text-align:center; border: 0px solid white;'><label>नगर परिषद कार्यालय, घाटंजी</label><div style=" text-align:center;font-size: 16px; font-weight: bold;">मालमत्ता विवरण प्रपत्र</div></td>
+                <td style='width:37.5%; text-align:left; border: 0px solid white;'></td>
+            </tr>
+        </table> -->
+
+        <div style="width: 99%;">
+            <div style="font-size: 14px; float: left; padding-left: 20px;">
+                <label>महाराष्ट्र नगरपरिषदा, नगर पंचायती व औद्योगिक</label><br>
+                <label>नगरी अधिनियम, १९६५ कलम ११५(२) अन्वये संदर्भ</label>
+            </div>
+            <div style="font-size: 14px; float:right; position: relative;">
+                पान क्र.: 02 of 02
+            </div>
+        </div>
+        <table style="margin-top: 10px;width: 99.8%">
+            <tbody>
+            <tr style="background-color: #EDEDED;text-align: center">
+            </tr><tr style="background-color: #EDEDED;text-align: center">
+                <td>पार्सल आयडी</td>
+                <td>रोड आयडी</td>
+                <td>ग्रिड नं</td>
+                <td>अक्षांश(Lat)</td>
+                <td>रेखांश(Long)</td>
+                <td>प्रभाग क्र</td>
+                <td>झोन क्र</td>
+                <td>सर्व्हे मालमत्ता क्र</td>
+                <td>नविन मालमत्ता क्र</td>
+                <td>मालमत्ता क्र</td>
+                <td>जुना माल. क्र</td>
+                <td>जू वार्ड क्र</td>
+                <td>धारकाचा मो. क्र</td>
+            </tr>
+
+            <tr height="30" style="font-size: 14px;">
+                <td align="center"></td>
+                <td align="center"></td>
+                <td align="center"></td>
+
+
+                <td align="center">
+
+                </td>
+                <td align="center">
+
+                </td>
+                <!-- -->
+
+
+                <td id="wardNo1" align="center"></td>
+                <td id="zoneNo1" align="center"></td>
+                <td id="spn1" align="center">0061</td>
+                <td id="finalPropNo" align="center"></td>
+                <td></td>
+                <td id="oldpropno1" align="center"></td>
+                <td id="oldWard1" align="center"></td>
+                <td id="ownerMobileNo1" align="center"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- </div> -->
+
+        <!-- <div class='breakhere'></div> -->
+
+        <!-- <div style='border: 2px solid black;padding-right:3px !important;padding-left:3px !important; padding-bottom:3px !important; padding-top:15px !important;  '> -->
+
+        <!--                 <div style='font-size: 20px; font-weight: bold; text-align:center;'><label>नगर परिषद कार्यालय, दिग्रस</label><br><span  style="font-size: 16px; font-weight: bold;">मालमत्ताविवरणप्रपत्र</span></div>
+                        <div style='width: 90%;'>
+                            <div style='font-size: 14px; float: left; padding-left: 20px;'>
+                                <label>महाराष्ट्र नगरपरिषदा, नगर पंचायती व औद्योगिक</label><br>
+                                <label>नगरी अधिनियम, १९६५ कलम ११५(२) अन्वये संदर्भ</label>
+                            </div>
+                            <div style='font-size: 14px; float:right; position: relative; padding-right: 20px;'>
+                                 पान क्र.: 02 of 02
+                            </div>
+                        </div>   -->
+
+        टीप:-&nbsp;&nbsp;&nbsp;        <!-- need to add here  -->
+        <div class="imagediv" style="width: 100%; padding: 1%;">
+            <div class="img3" id="pdPropimageT"></div>
+            <div class="img2" id="pdHouseplan2T"></div>
+            <div class="img1" id="pdHouseplanT"></div>
+            <div class="img4" id="pdPropimage2T"></div>
+        </div>
+    </div>
+</form>
+<br>
+<form class="form" style="max-width: none; width: 99%;">
+    <div style="font-size: 22px; text-align:center;"><label class="councilName">नगर परिषद कार्यालय वणी, जि. यवतमाळ</label></div>
+    <!--   <div style="font-size: 16px; text-align:right;margin-top:-20px;margin-right: 13px;"><label >Page 01 of 01</label></div> -->
+
+
+    <table style="margin-top: 10px;width: 99%">
+        <tbody>
+        <tr style="background-color: #EDEDED;text-align: center">
+            <td>पार्सल आयडी</td>
+            <td>रोड आयडी</td>
+            <td>ग्रिड नं</td>
+            <td>अक्षांश(Lat)</td>
+            <td>रेखांश(Long)</td>
+            <td>प्रभाग क्र</td>
+            <td>झोन क्र</td>
+            <td>सर्व्हे मालमत्ता क्र</td>
+            <td>नविन मालमत्ता क्र</td>
+            <td>मालमत्ता क्र</td>
+            <td>धारकाचा मो. क्र</td>
+        </tr>
+        <tr height="30" style="font-size: 14px;">
+            <td align="center"></td>
+            <td align="center"></td>
+            <td align="center"></td>
+
+            <td align="center">
+
+            </td>
+            <td align="center">
+
+            </td>
+
+            <td id="wardNo2" align="center"></td>
+            <td id="zoneNo2" align="center"></td>
+            <td id="spn2" align="center"></td>
+            <td id="finalPropNo" align="center"></td>
+            <td align="center"></td>
+            <td id="ownerMobileNo2" align="center"></td>
+        </tr>
+        </tbody>
+    </table>
+    <br>
+
+<!--    unit built table start-->
+<table id="builtupsTable" style="max-width: none; width: 99%;">
+    <thead>
+        <tr style="font-size: 20px; text-align: center; background-color: #EDEDED;">
+            <th rowspan="2">युनिट क्र.</th>
+            <th rowspan="2">मजला</th>
+            <th rowspan="2">अ. क्र.</th>
+            <th rowspan="2">खोल्यांचा तपशिल</th>
+            <th rowspan="2">वापराचा प्रकार</th>
+            <th rowspan="2">वापराचा उपप्रकार</th>
+            <th rowspan="2">प्रत्येक खोलीचे मोजमाप (लांबी × रुंदी) मीटरमध्ये</th>
+            <th rowspan="2">बांधकाम क्षेत्रफळ</th>
+            <th rowspan="2">वजावट</th>
+            <th rowspan="2">चटई क्षेत्रफळ</th>
+            <th rowspan="2">भूखंड क्षेत्रफळ</th>
+            <th rowspan="2">सुट योग्य क्षेत्रफळ (चौ.मी.)</th>
+            <th colspan="3" align="center">करपात्र क्षेत्रफळ</th>
+            <th rowspan="2">मालमत्ता वर्ग</th>
+            <th rowspan="2">बांधकामाचे वर्ष</th>
+            <th rowspan="2">भोगवटदाराचे/भाडेकरूचे नाव</th>
+            <th rowspan="2">मासिक भाडे</th>
+            <th rowspan="2">शेरा</th>
+            <th rowspan="2">स्थापनेचे नाव</th>
+        </tr>
+        <tr style="font-size: 20px; text-align: center; background-color: #EDEDED;">
+            <th>एकूण क्षेत्रफळ (चौ.मी.)</th>
+            <th>अधिकृत क्षेत्रफळ (चौ.मी.)</th>
+            <th>अनधिकृत क्षेत्रफळ (चौ.मी.)</th>
+        </tr>
+
+        <tr style="font-size: 10px; text-align:center;">
+            <td>१</td>
+            <td>२</td>
+            <td>३</td>
+            <td>४</td>
+            <td>५</td>
+            <td>६</td>
+            <td>७</td>
+            <td>८</td>
+            <td>९</td>
+            <td>१०</td>
+            <td>११</td>
+            <td>१२</td>
+            <td>१३</td>
+            <td>१४</td>
+            <td>१५</td>
+            <td>१६</td>
+            <td>१७</td>
+            <td>१८</td>
+            <td>१९</td>
+            <td>२०</td>
+            <td>२१</td>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- <tr style="text-align:center">
+            <td align="center">1.</td>
+            <td align="center">1</td>
+
+            <td align="center">
+                तळमजला                </td>
+
+            <td align="center">
+                स्वयंपाकघर                </td>
+            <td align="center">
+                निवासी                </td>
+            <td align="center">
+                निवासी
+
+
+            </td>
+            <td align="center">
+                3.48 x 3.19                </td>
+            <td align="center">11.10</td>
+            <td align="center">0</td>
+            <td align="center">11.10</td>
+            <td align="center">11.10</td>
+            <td align="center">0</td>
+            <td align="center">B</td>
+
+            <td align="center" width="100px">
+                22/04/2010                </td>
+            <td align="center"></td>
+            <td align="center" rowspan="2" width="60px"></td>
+            <td align="center" width="100px">
+            </td>
+            <td></td>
+
+        </tr>
+        <tr style="text-align:center">
+            <td align="center">2.</td>
+            <td align="center">1</td>
+
+            <td align="center">
+                तळमजला                </td>
+
+            <td align="center">
+                हॉल                </td>
+            <td align="center">
+                निवासी                </td>
+            <td align="center">
+                निवासी
+
+
+            </td>
+            <td align="center">
+                2.50 x 2.84                </td>
+            <td align="center">7.10</td>
+            <td align="center">0</td>
+            <td align="center">7.10</td>
+            <td align="center">7.10</td>
+            <td align="center">0</td>
+            <td align="center">B</td>
+
+            <td align="center" width="100px">
+                22/04/2010                </td>
+            <td align="center"></td>
+            <td align="center" width="100px">
+            </td>
+            <td></td>
+
+        </tr>
+        <tr><td colspan="7">&nbsp;&nbsp;&nbsp;<span style="padding-left: 30px; font-weight: bold;">Total of Unit No 1</span></td>
+
+            <th align="center">18.2</th>
+            <th align="center">0</th>
+            <th align="center">18.2</th>
+            <th align="center">18.2</th>
+            <th align="center">0</th>
+            <td colspan="5"></td>
+            <td></td>
+        </tr><tr style="text-align:center">
+            <td align="center">3.</td>
+            <td align="center">2</td>
+
+            <td align="center">
+                1                </td>
+
+            <td align="center">
+                स्वयंपाकघर                </td>
+            <td align="center">
+                निवासी                </td>
+            <td align="center">
+                निवासी
+
+
+            </td>
+            <td align="center">
+                3.07 x 2.11                </td>
+            <td align="center">6.48</td>
+            <td align="center">0</td>
+            <td align="center">6.48</td>
+            <td align="center">6.48</td>
+            <td align="center">0</td>
+            <td align="center">B</td>
+
+            <td align="center" width="100px">
+                22/04/2010                </td>
+            <td align="center"></td>
+            <td align="center" rowspan="2" width="60px"></td>
+            <td align="center" width="100px">
+            </td>
+            <td></td>
+
+        </tr>
+        <tr style="text-align:center">
+            <td align="center">4.</td>
+            <td align="center">2</td>
+
+            <td align="center">
+                1                </td>
+
+            <td align="center">
+                हॉल                </td>
+            <td align="center">
+                निवासी                </td>
+            <td align="center">
+                निवासी
+
+
+            </td>
+            <td align="center">
+                3.07 x 2.11                </td>
+            <td align="center">6.48</td>
+            <td align="center">0</td>
+            <td align="center">6.48</td>
+            <td align="center">6.48</td>
+            <td align="center">0</td>
+            <td align="center">B</td>
+
+            <td align="center" width="100px">
+                22/04/2010                </td>
+            <td align="center"></td>
+            <td align="center" width="100px">
+            </td>
+            <td></td>
+
+        </tr>
+        <tr><td colspan="7">&nbsp;&nbsp;&nbsp;<span style="padding-left: 30px; font-weight: bold;">Total of Unit No 2</span></td>
+
+            <th align="center">12.96</th>
+            <th align="center">0</th>
+            <th align="center">12.96</th>
+            <th align="center">12.96</th>
+            <th align="center">0</th>
+            <td colspan="5"></td>
+            <td></td>
+        </tr><tr style="text-align:center">
+            <td align="center">5.</td>
+            <td align="center">3</td>
+
+            <td align="center">
+                2                </td>
+
+            <td align="center">
+                रूम                </td>
+            <td align="center">
+                निवासी                </td>
+            <td align="center">
+                निवासी
+
+
+            </td>
+            <td align="center">
+                3.07 x 2.11                </td>
+            <td align="center">6.48</td>
+            <td align="center">0</td>
+            <td align="center">6.48</td>
+            <td align="center">6.48</td>
+            <td align="center">0</td>
+            <td align="center">B</td>
+
+            <td align="center" width="100px">
+                22/04/2010                </td>
+            <td align="center"></td>
+            <td align="center" rowspan="1" width="60px"></td>
+            <td align="center" width="100px">
+            </td>
+            <td></td>
+
+        </tr>
+        <tr><td colspan="7">&nbsp;&nbsp;&nbsp;<span style="padding-left: 30px; font-weight: bold;">Total of Unit No 3</span></td>
+
+            <th align="center">6.48</th>
+            <th align="center">0</th>
+            <th align="center">6.48</th>
+            <th align="center">6.48</th>
+            <th align="center">0</th>
+            <td colspan="5"></td>
+            <td></td>
+        </tr><tr>
+            <td colspan="7">&nbsp;&nbsp;&nbsp;<span style="padding-left: 30px; font-weight: bold;">Total</span></td>
+
+            <th align="center">37.64 चौ.मी</th>
+            <th align="center">0 चौ.मी</th>
+            <th align="center">37.64 चौ.मी</th>
+            <th align="center">37.64 चौ.मी</th>
+            <th align="center">0 चौ.मी</th>
+            <td colspan="5"></td>
+            <th align="center"></th>
+
+
+        </tr> -->
+
+    </tbody>
+</table>
+
+
+</form>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/3GViewSurveyForm/js/scripts.js"></script>
+</body></html>

@@ -1,0 +1,247 @@
+/* Reset and base styles */
+body {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  background-color: white;
+  color: #333;
+  padding: 30px;
+  line-height: 1.6;
+}
+
+
+.container {
+  border: 4px solid #000; /* black solid border */
+  padding: 20px;
+  margin: auto;
+
+  background-color: #fff; /* makes inside content clean */
+  box-shadow: 0 0 10px rgba(0,0,0,0.2); /* optional shadow */
+}
+
+/* Logo and header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-size: 30px;
+}
+
+.header img {
+  position: relative;
+  left:-10px;
+  min-width: 3px;
+  height: 60px;
+
+
+}
+
+
+
+/* Subheader text */
+.subtext {
+  font-size: 18px;
+  margin: 15px 0;
+  color: #444;
+  text-align: center;
+}
+
+
+
+.subtext .highlight {
+  font-size: 22px;
+  font-weight: bold;
+  color: black;
+}
+
+/* General table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1px 0;
+  background-color: #fff;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+th, td {
+  border: 1px solid #999;
+  padding: 10px;
+  text-align: center;
+}
+
+
+body {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 40px;
+}
+
+.aadesh-patra {
+  max-width: 700px;
+
+  margin: auto;
+
+}
+
+h1 {
+  text-align: center;
+  color: #2e3a59;
+
+}
+
+
+
+
+/* Header Table */
+.khushi {
+  background-color: rgb(240, 218, 214);
+  font-weight: bold;
+}
+
+/* Section headings */
+.saniya td{
+
+  padding: 5px 9px;
+  text-align:center;
+  vertical-align: left;
+  background-color: rgb(240, 218, 214);
+}
+.ABCD {
+  background-color:  rgb(240, 218, 214);
+  font-weight: bold;
+  text-align: center;
+  vertical-align: left;
+  font-size: 16px;
+}
+
+/* Sub-header styling */
+.sub-header {
+
+  font-weight: bold;
+}
+
+.sub-header.green {
+  background-color: #d9f9d9;
+}
+
+/* Notice paragraph */
+.notice {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.dotted-line {
+  border-bottom: 1px dotted #333;
+  margin: 10px 0;
+  height: 15px;
+}
+.signature-section {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+ .left-text {
+  width: 70%;
+}
+
+.dotted-line {
+  border-bottom: 1px dotted black;
+  margin: 10px 0;
+  width: 100%;
+}
+
+
+/* Paragraph styling */
+p {
+  margin-bottom: 15px;
+}
+
+/* Bold Key Points */
+p b {
+  display: block;
+  margin: 5px 0;
+}
+
+/* Inputs */
+.input-line {
+  border: none;
+  border-bottom: 1px solid #000;
+  width: 300px;
+  margin-left: 10px;
+  font-size: 16px;
+  padding: 3px;
+}
+
+/* Centered footer text */
+.centered-text {
+  text-align: right;
+  margin-top: 40px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Last table (valuation) specific styles */
+.valuation-table thead .header-top {
+  background-color: #e7c6c5;
+}
+
+.valuation-table .title{
+  background-color:rgb(240, 218, 214);
+}
+
+.valuation-table th {
+  padding: 8px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  background-color: #baf3f8;
+
+}
+.valuation-table td{
+
+text-align: center;
+background-color: rgb(251, 251, 251);
+}
+.valuation-table .pink th{
+  background-color: #ffffff;
+}
+/* Media Query for smaller screens */
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    zoom: 0.7; /* scale down to fit on one page */
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Avoid page breaks inside elements */
+  .no-break, .container, main, section, article, div {
+    page-break-inside: avoid;
+  }
+
+  /* Force everything onto one page */
+  @page {
+    size: A4 portrait;
+    margin: 1cm;
+  }
+}
+@media print {
+  body {
+    background-color: white; /* or any color you want */
+    color: black; /* ensure text prints clearly */
+  }
+
+  .your-element {
+    background-color: #f0f0f0; /* light gray, for example */
+    color: #333;
+  }
+}

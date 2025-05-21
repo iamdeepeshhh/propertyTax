@@ -1,0 +1,2162 @@
+<!DOCTYPE html> <html lang="en" xmlns:th="http://www.thymeleaf.org"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy2FawZj/aW93Uqq5t4Z7Y8E9eV5dW6fn" crossorigin="anonymous"> <title>Property Survey Form</title> <style> body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #ecf0f1; color: #333; margin: 0; padding: 0; }
+    header { background-color: #fff; color: #2ecc71; padding: 1rem; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+    
+    .tabs { display: flex; overflow: hidden; background: #fdfdfd; overflow: auto; display: flex; padding: 10px 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); justify-content: center; flex: 1; text-align: center; padding: 15px; color: #26cf6d; cursor: pointer; position: relative; transition: color 0.3s ease; }
+    
+    .tabs button { background: #f0f0f0; color: #000000; border: none; padding: 10px 15px; font-size: 14px; cursor: pointer; border-radius: 5px; transition: background 0.3s ease, transform 0.2s ease-in-out; margin: 0 5px; }
+    
+    .unitbutton, .deletebtn { width: 150px; margin-left: 10px; }
+    
+    .tab-content { display: none; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); transition: opacity 0.5s ease-in-out; animation: fadeIn 0.8s ease-in-out; padding: 20px; background-color: #fff; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 8px; }
+    
+    .popup-container { display: none; overflow-x: auto; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: #fff; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); max-width: 89%; width: auto; }
+    
+    .overlay { position: center; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); }
+    
+    .close-btn { position: fixed; top: 10px; right: 10px; cursor: pointer; }
+    
+    .formContainer { display: none; margin-top: 20px; }
+    
+    .tabbutton { background: #2ecc71; color: #fff; border: none; padding: 15px; text-align: center; text-decoration: none; font-size: 16px; cursor: pointer; border-radius: 4px; transition: background 0.3s ease, transform 0.2s ease-in-out; width: 50%; }
+    
+    .tabbutton:hover { color: white; background: green; transform: scale(1.1); }
+    
+    .deletebutton { background: #2ecc71; color: #fff; border: none; padding: 15px; text-align: center; text-decoration: none; font-size: 16px; cursor: pointer; border-radius: 4px; transition: background 0.3s ease, transform 0.2s ease-in-out; width: 50px; }
+    
+    .deletebutton:hover { color: white; background: green; transform: scale(1.1); }
+    
+    .popup { display: none; margin-top: 5px; width: 100%; }
+    
+    .popup label, .popup input, .popup select, .popup button { display: block; margin-bottom: 5px; width: 95%; }
+    
+    .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.4); }
+    
+    .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; box-sizing: border-box; max-width: 400px; }
+    
+    .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+    
+    .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
+    
+    .common-form { max-width: 400px; margin: 20px auto; }
+    
+    label { display: block; margin-bottom: 8px; color: #333; }
+    
+    input[type="text"], select, button { width: calc(100% - 60px); padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 5px; transition: border-color 0.3s ease; }
+    
+    input[type="text"]:focus, select:focus, button:focus { outline: none; border-color: #3498db; }
+    
+    button { background: #2ecc71; color: #fff; border: none; padding: 15px; text-align: center; text-decoration: none; font-size: 16px; cursor: pointer; border-radius: 4px; transition: background 0.3s ease, transform 0.2s ease-in-out; width: 25%; }
+    
+    button:hover { color: white; background: green; transform: scale(1.1); }
+    
+    .button-container { display: flex; justify-content: space-between; }
+    
+    .mandatory::after { content: " *"; color: red; display: inline-block; margin-left: 5px; transform: scale(1.2); }
+    
+    @media screen and (max-width: 600px) { .tabs { flex-wrap: wrap; }
+    
+    .tabs button { flex: 1; margin: 5px; }
+    
+    .popup-container { max-width: 100%; } }
+    
+    #MainTabContent { display: block; }
+    
+    .tabbutton { background: #2ecc71; color: #fff; border: none; padding: 15px; text-align: center; text-decoration: none; font-size: 16px; cursor: pointer; border-radius: 4px; transition: background 0.3s ease, transform 0.2s ease-in-out; width: 50%; }
+    
+    .tabbutton:hover { color: white; background: green; transform: scale(1.1); }
+    
+    .deletebutton { background: #2ecc71; color: #fff; border: none; padding: 15px; text-align: center; text-decoration: none; font-size: 16px; cursor: pointer; border-radius: 4px; transition: background 0.3s ease, transform 0.2s ease-in-out; width: 50px; }
+    
+    .deletebutton:hover { color: white; background: green; transform: scale(1.1); }
+    
+    .popup { display: none; margin-top: 5px; width: 100%; }
+    
+    .popup label, .popup input, .popup select, .popup button { display: block; margin-bottom: 5px; width: 95%; }
+    
+    .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.4); }
+    
+    .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; box-sizing: border-box; max-width: 400px; }
+    
+    .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+    
+    .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
+    
+    .formContainer { display: none; margin-top: 20px; } </style>
+</head>
+
+<body>
+<div class="tabs">
+    <button onclick="openTab('Main')">Main</button>
+    <button onclick="openTab('Property')">Property</button>
+    <button onclick="openTab('Unit')">Unit</button>
+    <button onclick="openTab('Additional')">Additional</button>
+</div>
+<form id="propertyForm" action="/survey/submit" method="post">
+
+   <div id="MainTabContent" class="tab-content">
+    <form>
+
+        <label for="podRef">Reference no:</label>
+        <input type="text" id="podRef" name="podRef" style="width: 97%;" disabled><br>
+
+        <label for="zone" class="mandatory">Zone:</label>
+        <select id="zone" name="zone" style="width: 97%;"></select><br>
+
+        <label for="oldWard">Old Ward:</label>
+        <select id="oldWard" name="oldWard" style="width: 97%;"></select><br>
+
+        <label for="ward" class="mandatory">Ward:</label>
+        <select id="ward" name="ward" style="width: 97%;" onchange="checkSurveyPropNo()"></select><br>
+
+        <label for="citySurveyNo">City Survey No.:</label>
+        <input type="text" id="citySurveyNo" name="citySurveyNo" style="width: 95%;"><br>
+
+        <label for="oldPropertyNo">Old Property No.:</label>
+        <input type="text" id="oldPropertyNo" name="oldPropertyNo" style="width: 95%;"><br>
+
+        <label for="surveyPropNo" class="mandatory">Survey Prop No.:</label>
+        <input type="text" id="surveyPropNo" name="surveyPropNo" style="width: 95%;" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits" oninput="checkSurveyPropNo()"><br>
+        <span id="surveyPropNoMessage" style="color: red; display: none;">Survey Prop No. already exists in this ward.</span>
+
+        <label for="sequenceNo">Sequence No.:</label>
+        <input type="text" id="sequenceNo" name="sequenceNo" style="width: 95%;"><br>
+
+        <label for="layoutName">Layout Name:</label>
+        <input type="text" id="layoutName" name="layoutName" style="width: 95%;"><br>
+
+        <label for="layoutNo">Layout No.:</label>
+        <input type="text" id="layoutNo" name="layoutNo" style="width: 95%;"><br>
+
+        <label for="khasraNo">Khasra No.:</label>
+        <input type="text" id="khasraNo" name="khasraNo" style="width: 95%;"><br>
+
+        <label for="plotNo">Plot No.:</label>
+        <input type="text" id="plotNo" name="plotNo" style="width: 95%;"><br>
+
+        <label for="ownerName" class="mandatory">Owner Name:</label>
+        <input type="text" id="ownerName" name="ownerName" style="width: 95%;"><br>
+
+        <label for="newOwnerName">New Owner Name:</label>
+        <input type="text" id="newOwnerName" name="newOwnerName" style="width: 95%;" disabled><br>
+
+        <label for="occupierName">Occupier Name:</label>
+        <input type="text" id="occupierName" name="occupierName" style="width: 95%;"><br>
+
+        <label for="address" class="mandatory">Address:</label>
+        <input type="text" id="address" name="address" style="width: 95%;"><br>
+
+        <label for="ownerType" class="mandatory">Owner Type:</label>
+        <select id="ownerType" name="ownerType" style="width: 97%;"></select><br>
+
+        <label for="buildingStatus">Building Status:</label>
+        <select id="buildingStatus" name="buildingStatus" style="width: 100%;"></select><br><br>
+
+        <button type="button" onclick="Next('Property')">Next</button>
+    </form>
+</div>
+
+    <div id="PropertyTabContent" class="tab-content">
+
+        <form>
+            <fieldset>
+                <legend>Owner details</legend>
+                <label for="panNo" >Pan No.:</label>
+                <input style="width: 97%;" type="text" id="panNo" name="panNo"><br>
+
+                <label for="aadharNo" >Aadhar No.:</label>
+                <input style="width: 97%;" type="text" id="aadharNo" name="aadharNo"><br>
+
+                <label for="ownermobileNo" >Mobile No.:</label>
+                <input style="width: 97%;" type="text" id="ownermobileNo" name="mobileNo"><br>
+
+                <label for="category" class="mandatory">Category:</label>
+                <select style="width: 99%;" id="category" name="category">
+                </select><br>
+
+                <label for="propertyName">Property Name:</label>
+                <input style="width: 97%;" type="text" id="propertyName" name="propertyName"><br>
+
+                <label for="buildingValue">Building Value:</label>
+                <input style="width: 97%;" type="text" id="buildingValue" name="buildingValue"><br>
+
+                <label for="plotValue">Plot Value:</label>
+                <input style="width: 97%;" type="text" id="plotValue" name="plotValue"><br>
+            </fieldset>
+            <fieldset>
+                <legend>Property information</legend>
+
+                <label for="propertyType" class="mandatory">Property Type:</label>
+                <select style="width: 97%;" id="propertyType" name="propertyType">
+                    <option value="select">Select</option>
+                </select><br>
+
+                <label for="propertySubType" class="mandatory">Property Sub Type:</label>
+                <select style="width: 97%;" id="propertySubType" name="propertySubType">
+                    <option value="select">Select</option>
+                </select><br>
+
+                <label for="propertyusageType" class="mandatory">Usage Type:</label>
+                <select style="width: 97%;" id="propertyusageType" name="propertyusageType">
+                    <option value="select">Select</option>
+                </select><br>
+
+                <label for="propertyusageSubType" class="mandatory">Usage Sub Type:</label>
+                <select style="width: 97%;" id="propertyusageSubType" name="propertyusageSubType">
+                    <option value="select">Select</option>
+                </select><br>
+
+                <label for="buildingType">Building Type:</label>
+                <select style="width: 97%;" id="buildingType" name="buildingType">
+                    <option value="select">Select</option>
+                </select><br>
+
+                <label for="buildingSubType">Building Sub Type:</label>
+                <select style="width: 97%;" id="buildingSubType" name="buildingSubType">
+                    <option value="select">Select</option>
+                </select><br>
+
+                <label for="constYear" class="mandatory">Construction Year:</label>
+                <select style="width: 97%;" id="constYear" name="constYear" onchange="updatePropertyAgeFactor(this.value)">
+                    <!-- Year options will be populated by JavaScript -->
+                </select><br>
+
+                <label for="constAge">Construction Age:</label>
+                <input style="width: 97%;" type="text" id="constAgeProperty" name="constAgeProperty" readonly><br>
+
+                <label for="ageFactor">Age Factor:</label>
+                <input style="width: 97%;" type="text" id="ageFactorProperty" name="ageFactorProperty" readonly><br>
+
+                <input type="hidden" id="agefactorpropertyhid">
+                <input type="hidden" id="currentDateProperty" name="currentDateProperty">
+
+                <label for="permissionSelection">Permission:</label>
+                <select style="width: 97%;" id="permissionSelection" name="permissionSelection"
+                        onchange="togglePopup('permissionSelection', 'permissionPopup')">
+                    <option value="no">Select</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+                <div id="permissionPopup" class="popup">
+                    <label for="permissionNumber">Permission Number:</label>
+                    <input style="width: 97%;" type="text" id="permissionNumber" name="permissionNumber">
+                    <label for="permissionDate">Permission Date:</label>
+                    <input style="width: 97%;" type="date" id="permissionDate" name="permissionDate">
+                </div>
+
+
+                <label for="stair">Stair:</label>
+                <select style="width: 97%;" id="stair" name="stair">
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select><br>
+
+                <label for="lift">Lift:</label>
+                <select style="width: 97%;" id="lift" name="lift">
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select><br>
+
+                <label for="roadWidth">Road Width (in meter):</label>
+                <input style="width: 95%;" type="text" id="roadWidth" name="roadWidth"><br>
+            </fieldset>
+
+            <!-- Suraj's code starts here -->
+            <fieldset>
+                <legend>Other information</legend>
+                <label for="toiletSelection">Toilet:</label>
+                <select style="width: 97%;" id="toiletSelection" name="toiletSelection"
+                        onchange="togglePopup('toiletSelection', 'toiletPopup')">
+                    <option value="no">Select</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+
+                <div id="toiletPopup" class="popup">
+                    <label for="numberOfToilets">Number of Toilets:</label>
+                    <input style="width: 97%;" type="text" id="numberOfToilets" name="numberOfToilets">
+                </div>
+
+                <label for="sewerage">Sewerage:</label>
+                <select style="width: 97%;" id="sewerage" name="sewerage">
+                    <option value="no">Select</option>
+                    <option value="Drain">Drain</option>
+                    <option value="Septic Tank">Septic Tank</option>
+                </select><br>
+
+                <label for="sewerageType">Sewerage type:</label>
+                <select style="width: 97%;" id="sewerageType" name="sewerageType" disabled>
+                </select><br>
+
+                <label for="waterSelection">Water Con:</label>
+                <select style="width: 97%;" id="waterSelection" name="waterSelection"
+                        onchange="togglePopup('waterSelection', 'waterPopup')">
+                    <option value="no">Select</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+                <div id="waterPopup" class="popup">
+                    <label for="waterOptions">Water Connection Type:</label>
+                    <select style="width: 97%;" id="waterOptions" name="waterOptions">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select><br>
+                </div>
+
+                <div id="mcConnectionType" >
+                    <label for="mcConnection">MC Connection:</label>
+                    <select id="mcConnection" name="mcConnection">
+                        <option value="">Select</option>
+                        <option value="Authorized">Authorized</option>
+                        <option value="Unauthorized">Unauthorized</option>
+                    </select>
+                </div>
+                <div id="additionalFields" >
+                    <label for="meterNumber">Meter Number:</label>
+                    <input type="text" id="meterNumber" name="meterNumber"><br>
+
+                    <label for="consumerNumber">Consumer Number:</label>
+                    <input type="text" id="consumerNumber" name="consumerNumber"><br>
+
+                    <label for="connectionDate">Connection Date:</label>
+                    <input type="date" id="connectionDate" name="connectionDate"><br>
+
+                    <label for="pipeSize">Pipe Size:</label>
+                    <select id="pipeSize" name="pipeSize">
+                        <option value="">Select Pipe Size</option>
+                        <option value="0.5">0.5</option>
+                        <option value="0.75">0.75</option>
+                        <option value="1">1</option>
+                        <option value="1.25">1.25</option>
+                        <option value="1.50">1.50</option>
+                        <option value="1.75">1.75</option>
+                        <option value="2">2</option>
+                        <option value="2.25">2.25</option>
+                        <option value="2.50">2.50</option>
+                    </select>
+                </div>
+
+                <label for="solar">Solar:</label>
+                <select style="width: 97%;" id="solar" name="solar">
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select><br>
+
+                <label for="electricitySelection">Electricity:</label>
+                <select style="width: 97%;" id="electricitySelection" name="electricitySelection"
+                        onchange="togglePopup('electricitySelection', 'electricityPopup')">
+                    <option value="no">Select</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+                <div id="electricityPopup" class="popup">
+                    <label for="emeterNumber">Meter Number:</label>
+                    <input style="width: 97%;" type="text" id="emeterNumber" name="emeterNumber">
+                    <label for="consumerNumber">Consumer Number:</label>
+                    <input style="width: 97%;" type="text" id="consumerNumber" name="consumerNumber">
+                </div>
+
+
+                <label for="rainWaterHarvesting">Rain water Harvesting:</label>
+                <select style="width: 97%;" id="rainWaterHarvesting" name="rainWaterHarvesting">
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select><br>
+            </fieldset>
+
+            <fieldset>
+                <legend>Total Area</legend>
+
+                <label for="plotArea">Plot Area:</label>
+                <input type="text" id="plotArea" name="plotArea"><br>
+
+                <label for="builtUpArea">Built up Area:</label>
+                <input type="text" id="builtUpArea" name="builtUpArea"><br>
+
+                <label for="carpetArea">Carpet Area:</label>
+                <input type="text" id="carpetArea" name="carpetArea"><br>
+
+                <label for="exemptedArea">Exempted Area:</label>
+                <input type="text" id="exemptedArea" name="exemptedArea"><br>
+
+                <label for="assessableArea">Assessable Area:</label>
+                <input type="text" id="assessableArea" name="assessableArea"><br>
+
+                <label for="areaLetout">Area Letout:</label>
+                <input type="text" id="areaLetout" name="areaLetout"><br>
+
+                <label for="areaNotLetout">Area Not Letout:</label>
+                <input  type="text" id="areaNotLetout" name="areaNotLetout"><br>
+
+                <label for="currentAssmtDate">Current Assessment Date:</label>
+                <input type="text" id="currentAssmtDate" name="currentAssmtDate" readonly>
+
+                <label for="noofrooms">Number of Rooms:</label>
+                <input type="text" id="noofrooms" name="noofrooms" readonly>
+
+                <label for="nooffloors">Number of Floors:</label>
+                <input type="text" id="nooffloors" name="nooffloors" readonly>
+
+                <label for="lastAssmtDate">Last Assmt Date:</label>
+                <input type="text" id="lastAssmtDate" name="lastAssmtDate" readonly>
+
+                <label for="naSelection">NA Details:</label>
+                <select style="width: 97%;" id="naSelection" name="naSelection" onchange="togglePopup('naSelection', 'naPopup')">
+                    <option value="no">Select</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+
+                <div id="naPopup" class="popup">
+                    <label for="naOrder">NA Order:</label>
+                    <input type="text" id="naOrder" name="naOrder">
+                    <label for="naDate">NA Date:</label>
+                    <input style="width: 97%;
+                        padding: 8px;
+                        box-sizing: border-box;
+                        border: 1px solid #ccc;
+                        border-radius: 3px;" type="date" id="naDate" name="naDate">
+                </div>
+
+                <label for="tdSelection">TD Details:</label>
+                <select style="width: 97%;" id="tdSelection" name="tdSelection" onchange="togglePopup('tdSelection', 'tdPopup')">
+                    <option value="no">Select</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+
+                <div id="tdPopup" class="popup">
+                    <label for="tdOrder">TD Order:</label>
+                    <input type="text" id="tdOrder" name="tdOrder">
+                    <label for="tdDate">TD Date:</label>
+                    <input style="width: 97%;
+                        padding: 8px;
+                        box-sizing: border-box;
+                        border: 1px solid #ccc;
+                        border-radius: 3px;" type="date" id="tdDate" name="tdDate">
+                </div>
+
+
+                <label for="tpSelection">TP Details:</label>
+                <select style="width: 97%;" id="tpSelection" name="tpSelection" onchange="togglePopup('tpSelection', 'tpPopup')">
+                    <option value="no">Select</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+
+                <div id="tpPopup" class="popup">
+                    <label for="tpOrder">TP Order:</label>
+                    <input type="text" id="tpOrder" name="tpOrder">
+                    <label for="tpDate">TP Date:</label>
+                    <input style="width: 97%;
+                        padding: 8px;
+                        box-sizing: border-box;
+                        border: 1px solid #ccc;
+                        border-radius: 3px;" type="date" id="tpDate" name="tpDate">
+                </div>
+
+                <label for="saledeedSelection">Sale Deed:</label>
+                <select style="width: 97%;" id="saledeedSelection" name="saledeedSelection"
+                        onchange="togglePopup('saledeedSelection', 'saledeedPopup')">
+                    <option value="no">Select</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+
+                <div id="saledeedPopup" class="popup">
+                    <label for="saledeedDate">Sale Deed Date:</label>
+                    <input style="width: 97%;
+                        padding: 8px;
+                        box-sizing: border-box;
+                        border: 1px solid #ccc;
+                        border-radius: 3px;" type="date" id="saledeedDate" name="saledeedDate">
+                </div>
+
+
+                <label for="oldRV">Old R.V.:</label>
+                <input type="text" id="oldRV" name="oldRV"><br>
+            </fieldset>
+
+            <fieldset>
+                <legend>Property Images</legend>
+            
+                <label for="propertyImage">Property Image:</label>
+                <input type="file" id="propertyImage" name="propertyImage" accept="image/*" onchange="compressImage(this.files[0], 'previewPropertyImage')">
+                <button class="deletebutton" type="button" onclick="cancelUpload('propertyImage')">🗑</button>
+                <img id="previewPropertyImage" style="max-width: 100%; height: auto;" /><br>
+            
+                <label for="propertyImage2">Property Image 2:</label>
+                <input type="file" id="propertyImage2" name="propertyImage2" accept="image/*" onchange="compressImage(this.files[0], 'previewPropertyImage2')">
+                <button class="deletebutton" type="button" onclick="cancelUpload('propertyImage2')">🗑</button>
+                <img id="previewPropertyImage2" style="max-width: 100%; height: auto;" /><br>
+            </fieldset>
+            
+            <fieldset>
+                <legend>House Plans</legend>
+            
+                <label for="housePlan1">House Plan 1:</label>
+                <input type="file" id="housePlan1" name="housePlan1" accept="image/*" onchange="compressImage(this.files[0], 'previewHousePlan1')">
+                <button class="deletebutton" type="button" onclick="cancelUpload('housePlan1')">🗑</button>
+                <img id="previewHousePlan1" style="max-width: 100%; height: auto;" /><br>
+            
+                <label for="housePlan2">House Plan 2:</label>
+                <input type="file" id="housePlan2" name="housePlan2" accept="image/*" onchange="compressImage(this.files[0], 'previewHousePlan2')">
+                <button class="deletebutton" type="button" onclick="cancelUpload('housePlan2')">🗑</button>
+                <img id="previewHousePlan2" style="max-width: 100%; height: auto;" /><br>
+            </fieldset>
+            
+            
+            <br><br><br>
+
+            <div class="button-container">
+                <button type="button" onclick="Back('Main')">Back</button>
+                <button type="button" onclick="Next('Unit')">Next</button>
+            </div>
+
+        </form>
+    </div>
+
+    <div id="UnitTabContent" class="tab-content">
+        <button onclick="addUnit()">Add Unit</button><br>
+        <div id="unitButtons"></div>
+        <div id="formContainers"></div>
+        <div class="button-container">
+            <button type="button" onclick="Back('Property')">Back</button>
+            <button type="button" onclick="Next('Additional')">Next</button>
+        </div>
+    </div>
+
+
+    <div id="AdditionalTabContent" class="tab-content">
+        <form>
+            <div id="memberForm1">
+                <h3>Member 1 Details:</h3>
+
+                <label for="additionalName">Name:</label>
+                <input type="text" id="additionalName" name="additionalName"><br>
+
+                <label for="qualification">Qualification:</label>
+                <select id="qualification" name="qualification">
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                </select><br>
+
+                <label for="occupation">Occupation:</label>
+                <input type="text" id="occupation" name="occupation"><br>
+
+                <label for="noOfAdults">No. Of Adults:</label>
+                <input type="text" id="noOfAdults" name="noOfAdults"><br>
+
+                <label for="noOfChildren">No. of children:</label>
+                <input type="text" id="noOfChildren" name="noOfChildren"><br>
+
+                <label for="currentTaxDetails">Current Tax Details:</label>
+                <select id="currentTaxDetails" name="currentTaxDetails">
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                </select><br>
+
+                <label for="taxAmount">Tax Amount:</label>
+                <input type="text" id="taxAmount" name="taxAmount"><br>
+
+                <label for="roadType">Road Type:</label>
+                <select id="roadType" name="roadType">
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                </select><br>
+
+                <label for="roadName">Road Name:</label>
+                <input type="text" id="roadName" name="roadName"><br>
+
+                <button type="button" onclick="addMember()">Add Another Member</button>
+                </select><br>
+
+                <br><br>
+                <hr>
+            </div>
+            <div class="button-container">
+                <div id="signaturePopup" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="hideSignaturePopup()">&times;</span>
+                        <canvas id="signatureCanvas" width="400" height="200"></canvas>
+                        <br>
+                        <button type="button" onclick="clearSignature(event)">Clear</button>
+                        <button type="button" onclick="saveSignature(event)">Save</button>
+                    </div>
+                </div>
+            </div>
+            <button type="button" onclick="Back('Unit')">Back</button>
+            <button type="button" onclick="submitFormData()" style="float: right;">Submit</button>
+        </form>
+    </div>
+</form>
+
+<!-- <div id="overlay" class="overlay" onclick="submitFormData()"></div> -->
+
+<script>
+    function checkPodRef() {
+        document.getElementById('newOwnerName').disabled = document.getElementById('podRef').value.trim() === '';
+    }
+    document.getElementById('podRef').addEventListener('input', checkPodRef);
+    window.onload = checkPodRef;
+
+    document.getElementById('sewerage').addEventListener('change', function() {
+        document.getElementById('sewerageType').disabled = this.value !== 'Drain';
+    });
+    function openTab(tabName) {
+
+        var tabContents = document.getElementsByClassName("tab-content");
+        for (var i = 0; i < tabContents.length; i++) {
+            tabContents[i].style.display = "none";
+        }
+        document.getElementById(tabName + "TabContent").style.display = "block";
+
+    }
+
+    function Next(tabName) {
+        openTab(tabName);
+    }
+
+    function Back(tabName) {
+        openTab(tabName);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var selectedProperty = localStorage.getItem('selectedProperty');
+        selectedProperty = selectedProperty ? JSON.parse(selectedProperty) : null;
+        populateYearDropdown('constYear');
+        fetchAndPopulateAssessmentDates();
+        fetchAllTypesOfAPI('/3gSurvey/getAllOldWards', 'oldWard', selectedProperty);
+        initializePropertyTypesAndCaptureSelection('propertyType', '/3gSurvey/propertytypes');
+        initializeTypesAndCaptureSelection('propertyType', 'propertySubType', '/3gSurvey/propertySubtypes');
+        initializeTypesAndCaptureSelection('propertySubType', 'propertyusageType', '/3gSurvey/usageTypes');
+        initializeTypesAndCaptureSelection('propertyusageType', 'propertyusageSubType', '/3gSurvey/usageSubtypes');
+        initializeTypesAndCaptureSelection('propertyType', 'buildingType', '/3gSurvey/getBuildingTypesByPropertyClassification');
+        initializeTypesAndCaptureSelection('buildingType', 'buildingSubType', '/3gSurvey/buildingSubtypes');
+
+        if (selectedProperty) {
+            document.getElementById('podRef').value = selectedProperty.podRefNoVc || '';
+            document.getElementById('oldWard').value = selectedProperty.podWardI || '';
+            document.getElementById('oldPropertyNo').value = selectedProperty.podOldPropNoVc || '';
+            document.getElementById('ownerName').value = selectedProperty.podOwnerNameVc || '';
+            document.getElementById('address').value = selectedProperty.podPropertyAddressVc || '';
+            document.getElementById('occupierName').value = selectedProperty.podOccupierNameVc || '';
+            localStorage.removeItem('selectedProperty');
+        }
+
+        fetch('/3g/constructionAgeFactor')
+        .then(response => response.json())
+        .then(data => {
+            constructionAgeFactors = data;
+            console.log(JSON.stringify(constructionAgeFactors, null, 2)+"this is factors");
+        })
+        .catch(error => console.error('Error fetching construction age factors:', error));
+
+        document.querySelectorAll('[id^="classOfProperty"]').forEach(dropdown => {
+            disableFieldsIfClassOfPropertyOp(dropdown);
+        });
+    });
+
+    function disableFieldsIfClassOfPropertyOp(dropdown) {
+        console.log("disablefields");
+        const unitId = dropdown.id.replace('classOfProperty', '');
+        const isOpSelected = dropdown.value === 'op';
+
+        // Fetch the data-name attribute of the selected option
+        const selectedOption = dropdown.selectedOptions[0];
+        const dataName = selectedOption.getAttribute('data-name') || '';
+        console.log(`Selected data-name: ${dataName}`);
+
+        // Disable fields if "op" is selected or dataName contains "o.p"
+        const shouldDisable = isOpSelected || dataName.toLowerCase().includes('o.p');
+
+        document.getElementById(`constructionYear${unitId}`).disabled = shouldDisable;
+        document.getElementById(`constructionAge${unitId}`).disabled = shouldDisable;
+        document.getElementById(`constAgeFactor${unitId}`).disabled = shouldDisable;
+    }
+    fetchAllTypesOfAPI('/3gSurvey/getAllZones', 'zone');
+    fetchAllTypesOfAPI('/3gSurvey/getAllWards', 'ward');
+    fetchAllTypesOfAPI('/3gSurvey/getOwnerType', 'ownerType');
+    fetchAllTypesOfAPI('/3gSurvey/buildstatuses', 'buildingStatus');
+    fetchAllTypesOfAPI('/3gSurvey/ownerCategories', 'category');
+    fetchAllTypesOfAPI('/3gSurvey/getSewerageTypes', 'sewerageType');
+    fetchAllTypesOfAPI('/3gSurvey/waterConnections', 'waterOptions');
+
+    async function fetchAllTypesOfAPI(apiUrl, selectElementId, selectedProperty = null) {
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Network response was not ok for URL: ${apiUrl}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const selectElement = document.getElementById(selectElementId);
+
+            // Add a 'Select' option at the top of the dropdown
+            const defaultOption = new Option("Select", "");
+            selectElement.add(defaultOption);
+
+            // Populate the dropdown with options from the fetched data
+            data.forEach(item => {
+                const option = new Option(item.name, item.value);
+                option.setAttribute('data-name', item.name); // Assuming value is the percentage of deduction
+                selectElement.add(option);
+            });
+
+            // Set the dropdown value to the default 'Select' or to a specified property, if applicable
+            if (selectedProperty) {
+                selectElement.value = selectedProperty.podWardI;
+            } else {
+                selectElement.value = ""; // Ensures 'Select' is selected by default if no property is specified
+            }
+
+            // Add event listener for logging the deduction percentage
+            selectElement.addEventListener('change', () => logDeductionPercentage(selectElementId.replace('classOfProperty', '')));
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+}
+
+    function openPopup(unitId) {
+    var popupId = 'popup-' + unitId; // Unique ID for the popup based on the unit ID
+    var popup = document.getElementById(popupId);
+
+    // If the popup does not exist, create it dynamically
+    if (!popup) {
+        popup = document.createElement('div');
+        popup.id = popupId;
+        popup.className = 'popup-container';
+        // Add your popup content here, making sure to use `unitId` to make IDs unique
+        popup.innerHTML = getPopupContent(unitId);
+        document.body.appendChild(popup);
+    }
+
+    // Show the popup
+    popup.style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+}
+
+    function getPopupContent(unitId) {
+        return `
+            <span class="close-btn" onclick="closePopup('${unitId}')">&times;</span>
+            <h2 style="text-align: center;">Flat Details</h2>
+            <div>
+            <form>
+            <div id="tableContainer" style="overflow: auto;">
+                <table id="table-${unitId}" style="max-width: auto; height: 100px; overflow: auto;">
+                    <thead>
+                        <tr>
+                            <th>Room</th>
+                            <th>Use</th>
+                            <th>Inner/Outer</th>
+                            <th>Deduction %</th>
+                            <th>Length</th>
+                            <th>Breadth</th>
+                            <th>Area Before Deduction</th>
+                            <th>Carpet Area</th>
+                            <th>Plot Area</th>
+                            <th>Exemption</th>
+                            <th>Exemption Length</th>
+                            <th>Exemption Breadth</th>
+                            <th>Exemption Area</th>
+                            <th>Assumption Area</th>
+                            <th>Legal/Illegal</th>
+                            <th>Legal Assmt Area</th>
+                            <th>Illegal Assmt Area</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be dynamically added here -->
+                    </tbody>
+                    <tr id="total-${unitId}" style="background-color: whitesmoke">
+                            <td colspan="4"><center>Total Area</center></td>
+                            <td><td><td><td><input type="number" id="TotalCarpetArea-${unitId}" style="width: 78px; padding: 0px; background-color: white; border-color:white;"></td>
+                            <td><input type="number" id="TotalPlotArea-${unitId}" style="width: 78px; padding: 0px; background-color: white; border-color:white;"></td>
+                            <td></td><td></td><td></td>
+                            <td><input type="number" id="ExemptionArea1-${unitId}" style="width: 78px; padding: 0px; background-color: white; border-color:white;"></td>
+                            <td><input type="number" id="AssArea1-${unitId}" style="width: 78px; padding: 0px; background-color: white; border-color:white;"></td>
+                            <td></td>
+                            <td><input type="number" id="LegalAssmtArea1-${unitId}" style="width: 78px; padding: 0px; background-color: white; border-color:white;"></td>
+                            <td><input type="number" id="IllegalAssmtArea1-${unitId}" style="width: 78px; padding: 0px; background-color: white; border-color:white;"></td>
+                            <td></td>
+                        </tr>
+                </table>
+            </div>
+            </form>
+            </div>
+            <button type="button" onclick="saveAndClosePopup('${unitId}')">Save</button>
+            <button onclick="addRow('${unitId}')">Add Area</button>
+        `;
+    }
+//here i am searching survypropno if it exists show error
+    async function checkSurveyPropNo() {
+        console.log("Checking Survey Property Number");
+        const surveyPropNo = document.getElementById('surveyPropNo').value;
+        const ward = document.getElementById('ward').value;
+        const messageElement = document.getElementById('surveyPropNoMessage');
+
+        // Check if both inputs are provided and surveyPropNo is exactly 9 characters
+        if (surveyPropNo.length === 9 && ward) {
+            try {
+                const response = await fetch(`/3gSurvey/checkSurveyPropNo?surveyPropNo=${surveyPropNo}&ward=${ward}`);
+                const exists = await response.json();
+
+                if (exists) {
+                    messageElement.style.display = 'block';
+                } else {
+                    messageElement.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error checking survey property number:', error);
+                messageElement.style.display = 'none';
+            }
+        } else {
+            messageElement.style.display = 'none';
+        }
+    }
+    //here done
+
+//here we are populating picklist values so code is written below for it+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//all code will be written here
+
+    async function initializePropertyTypesAndCaptureSelection(selectId, apiUrl) {
+        const selectElement = document.getElementById(selectId);
+
+        // Fetch the property types from the API and populate the select element.
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error('Failed to fetch data');
+            const propertyTypes = await response.json();
+
+            let optionsHtml = '<option value="">Select</option>';
+            propertyTypes.forEach(type => {
+                // Apply specific format for "Building Type" dropdown or others as needed
+                if (selectId === 'bt-property-type-select') {
+                    // For "Building Type", concatenate the value and name
+                    optionsHtml += `<option value="${type.value},${type.name}">${type.name}</option>`;
+                } else {
+                    // For other dropdowns, just use the ID or another appropriate attribute
+                    optionsHtml += `<option value="${type.value}">${type.name}</option>`;
+                }
+            });
+            selectElement.innerHTML = optionsHtml;
+
+        }catch (error) {
+            console.error(`Error initializing property types for select #${selectId}:`, error);
+        }
+
+        // Attempt to reapply saved selection from localStorage
+        //const savedValue = localStorage.getItem(`${selectId}-value`);
+        // if (savedValue) {
+        //     selectElement.value = savedValue;
+        // }
+
+        // Listen for changes to the select element, log the selected option's ID and name, and save them to localStorage.
+        // selectElement.addEventListener('change', function() {
+        // const selectedOption = this.options[this.selectedIndex];
+        //     const value = selectedOption.value;
+        //     let selectedId, selectedName;
+
+            // Special handling for the "Building Type" section
+            // if (selectId === 'bt-property-type-select') {
+            // console.log("i am in");
+                // Assuming the value is in the format "id,name" for the "Building Type" section
+                // [selectedId, selectedName] = selectedOption.value.split(',');
+                // Additional logic for "Building Type", if necessary
+            // } else {
+                // For other select elements, handle the value as just an ID
+                // selectedId = selectedOption.value;
+                // selectedName = selectedOption.text; // Using .text to get the visible name
+            // }
+
+            ///console.log(`Selected ID: ${selectedId}, Name: ${selectedName}`);
+
+            // Save the selection ID (and name if applicable) to localStorage
+            // localStorage.setItem(`${selectId}-id`, selectedId);
+            // localStorage.setItem(`${selectId}-name`, selectedName);
+            // localStorage.setItem(`${selectId}-value`, value);
+
+        // });
+    }
+
+    async function initializeTypesAndCaptureSelection(propertyTypeId, subtypeSelectId, apiUrl) {
+        const propertyTypeSelectElement = document.getElementById(propertyTypeId);
+        const subtypeSelectElement = document.getElementById(subtypeSelectId);
+
+        // Listen for changes in the property type select element to fetch and populate subtypes.
+        propertyTypeSelectElement.addEventListener('change', async function() {
+            const selectedPropertyTypeId = this.value;
+            subtypeSelectElement.innerHTML = '<option value="">Select</option>';
+
+            if (!selectedPropertyTypeId) {
+                return;
+            }
+
+            try {
+                // Fetch the property subtypes based on the selected property type ID.
+                const response = await fetch(`${apiUrl}/${selectedPropertyTypeId}`);
+                if (!response.ok) throw new Error('Failed to fetch property subtypes');
+                const propertySubtypes = await response.json();
+
+                // Populate the subtype select element with options based on the fetched data.
+                let optionsHtml = '<option value="">Select</option>';
+                propertySubtypes.forEach(subtype => {
+                    optionsHtml += `<option value="${subtype.value}">${subtype.name}</option>`;
+                });
+                subtypeSelectElement.innerHTML = optionsHtml;
+
+                // Reapply the saved subtype selection from localStorage if available.
+                // const savedSubtypeSelectionId = localStorage.getItem(`${subtypeSelectId}-id`);
+                // if (savedSubtypeSelectionId) {
+                //     subtypeSelectElement.value = savedSubtypeSelectionId;
+                // }
+
+            } catch (error) {
+                console.error(`Error fetching property subtypes for ${subtypeSelectId}:`, error);
+            }
+        });
+
+        // Listen for changes to the subtype select element to save the selection to localStorage.
+        // // subtypeSelectElement.addEventListener('change', function() {
+        // //     const selectedOption = this.options[this.selectedIndex];
+        // //     const selectedId = selectedOption.value;
+        // //     const selectedName = selectedOption.text;
+        // //     console.log(`Selected Property Subtype ID: ${selectedId}, Name: ${selectedName}`);
+
+        // //     // Save selection ID and name to localStorage.
+        // //     localStorage.setItem(`${subtypeSelectId}-id`, selectedId);
+        // //     localStorage.setItem(`${subtypeSelectId}-name`, selectedName);
+        // });
+    }
+
+    async function initializeUnitUsageTypesAndCaptureSelection(propertyTypeId, subtypeSelectId, apiUrl) {
+        const subtypeSelectElement = document.getElementById(subtypeSelectId);
+
+        // Directly use propertyTypeId (numeric value) to fetch and populate subtypes without listening for changes on a select element
+        async function fetchAndPopulateSubtypes() {
+            subtypeSelectElement.innerHTML = '<option value="">Select</option>';
+
+            if (!propertyTypeId) {
+                return;
+            }
+
+            try {
+                // Fetch the property subtypes based on the propertyTypeId.
+                const response = await fetch(`${apiUrl}/${propertyTypeId}`);
+                if (!response.ok) throw new Error('Failed to fetch property subtypes');
+                const propertySubtypes = await response.json();
+
+                // Populate the subtype select element with options based on the fetched data.
+                let optionsHtml = '<option value="">Select</option>';
+                propertySubtypes.forEach(subtype => {
+                    optionsHtml += `<option value="${subtype.value}">${subtype.name}</option>`;
+                });
+                subtypeSelectElement.innerHTML = optionsHtml;
+
+            } catch (error) {
+                console.error(`Error fetching property subtypes for ${propertyTypeId}:`, error);
+            }
+        }
+
+        // Immediately fetch and populate subtypes upon function call
+        fetchAndPopulateSubtypes();
+    }
+
+//this is closure for populatin picklist code++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    function saveAndClosePopup(unitId) {
+        var totalCarpetArea = document.getElementById(`TotalCarpetArea-${unitId}`).value;
+        var totalExemptedArea = document.getElementById(`ExemptionArea1-${unitId}`).value;
+        var totaAssessableArea = document.getElementById(`AssArea1-${unitId}`).value;
+        var totallegalarea = document.getElementById(`LegalAssmtArea1-${unitId}`).value;
+        //var totalillegalarea = document.getElementById(`IllegalAssmtArea1-${unitId}`).value;
+        if (!totalCarpetArea || isNaN(totalCarpetArea)) {
+            alert("Please enter a valid carpet area.");
+            return;
+        }
+
+        document.getElementById(`totalcarpetarea${unitId}`).value = totalCarpetArea;
+        document.getElementById(`totalexemptedarea${unitId}`).value = totalExemptedArea;
+        document.getElementById(`assessablearea${unitId}`).value = totaAssessableArea;
+        document.getElementById(`totallegalarea${unitId}`).value = totallegalarea;
+        //document.getElementById(`totalillegalarea${unitId}`).value = totalillegalarea;
+        updateAreas(unitId);
+        closePopup(unitId);
+    }
+
+    function closePopup(unitId) {
+        var popup = document.getElementById('popup-' + unitId);
+        if (popup) {
+            popup.style.display = 'none';
+        }
+        // document.getElementById('overlay').style.display = 'none';
+    }
+
+    function addRow(unitId) {
+    let tableBody = document.querySelector(`#table-${unitId} tbody`);
+    let newRow = tableBody.insertRow();
+    let rowId = `row-${unitId}-${tableBody.rows.length}`;
+
+    fetchAllTypesOfAPI('/3gSurvey/roomTypes', `use-${rowId}`, `room-${rowId}`);
+    let cellHtmlContent = [
+        `<input type="checkbox" id="room-${rowId}" onclick="updateOnChange('${unitId}')" style="margin-right: 10px;" disabled>`,
+        `<select id="use-${rowId}" style="width: 120px; background-color: white; border-color:black;" onchange="updateAreas('${unitId}'), checkUseValue('${rowId}')"></select>`,
+        `<select id="measureType-${rowId}" style="width: 90px; background-color: white; border-color:black;" onchange="updateAreas('${unitId}')"><option value="">Select</option><option value="inner">Inner</option><option value="outer">Outer</option></select>`,
+        `<input id="deduction-${rowId}" type="number" step="0.01" readonly placeholder="Deduction Percentage" disabled />`,
+        `<input id="length-${rowId}" type="number" step="0.01" placeholder="Length" oninput="updateAreas('${unitId}')" />`,
+        `<input id="breadth-${rowId}" type="number" step="0.01" placeholder="Breadth" oninput="updateAreas('${unitId}')" />`,
+        `<input id="areabeforededuction-${rowId}" type="number" step="0.01" readonly placeholder="Area before deduction" />`,
+        `<input id="carpetArea-${rowId}" type="number" step="0.01" placeholder="Carpet Area" oninput="updateAreas('${unitId}')"/>`,
+        `<input id="plotArea-${rowId}" type="number" step="0.01" placeholder="Plot Area" oninput="updateAreas('${unitId}')"  />`,
+        `<select id="exemption-${rowId}" style="width: 90px; background-color: white; border-color:black;" onchange="updateAreas('${unitId}')"><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select>`,
+        `<input id="exemptionLength-${rowId}" type="number" step="0.01" placeholder="Exemption Length" oninput="updateAreas('${unitId}')" disabled />`,
+        `<input id="exemptionBreadth-${rowId}" type="number" step="0.01" placeholder="Exemption Breadth" oninput="updateAreas('${unitId}')" disabled />`,
+        `<input id="exemptionArea-${rowId}" type="number" step="0.01" placeholder="Exemption Area" oninput="updateAreas('${unitId}')" disabled/>`,
+        `<input id="assumptionArea-${rowId}" type="number" step="0.01" readonly placeholder="Assumption Area" />`,
+        `<select id="legalIllegal-${rowId}" style="width: 90px; background-color: white; border-color:black;" onchange="updateAreas('${unitId}')"><option value="">Select</option><option value="legal">Legal</option><option value="illegal">Illegal</option></select>`,
+        `<input id="legalAssmtArea-${rowId}" type="number" step="0.01" readonly placeholder="Legal Assmt Area" disabled />`,
+        `<input id="illegalAssmtArea-${rowId}" type="number" step="0.01" placeholder="Illegal Assmt Area" oninput="updateAreas('${unitId}')" disabled />`,
+        `<button type="button" onclick="removeRow(this, '${unitId}')">&#x1F5D1;</button>`
+    ];
+
+    cellHtmlContent.forEach((html, index) => {
+        let cell = newRow.insertCell(index);
+        cell.innerHTML = html;
+    });
+
+    // Call updateAreas to initialize the state of the new row
+    updateAreas(unitId);
+}
+    function checkUseValue(rowId) {
+        const selectElement = document.getElementById(`use-${rowId}`);
+        const checkboxElement = document.getElementById(`room-${rowId}`);
+        if (selectElement.value == 1) {
+            checkboxElement.checked = true;
+        } else {
+            checkboxElement.checked = false;
+        }
+    }
+
+    function updateOnChange(unitId) {
+        updateAreas(unitId);
+    }
+
+    function updateoccupancyfields(unitId){
+            // Enable/disable fields based on occupancy selection
+            const occupancy = document.getElementById(`occupancy${unitId}`);
+            const occupierName = document.getElementById(`occupiername${unitId}`);
+            const tenantNo = document.getElementById(`tenantno${unitId}`);
+            const monthlyRent = document.getElementById(`monthlyrent${unitId}`);
+            const rentalDocument = document.getElementById(`rentalDocument${unitId}`);
+            const selectedOption = occupancy.options[occupancy.selectedIndex];
+            if (selectedOption.text.toLowerCase() === 'tenant') {
+                occupierName.disabled = false;
+                tenantNo.disabled = false;
+                monthlyRent.disabled = false;
+                rentalDocument.disabled = false;
+            } else {
+                occupierName.disabled = true;
+                tenantNo.disabled = true;
+                monthlyRent.disabled = true;
+                rentalDocument.disabled = true;
+            }
+    }
+
+    function logDeductionPercentage(unitId) {
+        const classOfPropertyElement = document.querySelector(`#classOfProperty${unitId}`);
+        if (classOfPropertyElement) {
+            const deductionPercentage = parseFloat(classOfPropertyElement.value) || 0; // Value is the percentage of deduction
+            console.log("Deduction Percentage:", deductionPercentage); // Log the deduction percentage
+            const deductionPercentageField = document.querySelector(`#deductionPercentageField${unitId}`);
+            if (deductionPercentageField) {
+                deductionPercentageField.value = deductionPercentage + '%'; // Display the percentage
+            }
+        }
+    }
+// Update the updateAreas function to log the deduction percentage during calculation
+function getSelectedOptionText(selectElement) {
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    return selectedOption.getAttribute('data-name') || selectedOption.text;
+}
+
+function updateAreas(unitId) {
+    console.log("Updating areas for unit: " + unitId);
+
+    let totalCarpetArea = 0, totalExemptionArea = 0, totalAssumptionArea = 0;
+    let totalPlotArea = 0;
+    let totalLegalArea = 0, totalIllegalArea = 0;
+
+    let tableBody = document.querySelector(`#table-${unitId} tbody`);
+    let rows = tableBody.querySelectorAll('tr:not(#total-' + unitId + ')');
+
+    rows.forEach(row => {
+        let rowId = row.id;
+        let length = parseFloat(row.querySelector(`[id^="length-"]`).value) || 0;
+        let breadth = parseFloat(row.querySelector(`[id^="breadth-"]`).value) || 0;
+        let exemptionLength = parseFloat(row.querySelector(`[id^="exemptionLength-"]`).value) || 0;
+        let exemptionBreadth = parseFloat(row.querySelector(`[id^="exemptionBreadth-"]`).value) || 0;
+        let exemptionArea = parseFloat(row.querySelector(`[id^="exemptionArea-"]`).value) || 0;
+        let measureType = row.querySelector(`select[id^="measureType-"]`).value;
+        let classOfPropertyElement = document.querySelector(`#classOfProperty${unitId}`);
+        let deductionPercentage = 0;
+        let useElement = row.querySelector(`select[id^="use-"]`);
+        const useText = useElement.options[useElement.selectedIndex].text.toLowerCase();
+        let plotAreaElement = row.querySelector(`[id^="plotArea-"]`);
+        let carpetAreaElement = row.querySelector(`[id^="carpetArea-"]`);
+        let exemptionElement = row.querySelector(`select[id^="exemption-"]`);
+        let legalIllegalElement = row.querySelector(`select[id^="legalIllegal-"]`);
+        let illegalAssmtAreaElement = row.querySelector(`[id^="illegalAssmtArea-"]`);
+        let legalAssmtAreaElement = row.querySelector(`[id^="legalAssmtArea-"]`);
+
+        if (useText === 'open plot') {
+            plotAreaElement.disabled = false;
+            carpetAreaElement.disabled = true;
+        } else {
+            plotAreaElement.disabled = true;
+            carpetAreaElement.disabled = false;
+        }
+
+        if (exemptionElement && exemptionElement.value === 'yes') {
+            if (useText === 'open plot') {
+                row.querySelector(`[id^="exemptionLength-"]`).disabled = true;
+                row.querySelector(`[id^="exemptionBreadth-"]`).disabled = true;
+                row.querySelector(`[id^="exemptionArea-"]`).disabled = false;
+            } else {
+                row.querySelector(`[id^="exemptionLength-"]`).disabled = false;
+                row.querySelector(`[id^="exemptionBreadth-"]`).disabled = false;
+                row.querySelector(`[id^="exemptionArea-"]`).disabled = false;
+            }
+        } else {
+            if (row.querySelector(`[id^="exemptionLength-"]`)) {
+                row.querySelector(`[id^="exemptionLength-"]`).disabled = true;
+            }
+            if (row.querySelector(`[id^="exemptionBreadth-"]`)) {
+                row.querySelector(`[id^="exemptionBreadth-"]`).disabled = true;
+            }
+            if (row.querySelector(`[id^="exemptionArea-"]`)) {
+                row.querySelector(`[id^="exemptionArea-"]`).disabled = true;
+            }
+        }
+
+        if (legalIllegalElement && legalIllegalElement.value === 'illegal') {
+            legalAssmtAreaElement.disabled = true;
+            illegalAssmtAreaElement.disabled = false;
+        } else {
+            legalAssmtAreaElement.disabled = false;
+            illegalAssmtAreaElement.disabled = true;
+        }
+
+        let carpetArea = 0;
+        let plotArea = parseFloat(plotAreaElement.value) || 0;
+        let areabeforededuction = length * breadth;
+
+        if (!plotArea && length && breadth) {
+            plotArea = length * breadth;
+            plotAreaElement.value = plotArea.toFixed(2);
+        }
+
+        if (length && breadth) {
+            if (measureType === "outer") {
+                carpetArea = areabeforededuction - (areabeforededuction * deductionPercentage / 100);
+                row.querySelector(`[id^="deduction-"]`).value = deductionPercentage.toFixed(2);
+            } else {
+                carpetArea = areabeforededuction;
+                row.querySelector(`[id^="deduction-"]`).value = '';
+            }
+        } else {
+            carpetArea = parseFloat(carpetAreaElement.value) || 0;
+        }
+
+        let assumptionArea = plotArea ? plotArea - exemptionArea : carpetArea - exemptionArea;
+
+        row.querySelector(`[id^="areabeforededuction-"]`).value = areabeforededuction.toFixed(2);
+        row.querySelector(`[id^="carpetArea-"]`).value = useText === 'open plot' ? '0.00' : carpetArea.toFixed(2);
+        row.querySelector(`[id^="plotArea-"]`).value = useText === 'open plot' ? plotArea.toFixed(2) : '';
+
+        row.querySelector(`[id^="assumptionArea-"]`).value = assumptionArea.toFixed(2);
+
+        if (legalAssmtAreaElement) {
+            legalAssmtAreaElement.value = assumptionArea.toFixed(2);
+        }
+        if (illegalAssmtAreaElement) {
+            illegalAssmtAreaElement.value = assumptionArea.toFixed(2);
+        }
+
+        totalCarpetArea += carpetArea;
+        totalPlotArea += plotArea;
+        totalExemptionArea += exemptionArea;
+        totalAssumptionArea += assumptionArea;
+        if (legalIllegalElement && legalIllegalElement.value === 'legal') {
+            totalLegalArea += assumptionArea;
+        } else {
+            totalIllegalArea += assumptionArea;
+        }
+    });
+
+    document.getElementById(`TotalCarpetArea-${unitId}`).value = totalCarpetArea.toFixed(2);
+    document.getElementById(`TotalPlotArea-${unitId}`).value = totalPlotArea.toFixed(2);
+    document.getElementById(`ExemptionArea1-${unitId}`).value = totalExemptionArea.toFixed(2);
+    document.getElementById(`AssArea1-${unitId}`).value = totalAssumptionArea.toFixed(2);
+    document.getElementById(`LegalAssmtArea1-${unitId}`).value = totalLegalArea.toFixed(2);
+    document.getElementById(`IllegalAssmtArea1-${unitId}`).value = totalIllegalArea.toFixed(2);
+}
+
+
+
+
+
+
+
+
+
+
+    function updatePropertySectionTotals() {
+        let totalCarpetArea = 0, totalExemptionArea = 0, totalAssumptionArea = 0;
+        let totalLetOutArea = 0, totalNotLetOutArea = 0;
+        let floors = new Set();  // Set to keep track of unique floors
+        let totalRooms = 0;      // Variable to count the total number of rooms
+
+        // Get all unit totals and sum them up
+        document.querySelectorAll('[id^="TotalCarpetArea-"]').forEach(input => {
+            const unitId = input.id.split('-')[1]; // Extract unitId from the input id
+            const occupancyElement = document.querySelector(`#occupancy${unitId}`);
+            const floorElement = document.querySelector(`#floorNo${unitId}`); // Assuming you have an element with id 'floor-unitId'
+            let carpetArea = parseFloat(input.value) || 0;
+
+            totalCarpetArea += carpetArea;
+
+            // Check if the occupancy element exists and then use its value
+            if (occupancyElement) {
+                
+                const selectedOption = occupancyElement.options[occupancyElement.selectedIndex];
+                const occupancyName = selectedOption.textContent;
+                console.log(occupancyName+"this is"); // Log the name attribute value
+
+                if (occupancyName.toLowerCase() === 'tenant') {
+                    totalLetOutArea += carpetArea;
+                } else {
+                    totalNotLetOutArea += carpetArea;
+                }
+            }
+            // Add floor number to the set
+            if (floorElement && floorElement.value) {
+                floors.add(floorElement.value);
+            }
+
+            // Count the number of rooms based on checkbox selection
+            const tableBody = document.querySelector(`#table-${unitId} tbody`);
+            if (tableBody) {
+                tableBody.querySelectorAll('tr').forEach(row => {
+                    const checkbox = row.querySelector(`input[type="checkbox"]`);
+                    if (checkbox && checkbox.checked) {
+                        totalRooms++; // Increment the total rooms only if the checkbox is checked
+                    }
+                });
+            }
+        });
+
+    document.querySelectorAll('[id^="ExemptionArea1-"]').forEach(input => {
+        totalExemptionArea += parseFloat(input.value) || 0;
+    });
+
+    document.querySelectorAll('[id^="AssArea1-"]').forEach(input => {
+        totalAssumptionArea += parseFloat(input.value) || 0;
+    });
+
+    // Update main property section inputs
+    document.getElementById('carpetArea').value = totalCarpetArea.toFixed(2);
+    document.getElementById('exemptedArea').value = totalExemptionArea.toFixed(2);
+    document.getElementById('assessableArea').value = totalAssumptionArea.toFixed(2);
+    document.getElementById('areaLetout').value = totalLetOutArea.toFixed(2);
+    document.getElementById('areaNotLetout').value = totalNotLetOutArea.toFixed(2);
+    document.getElementById('nooffloors').value = floors.size;  // Update the number of floors
+    document.getElementById('noofrooms').value = totalRooms;  // Update the total number of rooms
+}
+
+    function createNumberInput(name) {
+        var input = document.createElement("input");
+        input.type = "number";
+        input.name = name;
+        input.style = "width: 78px; padding: 0px; background-color: white; border-color:white;";
+        return input;
+    }
+
+    function removeRow(button, unitId) {
+    let row = button.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+    updateAreas(unitId);
+    }
+
+    function cancelUpload(inputId) {
+        // Get the file input by ID
+        var fileInput = document.getElementById(inputId);
+        if (fileInput) {
+            // Reset the file input
+            fileInput.value = '';
+        }
+
+        // Optionally, clear the image preview if one exists
+        // This assumes you have a corresponding image preview element for each input
+        var previewId = 'preview' + inputId.charAt(0).toUpperCase() + inputId.slice(1);
+        var previewImage = document.getElementById(previewId);
+        if (previewImage) {
+            previewImage.src = '';
+        }
+
+        // Optionally, you might want to log or alert if the input or preview elements are not found
+        if (!fileInput) {
+            console.error('Failed to find file input:', inputId);
+        }
+        if (!previewImage) {
+            console.error('Failed to find preview image:', previewId);
+        }
+    }
+
+    function togglePopup(selectId, popupId) {
+        var selectBox = document.getElementById(selectId);
+        var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+        var popup = document.getElementById(popupId);
+
+        if (selectedValue == "yes") {
+            popup.style.display = "block";
+        } else {
+            popup.style.display = "none";
+        }
+    }
+
+// <!--    function showSignaturePopup() {-->
+// <!--        var signaturePopup = document.getElementById("signaturePopup");-->
+// <!--        signaturePopup.style.display = "block";-->
+// <!--    }-->
+
+// <!--    function hideSignaturePopup() {-->
+// <!--        var signaturePopup = document.getElementById("signaturePopup");-->
+// <!--        signaturePopup.style.display = "none";-->
+// <!--    }-->
+
+
+// <!--    function initCanvas() {-->
+// <!--        var canvas = document.getElementById("signatureCanvas");-->
+// <!--        var ctx = canvas.getContext("2d");-->
+// <!--        var isDrawing = false;-->
+// <!--        var lastX = 0;-->
+// <!--        var lastY = 0;-->
+
+// <!--        function draw(e) {-->
+// <!--            if (!isDrawing) return;-->
+
+// <!--            e.preventDefault();-->
+
+// <!--            var posX = e.clientX || e.touches[0].clientX;-->
+// <!--            var posY = e.clientY || e.touches[0].clientY;-->
+// <!--            var rect = canvas.getBoundingClientRect();-->
+
+// <!--            posX = (posX - rect.left) / (rect.right - rect.left) * canvas.width;-->
+// <!--            posY = (posY - rect.top) / (rect.bottom - rect.top) * canvas.height;-->
+
+// <!--            ctx.beginPath();-->
+// <!--            ctx.moveTo(lastX, lastY);-->
+// <!--            ctx.lineTo(posX, posY);-->
+// <!--            ctx.strokeStyle = 'black';-->
+// <!--            ctx.lineWidth = 2;-->
+// <!--            ctx.stroke();-->
+// <!--            lastX = posX;-->
+// <!--            lastY = posY;-->
+// <!--        }-->
+
+// <!--        function startPosition(e) {-->
+// <!--            isDrawing = true;-->
+// <!--            draw(e);-->
+// <!--        }-->
+
+// <!--        function finishedPosition() {-->
+// <!--            isDrawing = false;-->
+// <!--            ctx.beginPath();-->
+// <!--        }-->
+
+// <!--        canvas.addEventListener('mousedown', startPosition);-->
+// <!--        canvas.addEventListener('mousemove', draw);-->
+// <!--        canvas.addEventListener('mouseup', finishedPosition);-->
+// <!--        canvas.addEventListener('mouseout', finishedPosition);-->
+
+// <!--        canvas.addEventListener('touchstart', startPosition, { passive: false });-->
+// <!--        canvas.addEventListener('touchmove', draw, { passive: false });-->
+// <!--        canvas.addEventListener('touchend', finishedPosition, { passive: false });-->
+// <!--    }-->
+// <!--    function resizeCanvas() {-->
+// <!--        var canvas = document.getElementById("signatureCanvas");-->
+// <!--        var signaturePopup = document.getElementById("signaturePopup");-->
+// <!--        var popupContent = document.getElementById("popupContent");-->
+// <!--        canvas.width = popupContent.offsetWidth;-->
+// <!--        canvas.height = popupContent.offsetHeight;-->
+// <!--    }-->
+// <!--    window.addEventListener('resize', resizeCanvas);-->
+// <!--    window.onload = function () {-->
+// <!--        initCanvas();-->
+// <!--        resizeCanvas();-->
+// <!--    };-->
+
+// <!--    function clearSignature(event) {-->
+// <!--        event.preventDefault();-->
+// <!--        var canvas = document.getElementById("signatureCanvas");-->
+// <!--        var ctx = canvas.getContext("2d");-->
+// <!--        ctx.clearRect(0, 0, canvas.width, canvas.height);-->
+// <!--    }-->
+
+// <!--    function saveSignature(event) {-->
+// <!--        event.preventDefault();-->
+// <!--        var canvas = document.getElementById("signatureCanvas");-->
+// <!--        var signature = canvas.toDataURL();-->
+// <!--        document.getElementById("signature").value = signature;-->
+// <!--        alert("Record saved");-->
+// <!--        hideSignaturePopup();-->
+// <!--    }-->
+
+    var activeFormId = null;
+
+    function toggleForm(formId) {
+        console.log("Toggling form:", formId);
+        var form = document.getElementById(formId);
+
+        var allForms = document.getElementsByClassName("formContainer");
+        for (var i = 0; i < allForms.length; i++) {
+            if (allForms[i].id !== formId) {
+                allForms[i].style.display = "none";
+            }
+        }
+        
+    // Toggle the display of the clicked form
+    if(form){
+    if (form.style.display === "block") {
+        form.style.display = "none";
+        activeFormId = null;
+    }
+        else {
+        // Hide the previously active form, if any
+            if (activeFormId && activeFormId !== formId) {
+                var activeForm = document.getElementById(activeFormId);
+                if (activeForm) {
+                    activeForm.style.display = "none";
+                }
+            }
+        // Show the clicked form
+            form.style.display = "block";
+            activeFormId = formId;
+        }
+    }else {
+            console.error("Form with ID " + formId + " not found.");
+        }
+    }
+
+    document.getElementById('propertyusageType').addEventListener('change', function() {
+        const propertyTypeId = this.value; // Get the selected property type ID
+        updateFormsBasedOnPropertyType(propertyTypeId);
+        });
+
+        var unitCount = 1;
+        function addUnit() {
+            var existingUnitButtons = document.querySelectorAll('.unitbutton').length; //Added to make unit no dynamic and uniform
+            unitCount = existingUnitButtons + 1;
+            var unitButtons = document.getElementById("unitButtons");
+            var formContainers = document.getElementById("formContainers");
+            var existingUnitButtons = document.querySelectorAll('.unitbutton').length;
+            unitCount = existingUnitButtons + 1;
+            var formId = "myForm" + unitCount;
+
+            var button = document.createElement("button");
+            button.textContent = "Unit " + unitCount;
+            button.className = "unitbutton";
+            button.id = "unitButton" + unitCount;
+            button.type = "button";
+            button.onclick = function() { toggleForm(formId); };
+            unitButtons.appendChild(button);
+
+            var formContainer = document.createElement("div");
+            formContainer.id = formId;
+            formContainer.className = "formContainer";
+            formContainer.style.display = "none";
+
+            var form = document.createElement("form");
+            form.innerHTML = getFormInnerHTML(unitCount);
+            formContainer.appendChild(form);
+
+            document.getElementById("formContainers").appendChild(formContainer); //added for testing purpose
+
+            fetchAllTypesOfAPI('/3gSurvey/getUnitFloorNos', `floorNo${unitCount}`);
+            fetchAllTypesOfAPI('/3gSurvey/constructionClassMasters', `classOfProperty${unitCount}`);
+            fetchAllTypesOfAPI('/3gSurvey/occupancyMasters', `occupancy${unitCount}`);
+            fetchAllTypesOfAPI('/3gSurvey/getAllRemarks', `remark${unitCount}`);
+            // Only update forms for the newly added unit
+            const currentPropertyTypeId = document.getElementById('propertyusageType').value;
+            if (currentPropertyTypeId) {
+                initializeUnitUsageTypesAndCaptureSelection(currentPropertyTypeId, `unitusageType${unitCount}`, '/3gSurvey/getUnitUsageByPropUsageId');
+                initializeTypesAndCaptureSelection(`unitusageType${unitCount}`, `unitusageSubType${unitCount}`, '/3gSurvey/getUnitUsageSub');
+            }
+
+            var deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete Unit " + unitCount;
+            deleteButton.className = "deletebtn";
+            deleteButton.id = "deleteButton" + unitCount; // Unique delete button ID
+            deleteButton.type = "button";
+
+            deleteButton.onclick = function () {
+                removeUnit(formId);
+            }
+
+            form.appendChild(deleteButton);
+
+            formContainers.appendChild(formContainer);
+
+            formContainer.appendChild(form);
+            var allForms = formContainers.getElementsByClassName("formContainer");
+            for (var i = 0; i < allForms.length; i++) {
+                allForms[i].style.display = "none";
+            }
+
+            formContainer.style.display = "block";
+            unitCount++;
+
+            updateOnChange(unitCount);
+            document.getElementById(`occupancy${unitCount}`).addEventListener('change', function() {
+                updateOnChange(unitCount);
+            });
+             // Add event listener for the new "Class of Property" dropdown
+            document.getElementById(`classOfProperty${unitCount}`).addEventListener('change', function() {
+                disableFieldsIfClassOfPropertyOp(this);
+            });
+
+            // Initial call to handle preselected value
+            disableFieldsIfClassOfPropertyOp(document.getElementById(`classOfProperty${unitCount}`));
+        }
+
+    function updateFormsBasedOnPropertyType(propertyTypeId) {
+    for (let i = 1; i <= unitCount; i++) {
+        const subtypeSelectId = `unitusageType${i}`;
+        const apiUrl = '/3gSurvey/getUnitUsageByPropUsageId';
+        // Update forms only if they are newly added or empty
+        if (!document.getElementById(subtypeSelectId).value) {
+            initializeUnitUsageTypesAndCaptureSelection(propertyTypeId, subtypeSelectId, apiUrl);
+        }
+    }
+}
+
+    function populateYearDropdown(dropdownId) {
+        const yearDropdown = document.getElementById(dropdownId);
+        const currentYear = new Date().getFullYear();
+        let yearOptions = '<option value="">Select Year</option>';
+        for (let year = currentYear; year >= 1900; year--) {
+            yearOptions += `<option value="${year}">${year}</option>`;
+        }
+        yearDropdown.innerHTML = yearOptions;
+    }
+
+    function fetchAndPopulateAssessmentDates() {
+        fetch('/3gSurvey/getAllAssessmentDates')
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {  const { currentAssessmentDate, lastAssessmentDate } = data[0];  
+                document.getElementById('currentAssmtDate').value = currentAssessmentDate; 
+                document.getElementById('lastAssmtDate').value = lastAssessmentDate;
+                }
+            })
+            .catch(error => console.error('Error fetching assessment dates:', error));
+    }
+
+    function getFormInnerHTML(unitCount) {
+    // Generate year options dynamically
+    const currentYear = new Date().getFullYear();
+    let yearOptions = '<option value="">Select Year</option>';
+    for (let year = currentYear; year >= 1900; year--) {
+        yearOptions += `<option value="${year}">${year}</option>`;
+    }
+
+    return '<label for="floorNo' + unitCount + '" class="mandatory">Floor No:</label>' +
+            '<select id="floorNo' + unitCount + '" name="floorNo" onchange="updateOnChange(' + unitCount + ')">' +
+            '</select><br>' +
+            '<label for="occupancy' + unitCount + '" class="mandatory">Occupancy:</label>' +
+            '<select id="occupancy' + unitCount + '" name="occupancy" onchange="updateoccupancyfields(' + unitCount + ')">' +
+            '</select><br>' +
+            '<label for="monthlyrent' + unitCount + '">Monthly Rent:</label>' +
+            '<input type="number" style="width: 90%;" id="monthlyrent' + unitCount + '" name="monthlyrent" disabled><br>' +
+            '<label for="tenantno' + unitCount + '">Tenant Number:</label>' +
+            '<input type="text" id="tenantno' + unitCount + '" name="tenantno" disabled><br>' +
+            '<label for="occupiername' + unitCount + '">Tenant Name:</label>' +
+            '<input type="text" id="occupiername' + unitCount + '" name="occupiername" disabled><br>' +
+            '<label for="rentalDocument' + unitCount + '">Rental Document:</label>' +
+            '<input type="file" id="rentalDocument' + unitCount + '" name="rentalDocument" disabled><br><br>' +
+            '<label for="unitNo' + unitCount + '" class="mandatory">Unit No.:</label>' +
+            '<input type="text" id="unitNo' + unitCount + '" name="unitNo" value="' + unitCount + '" readonly class="disabled-field"><br>' +
+            '<label id="existingElement" for="umobileNo' + unitCount + '">Mobile No:</label>' +
+            '<input type="text" id="umobileNo' + unitCount + '" name="umobileNo"><br>' +
+            '<label for="email' + unitCount + '">Email:</label>' +
+            '<input type="text" id="email' + unitCount + '" name="email"><br>' +
+            '<label for="unitusageType' + unitCount + '" class="mandatory">Usage Type:</label>' +
+            '<select id="unitusageType' + unitCount + '" name="unitusageType">' +
+            '</select><br>' +
+            '<label for="unitusageSubType' + unitCount + '" class="mandatory">Usage Sub Type:</label>' +
+            '<select id="unitusageSubType' + unitCount + '" name="unitusageSubType">' +
+            '</select><br>' +
+            '<label for="classOfProperty' + unitCount + '" class="mandatory">Class Of Property:</label>' +
+            '<select id="classOfProperty' + unitCount + '" name="classOfProperty" onchange="disableFieldsIfClassOfPropertyOp(this)">' +
+            '</select><br>' +
+            '<label for="deductionPercentageField' + unitCount + '">% of Deduction:</label>' +
+            '<input type="text" id="deductionPercentageField' + unitCount + '" name="deductionPercentageField" disabled><br>' +
+            '<label for="establishmentName' + unitCount + '">Establishment Name:</label>' +
+            '<input type="text" id="establishmentName' + unitCount + '" name="establishmentName"><br>' +
+            '<label for="constructionYear' + unitCount + '">Construction Year:</label>' +
+            '<select id="constructionYear' + unitCount + '" name="constructionYear" onchange="updateUnitAgeFactor(this.value, ' + unitCount + ')">' +
+            yearOptions +
+            '</select><br>' +
+            '<label for="constructionAge' + unitCount + '">Construction Age:</label>' +
+            '<input type="text" id="constructionAge' + unitCount + '" name="constructionAge"><br>' +
+            '<label for="constAgeFactor' + unitCount + '">Const. Age Factor:</label>' +
+            '<input type="text" id="constAgeFactor' + unitCount + '" readonly class="disabled-field" name="constAgeFactor"><br>' +
+            '<input type="hidden" id="agefactorunithid' + unitCount + '">'+
+            '<input type="hidden" id="currentDateUnit' + unitCount + '" name="currentDateUnit">'+
+            '<label id="unitareain" for="unitArea' + unitCount + '">Unit Area:</label>' +
+            '<input type="text" id="unitArea' + unitCount + '" name="unitArea" onclick="openPopup(' + unitCount + ')"><br>' +
+            '<label id="unitrooms" for="unitrooms' + unitCount + '">Rooms:</label>' +
+            '<input type="text" id="unitrooms' + unitCount + '" name="unitrooms"><br>' +
+            '<label id="totalcarpetarea" for="totalcarpetarea' + unitCount + '">Total Carpet Area:</label>' +
+            '<input type="text" id="totalcarpetarea' + unitCount + '" name="totalcarpetarea"><br>' +
+            '<label id="totalexemptedarea" for="totalexemptedarea' + unitCount + '">Total Exempted Area:</label>' +
+            '<input type="text" id="totalexemptedarea' + unitCount + '" name="totalexemptedarea"><br>' +
+            '<label id="assessablearea" for="assessablearea' + unitCount + '">Total Assessable Area:</label>' +
+            '<input type="text" id="assessablearea' + unitCount + '" name="assessablearea"><br>' +
+            '<label id="totallegalarea" for="totallegalarea' + unitCount + '">Total Legal Area:</label>' +
+            '<input type="text" id="totallegalarea' + unitCount + '" name="totallegalarea"><br>' +
+            '<label id="totaillegalarea" for="totaillegalarea' + unitCount + '">Total Illegal Area:</label>' +
+            '<input type="text" id="totaillegalarea' + unitCount + '" name="totaillegalarea"><br>' +
+            '<label for="remark' + unitCount + '">Remark:</label>' +
+            '<select id="remark' + unitCount + '" name="remark">' +
+            '</select><br><br>' +
+            '<div class="button-container">';
+    }
+
+    function calculateAgeAndUpdateFactor(selectedYear, ageFieldId, factorFieldId, hiddenFieldId, currentDateFieldId) {
+        if (!selectedYear) return;
+
+        const currentYear = new Date().getFullYear();
+        const constructionYear = new Date(selectedYear).getFullYear();
+        const age = currentYear - constructionYear;
+
+        console.log(`Selected Year: ${selectedYear}, Age: ${age}`);
+
+        // Populate the Construction Age field
+        const ageField = document.getElementById(ageFieldId);
+        if (ageField) {
+            ageField.value = age;
+            console.log(`Updated Age Field (${ageFieldId}): ${age}`);
+        }
+
+        // Determine the Construction Age Factor based on the age
+        const { factor, ageFactorId } = getAgeFactorFromDB(age);
+        console.log(`Age Factor for Age ${age}: ${factor}, ID: ${ageFactorId}`);
+
+        // Set the Construction Age Factor in a text field
+        const factorField = document.getElementById(factorFieldId);
+        if (factorField) {
+            factorField.value = factor;
+        }
+
+        // Update the hidden input field with the age factor ID
+        const hiddenField = document.getElementById(hiddenFieldId);
+        if (hiddenField) {
+            hiddenField.value = ageFactorId;
+        }
+
+        // Populate the current date field
+        const currentDate = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
+        const currentDateField = document.getElementById(currentDateFieldId);
+        if (currentDateField) {
+            currentDateField.value = currentDate;
+            console.log(`Updated Current Date Field (${currentDateFieldId}): ${currentDate}`);
+        }
+    }
+    function getAgeFactorFromDB(age) {
+    let factor = 'Unknown';
+    let ageFactorId = null;
+
+    for (const factorEntry of constructionAgeFactors) {
+        const minAge = parseInt(factorEntry.afm_ageminage_vc, 10);
+        const maxAge = parseInt(factorEntry.afm_agemaxage_vc, 10);
+        console.log(`Checking age range: ${minAge} - ${maxAge}`);
+
+        if (age >= minAge && age <= maxAge) {
+                factor = factorEntry.afm_agefactornamell_vc;
+                ageFactorId = factorEntry.afm_agefactorid_i; // Assuming afm_agefactorid_i exists in factorEntry
+                break;
+            }
+        }
+
+        return { factor, ageFactorId };
+    }
+
+// Usage Example for Units
+function updateUnitAgeFactor(selectedYear, unitCount) {
+    calculateAgeAndUpdateFactor(selectedYear, `constructionAge${unitCount}`, `constAgeFactor${unitCount}`, `agefactorunithid${unitCount}`, `currentDateUnit${unitCount}`);
+}
+
+// Usage Example for Property
+function updatePropertyAgeFactor(selectedYear) {
+    calculateAgeAndUpdateFactor(selectedYear, 'constAgeProperty', 'ageFactorProperty', 'agefactorpropertyhid', 'currentDateProperty');
+}
+    function removeUnit(formId) {
+        var formContainer = document.getElementById(formId);
+        if (formContainer) {
+            formContainer.remove(); // Remove the form container
+        }
+
+        var popupId = 'popup-' + formId.replace("myForm", "");
+        var popup = document.getElementById(popupId);
+        if (popup) {
+            popup.remove(); // Remove the popup for the unit
+        }
+
+        var buttonId = "unitButton" + formId.replace("myForm", "");
+        var unitButton = document.getElementById(buttonId);
+        if (unitButton) {
+            unitButton.remove(); // Remove the unit button
+        }
+
+        if (typeof activeFormId !== 'undefined' && activeFormId === formId) {
+            activeFormId = null;
+        }
+
+        // Recalculate unit counts and update remaining units
+        var existingUnitButtons = document.querySelectorAll('.unitbutton');
+        unitCount = existingUnitButtons.length;  // Update global unit count
+
+        var currentUnitIndex = parseInt(formId.replace("myForm", ""));
+        existingUnitButtons.forEach(function(button, index) {
+            var expectedIndex = index + 1;
+            if (expectedIndex >= currentUnitIndex) {
+                button.textContent = "Unit " + expectedIndex;
+                button.id = "unitButton" + expectedIndex;
+                button.onclick = function() { toggleForm("myForm" + expectedIndex); };
+
+                var newFormContainer = document.getElementById("myForm" + (index + 2));
+                if (newFormContainer) {
+                    newFormContainer.id = "myForm" + expectedIndex;
+                    var deleteButton = newFormContainer.querySelector(".deletebtn");
+                    var unitNoInput = newFormContainer.querySelector('input[name="unitNo"]');
+                    if (deleteButton) {
+                        deleteButton.textContent = "Delete Unit " + expectedIndex;
+                        deleteButton.id = "deleteButton" + expectedIndex;
+                        deleteButton.onclick = function () {
+                            removeUnit("myForm" + expectedIndex);
+                        }
+                    }
+                    if (unitNoInput) {
+                        unitNoInput.value = expectedIndex; // Update the Unit No. input field
+                    }
+                }
+            }
+        });
+        updatePropertySectionTotals();
+    }
+
+    var compressedImages = {};
+
+    function compressImage(file, previewId) {
+        if (!file) return;  // Exit if no file is selected
+
+        const maxWidth = 525;  // Maximum width of the compressed image
+        const maxHeight = 700; // Maximum height of the compressed image
+        const quality = 9;   // Quality of the compressed image
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // Adjust the dimensions while maintaining the aspect ratio
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width *= maxHeight / height;
+                        height = maxHeight;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Convert the canvas to a blob and update the image preview
+                canvas.toBlob((blob) => {
+                    compressedImages[previewId] = blob; // Store the blob using the previewId as the key
+                    const imageUrl = URL.createObjectURL(blob);
+                    document.getElementById(previewId).src = imageUrl;
+                }, 'image/jpeg', quality);
+            };
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    function getSelectedOptionText(selectId) {
+        if (!selectId) {
+            console.error('getSelectedOptionText: selectElement is null');
+            return '';
+        }
+        const selectElement = document.getElementById(selectId);
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        return selectedOption.getAttribute('data-name') || selectedOption.text;
+    }
+
+    function collectFormData() {
+    let formData = {
+        propertyDetails: {
+            //main
+            propRefno: document.getElementById('podRef').value,
+            pdZoneI: document.getElementById('zone').value,
+            pdWardI: document.getElementById('ward').value,
+            pdCitysurveynoF: document.getElementById('citySurveyNo').value,
+            pdOldpropnoVc: document.getElementById('oldPropertyNo').value,
+            pdSurypropnoVc: document.getElementById('surveyPropNo').value,
+            pdLayoutnameVc: document.getElementById('layoutName').value,
+            pdLayoutnoVc: document.getElementById('layoutNo').value,
+            pdKhasranoVc: document.getElementById('khasraNo').value,
+            pdPlotnoVc: document.getElementById('plotNo').value,
+            pdOwnernameVc: document.getElementById('ownerName').value,
+            pdAddnewownernameVc: document.getElementById('newOwnerName').value,
+            pdOccupinameF: document.getElementById('occupierName').value,
+            pdPropertyaddressVc: document.getElementById('address').value,
+            pdOwnertypeVc: document.getElementById('ownerType').value,
+            pdStatusbuildingVc: document.getElementById('buildingStatus').value,
+            //property
+            //(a)
+            pdPannoVc: document.getElementById('panNo').value,
+            pdAadharnoVc: document.getElementById('aadharNo').value,
+            pdContactnoVc: document.getElementById('ownermobileNo').value,
+            pdCategoryI: document.getElementById('category').value,
+            pdPropertynameVc: document.getElementById('propertyName').value,
+            pdBuildingvalueI: document.getElementById('buildingValue').value,
+            pdPlotvalueF: document.getElementById('plotValue').value,
+            //(b)
+            pdPropertytypeI: document.getElementById('propertyType').value,
+            pdPropertysubtypeI: document.getElementById('propertySubType').value,
+            pdUsagetypeI: document.getElementById('propertyusageType').value,
+            pdUsagesubtypeI: document.getElementById('propertyusageSubType').value,
+            pdBuildingtypeI: document.getElementById('buildingType').value,
+            pdBuildingsubtypeI: document.getElementById('buildingSubType').value,
+            pdConstYear: document.getElementById('currentDateProperty').value,
+            pdConstAgeI: document.getElementById('constAgeProperty').value,
+            //pdagefactor
+            pdPermissionstatusVc: document.getElementById('permissionSelection').value,
+            pdPermissionnoVc: document.getElementById('permissionNumber').value,
+            pdPermissiondateDt: document.getElementById('permissionDate').value,
+            pdStairVc: document.getElementById('stair').value,
+            pdLiftVc: document.getElementById('lift').value,
+            pdRoadwidthF: document.getElementById('roadWidth').value,
+            //(c)
+            pdToiletstatusVc: document.getElementById('toiletSelection').value,
+            pdToiletsI: document.getElementById('numberOfToilets').value,
+            pdSeweragesVc: document.getElementById('sewerage').value,
+            pdSeweragesType: document.getElementById('sewerageType').value,
+            pdWaterconnstatusVc: document.getElementById('waterSelection').value,
+            pdWaterconntypeVc: document.getElementById('waterOptions').value,
+            pdMcconnectionVc: document.getElementById('mcConnection').value,
+            pdMeternoVc: document.getElementById('meterNumber').value,
+            pdConsumernoVc: document.getElementById('consumerNumber').value,
+            pdConnectiondateDt: document.getElementById('connectionDate').value, 
+            pdPipesizeF: document.getElementById('pipeSize').value,
+            pdSolarunitVc: document.getElementById('solar').value,
+            pdElectricityconnectionVc: document.getElementById('electricitySelection').value,
+            pdElemeternoVc: document.getElementById('emeterNumber').value,
+            pdEleconsumernoVc: document.getElementById('emeterNumber').value,
+            pdRainwaterhaverstVc: document.getElementById('rainWaterHarvesting').value,
+            //(d)
+            pdPlotareaF: document.getElementById('plotArea').value,
+            pdTotbuiltupareaF: document.getElementById('builtUpArea').value,
+            pdTotcarpetareaF: document.getElementById('carpetArea').value,
+            pdTotalexempareaF: document.getElementById('exemptedArea').value,
+            pdAssesareaF: document.getElementById('assessableArea').value,
+            pdArealetoutF: document.getElementById('areaLetout').value,
+            pdAreanotletoutF: document.getElementById('areaNotLetout').value,
+            pdNooffloorsI: document.getElementById('nooffloors').value,
+            pdNoofroomsI: document.getElementById('noofrooms').value,
+            pdCurrassesdateDt: document.getElementById('currentAssmtDate').value,
+            pdLastassesdateDt: document.getElementById('lastAssmtDate').value,
+            pdNadetailsVc: document.getElementById('naSelection').value,
+            pdNanumberI: document.getElementById('naOrder').value,
+            pdNadateDt: document.getElementById('naDate').value,
+            pdTddetailsVc: document.getElementById('tdSelection').value,
+            pdTdordernumF: document.getElementById('tdOrder').value,
+            pdTddateDt: document.getElementById('tdDate').value,
+            pdTpdetailsVc: document.getElementById('tpSelection').value,
+            pdTpordernumF: document.getElementById('tpOrder').value,
+            pdTpdateDt: document.getElementById('tpDate').value,
+            pdSaledeedI: document.getElementById('saledeedSelection').value,
+            pdSaledateDt: document.getElementById('saledeedDate').value,
+            pdOldrvFl: document.getElementById('oldRV').value,
+            unitDetails: []
+            // additionalInfo: {
+            //     paNameVc: document.getElementById('additionalName').value,
+            //     paQualificationVc: document.getElementById('qualification').value,
+            //     paOccupationVc: document.getElementById('occupation').value,
+            //     paAdultnoIn: document.getElementById('noOfAdults').value,
+            //     paChildrennoIn: document.getElementById('noOfChildren').value,
+            //     paCtaxstatusVc: document.getElementById('currentTaxDetails').value,
+            //     paCtaxamountIn: document.getElementById('taxAmount').value,
+            //     paNroadnameVc: document.getElementById('roadName').value,
+            //     paRoadtypeVc: document.getElementById('roadType').value,
+            // }
+        }
+    };
+
+    document.querySelectorAll('.formContainer').forEach((unitContainer, index) => {
+        let unitIndex = index + 1;
+        let unitDetails = {
+            udFloorNoVc: unitContainer.querySelector(`#floorNo${unitIndex}`).value,
+            udUnitNoVc: parseInt(unitContainer.querySelector(`#unitNo${unitIndex}`).value, 10),
+            udOccupantStatusI: unitContainer.querySelector(`#occupancy${unitIndex}`).value, // Assuming this field exists
+            udRentalNoVc: unitContainer.querySelector(`#monthlyrent${unitIndex}`).value,
+            udTenantNoI: unitContainer.querySelector(`#tenantno${unitIndex}`).value,
+            udOccupierNameVc: unitContainer.querySelector(`#occupiername${unitIndex}`).value,
+            udEstablishmentNameI: unitContainer.querySelector(`#establishmentName${unitIndex}`).value,
+            udMobileNoVc: unitContainer.querySelector(`#umobileNo${unitIndex}`).value,
+            udEmailIdVc: unitContainer.querySelector(`#email${unitIndex}`).value,
+            udUsageTypeI: parseInt(unitContainer.querySelector(`#unitusageType${unitIndex}`).value, 10),
+            udUsageSubtypeI: parseInt(unitContainer.querySelector(`#unitusageSubType${unitIndex}`).value, 10),
+            udConstructionClassI: getSelectedOptionText(`classOfProperty${unitIndex}`),
+            udConstYearDt: unitContainer.querySelector(`#currentDateUnit${unitIndex}`).value,
+            udConstAgeI: parseInt(unitContainer.querySelector(`#constructionAge${unitIndex}`).value, 10),
+            udAgeFactorI: unitContainer.querySelector(`#agefactorunithid${unitIndex}`).value,
+            udCarpetAreaF: parseFloat(unitContainer.querySelector(`#totalcarpetarea${unitIndex}`).value),
+            udExemptedAreaF: parseFloat(unitContainer.querySelector(`#totalexemptedarea${unitIndex}`).value),
+            udAssessmentAreaF: parseFloat(unitContainer.querySelector(`#assessablearea${unitIndex}`).value),
+            udTotLegAreaF: parseFloat(unitContainer.querySelector(`#totallegalarea${unitIndex}`).value), 
+            udTotIllegAreaF: parseFloat(unitContainer.querySelector(`#totaillegalarea${unitIndex}`).value),
+            udUnitRemarkVc: unitContainer.querySelector(`#remark${unitIndex}`).value,
+            //  // Assuming this field exists
+            //  // Assuming this field exists
+            // udAgreementCopyVc: unitContainer.querySelector(`#agreementCopy${unitIndex}`).value, // Handling file inputs may need adjustments
+           
+            
+            
+           
+            
+            //udCarpetAreaF: parseFloat(unitContainer.querySelector(`#carpetArea${unitIndex}`).value),
+            // udExemptedAreaF: parseFloat(unitContainer.querySelector(`#exemptedArea${unitIndex}`).value),
+            // udAssessmentAreaF: parseFloat(unitContainer.querySelector(`#assessmentArea${unitIndex}`).value),
+            //udSignatureVc: unitContainer.querySelector(`#signature${unitIndex}`).value,
+            // udTotLegAreaF: parseFloat(unitContainer.querySelector(`#totLegArea${unitIndex}`).value),
+            // udTotIllegAreaF: parseFloat(unitContainer.querySelector(`#totIllegArea${unitIndex}`).value),
+            
+            
+            
+            //udAgeFactVc: unitContainer.querySelector(`#ageFact${unitIndex}`).value,
+            //udAssVc: unitContainer.querySelector(`#ass${unitIndex}`).value,
+            unitBuiltupUps: []
+        };
+
+        let popupId = `popup-${unitIndex}`;
+        let popup = document.getElementById(popupId);
+        console.log("here is popup:"+popup)
+        if (popup) {
+    // Select all rows without excluding the last one
+        const rows = popup.querySelectorAll('table tbody tr');
+        for (let rowIndex = 0; rowIndex < rows.length - 1; rowIndex++) {
+            let row = rows[rowIndex];
+            let rowId = `row-${unitIndex}-${rowIndex+1}`;
+
+            let roomTypeElement = row.querySelector(`select[id="use-${rowId}"]`);
+            let deduction = row.querySelector(`input[id="deduction-${rowId}"]`);
+            let lengthElement = row.querySelector(`input[id="length-${rowId}"]`);
+            let breadthElement = row.querySelector(`input[id="breadth-${rowId}"]`);
+            let areabeforededuction = row.querySelector(`input[id="areabeforededuction-${rowId}"]`); 
+            let exemptionsElement = row.querySelector(`select[id="exemption-${rowId}"]`);
+            let exemLengthElement = row.querySelector(`input[id="exemptionLength-${rowId}"]`);
+            let exemBreadthElement = row.querySelector(`input[id="exemptionBreadth-${rowId}"]`);
+            let carpetAreaElement = row.querySelector(`input[id="carpetArea-${rowId}"]`);
+            let legalStatusElement = row.querySelector(`select[id="legalIllegal-${rowId}"]`);
+            // Assuming calculated fields are shown in input fields or spans with IDs following a similar naming convention
+            let exemAreaElement = document.getElementById(`exemptionArea-${rowId}`);
+            let assesAreaElement = document.getElementById(`assumptionArea-${rowId}`);
+            let legalAreaElement = document.getElementById(`legalAssmtArea-${rowId}`);
+            let illegalAreaElement = document.getElementById(`illegalAssmtArea-${rowId}`);
+            let measureTypeElement = row.querySelector(`select[id="measureType-${rowId}"]`);
+
+
+
+            //if (useElement && innerOuterElement && lengthElement && breadthElement && carpetAreaElement) {
+                let builtUpAreas = {
+                    ubRoomTypeVc: roomTypeElement ? getSelectedOptionText(roomTypeElement.id) : '',
+                    ubDedpercent: deduction ? parseFloat(deduction.value) : 0,
+                    ubareabefded: areabeforededuction ? parseFloat(areabeforededuction.value) : 0,
+                    ubLengthFl: lengthElement ? lengthElement.value : '',
+                    ubBreadthFl: breadthElement ? breadthElement.value : '',
+                    ubExemptionsVc: exemptionsElement ? exemptionsElement.value : '',
+                    ubExemLengthFl: exemLengthElement ? exemLengthElement.value : '',
+                    ubExemBreadthFl: exemBreadthElement ? exemBreadthElement.value : '',
+                    ubCarpetAreaFl: carpetAreaElement ? carpetAreaElement.value : '',
+                    ubLegalStVc: legalStatusElement ? legalStatusElement.value : '',
+                    ubExemAreaFl: exemAreaElement ? exemAreaElement.value : '', // Capture real-time calculated values
+                    ubAssesAreaFl: assesAreaElement ? assesAreaElement.value : '',
+                    ubLegalAreaFl: legalAreaElement ? legalAreaElement.value : '',
+                    ubIllegalAreaFl: illegalAreaElement ? illegalAreaElement.value : '',
+                    ubMeasureTypeVc: measureTypeElement ? measureTypeElement.value : '',
+                };
+                unitDetails.unitBuiltupUps.push(builtUpAreas);
+
+        }
+    }
+        formData.propertyDetails.unitDetails.push(unitDetails);
+    });
+
+    let jsonData = JSON.stringify(formData);
+
+    // Create a new FormData object
+    let formDataToSend = new FormData();
+    formDataToSend.append('jsonData', jsonData); // Append JSON string directly
+
+    // Append image files to FormData
+    const imageFields = ['previewPropertyImage', 'previewPropertyImage2', 'previewHousePlan1', 'previewHousePlan2'];
+    imageFields.forEach(field => {
+        let blob = compressedImages[field]; // Access the blob stored after compression
+        if (blob) {
+            formDataToSend.append(field, blob, field + ".jpg"); // Append blob with a filename
+        }
+    });
+
+    // Debug: Log each FormData key-value pair
+    for (let pair of formDataToSend.entries()) {
+        console.log(`${pair[0]}:`, pair[1]);
+    }
+
+    return formDataToSend;
+    }
+
+    var memberCount = 1;
+
+    function addMember() {
+        memberCount++;
+
+        var formContainer = document.getElementById("formContainer");
+
+        const newForm = `
+        <div id="memberForm${memberCount}">
+            <h3>Member ${memberCount} Details:</h3>
+            <label for="name${memberCount}">Name:</label>
+            <input type="text" id="name${memberCount}" name="name${memberCount}"><br>
+
+            <label for="qualification${memberCount}">Qualification:</label>
+            <select id="qualification${memberCount}" name="qualification${memberCount}">
+                <option value="undergraduate">Undergraduate</option>
+                <option value="postgraduate">Postgraduate</option>
+                <option value="doctorate">Doctorate</option>
+            </select><br>
+
+            <label for="occupation${memberCount}">Occupation:</label>
+            <input type="text" id="occupation${memberCount}" name="occupation${memberCount}"><br>
+
+            <label for="noOfAdults${memberCount}">No. Of Adults:</label>
+            <input type="text" id="noOfAdults${memberCount}" name="noOfAdults${memberCount}"><br>
+
+            <label for="noOfChildren${memberCount}">No. of Children:</label>
+            <input type="text" id="noOfChildren${memberCount}" name="noOfChildren${memberCount}"><br>
+
+            <label for="currentTaxDetails${memberCount}">Current Tax Details:</label>
+            <select id="currentTaxDetails${memberCount}" name="currentTaxDetails${memberCount}">
+                <option value="taxed">Taxed</option>
+                <option value="nontaxed">Non-taxed</option>
+            </select><br>
+
+            <label for="taxAmount${memberCount}">Tax Amount:</label>
+            <input type="text" id="taxAmount${memberCount}" name="taxAmount${memberCount}"><br>
+
+            <label for="roadType${memberCount}">Road Type:</label>
+            <select id="roadType${memberCount}" name="roadType${memberCount}">
+                <option value="residential">Residential</option>
+                <option value="commercial">Commercial</option>
+            </select><br>
+
+            <label for="roadName${memberCount}">Road Name:</label>
+            <input type="text" id="roadName${memberCount}" name="roadName${memberCount}"><br>
+
+            <button type="button" onclick="addMember()">Add Another Member</button>
+            <button type="button" onclick="removeMember(${memberCount})">Remove Member</button>
+            <hr>
+        </div>
+    `;
+        document.getElementById("memberForm1").insertAdjacentHTML('beforeend', newForm);
+
+    }
+
+    function removeMember(formId) {
+        var formToRemove = document.getElementById(`memberForm${formId}`);
+        formToRemove.remove();
+    }
+
+    function validateForm() {
+        let isValid = true;
+        let missingFields = [];
+        document.querySelectorAll('.mandatory').forEach((field) => {
+            let input = document.getElementById(field.htmlFor);
+            if (input && !input.value.trim()) {
+                isValid = false;
+                missingFields.push(field.textContent);
+            }
+        });
+        if (!isValid) {
+            alert("Please fill in the following mandatory fields: " + missingFields.join(', '));
+        }
+        return isValid;
+    }
+
+    async function submitFormData() {
+        if (!validateForm()) {
+            return; 
+        }
+        const formDataToSend = collectFormData(); 
+
+        try {
+            const response = await fetch('/3gSurvey/submitNewPropertyDetails', {
+                method: 'POST',
+                body: formDataToSend, // Send the FormData object directly
+                // Do not set Content-Type header; let the browser handle it
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            console.log('Submission successful:', result);
+
+            alert(result.message || "Form submitted successfully!");
+
+            //window.location.href = "/3gSurvey/newRegistration";
+        } catch (error) {
+            console.error('Submission failed:', error);
+            alert('Form could not be submitted');
+        }
+    }
+
+    window.addEventListener('beforeunload', function (event) {
+        event.preventDefault();
+        event.returnValue = 'Are you sure you want to leave? Your changes may not be saved.';
+    });
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

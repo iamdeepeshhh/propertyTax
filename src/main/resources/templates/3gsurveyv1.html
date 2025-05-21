@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Table</title>
+    <script>
+        function calculateRowTotals(element) {
+            var row = element.closest('tr');
+
+            var length = parseFloat(row.querySelector('input[name="length"]').value) || 0;
+            var breadth = parseFloat(row.querySelector('input[name="breadth"]').value) || 0;
+            var carpetArea = parseFloat(row.querySelector('input[name="carpetArea"]').value) || 0;
+            var plotArea = parseFloat(row.querySelector('input[name="plotArea"]').value) || 0;
+
+            if (length && breadth) {
+                carpetArea = length * breadth;
+                plotArea = length * breadth; // Adjust if plot area calculation differs
+            }
+
+            var exemptionLength = parseFloat(row.querySelector('input[name="exemptionLength"]').value) || 0;
+            var exemptionBreadth = parseFloat(row.querySelector('input[name="exemptionBreadth"]').value) || 0;
+            var exemptionArea = parseFloat(row.querySelector('input[name="exemptionArea"]').value) || 0;
+
+            if (exemptionLength && exemptionBreadth) {
+                exemptionArea = exemptionLength * exemptionBreadth;
+            }
+
+            row.querySelector('input[name="carpetArea"]').value = carpetArea;
+            row.querySelector('input[name="plotArea"]').value = plotArea;
+            row.querySelector('input[name="exemptionArea"]').value = exemptionArea;
+
+            var assumptionArea = carpetArea - exemptionArea;
+            if (plotArea) {
+                assumptionArea = plotArea - exemptionArea;
+            }
+
+            var legalIllegal = row.querySelector('select[name="legalIllegal"]').value;
+            var illegalAssmtArea = parseFloat(row.querySelector('input[name="illegalAssmtArea"]').value) || 0;
+
+            var legalAssmtArea = legalIllegal === 'Illegal' ? assumptionArea - illegalAssmtArea : assumptionArea;
+
+            row.querySelector('input[name="assumptionArea"]').value = assumptionArea;
+            row.querySelector('input[name="legalAssmtArea"]').value = legalAssmtArea;
+
+            // Enable or disable the illegalAssmtArea input based on the selection
+            row.querySelector('input[name="illegalAssmtArea"]').disabled = legalIllegal !== 'Illegal';
+
+            updateFinalTotals();
+        }
+
+        function updateFinalTotals() {
+            var totalCarpetArea = 0;
+            var totalPlotArea = 0;
+            var totalExemptionArea = 0;
+            var totalAssumptionArea = 0;
+            var totalLegalAssmtArea = 0;
+            var totalIllegalAssmtArea = 0;
+
+            document.querySelectorAll('#propertyTable tbody tr').forEach(function(row) {
+                totalCarpetArea += parseFloat(row.querySelector('input[name="carpetArea"]').value) || 0;
+                totalPlotArea += parseFloat(row.querySelector('input[name="plotArea"]').value) || 0;
+                totalExemptionArea += parseFloat(row.querySelector('input[name="exemptionArea"]').value) || 0;
+                totalAssumptionArea += parseFloat(row.querySelector('input[name="assumptionArea"]').value) || 0;
+                totalLegalAssmtArea += parseFloat(row.querySelector('input[name="legalAssmtArea"]').value) || 0;
+                totalIllegalAssmtArea += parseFloat(row.querySelector('input[name="illegalAssmtArea"]').value) || 0;
+            });
+
+            document.getElementById('totalCarpetArea').textContent = totalCarpetArea.toFixed(2);
+            document.getElementById('totalPlotArea').textContent = totalPlotArea.toFixed(2);
+            document.getElementById('totalExemptionArea').textContent = totalExemptionArea.toFixed(2);
+            document.getElementById('totalAssumptionArea').textContent = totalAssumptionArea.toFixed(2);
+            document.getElementById('totalLegalAssmtArea').textContent = totalLegalAssmtArea.toFixed(2);
+            document.getElementById('totalIllegalAssmtArea').textContent = totalIllegalAssmtArea.toFixed(2);
+        }
+
+        function addRow() {
+            var table = document.getElementById('propertyTable').getElementsByTagName('tbody')[0];
+            var newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td><input type="text" name="room"></td>
+                <td><input type="text" name="use"></td>
+                <td><input type="text" name="innerOuter"></td>
+                <td><input type="number" name="deduction"></td>
+                <td><input type="number" name="length" oninput="calculateRowTotals(this)"></td>
+                <td><input type="number" name="breadth" oninput="calculateRowTotals(this)"></td>
+                <td><input type="number" name="areaBeforeDeduction"></td>
+                <td><input type="number" name="carpetArea" oninput="calculateRowTotals(this)"></td>
+                <td><input type="number" name="plotArea" oninput="calculateRowTotals(this)"></td>
+                <td><input type="text" name="exemption"></td>
+                <td><input type="number" name="exemptionLength" oninput="calculateRowTotals(this)"></td>
+                <td><input type="number" name="exemptionBreadth" oninput="calculateRowTotals(this)"></td>
+                <td><input type="number" name="exemptionArea" oninput="calculateRowTotals(this)"></td>
+                <td><input type="number" name="assumptionArea" oninput="calculateRowTotals(this)"></td>
+                <td>
+                    <select name="legalIllegal" onchange="calculateRowTotals(this)">
+                        <option value="Legal">Legal</option>
+                        <option value="Illegal">Illegal</option>
+                    </select>
+                </td>
+                <td><input type="number" name="legalAssmtArea" readonly></td>
+                <td><input type="number" name="illegalAssmtArea" oninput="calculateRowTotals(this)" disabled></td>
+                <td><button type="button" onclick="removeRow(this)">Remove</button></td>
+            `;
+        }
+
+        function removeRow(button) {
+            var row = button.closest('tr');
+            row.remove();
+            updateFinalTotals();
+        }
+    </script>
+</head>
+<body>
+    <table id="propertyTable">
+        <thead>
+            <tr>
+                <th>Room</th>
+                <th>Use</th>
+                <th>Inner/Outer</th>
+                <th>Deduction %</th>
+                <th>Length</th>
+                <th>Breadth</th>
+                <th>Area Before Deduction</th>
+                <th>Carpet Area</th>
+                <th>Plot Area</th>
+                <th>Exemption</th>
+                <th>Exemption Length</th>
+                <th>Exemption Breadth</th>
+                <th>Exemption Area</th>
+                <th>Assumption Area</th>
+                <th>Legal/Illegal</th>
+                <th>Legal Assmt Area</th>
+                <th>Illegal Assmt Area</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="text" name="room"></td>
+                <td><input type="text" name="use"></td>
+                <td><input type="text" name="innerOuter"></td>
+                <td><input type="number" name="deduction"></td>
+                <td><input type="number" name="length" oninput="calculateRowTotals(this)"></td>
+                <td><input type="number" name="breadth" oninput="calculateRowTotals(this)"></td>
+                <td><input type="number" name="areaBeforeDeduction"></td>
+                <td><input type="number" name="carpetArea" oninput="calculateRowTotals(this)"></td>
+                <td><input type="number" name="plotArea" oninput="calculateRowTotals(this)"></td>
+                <td><input type="text" name="exemption"></td>
+                <td><input type="number" name="exemptionLength" oninput="calculateRowTotals(this)"></td>
+                <td><input type="number" name="exemptionBreadth" oninput="calculateRowTotals(this)"></td>
+                <td><input type="number" name="exemptionArea" oninput="calculateRowTotals(this)"></td>
+                <td><input type="number" name="assumptionArea" oninput="calculateRowTotals(this)"></td>
+                <td>
+                    <select name="legalIllegal" onchange="calculateRowTotals(this)">
+                        <option value="Legal">Legal</option>
+                        <option value="Illegal">Illegal</option>
+                    </select>
+                </td>
+                <td><input type="number" name="legalAssmtArea" readonly></td>
+                <td><input type="number" name="illegalAssmtArea" oninput="calculateRowTotals(this)" disabled></td>
+                <td><button type="button" onclick="removeRow(this)">Remove</button></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="7">Totals</td>
+                <td id="totalCarpetArea">0</td>
+                <td id="totalPlotArea">0</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td id="totalExemptionArea">0</td>
+                <td id="totalAssumptionArea">0</td>
+                <td></td>
+                <td id="totalLegalAssmtArea">0</td>
+                <td id="totalIllegalAssmtArea">0</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+    <button type="button" onclick="addRow()">Add Row</button>
+</body>
+</html>

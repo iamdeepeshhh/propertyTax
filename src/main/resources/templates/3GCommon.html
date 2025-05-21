@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>3G Associates | Login Portal</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link href="/3GCommon/CSS/styles.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style>
+        .info-container {
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-left: 4px solid #28a745;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        font-family: 'Roboto', sans-serif;
+        color: #000; /* Set all font color inside to black */
+        font-size: 200px;
+ }
+
+ .info-container h2,
+ .info-container p,
+ .info-container li {
+   color: #000; /* Ensure all text is black */
+ }
+
+
+         .info-container p,
+         .info-container li {
+           font-size: 16px;
+           line-height: 1.6;
+         }
+
+         .info-container ul {
+           padding-left: 1rem;
+         }
+
+         .dropdown .btn {
+           margin-right: 1rem;
+         }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-green">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#" id="councilName">3G Associates</a>
+            <div class="ms-auto dropdown">
+                <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Master Login
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/3g/MasterWebLogin"><i class="fas fa-user-shield"></i> Master Web Login</a></li>
+                    <li><a class="dropdown-item" href="/3gSurvey/surveyLogin"><i class="fas fa-user-edit"></i> Surveyor Login</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="container-main d-flex align-items-center">
+    <div class="container">
+        <div class="row align-items-center offset-md-1">
+
+            <!-- Left Side Info Section -->
+            <div class="col-md-5 d-flex flex-column justify-content-center info-container">
+                <h2 class="mb-4 text-success">Welcome to 3G Associates</h2>
+                <p class="lead fw-semibold">We provide the most accurate and trusted property tax assessment services.</p>
+                <p>At <strong>3G Associates</strong>, we leverage real-time technologies and expert teams to deliver transparent, reliable, and government-compliant property evaluations.</p>
+                <p>Why choose us?</p>
+                <ul class="list-unstyled ps-3">
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Real-time property tax assessments</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Comprehensive property evaluations</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Accurate and reliable property data</li>
+                    <li><i class="fas fa-check-circle text-success me-2"></i> Expert advice and consultation</li>
+                </ul>
+            </div>
+
+            <!-- Right Side Citizen Login Button -->
+            <div class="col-md-5 d-flex flex-column justify-content-center align-items-center login-container">
+                <h3 class="mb-4 text-center">Citizen Login</h3>
+                <button class="btn btn-primary btn-success px-3 w-50 shadow-sm" onclick="window.location.href='/3gCitizen/citizenDashboard'">
+                    <i class="fas fa-user"></i> Enter as Citizen
+                </button>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<footer class="site-footer text-center py-3">
+    <p>© 2024 3G Associates. All rights reserved.</p>
+</footer>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Fetch Council Name -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      fetch('/3g/getCouncilDetails')
+        .then(response => response.json())
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0 && data[0].standardName) {
+            document.getElementById('councilName').textContent = data[0].standardName;
+          }
+        })
+        .catch(() => {
+          document.getElementById('councilName').textContent = '3G Associates';
+        });
+    });
+</script>
+
+</body>
+</html>

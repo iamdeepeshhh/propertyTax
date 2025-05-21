@@ -1,0 +1,7 @@
+package com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.TaxAssessment_MasterRepository;
+
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxAssessment_MasterEntity.Property_RValues;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface Property_RValuesRepository extends JpaRepository<Property_RValues, String > {
+}

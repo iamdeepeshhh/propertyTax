@@ -1,0 +1,48 @@
+body{font-family: Arial Unicode MS;}
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+div.breakhere {
+    page-break-before: always;
+}
+
+.main table, th, td {
+    border: 1px solid black; padding: 3px;
+}
+
+body table, th, td {}
+
+.tablecls {
+    border: 1px solid red; padding: 3px;
+}
+
+#headingDiv, #imgDiv {
+    display: inline-block;
+}
+
+.txtcontent {font-size: 14px; width: 99.8%; border: 1px solid black; margin-top: 3px; margin-bottom: 3px;}
+#headingDiv {}
+
+.imagediv {
+    display: flex;
+    flex-wrap: wrap; /* Allows the images to wrap into multiple lines */
+    width: 99.8%;
+    height: 900px; /* Increased height to give images more height */
+    border: 1px solid black;
+    margin-top: 3px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    overflow: hidden; /* Ensures content doesn't overflow the container */
+}
+
+.img1, .img2, .img3, .img4 {
+    flex: 1 0 47%; /* Adjusts width to ensure two images per row */
+    height: 49%; /* Adjusts height to ensure more height for each image */
+    border: 1px solid black;
+    text-align: center;
+    margin: 0.5%; /* Adjust margin to fit within the container */
+    box-sizing: border-box; /* Ensures padding and border are included in the width and height */
+    padding: 1px;
+}

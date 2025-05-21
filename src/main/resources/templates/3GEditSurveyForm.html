@@ -6,369 +6,248 @@
     <title>Edit Property Details</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" crossorigin="anonymous">
     <link href="/3GSurveyForm/css/styles.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-
-<div class="container mt-4">
-    <h2 class="text-center">Edit Property Details</h2>
     <div class="tabs">
-        <button onclick="openTab('MainTabContent')" class="btn btn-secondary">Main</button>
-        <button onclick="openTab('PropertyTabContent')" class="btn btn-secondary">Property</button>
-        <button onclick="openTab('UnitTabContent')" class="btn btn-secondary">Unit</button>
-        <button onclick="openTab('AdditionalTabContent')" class="btn btn-secondary">Additional</button>
+        <button onclick="openTab('Main')">Main</button>
+        <button onclick="openTab('Property')">Property</button>
+        <button onclick="openTab('Unit')">Unit</button>
+        <button onclick="openTab('Additional')">Additional</button>
     </div>
-
-    <form id="editPropertyForm" action="/survey/submit" method="post" class="mt-3">
-        <!-- Main Tab Content -->
-        <div id="MainTabContent" class="tab-content" style="display: block;">
-            <h3>Main Information</h3>
-            <fieldset class="border p-3 mb-3">
-                <form id="mainForm">
-                    <!-- Reference No -->
-                    <div class="form-group">
-                        <label for="podRef">Reference no:</label>
-                        <input type="text" id="podRef" name="podRef" class="form-control" disabled>
-                    </div>
-
-                    <!-- Zone -->
-                    <div class="form-group">
-                        <label for="zone" class="mandatory">Zone:</label>
-                        <select id="zone" name="zone" class="form-control"></select>
-                    </div>
-
-                    <!-- Old Ward -->
-                    <div class="form-group">
-                        <label for="oldWard">Old Ward:</label>
-                        <select id="oldWard" name="oldWard" class="form-control"></select>
-                    </div>
-
-                    <!-- Ward -->
-                    <div class="form-group">
-                        <label for="ward" class="mandatory">Ward:</label>
-                        <select id="ward" name="ward" class="form-control" onchange="checkSurveyPropNo()"></select>
-                    </div>
-
-                    <!-- City Survey No. -->
-                    <div class="form-group">
-                        <label for="citySurveyNo">City Survey No.:</label>
-                        <input type="text" id="citySurveyNo" name="citySurveyNo" class="form-control">
-                    </div>
-
-                    <!-- Old Property No. -->
-                    <div class="form-group">
-                        <label for="oldPropertyNo">Old Property No.:</label>
-                        <input type="text" id="oldPropertyNo" name="oldPropertyNo" class="form-control">
-                    </div>
-
-                    <!-- Survey Prop No. -->
-                    <div class="form-group">
-                        <label for="surveyPropNo" class="mandatory">Survey Prop No.:</label>
-                        <input type="text" id="surveyPropNo" name="surveyPropNo" class="form-control" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits" oninput="removeSpacesAndCheck(this)">
-                        <small id="surveyPropNoMessage" class="form-text text-danger" style="display: none;">Survey Prop No. already exists in this ward.</small>
-                    </div>
-
-                    <!-- Sequence No. -->
-                    <div class="form-group">
-                        <label for="sequenceNo">Sequence No.:</label>
-                        <input type="text" id="sequenceNo" name="sequenceNo" class="form-control">
-                    </div>
-
-                    <!-- Layout Name -->
-                    <div class="form-group">
-                        <label for="layoutName">Layout Name:</label>
-                        <input type="text" id="layoutName" name="layoutName" class="form-control">
-                    </div>
-
-                    <!-- Layout No. -->
-                    <div class="form-group">
-                        <label for="layoutNo">Layout No.:</label>
-                        <input type="text" id="layoutNo" name="layoutNo" class="form-control">
-                    </div>
-
-                    <!-- Khasra No. -->
-                    <div class="form-group">
-                        <label for="khasraNo">Khasra No.:</label>
-                        <input type="text" id="khasraNo" name="khasraNo" class="form-control">
-                    </div>
-
-                    <!-- Plot No. -->
-                    <div class="form-group">
-                        <label for="plotNo">Plot No.:</label>
-                        <input type="text" id="plotNo" name="plotNo" class="form-control">
-                    </div>
-
-                    <!-- Owner Name -->
-                    <div class="form-group">
-                        <label for="ownerName" class="mandatory">Owner Name:</label>
-                        <input type="text" id="ownerName" name="ownerName" class="form-control">
-                    </div>
-
-                    <!-- New Owner Name -->
-                    <div class="form-group">
-                        <label for="newOwnerName">New Owner Name:</label>
-                        <input type="text" id="newOwnerName" name="newOwnerName" class="form-control" disabled>
-                    </div>
-
-                    <!-- Occupier Name -->
-                    <div class="form-group">
-                        <label for="occupierName">Occupier Name:</label>
-                        <input type="text" id="occupierName" name="occupierName" class="form-control">
-                    </div>
-
-                    <!-- Address -->
-                    <div class="form-group">
-                        <label for="address" class="mandatory">Address:</label>
-                        <input type="text" id="address" name="address" class="form-control">
-                    </div>
-
-                    <!-- Owner Type -->
-                    <div class="form-group">
-                        <label for="ownerType" class="mandatory">Owner Type:</label>
-                        <select id="ownerType" name="ownerType" class="form-control"></select>
-                    </div>
-
-                    <!-- Building Status -->
-                    <div class="form-group">
-                        <label for="buildingStatus">Building Status:</label>
-                        <select id="buildingStatus" name="buildingStatus" class="form-control"></select>
-                    </div>
-
-                    <!-- Next Button -->
-
-                </form>
-            </fieldset>
-            <div class="form-group text-right">
-                <button type="button" class="btn btn-primary" onclick="Next('PropertyTabContent')">Next</button>
-            </div>
-        </div>
-
-        <div id="PropertyTabContent" class="tab-content" style="display: none;">
-            <h3>Property Information</h3>
-            <form id="propertyForm">
-                <!-- Owner Details -->
-                <fieldset class="border p-3 mb-3">
-                    <legend class="w-auto px-2">Owner Details</legend>
-
-                    <div class="form-group">
-                        <label for="panNo">Pan No.:</label>
-                        <input type="text" id="panNo" name="panNo" class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="aadharNo">Aadhar No.:</label>
-                        <input type="text" id="aadharNo" name="aadharNo" class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ownermobileNo">Mobile No.:</label>
-                        <input type="text" id="ownermobileNo" name="mobileNo" class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="category" class="mandatory">Category:</label>
-                        <select id="category" name="category" class="form-control"></select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="propertyName">Property Name:</label>
-                        <input type="text" id="propertyName" name="propertyName" class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="buildingValue">Building Value:</label>
-                        <input type="text" id="buildingValue" name="buildingValue" class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="plotValue">Plot Value:</label>
-                        <input type="text" id="plotValue" name="plotValue" class="form-control">
-                    </div>
+    <form id="propertyForm" action="/survey/submit" method="post">
+    
+       <div id="MainTabContent" class="tab-content">
+        <form>
+    
+            <label for="podRef">Reference no:</label>
+            <input type="text" id="podRef" name="podRef" style="width: 97%;" disabled><br>
+    
+            <label for="zone" class="mandatory">Zone:</label>
+            <select id="zone" name="zone" style="width: 97%;"></select><br>
+    
+            <label for="oldWard">Old Ward:</label>
+            <select id="oldWard" name="oldWard" style="width: 97%;"></select><br>
+    
+            <label for="ward" class="mandatory">Ward:</label>
+            <select id="ward" name="ward" style="width: 97%;" onchange="checkSurveyPropNo()"></select><br>
+    
+            <label for="citySurveyNo">City Survey No.:</label>
+            <input type="text" id="citySurveyNo" name="citySurveyNo" style="width: 95%;"><br>
+    
+            <label for="oldPropertyNo">Old Property No.:</label>
+            <input type="text" id="oldPropertyNo" name="oldPropertyNo" style="width: 95%;"><br>
+    
+            <label for="surveyPropNo" class="mandatory">Survey Prop No.:</label>
+            <input type="text" id="surveyPropNo" name="surveyPropNo" style="width: 95%;" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits" oninput="removeSpacesAndCheck(this)"><br>
+            <span id="surveyPropNoMessage" style="color: red; display: none;">Survey Prop No. already exists in this ward.</span>
+    
+            <label for="sequenceNo">Sequence No.:</label>
+            <input type="text" id="sequenceNo" name="sequenceNo" style="width: 95%;"><br>
+    
+            <label for="layoutName">Layout Name:</label>
+            <input type="text" id="layoutName" name="layoutName" style="width: 95%;"><br>
+    
+            <label for="layoutNo">Layout No.:</label>
+            <input type="text" id="layoutNo" name="layoutNo" style="width: 95%;"><br>
+    
+            <label for="khasraNo">Khasra No.:</label>
+            <input type="text" id="khasraNo" name="khasraNo" style="width: 95%;"><br>
+    
+            <label for="plotNo">Plot No.:</label>
+            <input type="text" id="plotNo" name="plotNo" style="width: 95%;"><br>
+    
+            <label for="ownerName" class="mandatory">Owner Name:</label>
+            <input type="text" id="ownerName" name="ownerName" style="width: 95%;"><br>
+    
+            <label for="newOwnerName">New Owner Name:</label>
+            <input type="text" id="newOwnerName" name="newOwnerName" style="width: 95%;" disabled><br>
+    
+            <label for="occupierName">Occupier Name:</label>
+            <input type="text" id="occupierName" name="occupierName" style="width: 95%;"><br>
+    
+            <label for="address" class="mandatory">Address:</label>
+            <input type="text" id="address" name="address" style="width: 95%;"><br>
+    
+            <label for="ownerType" class="mandatory">Owner Type:</label>
+            <select id="ownerType" name="ownerType" style="width: 97%;"></select><br>
+    
+            <label for="buildingStatus">Building Status:</label>
+            <select id="buildingStatus" name="buildingStatus" style="width: 100%;"></select><br><br>
+    
+            <button type="button" onclick="Next('Property')">Next</button>
+        </form>
+    </div>
+    
+        <div id="PropertyTabContent" class="tab-content">
+    
+            <form>
+                <fieldset>
+                    <legend>Owner details</legend>
+                    <label for="panNo" >Pan No.:</label>
+                    <input style="width: 97%;" type="text" id="panNo" name="panNo"><br>
+    
+                    <label for="aadharNo" >Aadhar No.:</label>
+                    <input style="width: 97%;" type="text" id="aadharNo" name="aadharNo"><br>
+    
+                    <label for="ownermobileNo" >Mobile No.:</label>
+                    <input style="width: 97%;" type="text" id="ownermobileNo" name="mobileNo"><br>
+    
+                    <label for="category" class="mandatory">Category:</label>
+                    <select style="width: 99%;" id="category" name="category">
+                    </select><br>
+    
+                    <label for="propertyName">Property Name:</label>
+                    <input style="width: 97%;" type="text" id="propertyName" name="propertyName"><br>
+    
+                    <label for="buildingValue">Building Value:</label>
+                    <input style="width: 97%;" type="text" id="buildingValue" name="buildingValue"><br>
+    
+                    <label for="plotValue">Plot Value:</label>
+                    <input style="width: 97%;" type="text" id="plotValue" name="plotValue"><br>
                 </fieldset>
-
-                <!-- Property Information -->
-                <fieldset class="border p-3 mb-3">
-                    <legend class="w-auto px-2">Property Information</legend>
-
-                    <div class="form-group">
-                        <label for="propertyType" class="mandatory">Property Type:</label>
-                        <select id="propertyType" name="propertyType" class="form-control">
-                            <option value="select">Select</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="propertySubType" class="mandatory">Property Sub Type:</label>
-                        <select id="propertySubType" name="propertySubType" class="form-control">
-                            <option value="select">Select</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="propertyusageType" class="mandatory">Usage Type:</label>
-                        <select id="propertyusageType" name="propertyusageType" class="form-control">
-                            <option value="select">Select</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="propertyusageSubType" class="mandatory">Usage Sub Type:</label>
-                        <select id="propertyusageSubType" name="propertyusageSubType" class="form-control">
-                            <option value="select">Select</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="buildingType">Building Type:</label>
-                        <select id="buildingType" name="buildingType" class="form-control">
-                            <option value="select">Select</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="buildingSubType">Building Sub Type:</label>
-                        <select id="buildingSubType" name="buildingSubType" class="form-control">
-                            <option value="select">Select</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="constYear" class="mandatory">Construction Year:</label>
-                        <select id="constYear" name="constYear" class="form-control" onchange="updatePropertyAgeFactor(this.value)">
-                            <!-- Year options will be populated by JavaScript -->
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="constAgeProperty">Construction Age:</label>
-                        <input type="text" id="constAgeProperty" name="constAgeProperty" class="form-control" readonly>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ageFactorProperty">Age Factor:</label>
-                        <input type="text" id="ageFactorProperty" name="ageFactorProperty" class="form-control" readonly>
-                    </div>
-
+                <fieldset>
+                    <legend>Property information</legend>
+    
+                    <label for="propertyType" class="mandatory">Property Type:</label>
+                    <select style="width: 97%;" id="propertyType" name="propertyType">
+                        <option value="select">Select</option>
+                    </select><br>
+    
+                    <label for="propertySubType" class="mandatory">Property Sub Type:</label>
+                    <select style="width: 97%;" id="propertySubType" name="propertySubType">
+                        <option value="select">Select</option>
+                    </select><br>
+    
+                    <label for="propertyusageType" class="mandatory">Usage Type:</label>
+                    <select style="width: 97%;" id="propertyusageType" name="propertyusageType">
+                        <option value="select">Select</option>
+                    </select><br>
+    
+                    <label for="propertyusageSubType" class="mandatory">Usage Sub Type:</label>
+                    <select style="width: 97%;" id="propertyusageSubType" name="propertyusageSubType">
+                        <option value="select">Select</option>
+                    </select><br>
+    
+                    <label for="buildingType">Building Type:</label>
+                    <select style="width: 97%;" id="buildingType" name="buildingType">
+                        <option value="select">Select</option>
+                    </select><br>
+    
+                    <label for="buildingSubType">Building Sub Type:</label>
+                    <select style="width: 97%;" id="buildingSubType" name="buildingSubType">
+                        <option value="select">Select</option>
+                    </select><br>
+    
+                    <label for="constYear" class="mandatory">Construction Year:</label>
+                    <select style="width: 97%;" id="constYear" name="constYear" onchange="updatePropertyAgeFactor(this.value)">
+                        <!-- Year options will be populated by JavaScript -->
+                    </select><br>
+    
+                    <label for="constAgeProperty">Construction Age:</label>
+                    <input style="width: 97%;" type="text" id="constAgeProperty" name="constAgeProperty" readonly><br>
+    
+                    <label for="ageFactorProperty">Age Factor:</label>
+                    <input style="width: 97%;" type="text" id="ageFactorProperty" name="ageFactorProperty" readonly><br>
+    
                     <input type="hidden" id="agefactorpropertyhid">
-                    <input type="hidden" id="currentDateProperty" name="currentDateProperty">
-                </fieldset>
-
-                <!-- Permissions -->
-                <fieldset class="border p-3 mb-3">
-                    <legend class="w-auto px-2">Permissions</legend>
-
-                    <div class="form-group">
-                        <label for="permissionSelection">Permission:</label>
-                        <select id="permissionSelection" name="permissionSelection" class="form-control" onchange="togglePopup('permissionSelection', 'permissionPopup')">
-                            <option value="no">Select</option>
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
-
+                    <input type="text" id="currentDateProperty" name="currentDateProperty">
+    
+                    <label for="permissionSelection">Permission:</label>
+                    <select style="width: 97%;" id="permissionSelection" name="permissionSelection"
+                            onchange="togglePopup('permissionSelection', 'permissionPopup')">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
                     <div id="permissionPopup" class="popup">
                         <label for="permissionNumber">Permission Number:</label>
-                        <input type="text" id="permissionNumber" name="permissionNumber" class="form-control">
-
+                        <input style="width: 97%;" type="text" id="permissionNumber" name="permissionNumber">
                         <label for="permissionDate">Permission Date:</label>
-                        <input type="date" id="permissionDate" name="permissionDate" class="form-control">
-                    </div>
+                        <input style="width: 97%;
+                                padding: 8px;
+                                box-sizing: border-box;
+                                border: 1px solid #ccc;
+                            border-radius: 3px;" type="date" id="permissionDate" name="permissionDate">
+                        </div>
+    
+    
+                    <label for="stair">Stair:</label>
+                    <select style="width: 97%;" id="stair" name="stair">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select><br>
+    
+                    <label for="lift">Lift:</label>
+                    <select style="width: 97%;" id="lift" name="lift">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select><br>
+    
+                    <label for="roadWidth">Road Width (in meter):</label>
+                    <input style="width: 95%;" type="text" id="roadWidth" name="roadWidth"><br>
                 </fieldset>
-
-                <!-- Additional Details -->
-                <fieldset class="border p-3 mb-3">
-                    <legend class="w-auto px-2">Additional Details</legend>
-
-                    <div class="form-group">
-                        <label for="stair">Stair:</label>
-                        <select id="stair" name="stair" class="form-control">
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="lift">Lift:</label>
-                        <select id="lift" name="lift" class="form-control">
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="roadWidth">Road Width (in meters):</label>
-                        <input type="text" id="roadWidth" name="roadWidth" class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="toiletSelection">Toilet:</label>
-                        <select id="toiletSelection" name="toiletSelection" class="form-control" onchange="togglePopup('toiletSelection', 'toiletPopup')">
-                            <option value="no">Select</option>
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
-
+    
+                <!-- Suraj's code starts here -->
+                <fieldset>
+                    <legend>Other information</legend>
+                    <label for="toiletSelection">Toilet:</label>
+                    <select style="width: 97%;" id="toiletSelection" name="toiletSelection"
+                            onchange="togglePopup('toiletSelection', 'toiletPopup')">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+    
                     <div id="toiletPopup" class="popup">
                         <label for="numberOfToilets">Number of Toilets:</label>
-                        <input type="text" id="numberOfToilets" name="numberOfToilets" class="form-control">
+                        <input style="width: 97%;" type="text" id="numberOfToilets" name="numberOfToilets">
                     </div>
-
-                    <div class="form-group">
-                        <label for="sewerage">Sewerage:</label>
-                        <select id="sewerage" name="sewerage" class="form-control">
-                            <option value="no">Select</option>
-                            <option value="Drain">Drain</option>
-                            <option value="Septic Tank">Septic Tank</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sewerageType">Sewerage Type:</label>
-                        <select id="sewerageType" name="sewerageType" class="form-control" disabled></select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="waterSelection">Water Connection:</label>
-                        <select id="waterSelection" name="waterSelection" class="form-control" onchange="togglePopup('waterSelection', 'waterPopup')">
-                            <option value="no">Select</option>
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
-
+    
+                    <label for="sewerage">Sewerage:</label>
+                    <select style="width: 97%;" id="sewerage" name="sewerage">
+                        <option value="Drain">Drain</option>
+                        <option value="Septic Tank">Septic Tank</option>
+                    </select><br>
+    
+                    <label for="sewerageType">Sewerage type:</label>
+                    <select style="width: 97%;" id="sewerageType" name="sewerageType" disabled>
+                    </select><br>
+    
+                    <label for="waterSelection">Water Con:</label>
+                    <select style="width: 97%;" id="waterSelection" name="waterSelection"
+                            onchange="togglePopup('waterSelection', 'waterPopup')">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
                     <div id="waterPopup" class="popup">
                         <label for="waterOptions">Water Connection Type:</label>
-                        <select id="waterOptions" name="waterOptions" class="form-control">
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
+                        <select style="width: 97%;" id="waterOptions" name="waterOptions">
+                        </select><br>
                     </div>
-
-                    <div class="form-group">
+    
+                    <div id="mcConnectionType" >
                         <label for="mcConnection">MC Connection:</label>
-                        <select id="mcConnection" name="mcConnection" class="form-control">
-                            <option value="">Select</option>
+                        <select id="mcConnection" name="mcConnection">
                             <option value="Authorized">Authorized</option>
                             <option value="Unauthorized">Unauthorized</option>
                         </select>
                     </div>
-
-                    <div class="form-group">
+                    <div id="additionalFields" >
                         <label for="meterNumber">Meter Number:</label>
-                        <input type="text" id="meterNumber" name="meterNumber" class="form-control">
-                    </div>
-                    <div class="form-group">
+                        <input type="text" id="meterNumber" name="meterNumber"><br>
+    
                         <label for="consumerNumber">Consumer Number:</label>
-                        <input type="text" id="consumerNumber" name="consumerNumber" class="form-control">
-                    </div>
-                    <div class="form-group">
+                        <input type="text" id="consumerNumber" name="consumerNumber"><br>
+    
                         <label for="connectionDate">Connection Date:</label>
-                        <input type="date" id="connectionDate" name="connectionDate" class="form-control">
-                    </div>
-
-                    <div class="form-group">
+                        <input style="width: 97%;
+                            padding: 8px;
+                            box-sizing: border-box;
+                            border: 1px solid #ccc;
+                        border-radius: 3px;" type="date" id="connectionDate" name="connectionDate"><br>
+    
                         <label for="pipeSize">Pipe Size:</label>
-                        <select id="pipeSize" name="pipeSize" class="form-control">
+                        <select id="pipeSize" name="pipeSize">
                             <option value="">Select Pipe Size</option>
                             <option value="0.5">0.5</option>
                             <option value="0.75">0.75</option>
@@ -381,187 +260,271 @@
                             <option value="2.50">2.50</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="solar">Solar:</label>
-                        <select id="solar" name="solar" class="form-control">
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="electricitySelection">Electricity:</label>
-                        <select id="electricitySelection" name="electricitySelection" class="form-control" onchange="togglePopup('electricitySelection', 'electricityPopup')">
-                            <option value="no">Select</option>
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
+    
+                    <label for="solar">Solar:</label>
+                    <select style="width: 97%;" id="solar" name="solar">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select><br>
+    
+                    <label for="electricitySelection">Electricity:</label>
+                    <select style="width: 97%;" id="electricitySelection" name="electricitySelection"
+                            onchange="togglePopup('electricitySelection', 'electricityPopup')">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
                     <div id="electricityPopup" class="popup">
                         <label for="emeterNumber">Meter Number:</label>
-                        <input type="text" id="emeterNumber" name="emeterNumber" class="form-control">
+                        <input style="width: 97%;" type="text" id="emeterNumber" name="emeterNumber">
                         <label for="econsumerNumber">Consumer Number:</label>
-                        <input type="text" id="econsumerNumber" name="econsumerNumber" class="form-control">
+                        <input style="width: 97%;" type="text" id="econsumerNumber" name="econsumerNumber">
                     </div>
-                    <div class="form-group">
-                        <label for="rainWaterHarvesting">Rainwater Harvesting:</label>
-                        <select id="rainWaterHarvesting" name="rainWaterHarvesting" class="form-control">
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
-                    </div>
+    
+    
+                    <label for="rainWaterHarvesting">Rain water Harvesting:</label>
+                    <select style="width: 97%;" id="rainWaterHarvesting" name="rainWaterHarvesting">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select><br>
                 </fieldset>
-                <fieldset class="border p-3 mb-3">
+    
+                <fieldset>
                     <legend>Total Area</legend>
-
-                    <div class="form-group">
-                        <label for="plotArea">Plot Area:</label>
-                        <input type="text" id="plotArea" name="plotArea" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="builtUpArea">Built up Area:</label>
-                        <input type="text" id="builtUpArea" name="builtUpArea" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="carpetArea">Carpet Area:</label>
-                        <input type="text" id="carpetArea" name="carpetArea" class="form-control" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="exemptedArea">Exempted Area:</label>
-                        <input type="text" id="exemptedArea" name="exemptedArea" class="form-control" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="assessableArea">Assessable Area:</label>
-                        <input type="text" id="assessableArea" name="assessableArea" class="form-control" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="areaLetout">Area Letout:</label>
-                        <input type="text" id="areaLetout" name="areaLetout" class="form-control" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="areaNotLetout">Area Not Letout:</label>
-                        <input type="text" id="areaNotLetout" name="areaNotLetout" class="form-control" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="currentAssmtDate">Current Assessment Date:</label>
-                        <input type="text" id="currentAssmtDate" name="currentAssmtDate" class="form-control" value="2024-11-07" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="noofrooms">Number of Rooms:</label>
-                        <input type="text" id="noofrooms" name="noofrooms" class="form-control" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="nooffloors">Number of Floors:</label>
-                        <input type="text" id="nooffloors" name="nooffloors" class="form-control" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="lastAssmtDate">Last Assessment Date:</label>
-                        <input type="text" id="lastAssmtDate" name="lastAssmtDate" class="form-control" readonly>
-                    </div>
-                </fieldset>
-
-                <!-- NA, TD, TP, and Sale Deed Details -->
-                <fieldset class="border p-3 mb-3">
-                    <legend>Additional Details</legend>
-
-                    <!-- NA Details -->
-                    <div class="form-group">
-                        <label for="naSelection">NA Details:</label>
-                        <select id="naSelection" name="naSelection" class="form-control" onchange="togglePopup('naSelection', 'naPopup')">
-                            <option value="select">Select</option>
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
+    
+                    <label for="plotArea">Plot Area:</label>
+                    <input type="text" id="plotArea" name="plotArea"><br>
+    
+                    <label for="builtUpArea">Built up Area:</label>
+                    <input type="text" id="builtUpArea" name="builtUpArea"><br>
+    
+                    <label for="carpetArea">Carpet Area:</label>
+                    <input type="text" id="carpetArea" name="carpetArea" readonly><br>
+    
+                    <label for="exemptedArea">Exempted Area:</label>
+                    <input type="text" id="exemptedArea" name="exemptedArea" readonly><br>
+    
+                    <label for="assessableArea">Assessable Area:</label>
+                    <input type="text" id="assessableArea" name="assessableArea" readonly><br>
+    
+                    <label for="areaLetout">Area Letout:</label>
+                    <input type="text" id="areaLetout" name="areaLetout" readonly><br>
+    
+                    <label for="areaNotLetout">Area Not Letout:</label>
+                    <input  type="text" id="areaNotLetout" name="areaNotLetout" readonly><br>
+    
+                    <label for="currentAssmtDate">Current Assessment Date:</label>
+                    <input type="text" id="currentAssmtDate" name="currentAssmtDate" readonly>
+    
+                    <label for="noofrooms">Number of Rooms:</label>
+                    <input type="text" id="noofrooms" name="noofrooms">
+    
+                    <label for="nooffloors">Number of Floors:</label>
+                    <input type="text" id="nooffloors" name="nooffloors" readonly>
+    
+                    <label for="lastAssmtDate">Last Assmt Date:</label>
+                    <input type="text" id="lastAssmtDate" name="lastAssmtDate" readonly>
+    
+                    <input type = "hidden" id="firstAssmtDate" name="firstAssmtDate">
+    
+                    <label for="naSelection">NA Details:</label>
+                    <select style="width: 97%;" id="naSelection" name="naSelection" onchange="togglePopup('naSelection', 'naPopup')">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+    
                     <div id="naPopup" class="popup">
                         <label for="naOrder">NA Order:</label>
-                        <input type="text" id="naOrder" name="naOrder" class="form-control">
+                        <input type="text" id="naOrder" name="naOrder">
                         <label for="naDate">NA Date:</label>
-                        <input type="date" id="naDate" name="naDate" class="form-control">
+                        <input style="width: 97%;
+                            padding: 8px;
+                            box-sizing: border-box;
+                            border: 1px solid #ccc;
+                            border-radius: 3px;" type="date" id="naDate" name="naDate">
                     </div>
-
-                    <!-- TD Details -->
-                    <div class="form-group">
-                        <label for="tdSelection">TD Details:</label>
-                        <select id="tdSelection" name="tdSelection" class="form-control" onchange="togglePopup('tdSelection', 'tdPopup')">
-                            <option value="select">Select</option>
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
+    
+                    <label for="tdSelection">TD Details:</label>
+                    <select style="width: 97%;" id="tdSelection" name="tdSelection" onchange="togglePopup('tdSelection', 'tdPopup')">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+    
                     <div id="tdPopup" class="popup">
                         <label for="tdOrder">TD Order:</label>
-                        <input type="text" id="tdOrder" name="tdOrder" class="form-control">
+                        <input type="text" id="tdOrder" name="tdOrder">
                         <label for="tdDate">TD Date:</label>
-                        <input type="date" id="tdDate" name="tdDate" class="form-control">
+                        <input style="width: 97%;
+                            padding: 8px;
+                            box-sizing: border-box;
+                            border: 1px solid #ccc;
+                            border-radius: 3px;" type="date" id="tdDate" name="tdDate">
                     </div>
-
-                    <!-- TP Details -->
-                    <div class="form-group">
-                        <label for="tpSelection">TP Details:</label>
-                        <select id="tpSelection" name="tpSelection" class="form-control" onchange="togglePopup('tpSelection', 'tpPopup')">
-                            <option value="select">Select</option>
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
+    
+    
+                    <label for="tpSelection">TP Details:</label>
+                    <select style="width: 97%;" id="tpSelection" name="tpSelection" onchange="togglePopup('tpSelection', 'tpPopup')">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+    
                     <div id="tpPopup" class="popup">
                         <label for="tpOrder">TP Order:</label>
-                        <input type="text" id="tpOrder" name="tpOrder" class="form-control">
+                        <input type="text" id="tpOrder" name="tpOrder">
                         <label for="tpDate">TP Date:</label>
-                        <input type="date" id="tpDate" name="tpDate" class="form-control">
+                        <input style="width: 97%;
+                            padding: 8px;
+                            box-sizing: border-box;
+                            border: 1px solid #ccc;
+                            border-radius: 3px;" type="date" id="tpDate" name="tpDate">
                     </div>
-
-                    <!-- Sale Deed -->
-                    <div class="form-group">
-                        <label for="saledeedSelection">Sale Deed:</label>
-                        <select id="saledeedSelection" name="saledeedSelection" class="form-control" onchange="togglePopup('saledeedSelection', 'saledeedPopup')">
-                            <option value="select">Select</option>
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
+    
+                    <label for="saledeedSelection">Sale Deed:</label>
+                    <select style="width: 97%;" id="saledeedSelection" name="saledeedSelection"
+                            onchange="togglePopup('saledeedSelection', 'saledeedPopup')">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+    
                     <div id="saledeedPopup" class="popup">
                         <label for="saledeedDate">Sale Deed Date:</label>
-                        <input type="date" id="saledeedDate" name="saledeedDate" class="form-control">
+                        <input style="width: 97%;
+                            padding: 8px;
+                            box-sizing: border-box;
+                            border: 1px solid #ccc;
+                            border-radius: 3px;" type="date" id="saledeedDate" name="saledeedDate">
                     </div>
-
-                    <!-- Old R.V. -->
-                    <div class="form-group">
-                        <label for="oldRV">Old R.V.:</label>
-                        <input type="text" id="oldRV" name="oldRV" class="form-control">
-                    </div>
+    
+    
+                    <label for="oldRV">Old R.V.:</label>
+                    <input type="text" id="oldRV" name="oldRV"><br>
                 </fieldset>
-
-                <div class="text-right">
-                    <button type="button" class="btn btn-secondary" onclick="Back('MainTabContent')">Back</button>
-                    <button type="button" class="btn btn-primary" onclick="Next('UnitTabContent')">Next</button>
+    
+                <fieldset>
+                    <legend>Property Images</legend>
+                
+                    <label for="propertyImage">Property Image:</label>
+                    <input type="file" id="propertyImage" name="propertyImage" accept="image/*" onchange="compressImage(this.files[0], 'previewPropertyImage', 'includePropertyImage')">
+                    <button class="deletebutton" type="button" onclick="cancelUpload('propertyImage','includePropertyImage')">🗑</button>
+                    <input type="hidden" id="includePropertyImage" value="0">
+                    <img id="previewPropertyImage" style="max-width: 100%; height: auto;" /><br>
+                
+                    <label for="propertyImage2">Property Image 2:</label>
+                    <input type="file" id="propertyImage2" name="propertyImage2" accept="image/*" onchange="compressImage(this.files[0], 'previewPropertyImage2', 'includePropertyImage2')">
+                    <button class="deletebutton" type="button" onclick="cancelUpload('propertyImage2','includePropertyImage2')">🗑</button>
+                    <input type="hidden" id="includePropertyImage2" value="0">
+                    <img id="previewPropertyImage2" style="max-width: 100%; height: auto;" /><br>
+                </fieldset>
+                
+                <fieldset>
+                    <legend>House Plans</legend>
+                
+                    <label for="housePlan1">House Plan 1:</label>
+                    <input type="file" id="housePlan1" name="housePlan1" accept="image/*" onchange="compressImage(this.files[0], 'previewHousePlan1', 'includeHousePlan1')">
+                    <button class="deletebutton" type="button" onclick="cancelUpload('housePlan1','includeHousePlan1')">🗑</button>
+                    <input type="hidden" id="includeHousePlan1" value="0">
+                    <img id="previewHousePlan1" style="max-width: 100%; height: auto;" /><br>
+                
+                    <label for="housePlan2">House Plan 2:</label>
+                    <input type="file" id="housePlan2" name="housePlan2" accept="image/*" onchange="compressImage(this.files[0], 'previewHousePlan2', 'includeHousePlan2')">
+                    <button class="deletebutton" type="button" onclick="cancelUpload('housePlan2','includeHousePlan2')">🗑</button>
+                    <input type="hidden" id="includeHousePlan2" value="0">
+                    <img id="previewHousePlan2" style="max-width: 100%; height: auto;" /><br>
+                </fieldset>
+                
+                
+                <br><br><br>
+    
+                <div class="button-container">
+                    <button type="button" onclick="Back('Main')">Back</button>
+                    <button type="button" onclick="Next('Unit')">Next</button>
                 </div>
+    
             </form>
         </div>
-
+    
+        <div id="UnitTabContent" class="tab-content">
+            <button onclick="addUnit()">Add Unit</button><br>
+            <div id="unitButtons"></div>
+            <div id="formContainers"></div>
+            <div class="button-container">
+                <button type="button" onclick="Back('Property')">Back</button>
+                <button type="button" onclick="Next('Additional')">Next</button>
+            </div>
+        </div>
+    
+    
+        <div id="AdditionalTabContent" class="tab-content">
+            <form>
+                <div id="memberForm1">
+                    <h3>Member 1 Details:</h3>
+    
+                    <label for="additionalName">Name:</label>
+                    <input type="text" id="additionalName" name="additionalName"><br>
+    
+                    <label for="qualification">Qualification:</label>
+                    <select id="qualification" name="qualification">
+                        <option value="option1">Option 1</option>
+                        <option value="option2">Option 2</option>
+                    </select><br>
+    
+                    <label for="occupation">Occupation:</label>
+                    <input type="text" id="occupation" name="occupation"><br>
+    
+                    <label for="noOfAdults">No. Of Adults:</label>
+                    <input type="text" id="noOfAdults" name="noOfAdults"><br>
+    
+                    <label for="noOfChildren">No. of children:</label>
+                    <input type="text" id="noOfChildren" name="noOfChildren"><br>
+    
+                    <label for="currentTaxDetails">Current Tax Details:</label>
+                    <select id="currentTaxDetails" name="currentTaxDetails">
+                        <option value="option1">Option 1</option>
+                        <option value="option2">Option 2</option>
+                    </select><br>
+    
+                    <label for="taxAmount">Tax Amount:</label>
+                    <input type="text" id="taxAmount" name="taxAmount"><br>
+    
+                    <label for="roadType">Road Type:</label>
+                    <select id="roadType" name="roadType">
+                        <option value="option1">Option 1</option>
+                        <option value="option2">Option 2</option>
+                    </select><br>
+    
+                    <label for="roadName">Road Name:</label>
+                    <input type="text" id="roadName" name="roadName"><br>
+    
+                    <button type="button" onclick="addMember()">Add Another Member</button>
+                    </select><br>
+    
+                    <br><br>
+                    <hr>
+                </div>
+                <div class="button-container">
+                    <div id="signaturePopup" class="modal">
+                        <div class="modal-content">
+                            <span class="close" onclick="hideSignaturePopup()">&times;</span>
+                            <canvas id="signatureCanvas" width="400" height="200"></canvas>
+                            <br>
+                            <button type="button" onclick="clearSignature(event)">Clear</button>
+                            <button type="button" onclick="saveSignature(event)">Save</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="Back('Unit')">Back</button>
+                <button type="button" onclick="submitFormData()" style="float: right;">Submit</button>
+            </form>
+        </div>
     </form>
+    
+    <div id="loadingSpinner" class="spinner-overlay" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
 </div>
 
-<script>
-    function openTab(tabId) {
-        let tabs = document.getElementsByClassName("tab-content");
-        for (let i = 0; i < tabs.length; i++) {
-            tabs[i].style.display = "none";
-        }
-        document.getElementById(tabId).style.display = "block";
-    }
-
-    function Next(tabId) {
-        openTab(tabId);
-    }
-
-    function Back(tabId) {
-        openTab(tabId);
-    }
-</script>
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="/3GEditForm/js/scripts.js"></script>
 </body>
 </html>

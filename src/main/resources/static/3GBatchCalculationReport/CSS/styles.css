@@ -1,132 +1,80 @@
-:root {
-    --primary-color: #4CAF50; /* Primary color for buttons and links */
-    --secondary-color: #0056b3; /* Secondary color for background gradients */
-    --text-color: #333; /* Text color */
-    --light-color: #f5f5f5; /* Light background color */
-    --dark-color: #333; /* Dark color for text */
-    --brand-color: #2ecc71; /* Emerald Green for branding */
-    --footer-bg-color: #1e1e1e; /* Footer background color */
-    --footer-text-color: #bbb; /* Footer text color */
-    --background-image: url('/3GCommon/images/background.jpg'); /* Background image */
+body
+{
+    font-family:  Arial Unicode MS!important;
 }
 
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: var(--light-color);
-    color: var(--dark-color);
-    margin: 0;
-    padding-top: 70px; /* Adjust based on the height of your header */
-    background: var(--background-image) no-repeat center center fixed;
-    background-size: cover;
+table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+
+div.breakhere {
+      page-break-before: always;
+  }
+
+.main table, th ,td {
+border: 1px solid black; padding: 3px;
 }
 
-header, .navbar-brand {
-    background-color: #fff;
-    color: var(--brand-color);
+body table, th, td {
+  font-size: 10px;
 }
 
-header {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000; /* Ensure header stays above other content */
+.margin50 {
+    margin-left:50px;
+    margin-right:50px;
+    margin-top:25px;
+}
+.m-t-50 {
+    margin-top: 50px!important;
+}
+.h-25 {
+    height:25px;
+}
+.p-n {
+    padding: 0px!important;
+}
+.p-r-10 {
+    padding-right: 10px!important;
 }
 
-.navbar-brand {
+.txtcontent{font-size: 14px; width: 99.8%; border: 1px solid black; margin-top: 3px; margin-bottom: 3px;}
+
+#thirdADiv, #thirdBDiv {
+    display:inline!important;
+}
+
+#fourADiv, #fourBDiv,#fourCDiv{
+    display:inline-block!important;
+
+
+    height:340px
+}
+
+
+.p-l-8 {
+    padding-left:8px;
+}
+.f-w-b {
     font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-    font-size: 24px; /* Increase font size of brand name */
-    color: var(--brand-color); /* Emerald Green for branding */
 }
-
-.navbar-nav .nav-link {
-    color: var(--dark-color);
-    font-weight: 500;
-}
-
-.navbar-toggler {
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-.container-main {
-    padding: 20px;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.container {
-    max-width: 1200px;
-}
-
-.info-container {
-    color: #fff; /* Text color for better readability on background */
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
-    border-radius: 10px;
-    margin: 20px;
-}
-
-.login-container {
-    padding: 20px;
-    border-radius: 10px;
-    margin: 20px;
+.t-a-c {
     text-align: center;
 }
-
-.choice-button {
-    margin: 10px;
-    padding: 15px;
-    font-size: 18px;
-    width: 80%;
-    background-color: var(--primary-color);
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    transition: all 0.3s ease;
+.t-a-l {
+    text-align: left;
+}
+.t-a-r {
+    text-align: right;
+}
+.b-n {
+    border: none!important;
+}
+.bb-n {
+    border-bottom: none!important;
 }
 
-.choice-button:hover {
-    background: linear-gradient(145deg, var(--primary-color), var(--secondary-color)); /* Gradient on hover */
-    color: #fff;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-}
-
-.site-footer {
-    background-color: var(--footer-bg-color); /* Darker Gray */
-    color: var(--footer-text-color);
-    text-align: center;
-    padding: 1rem;
-    width: 100%;
-}
-
-@media (max-width: 768px) {
-    .navbar-brand {
-        font-size: 18px; /* Adjust brand name size */
-    }
-    .navbar-nav .nav-link {
-        font-size: 14px; /* Adjust navigation link size */
-    }
-
-    .container-main {
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .info-container,
-    .login-container {
-        margin: 0 auto; /* Center the containers horizontally */
-        padding: 20px;
-        width: 90%; /* Limit the width to ensure it doesn't stretch too much */
-        text-align: center; /* Center text */
-    }
-
-    .info-container {
-        background: rgba(0, 0, 0, 0.7); /* Background for better readability */
-    }
+.m-l-5 {
+    margin-left: 5px;
 }

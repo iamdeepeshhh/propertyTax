@@ -1,0 +1,7 @@
+package com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.ConstructionClass_MasterRepository;
+
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.ConstructionClass_MasterEntity.ConstructionClass_MasterEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ConstructionClass_MasterRepository extends JpaRepository<ConstructionClass_MasterEntity, Integer> {
+}

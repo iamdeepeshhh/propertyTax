@@ -1,0 +1,11 @@
+package com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.PropertyRates_MasterRepository;
+
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.PropertyRates_MasterDto.PropertyRates_MasterDto;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.PropertyRates_MasterEntity.PropertyRates_MasterEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface PropertyRates_MasterRepository extends JpaRepository<PropertyRates_MasterEntity, Long> {
+    Optional<PropertyRates_MasterEntity> findByConstructionTypeVcAndTaxRateZoneI(String constructionType, String zone);
+}

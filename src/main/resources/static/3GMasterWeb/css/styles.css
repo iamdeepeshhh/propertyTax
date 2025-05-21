@@ -1,0 +1,174 @@
+
+/* Custom CSS */
+html {
+   height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Make sure the body takes up at least the full height of the viewport */
+  margin: 0; /* Override default margin */
+}
+footer {
+  margin-top: auto; /* Push the footer to the bottom of the flex container */
+  background-color: #1e1e1e; /* Darker Gray */
+  color: #bbb;
+  text-align: center;
+  padding: 0.5rem;
+  width: 100%;
+}
+.h1{
+  font-family: "Alata", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+
+}
+label {
+  margin-bottom: 5px;
+  display: block;
+}
+input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+button {
+  background-color: #006400;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #004d00;
+}
+section {
+  display: none; /* Hide all sections by default */
+}
+
+/* Navbar color customization */
+.navbar {
+    width: 100%;
+    margin: 0;
+    border-top: 3px solid #006400; /* Dark green top line */
+    padding: 0.5rem 6rem;
+    display: flex;
+    justify-content: flex-start;
+    background: rgb(219, 255, 223); /* Dark green navbar */
+ }
+.navbar-nav .nav-link {
+  color: black !important; /* White text color for navbar links */
+}
+.navbar-nav .nav-link:hover {
+  color: rgb(23, 135, 94)!important; /* Light green text color on hover for navbar links */
+}
+.dropdown-menu .dropdown-item:hover {
+  background-color: #006400; /* Dark green background color on hover for dropdown items */
+}
+
+ header, .navbar1-brand {
+        background-color: #fff;
+        color: #2ecc71; /* Emerald Green for branding */
+ }
+
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure header stays above other content */
+  }
+
+    body {
+        padding-top: 60px; /* Adjust based on the height of your header */
+    }
+
+    .navbar1-brand {
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        font-size: 24px; /* Increase font size of brand name */
+    }
+    .navbar1-brand {
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    font-size: 24px; /* Increase font size of brand name */
+    color: #2ecc71; /* Emerald Green for branding */
+    }
+
+    .navbar1-nav .nav-item {
+        color: #000; /* Black text color */
+
+    }
+
+    /* Ensure that the container is a flexbox with space between items */
+    .container-fluid {
+      display: flex;
+      justify-content: space-between;
+      align-items: center; /* Align items vertically */
+    }
+
+  .logout-link {
+    padding-right: 70px; /* Adds padding inside the link, effectively moving it to the left */
+    color: #000; /* Default color */
+    text-decoration: none; /* Removes underline from links */
+    transition: color 0.2s ease-in-out, text-decoration 0.2s ease-in-out; /* Smooth transition for hover effect */
+  }
+
+  .logout-link:hover, .logout-link:focus {
+    color: #2ecc71; /* Change color on hover */
+    text-decoration: underline; /* Add underline on hover for more visibility */
+  }
+
+  .navbar1-brand, .logout-link {
+      padding-top: 15px; /* Adjusts the space above the brand and logout link */
+  }
+    .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  .bordered-container {
+      border: 2px solid #ccc; /* Gray border */
+      border-radius: 5px; /* Rounded corners */
+      padding: 15px;
+      margin-top: 20px;
+  }
+
+  .form-row > div {
+      padding-right: 10px; /* Adds spacing between form inputs */
+  }
+
+  #rvCheckboxesContainer .form-check {
+      display: inline-block; /* Aligns checkboxes horizontally */
+      margin-right: 10px; /* Adds spacing between checkboxes */
+      margin-bottom: 10px; /* Space between rows if it wraps */
+  }
+  .center-text {
+      text-align: center;
+  }
+
+  .table th, .table td {
+      vertical-align: middle; /* Aligns text vertically in the middle */
+  }
+
+  thead th {
+      position: sticky;
+      top: 0;
+      background-color: #343a40; /* Matches thead-dark background */
+      z-index: 1;
+  }
+  .spinner {
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+

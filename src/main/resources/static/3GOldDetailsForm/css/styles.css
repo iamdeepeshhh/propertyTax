@@ -1,0 +1,98 @@
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Form styling */
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+/* Styling for form headings */
+h2 {
+    font-size: 24px;
+    margin: 0 0 20px 0;
+    color: #333;
+    text-align: center;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Label styling */
+label {
+    font-weight: bold;
+    display: block;
+    margin-top: 20px;
+    color: #666;
+}
+
+/* Input fields styling */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Styling for the submit button */
+input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    float: right;
+    margin-top: 20px;
+}
+
+/* Hover effect for the submit button */
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Scrollable table container */
+.scrollable-table {
+    overflow-x: auto;
+    width: 100%;
+    margin: 10px 0;
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    min-width: 768px; /* Adjust as needed */
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+/* Table header and cell styling */
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    word-wrap: break-word;
+}
+
+/* Header row styling */
+th {
+    background-color: #f2f2f2;
+}
+
+.mandatory::after { content: " *"; color: red; display: inline-block; margin-left: 5px; transform: scale(1.2); }

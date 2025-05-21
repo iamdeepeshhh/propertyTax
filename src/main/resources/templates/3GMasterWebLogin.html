@@ -4,259 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
-    <link rel="icon" type="image/png" href="favicon.png"/>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            overflow: hidden;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            background: radial-gradient(#c1efc0 0%, whitesmoke 30%, #bde7a8 70%);
-        }
-        .content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: calc(100% - 80px); /* Adjusted height to account for navbar */
-            margin-top: 80px; /* Height of the navbar */
-        }
-       
-        .login-container {
-            display: flex;
-            flex-direction: row;
-            width: 80%;
-            max-width: 1000px;
-            max-height: 80%; /* Set a minimum height */
-            box-shadow: 15px 0px 15px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
-            overflow: hidden; /* Prevents any image overflow */
-            border-radius: 25px;
-        }
-        .image-slideshow {
-            width: 50%;
-            position: relative; 
-           
-        }
-        .image-slideshow img {
-            width: 100%;
-            height: 100%;
-            object-fit: fill;
-            position: absolute;
-            top: 0;
-            left: 0;
-            opacity: 0; /* Hide all images by default */
-            transition: opacity 1s ease-in-out;
-         
-        }
-        
-        .image-slideshow .slide {
-            width: 100%; /* Full width of the parent container */
-            height: 100%; /* Height is set to 'auto' to maintain aspect ratio */
-            object-fit: fill; /* Ensures that the image scales to fit the container without stretching */
-            position: absolute; /* Positions image absolutely within the parent container */
-            top: 0;
-            left: 0;
-            opacity: 0; /* Hides the image by default */
-            transition: opacity 1s ease-in-out; /* Smooth transition for the opacity */
-        }
-        .image-slideshow img.active {
-            opacity: 1; /* Only the active image is shown */
-            z-index: 1; /* Ensure active image is on top of others */
-}
-        
-        
-        .image-slideshow img.active {
-            display: block; /* Only the active image is shown */
-        }
-        
-        .login-form {
-            width: 50%;
-            padding: 35px;
-            box-sizing: border-box; /* Include padding in the width */
-        }
-        .login-form h2 {
-            margin-bottom: 20px;
-            border-radius: 25px;
-        }
-        .styled-dropdown {
-            font-family: Arial, sans-serif; /* Choose your font */
-            font-size: 16px; /* Set the font size */
-            color: #333; /* Text color */
-            padding: 10px; /* Add some padding */
-            margin-top: 5px;
-            margin-bottom: 8px;
-            border: 1px solid #ccc; /* Border properties */
-            border-radius: 5px; /* Rounded corners */
-            background-color: #fff; /* Background color */
-            cursor: pointer; /* Cursor to pointer to indicate it's clickable */
-            width: 450px;
-          }
-          
-          .styled-dropdown:hover {
-            border-color: #888; /* Darker border on hover for visual feedback */
-          }
-          
-          .styled-dropdown:focus {
-            outline: none; /* Remove focus outline */
-            border-color: #555; /* More noticeable border when focused */
-          }
-          
-          /* NOTE: Styling for individual <option> elements is highly limited */
-          .option {
-            padding: 5px; /* Small padding for options */
-          }
-        /* ... other .login-form styles ... */
-        .form-group {
-            margin-bottom: 20px;
-            display: flexbox;
-           
-        }
-       
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .btns input {
-            margin-right: -9px; /* Adjust as needed */
-            margin-left: 18%;
-        }
-        .btn {
-            display: flex; /* Change 'flexbox' to 'flex' */
-            flex-direction: row;
-            justify-content: center;
-            align-items: center; /* Change 'align-content' to 'align-items' */
-            /*margin-left: auto; /* Set margin-left to 'auto' to center horizontally */
-           /* margin-right: auto; /* Set margin-right to 'auto' to center horizontally */
-        }
-        .form-group input[type="submit"] {
-            background-color: #07ac07;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            width: 25%;
-        }
-        .form-group input[type="button"] {
-            background-color: #07ac07;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            width: 25%;
-        }
-        .footer {
-            text-align: center;
-            background-color: #333;
-            color: #fff;
-            padding: 20px 0;
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-        }
-        /* New styles for navbar and footer */
-        .navbar {
-            color: green;
-            padding: 0 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: fixed; /* Fix navbar to the top */
-            top: 0;
-            width: 100%;
-            z-index: 1000; /* Ensure navbar is above other items */
-            height: 60px; /* Set the height of the navbar */
-            font-weight:bolder;
-            background: white;
-        }
-
-        .navbar b{
-            padding-left: 20px;
-        }
-
-        .login-form h2{
-            color: #29a853;
-            text-shadow: 1px 1px 1px teal;
-        }
-    </style>
+    <link href="/3GMasterWebLogin/css/styles.css" rel="stylesheet">
 </head>
 <body>
-    <div class="navbar">
-        <div><b>3G Associates</b></div>
-        <div></div>
+<div class="login-container">
+    <div class="image-slideshow">
+        <img src="/3GMasterWebLogin/images/logo.jpg" alt="logo" class="center-image slide">
     </div>
 
-    <div class="login-container">
-        <!-- Slideshow -->
-        <div class="image-slideshow">
-            <!-- Images -->
-            <img src="./download.jpeg" alt="Drum Sets" class="slide ">
-            <img src="./download (1).jpeg" alt="Instruments" class="slide ">
-            <img src="./download (2).jpeg" alt="Drum" class="slide ">
-            <!-- Add more images with class "slide" -->
-        </div>
+    <div class="login-form">
+        <h2>Secure Property Tax Assessment Services</h2>
+        <form action="/3g/authenticate" method="post" class="login-form">
+            <div class="form-group">
+                <label for="councilLabel"><b>Site Council:</b></label>
+                <label for="councilLabel" id="councilLabel"><b>Loading...</b></label>
+            </div>
 
-        <!-- Login Form -->
-        <div class="login-form">
-            <h2>Secure Property Tax Assessment Services</h2>
-            <form action="login.php" method="post">
-                <label for="server"><b>Site Server</b></label>
-                <select class="styled-dropdown">
-                    <option value="option1">Patur</option>
-                    <option value="option2">Server 2</option>
-                </select>
-                <!-- Username -->
-                <div class="form-group">
-                    <label for="username"><b>Username</b></label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-                <!-- Password -->
-                <div class="form-group">
-                    <label for="password"><b>Password</b></label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <!-- Submit Button -->
-                <div class="form-group">
-                    <div class="btns">
-                    <input type="submit" value="Login">
+            <div class="form-group">
+                <label for="username"><b>Username</b></label>
+                <input type="text" id="username" name="username" required>
+            </div>
 
-                    <input type="button" value="Signin">
-                </div>
-                </div>
-            </form>
-        </div>
+            <div class="form-group">
+                <label for="password"><b>Password</b></label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-group btns">
+                <input type="submit" value="Login">
+            </div>
+        </form>
     </div>
-    <div class="footer">
-        &copy; 2024 3G Associate. All rights reserved.
-    </div>
+</div>
 
-    <script>
-        // Image slideshow functionality
-        const images = document.querySelectorAll('.image-slideshow img');
-        images[0].style.display = 'block'; // Ensure the first image is shown
-        let currentIndex = 0;
-
-        function nextImage() {
-            images[currentIndex].style.opacity = '0';
-            setTimeout(() => {
-                images[currentIndex].style.display = 'none'; // Hide the current image
-
-                currentIndex = (currentIndex + 1) % images.length;
-
-                images[currentIndex].style.display = 'block'; // Show the next image
-                setTimeout(() => images[currentIndex].style.opacity = '1', 1); // Fade in the next image
-            }, 100); // Wait for the fade out transition before hiding the image
-        }
-
-        setInterval(nextImage, 2000); // 4 seconds for each image
-    </script>
+<script src="/3GMasterWebLogin/js/scripts.js"></script>
 </body>
 </html>

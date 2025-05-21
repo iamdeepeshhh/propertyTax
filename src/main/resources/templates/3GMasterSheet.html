@@ -166,8 +166,8 @@
               Rate Chart
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdownPropertyDetails">
-              <a class="dropdown-item" href="#" onclick="showTab('Tax-Depreciation')">Tax-Depreciation</a>
-              <a class="dropdown-item" href="#" onclick="showTab('Property-Rate')">Property-Rate</a>
+              <a class="dropdown-item" href="#" onclick="showTab('AssessmentDates')">AssessmentDates</a>
+              <a class="dropdown-item" href="#" onclick="showTab('Occupancies')">Occupancies</a>
             </div>
           </li>
       </ul>
@@ -378,7 +378,23 @@
 <!--    </div>-->
 <!--  </div>-->
 
+<section id="AssessmentDates">
+  <label for="firstassessmentdate">First Assessment Date:</label>
+  <input type="text" id="firstassessmentdate" name="firstassessmentdate"><br>
 
+  <label for="lastassessmentdate">Last Assessment Date:</label>
+  <input type="text" id="lastassessmentdate" name="lastassessmentdate"><br>
+
+  <label for="currentassessmentdate">Current Assessment Date:</label>
+  <input type="text" id="currentassessmentdate" name="currentassessmentdate"><br>
+
+  <button onclick="submitAssessmentDate()">Submit</button>
+</section>
+
+
+<section id="Occupancies">
+  
+</section>
 
 
 
@@ -1396,6 +1412,39 @@ async function initializeBuildingTypesAndCaptureSelection(selectId, apiUrl) {
     } catch (error) {
         console.error(`Error initializing building types for select #${selectId}:`, error);
     }
+}
+function submitAssessmentDates() {
+    const firstAssessmentDate = document.getElementById('firstAssessmentDate').value;
+    const lastAssessmentDate = document.getElementById('lastAssessmentDate').value;
+    const currentAssessmentDate = document.getElementById('currentAssessmentDate').value;
+
+    const assessmentDates = {
+        firstassessmentdate: firstAssessmentDate,
+        lastassessmentdate: lastAssessmentDate,
+        currentassessmentdate: currentAssessmentDate
+    };
+
+    fetch('/3g/createAssessmentDates', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(assessmentDates)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Assessment dates submitted successfully:', data);
+        // Handle success response
+    })
+    .catch(error => {
+        console.error('Error submitting assessment dates:', error);
+        // Handle error
+    });
 }
 
 </script>

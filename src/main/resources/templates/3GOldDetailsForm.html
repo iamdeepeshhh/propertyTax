@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Old Details Submission Form</title>
+    <link href="/3GOldDetailsForm/css/styles.css" rel="stylesheet">
+</head>
+
+<body>
+<form id="propertyOldDetailsForm" action="/3gSurvey/submitPropertyOldDetails" method="POST">
+    <h2>Property Old Details Form</h2>
+    <label for="podZoneI">Old Zone:</label><br>
+    <input type="text" id="podZoneI" name="podZoneI"><br>
+
+    <label for="podWardI" class="mandatory">Old Ward:</label><br>
+    <select id="podWardI" name="podWardI" required>
+        <option value="">Select an Old Ward...</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+        <option value="13">13</option>
+        <option value="14">14</option>
+        <option value="15">15</option>
+        <option value="16">16</option>
+        <option value="17">17</option>
+        <option value="18">18</option>
+        <option value="19">19</option>
+        <option value="20">20</option>
+        <option value="21">21</option>
+        <option value="22">22</option>
+        <option value="23">23</option>
+        <option value="24">24</option>
+        <option value="25">25</option>
+        <option value="26">26</option>
+        <option value="27">27</option>
+        <option value="28">28</option>
+        <option value="29">29</option>
+        <option value="30">30</option>
+    </select><br>
+
+    <label for="podOldPropNoVc" class="mandatory">Old Property Number:</label><br>
+    <input type="text" id="podOldPropNoVc" name="podOldPropNoVc" required><br>
+
+    <label for="podNewPropertyNoVc">Property Number:</label><br>
+    <input type="text" id="podNewPropertyNoVc" name="podNewPropertyNoVc"><br>
+
+    <label for="podOwnerNameVc" class="mandatory">Owner Name:</label><br>
+    <input type="text" id="podOwnerNameVc" name="podOwnerNameVc" required><br>
+
+    <label for="podOccupierNameVc">Occupier Name:</label><br>
+    <input type="text" id="podOccupierNameVc" name="podOccupierNameVc"><br>
+
+    <label for="podPropertyAddressVc" class="mandatory">Property Address:</label><br>
+    <input type="text" id="podPropertyAddressVc" name="podPropertyAddressVc" required><br>
+
+    <label for="podNoofrooms">No of rooms:</label><br>
+    <input type="number" id="podNoofrooms" name="podNoofrooms"><br>
+
+    <label for="podPlotvalue">Plot value:</label><br>
+    <input type="number" id="podPlotvalue" name="podPlotvalue"><br>
+
+    <label for="podTotalPropertyvalue">Total Property value:</label><br>
+    <input type="number" step="any" id="podTotalPropertyvalue" name="podTotalPropertyvalue"><br>
+
+    <label for="podBuildingvalue">Building value</label><br>
+    <input type="number" step="any" id="podBuildingvalue" name="podBuildingvalue"><br>
+
+    <label for="podPropertyTypeI">Property Type:</label><br>
+    <select style="width: 97%;" id="podPropertyTypeI" name="podPropertyTypeI">
+        <option value="select">Select</option>
+    </select>
+
+    <label for="podPropertySubTypeI">Property Sub Type:</label><br>
+    <select style="width: 97%;" id="podPropertySubTypeI" name="podPropertySubTypeI">
+        <option value="select">Select</option>
+    </select>
+
+    <label for="podUsageTypeI">Usage Type:</label><br>
+    <select style="width: 97%;" id="podUsageTypeI" name="podUsageTypeI">
+        <option value="select">Select</option>
+    </select>
+
+    <label for="podConstClassVc">Construction Class:</label><br>
+    <input type="text" id="podConstClassVc" name="podConstClassVc"><br>
+
+    <label for="pdConstructionYearD">Construction Year:</label><br>
+    <input type="date" id="pdConstructionYearD" name="pdConstructionYearD"><br>
+
+    <label for="podBuiltUpAreaFl">Built-Up Area (sq ft):</label><br>
+    <input type="number" step="any" id="podBuiltUpAreaFl" name="podBuiltUpAreaFl"><br>
+
+    <label for="podPropertyTaxFl">Property Tax:</label><br>
+    <input type="number" step="any" id="podPropertyTaxFl" name="podPropertyTaxFl"><br>
+
+    <label for="podEduCessFl">Education Cess:</label><br>
+    <input type="number" step="any" id="podEduCessFl" name="podEduCessFl"><br>
+
+    <label for="podEgcFl">Emergency Services Charge:</label><br>
+    <input type="number" step="any" id="podEgcFl" name="podEgcFl"><br>
+
+    <label for="podTreeTaxFl">Tree Tax:</label><br>
+    <input type="number" step="any" id="podTreeTaxFl" name="podTreeTaxFl"><br>
+
+    <label for="podEnvTaxFl">Environment Tax:</label><br>
+    <input type="number" step="any" id="podEnvTaxFl" name="podEnvTaxFl"><br>
+
+    <label for="podFireTaxFl">Fire Service Tax:</label><br>
+    <input type="number" step="any" id="podFireTaxFl" name="podFireTaxFl"><br>
+
+    <div class="scrollable-table">
+        <table id="unitsTable" style="width: 300%; table-layout: fixed;">
+            <thead>
+            <tr>
+                <th >Occupancy</th>
+                <th>Floor Number</th>
+                <th>Old Property Class</th>
+                <th>Construction Year</th>
+                <th>Unit Usage Type</th>
+                <th>Unit Sub Usage Type</th>
+                <th>Assessment Area</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Units will be added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <button type="button" id="addUnitButton" onclick="addUnit()">Add Unit</button>
+
+    <label for="podTotalTaxFl" class="mandatory">Total Tax:</label><br>
+    <input type="number" step="any" id="podTotalTaxFl" name="podTotalTaxFl" required><br>
+
+    <label for="podTotalAssessmentArea">Total assessment area:</label><br>
+    <input type="number" step="any" id="podTotalAssessmentArea" name="podTotalAssessmentArea"><br>
+
+    <label for="podTotalAssessmentAreaFt">Total assessment area in Sq Ft:</label><br>
+    <input type="number" step="any" id="podTotalAssessmentAreaFt" name="podTotalAssessmentAreaFt"><br>
+
+    <label for="podTotalRatableValue">Total ratable value:</label><br>
+    <input type="number" step="any" id="podTotalRatableValue" name="podTotalRatableValue"><br>
+
+    <input type="submit" value="Submit">
+    <div id="alertPlaceholder" style="display: none;"></div>
+
+</form>
+
+<script src="/3GOldDetailsForm/js/scripts.js"></script>
+</body>
+</html>

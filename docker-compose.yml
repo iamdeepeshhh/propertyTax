@@ -1,0 +1,123 @@
+#
+#services:
+#  app:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: springboot-app
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      - DB_HOST=anildb.cntcfzqepwsi.ap-south-1.rds.amazonaws.com #this will change whenever we change dbhost
+##      - DB_NAME=arvi #this will change to property_tax for Patur
+#      - DB_NAME=property_tax
+#      - DB_USER=anildb #this will change
+#      - DB_PASSWORD=anildatabase #this will change
+
+version: '3'
+services:
+  arvi-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arvi-springboot-app
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=anildb.cntcfzqepwsi.ap-south-1.rds.amazonaws.com
+      - DB_NAME=arvi
+      - DB_USER=anildb
+      - DB_PASSWORD=anildatabase
+
+  patur-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: patur-springboot-app
+    ports:
+      - "8081:8080"
+    environment:
+      - DB_HOST=anildb.cntcfzqepwsi.ap-south-1.rds.amazonaws.com
+      - DB_NAME=property_tax
+      - DB_USER=anildb
+      - DB_PASSWORD=anildatabase
+
+  bhisi-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bhisi-springboot-app
+    ports:
+      - "8082:8080"
+    environment:
+      - DB_HOST=anildb.cntcfzqepwsi.ap-south-1.rds.amazonaws.com
+      - DB_NAME=bhisi
+      - DB_USER=anildb
+      - DB_PASSWORD=anildatabase
+
+#new environments:
+
+  wadwani-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wadwani-springboot-app
+    ports:
+      - "8083:8080"
+    environment:
+      - DB_HOST=anildb.cntcfzqepwsi.ap-south-1.rds.amazonaws.com
+      - DB_NAME=wadwani
+      - DB_USER=anildb
+      - DB_PASSWORD=anildatabase
+
+  malegaon-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: malegaon-springboot-app
+    ports:
+      - "8084:8080"
+    environment:
+      - DB_HOST=anildb.cntcfzqepwsi.ap-south-1.rds.amazonaws.com
+      - DB_NAME=malegaon
+      - DB_USER=anildb
+      - DB_PASSWORD=anildatabase
+
+  dharmabad-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dharmabad-springboot-app
+    ports:
+      - "8085:8080"
+    environment:
+      - DB_HOST=anildb.cntcfzqepwsi.ap-south-1.rds.amazonaws.com
+      - DB_NAME=dharmabad
+      - DB_USER=anildb
+      - DB_PASSWORD=anildatabase
+
+  mangrulpir-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mangrulpir-springboot-app
+    ports:
+      - "8086:8080"
+    environment:
+      - DB_HOST=anildb.cntcfzqepwsi.ap-south-1.rds.amazonaws.com
+      - DB_NAME=mangrulpir
+      - DB_USER=anildb
+      - DB_PASSWORD=anildatabase
+
+  kundalwadi-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kundalwadi-springboot-app
+    ports:
+      - "8087:8080"
+    environment:
+      - DB_HOST=anildb.cntcfzqepwsi.ap-south-1.rds.amazonaws.com
+      - DB_NAME=kundalwadi
+      - DB_USER=anildb
+      - DB_PASSWORD=anildatabase

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Page</title>
+    <link rel="icon" type="image/png" href="favicon.png"/>
+    <link href="/3GMasterWebSignUp/css/styles.css" rel="stylesheet">
+</head>
+<body>
+<div class="signup-container">
+    <div class="image-slideshow">
+        <img src="/3GMasterWebSignUp/images/logo.jpg" alt="logo" class="slide active">
+    </div>
+
+    <div class="signup-form">
+        <h2>Signup</h2>
+        <form action="/3g/MasterWebUserSignup" method="POST" onsubmit="return showAlert();">
+            <div class="form-group">
+                <label for="firstname">First Name:</label>
+                <input type="text" id="firstname" name="firstname" required>
+            </div>
+
+            <div class="form-group">
+                <label for="lastname">Last Name:</label>
+                <input type="text" id="lastname" name="lastname" required>
+            </div>
+
+            <div class="form-group">
+                <label for="profile">Profile:</label>
+                <select id="profile" name="profile" class="styled-dropdown" required>
+                    <option value="">--Please choose an option--</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="btns">
+                <input type="submit" value="Submit">
+                <input type="button" value="Cancel" onclick="window.location.href='/3g/masterSheet';">
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/3GMasterWebSignUp/js/scripts.js"></script>
+
+</body>
+</html>

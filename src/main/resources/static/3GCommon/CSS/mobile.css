@@ -1,0 +1,72 @@
+/* mobile.css */
+
+.choice-container {
+    padding: 20px;
+    margin: 20px auto; /* Center the container horizontally */
+    background: rgba(0, 0, 0, 0.8); /* Darker semi-transparent background for better readability */
+    border-radius: 10px; /* Rounded corners */
+    color: #fff; /* Ensure text is white for contrast */
+    text-align: center; /* Center text */
+    max-width: 90%; /* Limit the width to ensure it doesn't stretch too much */
+}
+
+.info-container,
+.login-container {
+    max-width: 100%;
+    margin-bottom: 20px; /* Add some spacing between sections */
+    margin: 0 auto; /* Center the containers horizontally */
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.7); /* Background for better readability */
+    color: #fff; /* Text color */
+    border-radius: 10px;
+    width: 90%; /* Limit the width to ensure it doesn't stretch too much */
+    text-align: center; /* Center text */
+}
+
+.choice-button {
+    padding: 10px;
+    font-size: 16px;
+    width: 100%; /* Make buttons full width */
+    margin: 10px 0; /* Add vertical margin */
+}
+
+.info-container h2 {
+    font-size: 24px; /* Adjust heading size */
+}
+
+.info-container p,
+.info-container ul {
+    font-size: 14px; /* Adjust text size */
+}
+
+.login-container h3 {
+    font-size: 20px; /* Adjust heading size */
+}
+
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 18px; /* Adjust brand name size */
+    }
+    .navbar-nav .nav-link {
+        font-size: 14px; /* Adjust navigation link size */
+    }
+
+    .container-main {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .info-container,
+    .login-container {
+        margin: 0 auto; /* Center the containers horizontally */
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.7); /* Background for better readability */
+        color: #fff; /* Text color */
+        border-radius: 10px;
+        width: 90%; /* Limit the width to ensure it doesn't stretch too much */
+        text-align: center; /* Center text */
+    }
+}
