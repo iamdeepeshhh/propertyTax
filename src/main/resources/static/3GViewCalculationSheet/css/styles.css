@@ -1,0 +1,87 @@
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #ecf0f1; color: #333; margin: 0; padding: 0; }
+header { background-color: #fff; color: #2ecc71; padding: 1rem; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+
+.tabs { display: flex; overflow: hidden; background: #fdfdfd; overflow: auto; display: flex; padding: 10px 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); justify-content: center; flex: 1; text-align: center; padding: 15px; color: #26cf6d; cursor: pointer; position: relative; transition: color 0.3s ease; }
+
+.tabs button { background: #f0f0f0; color: #000000; border: none; padding: 10px 15px; font-size: 14px; cursor: pointer; border-radius: 5px; transition: background 0.3s ease, transform 0.2s ease-in-out; margin: 0 5px; }
+
+.unitbutton, .deletebtn { width: 150px; margin-left: 10px; }
+
+.tab-content { display: none; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); transition: opacity 0.5s ease-in-out; animation: fadeIn 0.8s ease-in-out; padding: 20px; background-color: #fff; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 8px; }
+
+.popup-container { display: none; overflow-x: auto; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: #fff; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); max-width: 89%; width: auto; }
+
+.overlay { position: center; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); }
+
+.close-btn { position: fixed; top: 10px; right: 10px; cursor: pointer; }
+
+.formContainer { display: none; margin-top: 20px; }
+
+.tabbutton { background: #2ecc71; color: #fff; border: none; padding: 15px; text-align: center; text-decoration: none; font-size: 16px; cursor: pointer; border-radius: 4px; transition: background 0.3s ease, transform 0.2s ease-in-out; width: 50%; }
+
+.tabbutton:hover { color: white; background: green; transform: scale(1.1); }
+
+.deletebutton { background: #2ecc71; color: #fff; border: none; padding: 15px; text-align: center; text-decoration: none; font-size: 16px; cursor: pointer; border-radius: 4px; transition: background 0.3s ease, transform 0.2s ease-in-out; width: 50px; }
+
+.deletebutton:hover { color: white; background: green; transform: scale(1.1); }
+
+.popup { display: none; margin-top: 5px; width: 100%; }
+
+.popup label, .popup input, .popup select, .popup button { display: block; margin-bottom: 5px; width: 95%; }
+
+.modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.4); }
+
+.modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; box-sizing: border-box; max-width: 400px; }
+
+.close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+
+.close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
+
+.common-form { max-width: 400px; margin: 20px auto; }
+
+label { display: block; margin-bottom: 8px; color: #333; }
+
+input[type="text"], select, button { width: calc(100% - 60px); padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 5px; transition: border-color 0.3s ease; }
+
+input[type="text"]:focus, select:focus, button:focus { outline: none; border-color: #3498db; }
+
+button { background: #2ecc71; color: #fff; border: none; padding: 15px; text-align: center; text-decoration: none; font-size: 16px; cursor: pointer; border-radius: 4px; transition: background 0.3s ease, transform 0.2s ease-in-out; width: 25%; }
+
+button:hover { color: white; background: green; transform: scale(1.1); }
+
+.button-container { display: flex; justify-content: space-between; }
+
+.mandatory::after { content: " *"; color: red; display: inline-block; margin-left: 5px; transform: scale(1.2); }
+
+@media screen and (max-width: 600px) { .tabs { flex-wrap: wrap; }
+
+.tabs button { flex: 1; margin: 5px; }
+
+.popup-container { max-width: 100%; } }
+
+#MainTabContent { display: block; }
+
+.tabbutton { background: #2ecc71; color: #fff; border: none; padding: 15px; text-align: center; text-decoration: none; font-size: 16px; cursor: pointer; border-radius: 4px; transition: background 0.3s ease, transform 0.2s ease-in-out; width: 50%; }
+
+.tabbutton:hover { color: white; background: green; transform: scale(1.1); }
+
+.deletebutton { background: #2ecc71; color: #fff; border: none; padding: 15px; text-align: center; text-decoration: none; font-size: 16px; cursor: pointer; border-radius: 4px; transition: background 0.3s ease, transform 0.2s ease-in-out; width: 50px; }
+
+.deletebutton:hover { color: white; background: green; transform: scale(1.1); }
+
+.popup { display: none; margin-top: 5px; width: 100%; }
+
+.popup label, .popup input, .popup select, .popup button { display: block; margin-bottom: 5px; width: 95%; }
+
+.modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.4); }
+
+.modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; box-sizing: border-box; max-width: 400px; }
+
+.close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+
+.close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
+
+.formContainer { display: none; margin-top: 20px; }
+
+.spinner-overlay {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;}
