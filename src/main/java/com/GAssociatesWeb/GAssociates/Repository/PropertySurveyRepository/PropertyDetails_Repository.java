@@ -21,4 +21,7 @@ public interface PropertyDetails_Repository extends JpaRepository<PropertyDetail
     List<PropertyDetails_Entity> findByPdWardI(Integer wardNo);
 
     List<PropertyDetails_Entity> findAllByPdWardI(int wardNumber, Pageable pageable);
+
+    List<PropertyDetails_Entity> findByPdFinalpropnoVcAndPdWardI(String pdFinalpropnoVc, Integer pdWardI);
+
 }

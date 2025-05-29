@@ -1269,7 +1269,7 @@ async function fetchAndPopulateWardsForBatch(endpointUrl, tableBodyId) {
             // "Process Ward" button
             const processButton = document.createElement('button');
             processButton.textContent = 'Process Ward';
-            processButton.classList.add('btn', 'btn-primary', 'mr-2');
+            processButton.classList.add('btn', 'btn-success', 'mr-2');
             processButton.onclick = function() {
                 processBatchForWard(ward.wardNo, row);
             };
@@ -1278,7 +1278,7 @@ async function fetchAndPopulateWardsForBatch(endpointUrl, tableBodyId) {
             // "View Batch Report" button
             const viewBatchReportButton = document.createElement('button');
             viewBatchReportButton.textContent = 'Batch Assessment Report';
-            viewBatchReportButton.classList.add('btn', 'btn-info', 'mr-2');
+            viewBatchReportButton.classList.add('btn', 'btn-primary', 'mr-2');
             viewBatchReportButton.onclick = function() {
                 viewBatchAssessmentReport(ward.wardNo);
             };
@@ -1287,12 +1287,49 @@ async function fetchAndPopulateWardsForBatch(endpointUrl, tableBodyId) {
             // "View Calculation Sheet" button
             const viewCalculationSheetButton = document.createElement('button');
             viewCalculationSheetButton.textContent = 'Batch Calculation Report';
-            viewCalculationSheetButton.classList.add('btn', 'btn-secondary');
+            viewCalculationSheetButton.classList.add('btn', 'btn-primary', 'mr-2');
             viewCalculationSheetButton.onclick = function() {
                 viewBatchCalculationSheet(ward.wardNo);
             };
             actionsCell.appendChild(viewCalculationSheetButton);
 
+            // "View Special Notices" button
+            const viewSpecialNoticeButton = document.createElement('button');
+            viewSpecialNoticeButton.textContent = 'Batch Special Notices';
+            viewSpecialNoticeButton.classList.add('btn', 'btn-primary','mr-2');
+            viewSpecialNoticeButton.onclick = function() {
+                viewSpecialNotice(ward.wardNo);
+            };
+            actionsCell.appendChild(viewSpecialNoticeButton);
+
+            // "View Hearing Notices" button
+            const viewHearingNoticeButton = document.createElement('button');
+            viewHearingNoticeButton.textContent = 'Batch Hearing Notices';
+            viewHearingNoticeButton.classList.add('btn', 'btn-primary','mr-2');
+            viewHearingNoticeButton.onclick = function() {
+                viewHearingNotice(ward.wardNo);
+            };
+            actionsCell.appendChild(viewHearingNoticeButton);
+
+
+            // "View OrderSheets" Button
+            const viewOrderSheetButton = document.createElement('button');
+            viewOrderSheetButton.textContent = 'Batch OrderSheet';
+            viewOrderSheetButton.classList.add('btn', 'btn-primary','mr-2');
+            viewOrderSheetButton.onclick = function() {
+                viewOrderSheet(ward.wardNo);
+            };
+
+            actionsCell.appendChild(viewOrderSheetButton);
+
+            // "View Hearing Notices" button
+            const viewAssessmentRegisterButton = document.createElement('button');
+            viewAssessmentRegisterButton.textContent = 'Batch Assessment Register';
+            viewAssessmentRegisterButton.classList.add('btn', 'btn-primary','mr-2');
+            viewAssessmentRegisterButton.onclick = function() {
+                viewHearingNotice(ward.wardNo);
+            };
+            actionsCell.appendChild(viewAssessmentRegisterButton);
             row.appendChild(actionsCell);
             tableBody.appendChild(row);
 
@@ -1346,9 +1383,23 @@ function viewBatchCalculationSheet(wardNo) {
     const url = `/3g/batchCalculationReport/${wardNo}`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
-// Function to view the calculation sheet for a ward
 function viewCalculationSheet(wardNo) {
     console.log('Viewing calculation sheet for ward:', wardNo);
+    const url = `/3g/calculationSheet/${wardNo}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+function viewSpecialNotice(wardNo) {
+    window.open('/specialNotice', '_blank', 'noopener,noreferrer');
+    const url = `/3g/calculationSheet/${wardNo}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+function viewHearingNotice(wardNo) {
+    window.open('/hearingNotice', '_blank', 'noopener,noreferrer');
+    const url = `/3g/calculationSheet/${wardNo}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+function viewOrderSheet(wardNo) {
+    window.open('/orderSheet', '_blank', 'noopener,noreferrer');
     const url = `/3g/calculationSheet/${wardNo}`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }

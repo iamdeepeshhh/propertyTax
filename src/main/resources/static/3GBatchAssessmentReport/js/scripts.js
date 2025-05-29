@@ -3,6 +3,7 @@
 //we are having another ajax to fetch the details with parameters such as wardno
 //to sort the data coming from the server we have groupByPropertyNumber which is sorting the data according there finalpropertynumber
 const getTranslations = new Map();
+let globalYearRange = '';
 document.addEventListener('DOMContentLoaded', () => {
     fetch('/3g/getAllUnitUsageTypes', {
         method: 'GET',
@@ -36,9 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return response.json();
     })
     .then(data => {
+
         const currentAssessmentDate = data[0].currentassessmentdate;
-        const yearRange = formatYearRange(currentAssessmentDate);
-        $('#yearRange').text(yearRange);
+        globalYearRange = formatYearRange(currentAssessmentDate);
+        $('.yearRange').text(globalYearRange);
     })
     .catch(error => console.error('Error fetching additional data:', error));
 });
@@ -77,6 +79,7 @@ $(document).ready(function () {
        $('.localSiteNameVC').text(councilDetails.localSiteNameVC);
        $('.standardDistrictNameVC').text(councilDetails.standardDistrictNameVC);
        $('.localDistrictNameVC').text(councilDetails.localDistrictNameVC);
+
      }
    }
  });
@@ -150,7 +153,7 @@ $(document).ready(function () {
 
     // Function to populate the table with the grouped data
     function populateTable(groupedData) {
-        const batchSize = 9;
+        const batchSize = 10;
         const reportRoot = $('#report-root');
         reportRoot.empty();
 
@@ -175,6 +178,7 @@ $(document).ready(function () {
                 if (councilDetails.imageBase64) {
                     $(currentChunk).find('.councilLogo').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
                 }
+                $(currentChunk).find('.yearRange').text(globalYearRange);
 
                 // Proceed with tbody filling
                 const tbody = $(currentChunk).find('tbody');

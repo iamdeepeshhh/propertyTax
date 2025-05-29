@@ -1,7 +1,7 @@
 
 /* Custom CSS */
-    html {
-  height: 100%;
+html {
+   height: 100%;
 }
 
 body {
@@ -18,12 +18,9 @@ footer {
   padding: 0.5rem;
   width: 100%;
 }
-.h1{
-  font-family: "Alata", sans-serif;
-  font-weight: 400;
-  font-style: normal;
 
-}
+
+
 label {
   margin-bottom: 5px;
   display: block;
@@ -46,16 +43,17 @@ button {
 button:hover {
   background-color: #004d00;
 }
-section {
-  display: none; /* Hide all sections by default */
-}
 
 /* Navbar color customization */
 .navbar {
+    width: 100%;
+    margin: 0;
+    border-top: 3px solid #006400; /* Dark green top line */
+    padding: 0.5rem 6rem;
     display: flex;
     justify-content: flex-start;
     background: rgb(219, 255, 223); /* Dark green navbar */
-  }
+ }
 .navbar-nav .nav-link {
   color: black !important; /* White text color for navbar links */
 }
@@ -69,14 +67,14 @@ section {
  header, .navbar1-brand {
         background-color: #fff;
         color: #2ecc71; /* Emerald Green for branding */
-    }
+ }
 
-    header {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        z-index: 1000; /* Ensure header stays above other content */
-    }
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure header stays above other content */
+  }
 
     body {
         padding-top: 60px; /* Adjust based on the height of your header */
@@ -93,12 +91,6 @@ section {
     font-size: 24px; /* Increase font size of brand name */
     color: #2ecc71; /* Emerald Green for branding */
     }
-
-    .navbar1-nav .nav-item {
-        color: #000; /* Black text color */
-
-    }
-
     /* Ensure that the container is a flexbox with space between items */
     .container-fluid {
       display: flex;
@@ -123,6 +115,8 @@ section {
   }
     .table-striped tbody tr:nth-of-type(odd) {
     background-color: rgba(0, 0, 0, 0.05);
+    width: 100% !important;   /* Force full width */
+    table-layout: auto;
   }
   .bordered-container {
       border: 2px solid #ccc; /* Gray border */
@@ -135,11 +129,8 @@ section {
       padding-right: 10px; /* Adds spacing between form inputs */
   }
 
-  #rvCheckboxesContainer .form-check {
-      display: inline-block; /* Aligns checkboxes horizontally */
-      margin-right: 10px; /* Adds spacing between checkboxes */
-      margin-bottom: 10px; /* Space between rows if it wraps */
-  }
+
+
   .center-text {
       text-align: center;
   }
@@ -155,27 +146,4 @@ section {
       z-index: 1;
   }
 
-   .table-container {
-     width: 100%;
-     max-height: 600px;
-     margin-left: -350px;
- }
- .table {
-   min-width: 100px; /* or however wide you need */
- }
-.table-extended {
-   min-width: 1700px; /* or however wide you need */
- }
-  .spinner {
-    border: 8px solid #f3f3f3; /* Light grey */
-    border-top: 8px solid #3498db; /* Blue */
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 2s linear infinite;
-  }
 
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }

@@ -255,10 +255,10 @@ public class PropertySurveyController {
     }
     //search suggestions of old properties
     @GetMapping("/searchProperties")
-    public ResponseEntity<List<PropertyOldDetails_Dto>> searchProperties(
+    public ResponseEntity<List<PropertyOldDetails_Dto>> searchOldProperties(
             @RequestParam(required = false) String oldPropertyNo,
             @RequestParam(required = false) String ownerName,
-            @RequestParam(required = false) String wardNo) {
+            @RequestParam(required = false) String wardNo){
 
         List<PropertyOldDetails_Dto> properties = propertyOldDetails_service.searchOldProperties(oldPropertyNo, ownerName, wardNo);
 
@@ -274,10 +274,11 @@ public class PropertySurveyController {
     public ResponseEntity<List<PropertyDetails_Dto>> searchProperties(
             @RequestParam(required = false) String surveyPropertyNo,
             @RequestParam(required = false) String ownerName,
-            @RequestParam(required = false) Integer wardNo) {
+            @RequestParam(required = false) Integer wardNo,
+            @RequestParam(required = false) String finalPropertyNo) {
 
         logger.info(surveyPropertyNo+wardNo+ownerName);
-        List<PropertyDetails_Dto> results = propertyManagement_service.searchNewProperties(surveyPropertyNo, ownerName, wardNo);
+        List<PropertyDetails_Dto> results = propertyManagement_service.searchNewProperties(surveyPropertyNo, ownerName, wardNo,finalPropertyNo);
         if (results.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -356,15 +357,6 @@ public class PropertySurveyController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\":\"Failed to submit property details.\"}");
         }
     }
-
-    //this is used to convert the image in base64 string
-//    private Optional<String> processImageUpload(MultipartFile file) throws IOException {
-//        if (file != null && !file.isEmpty()) {
-//            return Optional.of(ImageUtils.convertToBase64(file));
-//        }
-//        return Optional.empty();
-//    }
-
 
     //this method is for updating existing property record
     @PatchMapping(value = "/submitUpdatedPropertyDetails", consumes = "multipart/form-data")
@@ -1079,5 +1071,6 @@ public class PropertySurveyController {
 
         return "3GEditSurveyForm";
     }
+
 
 }

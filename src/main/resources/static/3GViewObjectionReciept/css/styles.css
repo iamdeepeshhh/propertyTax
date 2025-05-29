@@ -1,0 +1,48 @@
+    .h-25 {
+        height: 20px;
+    }
+
+    .t-c {
+        text-align: center;
+    }
+
+    body{
+        font-size: 16px;
+        padding:2px;
+        font-family:  Arial Unicode MS;
+
+    }
+
+    #mainDiv {
+        border: 3px solid black;
+        padding:3px;
+    }
+
+    .margin-t-5 {
+        margin-top: 5px;
+        padding:5px;
+    }
+    .padding-20 {
+         padding-left: 15px;
+         padding-right: 15px;
+    }
+
+    #mainpara,#taxtable,#lastpara {
+        display:inline-block;
+    }
+
+    #welcome {
+       text-align:center;
+       margin-top:2px;
+       margin-bottom:2px;
+    }
+    @page  {
+        size: A4;
+     /* //  size: 25cm 35.7cm;*/
+        margin: 15mm 10mm 15mm 10mm; /* change the margins as you want them to be. */
+    }
+
+    .padding-10 {
+        padding:10px;
+    }
+

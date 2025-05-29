@@ -90,7 +90,7 @@ public class PropertyManagementImpl_Service implements PropertyManagement_Servic
     }
 
     @Transactional(readOnly = true)
-    public List<PropertyDetails_Dto> searchNewProperties(String surveyPropertyNo, String ownerName, Integer wardNo) {
+    public List<PropertyDetails_Dto> searchNewProperties(String surveyPropertyNo, String ownerName, Integer wardNo, String finalPropertyNo) {
         List<PropertyDetails_Entity> properties;
 
          if (surveyPropertyNo != null && wardNo != null){
@@ -113,6 +113,18 @@ public class PropertyManagementImpl_Service implements PropertyManagement_Servic
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<PropertyDetails_Dto> searchWardandFinalPropertyNo(String finalPropertyNo, Integer wardNo) {
+        if (finalPropertyNo != null && !finalPropertyNo.trim().isEmpty() && wardNo != null) {
+            return propertyDetails_repository
+                    .findByPdFinalpropnoVcAndPdWardI(finalPropertyNo, wardNo)
+                    .stream()
+                    .map(this::convertPropertyDetailsToDto)
+                    .collect(Collectors.toList()); // convert to DTO if present
+        }
+        return Collections.emptyList();
+    }
+
     private PropertyDetails_Dto convertPropertyDetailsToDto(PropertyDetails_Entity entity) {
         PropertyDetails_Dto dto = new PropertyDetails_Dto();
         dto.setPdNewpropertynoVc(entity.getPdNewpropertynoVc());
@@ -127,6 +139,9 @@ public class PropertyManagementImpl_Service implements PropertyManagement_Servic
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH-mm-ss, dd-MM-yyyy");
         String formattedDate = entity.getCreatedAt().format(formatter);
         dto.setCreateddateVc(formattedDate);
+
+        // Added this for old property number in objections property suggestions
+        dto.setPdOldpropnoVc(entity.getPdOldpropnoVc());
         return dto;
     }
 

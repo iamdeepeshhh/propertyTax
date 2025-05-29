@@ -1,14 +1,30 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <link href="/3GMasterWeb/css/styles.css" rel="stylesheet">
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>3G Associates</title>
   <!-- Bootstrap CSS -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <link href="/3GMasterWeb/css/styles.css" rel="stylesheet">
+
+
+  <style>
+    .table-container {
+     width: 100%;
+     max-height: 600px;
+     margin-left: -350px;
+ }
+ .table {
+   min-width: 100px; /* or however wide you need */
+ }
+.table-extended {
+   min-width: 1700px; /* or however wide you need */
+ }
+  </style>
 </head>
 <body>
 
@@ -120,16 +136,16 @@
 
           </div>
         </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownReports" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Reports
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdownPropertyDetails">
-            <a class="dropdown-item" href="#" onclick="showTab('surveyReports')">Survey Reports</a>
-            <a class="dropdown-item" href="#" onclick="showTab('batchReports')">Batch Reports</a>
+<!--        <li class="nav-item dropdown">-->
+<!--          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownReports" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+<!--            Reports-->
+<!--          </a>-->
+<!--          <div class="dropdown-menu" aria-labelledby="navbarDropdownPropertyDetails">-->
+<!--            <a class="dropdown-item" href="#" onclick="showTab('surveyReports')">Survey Reports</a>-->
+<!--            <a class="dropdown-item" href="#" onclick="showTab('batchReports')">Batch Reports</a>-->
 
-          </div>
-        </li>
+<!--          </div>-->
+<!--        </li>-->
 
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownFileUpload" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -153,7 +169,7 @@
 <!--            <a class="dropdown-item" href="#" onclick="showTab('userChargesSection')">User Charges</a>-->
           </div>
         </li>
-        <li class="nav-item dropdown">
+        <li class="nav-item dropdown ">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownOthers" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Others
             </a>
@@ -165,7 +181,18 @@
               <a class="dropdown-item" href="#" onclick="showTab('deletionlogs')">Deleted Properties</a>
               <a class="dropdown-item" href="#" onclick="showTab('councilDetails')">Council details</a>
             </div>
-          </li>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownReports" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Reports
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownPropertyDetails">
+            <a class="dropdown-item" href="#" onclick="showTab('surveyReports')">Survey Reports</a>
+            <a class="dropdown-item" href="#" onclick="showTab('batchReports')">Batch Reports</a>
+
+          </div>
+        </li>
       </ul>
     </div>
   </div>
@@ -223,7 +250,7 @@
       </div>
       <button type="button" class="btn btn-primary" onclick="submitForm('zoneForm', ['ZoneNo'], '/3g/addZones')">Add</button>
     </form>
-    <div class="mt-5">
+    <div class="container mt-5">
       <h3>Existing Zones</h3>
       <table class="table table-bordered">
         <thead class="thead-dark">
@@ -313,7 +340,7 @@
     </form>
 
     <!-- Existing Owner Types Display Section -->
-    <div class="mt-5">
+    <div class="container mt-5">
       <h3>Existing Owner Types</h3>
       <table class="table table-bordered">
         <thead class="thead-dark">
@@ -367,7 +394,7 @@
       </div>
       <button type="button" class="btn btn-primary" onclick="submitForm('ownerCategoryForm', ['ownerCategory', 'ownerCategoryMarathi', 'oc-language-select'], '/3g/addOwnerCategory')">Add</button>
     </form>
-    <div class="mt-5">
+    <div class="container mt-5 ">
       <h3>Existing Owner Categories</h3>
       <table class="table table-bordered table-striped">
         <thead class="thead-dark">
@@ -414,7 +441,7 @@
       </div>
       <button type="button" class="btn btn-primary" onclick="submitForm('waterConnectionForm', ['waterConnection', 'waterConnectionMarathi', 'language'], '/3g/addWaterConnection')">Add</button>
     </form>
-    <div class="mt-5">
+    <div class="container mt-5 ">
       <h3>Existing Water Connections</h3>
       <table class="table table-bordered table-striped">
         <thead class="thead-dark">
@@ -478,7 +505,7 @@
       </div>
       <button type="button" class="btn btn-primary" onclick="submitForm('propertyTypeForm', ['propertyTypeName', 'localPropertyTypeName', 'language', 'buildingInp'], '/3g/addPropertyType')">Add</button>
     </form>
-    <div class="mt-5">
+    <div class="container mt-5 ">
       <h3>Existing Property Types</h3>
       <table class="table table-bordered">
         <thead class="thead-dark">
@@ -545,7 +572,7 @@
   </div>
 
   <!-- Existing Property Subtypes Display Section -->
-  <div class="container mt-5">
+  <div class="container mt-5 ">
     <h3>Existing Property Subtypes</h3>
     <table class="table table-bordered">
       <thead class="thead-dark">
@@ -616,7 +643,7 @@
   </div>
 
   <!-- Existing Property Usage Types Display Section -->
-  <div class="container mt-5">
+  <div class="container mt-5 ">
     <h3>Existing Property Usage Types</h3>
     <table class="table table-bordered">
       <thead class="thead-dark">
@@ -692,7 +719,7 @@
       </div>
       <button type="button" class="btn btn-primary" onclick="submitForm('propertyUsageSubTypeForm', ['pusc-property-type-select', 'pusc-property-subtype-select', 'pusc-property-usage-type-select', 'usageTypeEng', 'language-select', 'usageTypeLocal', 'taxType'], '/3g/addPropertySubUsageTypes')">Add</button>
     </form>
-    <div class="container mt-5">
+    <div class="container mt-5 ">
       <h3>Existing Property Usage Subtypes</h3>
       <table class="table table-bordered">
         <thead class="thead-dark">
@@ -750,7 +777,7 @@
 </div>
 
   <!-- Existing Building Types Display Section -->
-  <div class="container mt-5">
+  <div class="container mt-5 ">
     <h3>Existing Building Types</h3>
     <table class="table table-bordered">
       <thead class="thead-dark">
@@ -808,7 +835,7 @@
   </div>
 
   <!-- Existing Building Subtypes Display Section -->
-  <div class="container mt-5">
+  <div class="container mt-5 ">
     <h3>Existing Building Subtypes</h3>
     <table class="table table-bordered">
       <thead class="thead-dark">
@@ -842,7 +869,7 @@
   </div>
 
   <!-- Existing Sewerage Types Display Section -->
-  <div class="container mt-5">
+  <div class="container mt-5 ">
     <h3>Existing Sewerage Types</h3>
     <table class="table table-bordered">
       <thead class="thead-dark">
@@ -876,7 +903,7 @@
       </div>
       <button type="button" class="btn btn-primary" onclick="submitForm('unitNoForm', ['unitno'], '/3g/addUnitNo')">Add</button>
     </form>
-    <div class="container mt-5">
+    <div  class="container mt-5 ">
       <h3>Existing Unit Numbers</h3>
       <table class="table table-bordered">
         <thead class="thead-dark">
@@ -914,7 +941,7 @@
   </div>
 
   <!-- Existing Unit Floor Numbers Display Section -->
-  <div class="container mt-5">
+  <div class="container mt-5 ">
     <h3>Existing Unit Floor Numbers</h3>
     <table class="table table-bordered">
       <thead class="thead-dark">
@@ -992,7 +1019,7 @@
   </div>
 
   <!-- Existing Unit Usage Types Display Section -->
-  <div class="container mt-5">
+  <div class="container mt-5 ">
     <h3>Existing Unit Usage Types</h3>
     <table class="table table-bordered">
       <thead class="thead-dark">
@@ -1089,7 +1116,7 @@
     <button type="button" class="btn btn-primary" onclick="submitForm('unitUsageSubTypeForm', ['uusc-property-type-select', 'uusc-property-subtype-select', 'uusc-property-usage-type-select', 'uusc-unit-usage-type-select', 'unit-usage-subtype-name', 'local-unit-usage-subtype-name', 'tax-type-input','usmApplyDifferentRateVc','usm_rvtype_vc'], '/3g/addUnitUsageSub')">Add</button>
   </form> 
   <!-- Existing Unit Usage Subtypes Display Section -->
-  <div class="container mt-5">
+  <div class="container mt-5 ">
     <h3>Existing Unit Usage Subtypes</h3>
     <table class="table table-bordered">
       <thead class="thead-dark">
@@ -1125,7 +1152,7 @@
       </div>
       <button type="button" class="btn btn-primary" onclick="submitForm('wardForm', ['wardNo'], '/3g/addWards')">Add</button>
     </form>
-    <div class="mt-5">
+    <div class="container mt-5 ">
       <h3>Existing Wards</h3>
       <table class="table table-bordered table-striped">
         <thead class="thead-dark">
@@ -1179,7 +1206,7 @@
     </div>
     <button type="button" class="btn btn-primary" onclick="submitForm('constructionClassForm', ['ccm_classnameeng_vc', 'ccm_classnamell_vc', 'ccm_percentageofdeduction_i', 'ccm_remarks_vc'], '/3g/constructionClassMasters')">Add</button>
   </form>
-  <div class="container mt-5">
+  <div class="container mt-5 ">
     <!-- Existing Construction Classes Display Section -->
     <h3>Existing Construction Classes</h3>
     <table class="table table-bordered">
@@ -1249,7 +1276,7 @@
     </form>
   
     <!-- Existing Construction Age Factors Display Section -->
-    <div class="container mt-5">
+      <div class="container mt-5 ">
       <h3>Existing Construction Age Factors</h3>
       <table class="table table-bordered">
         <thead class="thead-dark">
@@ -1292,7 +1319,7 @@
         </div>
         <button type="button" class="btn btn-primary" onclick="submitForm('occupancyForm', ['occupancy', 'occupancy_marathi'], '/3g/occupancyMasters')">Add</button>
       </form>
-      <div class="container mt-5">
+      <div class="container mt-5 ">
         <h3>Existing Occupancies</h3>
         <table class="table table-bordered">
           <thead class="thead-dark">
@@ -1339,7 +1366,7 @@
         </div>
         <button type="button" class="btn btn-primary" onclick="submitForm('assessmentDatesForm', ['firstAssessmentDate', 'lastAssessmentDate', 'currentAssessmentDate'], '/3g/createAssessmentDates')">Add</button>
     </form>
-    <div class="container mt-5">
+    <div class="container mt-5 ">
         <h3>Existing Assessment Dates</h3>
         <table class="table table-bordered">
             <thead class="thead-dark">
@@ -1387,7 +1414,7 @@
         </div>
         <button type="button" class="btn btn-primary" onclick="submitForm('roomTypesForm', ['roomType', 'roomTypeMarathi', 'roomSelected'], '/3g/roomTypes')">Add</button>
       </form>
-      <div class="container mt-5">
+      <div class="container mt-5 ">
         <h3>Existing Room Types</h3>
         <table class="table table-bordered">
           <thead class="thead-dark">
@@ -1417,7 +1444,7 @@
             </div>
             <button type="button" class="btn btn-primary" onclick="submitForm('oldWardsForm', ['wardCount'], '/3g/addOldWards')">Add</button>
         </form>
-        <div class="mt-5">
+        <div class="container mt-5 ">
             <h3>Existing Old Wards</h3>
             <table class="table table-bordered">
                 <thead class="thead-dark">
@@ -1446,7 +1473,7 @@
       </div>
       <button type="button" class="btn btn-primary" onclick="submitForm('remarksForm', ['remark'], '/3g/addRemarks')">Add</button>
     </form>
-    <div class="mt-5">
+    <div class="container mt-5 ">
       <h3>Existing Remarks</h3>
       <table class="table table-bordered">
         <thead class="thead-dark">
@@ -1466,7 +1493,7 @@
   
 <section id="deletionlogs" class="container mt-5">
   <h2>Deleted Properties</h2>
-  <div class="container mt-5">
+  <div class="container mt-5 table-container">
     <h3>Deleted Properties Log</h3>
     <table class="table table-bordered">
       <thead class="thead-dark">
@@ -1488,7 +1515,7 @@
   </div>
 </section>
 
-<section id="depreciationRatesSection" class="container mt-5">
+<section id="depreciationRatesSection"  class="container mt-5 ">
   <h2 class="mb-4">Depreciation Rates</h2>
   <form id="depreciationForm" class="needs-validation" novalidate>
       <div class="form-group">
@@ -1515,7 +1542,7 @@
       </div>
   </form>
   <h3 class="mt-5">Existing Depreciation Rates</h3>
-  <div style="max-height: 300px; overflow-y: auto;">
+  <div class="container mt-5 ">
       <table class="table table-bordered table-hover mt-3">
           <thead class="thead-dark">
               <tr>
@@ -1536,7 +1563,7 @@
 
 
 
-<section id="propertyRatesSection" class="container mt-5">
+<section id="propertyRatesSection" class="container mt-5 ">
   <h2 class="mb-4">Tax Rates</h2>
   <form id="propertyRatesForm" class="needs-validation" novalidate>
       <div class="form-group">
@@ -1564,7 +1591,7 @@
       </div>
   </form>
   <h3 class="mt-5">Existing Tax Rates</h3>
-  <div style="max-height: 300px; overflow-y: auto;">
+  <div class="container mt-5 ">
       <table class="table table-bordered table-hover mt-3">
           <thead class="thead-dark">
               <tr>
@@ -1665,9 +1692,9 @@
 
 
   <!-- Existing RV Types Table -->
-  <div class="mt-3">
+  <div class="container mt-5 ">
     <h3>Existing RV Types</h3>
-    <div style="max-height: 300px; overflow-y: auto;">
+    <div>
       <table class="table table-bordered table-hover">
         <thead class="thead-dark">
         <tr>
@@ -1750,7 +1777,7 @@
 
   <!-- Existing Consolidated Taxes Table -->
   <h3>Existing Consolidated Taxes</h3>
-  <div style="max-height: 300px; overflow-y: auto;">
+  <div class="container mt-5 ">
     <table class="table table-hover mt-3">
       <thead class="thead-dark">
       <tr>
@@ -1805,7 +1832,7 @@
     </form>
   </div>
   <h3 class="mt-5">Existing Cess Rates</h3>
-  <div style="max-height: 300px; overflow-y: auto;">
+  <div class="container mt-5 ">
   <table class="table table-bordered table-hover mt-3">
     <thead class="thead-dark">
     <tr>
@@ -1878,7 +1905,7 @@
   <!-- Existing User Charges Table -->
   <div class="mt-3">
       <h3>Existing User Charges</h3>
-      <div style="max-height: 300px; overflow-y: auto;">
+      <div class="container mt-5 ">
           <table class="table table-bordered table-hover">
               <thead class="thead-dark">
                   <tr>
@@ -1927,8 +1954,8 @@
     </div>
 </div>
   <!-- Survey Reports Table -->
-  <div class="table-responsive mt-4" style="max-height: 600px; overflow-y: auto;">
-      <table class="table table-bordered table-hover">
+  <div class="container mt-5 table-container">
+      <table class="table-extended table-bordered table-hover">
           <thead class="thead-dark">
               <tr>
                 <th class="center-text" >#</th>
@@ -1980,8 +2007,8 @@
     </div>
 </div>
   <!-- Survey Reports Table -->
-  <div class="table-responsive mt-4" style="max-height: 600px; overflow-y: auto;">
-      <table class="table table-bordered table-hover">
+  <div class="container mt-5 table-container">
+      <table class="table-extended table-bordered table-hover">
           <thead class="thead-dark">
               <tr>
                 <th class="center-text" >#</th>
@@ -2007,10 +2034,10 @@
 
 <section id="batchReports" class="container mt-5">
   <h2 class="mb-4">Batch Reports</h2>
-  <div class="container mt-5">
+  <div class="container mt-5" >
     <h3>Existing Wards</h3>
-    <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-      <table class="table table-bordered table-hover">
+    <div class="container mt-5 table-container">
+      <table class="table-extended table-bordered table-hover">
         <thead class="thead-dark">
         <tr>
           <th class="center-text">#</th>
@@ -2065,9 +2092,9 @@
   </form>
   </div>
 
-  <div class="mt-5">
+  <div class="mt-5" >
     <h3>Existing Council Details</h3>
-    <div class="table-responsive">
+    <div class="container mt-5">
       <table class="table table-bordered table-hover">
         <thead class="thead-dark">
         <tr>

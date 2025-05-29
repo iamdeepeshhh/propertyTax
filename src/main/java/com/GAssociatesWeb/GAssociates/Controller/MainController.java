@@ -23,5 +23,11 @@ public class MainController {
     }
 
     @GetMapping("citizenLogin")
-    public String showCitizenLogin(){return "3GCitizenLogin";}
+    public String showCitizenLogin(){return "3GCitizenPage";}
+
+    @GetMapping("hearingNotice")
+    public String showHearingNotice(){return "3GViewHearingNotice";}
+
+    @GetMapping("objectionReciept")
+    public String showObjectionReciept(){return "3GViewObjectionReciept";}
 }

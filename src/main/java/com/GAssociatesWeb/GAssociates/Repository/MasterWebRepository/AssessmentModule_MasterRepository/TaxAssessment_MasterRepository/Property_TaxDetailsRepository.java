@@ -1,6 +1,6 @@
 package com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.TaxAssessment_MasterRepository;
 
-import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxAssessment_MasterEntity.Property_TaxDetails;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxAssessment_Module.Property_TaxDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface Property_TaxDetailsRepository extends JpaRepository<Property_TaxDetails, String> {

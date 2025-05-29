@@ -1,6 +1,6 @@
 package com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.TaxAssessment_MasterRepository;
 
-import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxAssessment_MasterEntity.Proposed_RValues;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxAssessment_Module.Proposed_RValues;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface Proposed_RValuesRepository extends JpaRepository<Proposed_RValues, String> {

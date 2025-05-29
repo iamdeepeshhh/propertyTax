@@ -1,4 +1,4 @@
-package com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxAssessment_MasterEntity;
+package com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxAssessment_Module;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1087,8 +1087,9 @@ public class MasterWebController {
     public ResponseEntity<List<PropertyDetails_Dto>> searchProperties(
             @RequestParam(required = false) String surveyPropertyNo,
             @RequestParam(required = false) String ownerName,
-            @RequestParam(required = false) Integer wardNo) {
-        List<PropertyDetails_Dto> results = propertyManagement_service.searchNewProperties(surveyPropertyNo, ownerName, wardNo);
+            @RequestParam(required = false) Integer wardNo,
+            @RequestParam(required = false) String finalPropertyNo) {
+        List<PropertyDetails_Dto> results = propertyManagement_service.searchNewProperties(surveyPropertyNo, ownerName, wardNo,finalPropertyNo);
         if (results.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -1386,7 +1387,8 @@ public class MasterWebController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    //This is Additional feature to get council names and images so that application can become standard
+
+//This is Additional feature to get council names and images so that application can become standard
     @PostMapping(value = "/saveCouncilDetails", consumes = "multipart/form-data")
     public ResponseEntity<String> saveCouncilDetails(@RequestParam("standardName") String standardName,
                                                      @RequestParam("localName") String localName,
@@ -1501,6 +1503,23 @@ public class MasterWebController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading property image.");
         }
     }
+
+//for specially citizens when they are required to search there property with specified final property number and ward
+    @GetMapping("/searchByFinalPropertyNoAndWardNo")
+    public ResponseEntity<?> getByFinalPropertyNoAndWard(
+            @RequestParam String finalPropertyNo,
+            @RequestParam Integer wardNo) {
+
+        List<PropertyDetails_Dto> result = propertyManagement_service.searchWardandFinalPropertyNo(finalPropertyNo,wardNo);
+
+        if (result.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(result);
+    }
+
+//for registering the objection of citizen he below methood is getting used
+
 
 
 }

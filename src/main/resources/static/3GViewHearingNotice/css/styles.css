@@ -1,0 +1,77 @@
+/* style.css */
+
+body {
+  font-family: 'Mangal', Arial, sans-serif;
+  margin: 40px;
+  background-color: #fff;
+  color: #000;
+
+}
+.container {
+  margin: auto;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+}
+
+.header img {
+  height: 80px;
+  align-items: l;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.sub-title {
+  font-size: 20px;
+  font-weight:200;
+  margin-top: -5px;
+}
+
+.notice-no-date {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 14px;
+}
+.pink{
+    background-color:#f9dada;
+  padding: 6px;
+  text-align: center;
+}
+
+th, td {
+  border: 1px solid #000;
+
+  padding: 6px;
+  text-align: center;
+}
+
+.content {
+  margin-top: 20px;
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+.signature {
+  margin-top: 60px;
+  text-align: right;
+  font-weight: bold;
+}
+
+.custom-line {
+  border: none;
+  border-top: 2px dotted #666;
+  margin: 40px 0;
+}
