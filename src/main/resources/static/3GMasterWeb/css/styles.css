@@ -11,7 +11,7 @@ body {
   margin: 0; /* Override default margin */
 }
 footer {
-  margin-top: auto; /* Push the footer to the bottom of the flex container */
+  margin-top: 500px; /* Push the footer to the bottom of the flex container */
   background-color: #1e1e1e; /* Darker Gray */
   color: #bbb;
   text-align: center;
@@ -99,7 +99,6 @@ section {
 
     }
 
-    /* Ensure that the container is a flexbox with space between items */
     .container-fluid {
       display: flex;
       justify-content: space-between;
@@ -152,6 +151,7 @@ section {
       position: sticky;
       top: 0;
       background-color: #343a40; /* Matches thead-dark background */
+      color: #fff;               /* Change by Anand And also chage in inspect mode */
       z-index: 1;
   }
 
@@ -179,3 +179,8 @@ section {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
+
+.container{
+
+    color : initial;
+}

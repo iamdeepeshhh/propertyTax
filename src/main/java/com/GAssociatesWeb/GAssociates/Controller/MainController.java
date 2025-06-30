@@ -1,7 +1,9 @@
 package com.GAssociatesWeb.GAssociates.Controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -12,8 +14,9 @@ public class MainController {
         return "3GCommon";
     }
 
-    @GetMapping("specialNotice")
-    public String showSpecialNotice() {
+    @GetMapping("specialNotice/{wardNo}")
+    public String showSpecialNotice(@PathVariable("wardNo") String propertyId, Model model) {
+        model.addAttribute("wardNo", propertyId);
         return "3GViewSpecialNotice";
     }
 
@@ -30,4 +33,10 @@ public class MainController {
 
     @GetMapping("objectionReciept")
     public String showObjectionReciept(){return "3GViewObjectionReciept";}
+
+    @GetMapping("taxBill/{wardNo}")
+    public String showTaxBill(@PathVariable("wardNo") String propertyId, Model model) {
+        model.addAttribute("wardNo", propertyId);
+        return "3GViewTaxBill";
+    }
 }

@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Service
-public class SpecialNoticeServiceImpl implements SpecialNoticeService {
+public class SpecialNotice_MasterServiceImpl implements SpecialNotice_MasterService {
 
 
 

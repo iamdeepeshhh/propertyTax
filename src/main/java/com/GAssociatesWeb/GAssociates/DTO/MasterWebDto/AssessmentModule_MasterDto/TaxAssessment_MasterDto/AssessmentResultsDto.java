@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 public class AssessmentResultsDto {
 
+    private String SnNoticeId;
     private String pdZoneI;
     private String pdWardI;
     private String pdOldpropnoVc;

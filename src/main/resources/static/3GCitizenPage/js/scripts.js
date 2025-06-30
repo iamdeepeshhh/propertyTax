@@ -142,6 +142,44 @@ function cancelObjection() {
 //    document.getElementById("objectionForm").reset(); // Optional reset
 }
 
-function submitObjection(){
-      window.location.replace('/objectionReciept');
- }
+
+function submitObjection() {
+    const form = document.getElementById("objectionForm");
+
+    const data = {
+        wardNo: +form.objectionWardNo.value,
+        finalPropertyNo: form.objectionFinalPropertyNo.value,
+        ownerName: form.objectionOwnerName.value,
+        respondent: form.respondentname.value,
+        phoneNo: form.contactno.value,
+        userDate: form.userdate.value,
+        applicationReceivedDate: form.applicationdate.value,
+        others: form.others.value,
+        reasons: Array.from(document.querySelectorAll(".chk:checked"))
+                      .map(cb => cb.value)
+                      .join(", "),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+
+    if (!data.respondent || !data.phoneNo) {
+        return alert("Please enter respondent name and contact number.");
+    }
+
+    fetch("/3g/submitObjection", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
+    .then(() => {
+        alert("Objection submitted successfully!");
+        form.reset();
+        window.location.replace('/objectionReciept');
+        document.getElementById("objectionSection").style.display = "none";
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Failed to submit objection.");
+    });
+}

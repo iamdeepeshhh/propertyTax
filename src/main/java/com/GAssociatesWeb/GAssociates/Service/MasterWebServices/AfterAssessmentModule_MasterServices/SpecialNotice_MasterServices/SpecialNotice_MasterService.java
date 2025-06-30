@@ -4,7 +4,7 @@ import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDt
 
 import java.util.List;
 
-public interface SpecialNoticeService {
+public interface SpecialNotice_MasterService {
    // List<AssessmentResultsDto> getAllResults();
 
     List<AssessmentResultsDto> getSpecialNoticesByWard(int wardNo);

@@ -1,4 +1,4 @@
-package com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.AfterHearing_Entity;
+package com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,39 +8,35 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "afterhearing_unit_builtup")
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AfterHearing_UnitBuiltupDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    private String pd_newpropertyno_vc;
-    private String ud_floorno_vc;
-    private Integer ud_unitno_vc;
-    private Integer ub_ids_i;
-    private String ub_roomtype_vc;
-    private String ub_length_fl;
-    private String ub_breadth_fl;
-    private String ub_exemptionst_vc;
-    private String ub_exemlength_fl;
-    private String ub_exembreadth_fl;
-    private String ub_exemarea_fl;
-    private String ub_carpetarea_fl;
-    private String ub_assesarea_fl;
-    private LocalDate ud_timestamp_dt;
-    private String ub_legalst_vc;
-    private String ub_legalarea_fl;
-    private String ub_illegalarea_fl;
-    private LocalDateTime created_at;
-    private LocalDateTime updated_at;
-    private String ud_unitremark_vc;
-    private String ub_measuretype_vc;
-    private String ub_orgassessarea_vc;
-    private String ub_dedpercent_i;
-    private String ub_areabeforededuction_fl;
-    private String plotarea;
+    private String newPropertyNo;
+    private String floorNo;
+    private Integer unitNo;
+    private Integer builtupId;
+    private String roomType;
+    private String length;
+    private String breadth;
+    private String exemptionStatus;
+    private String exemptionLength;
+    private String exemptionBreadth;
+    private String exemptionArea;
+    private String carpetArea;
+    private String assessableArea;
+    private LocalDate timestamp;
+    private String legalStatus;
+    private String legalArea;
+    private String illegalArea;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private String unitRemark;
+    private String measureType;
+    private String originalAssessArea;
+    private String deductionPercent;
+    private String areaBeforeDeduction;
+    private String plotArea;
 }

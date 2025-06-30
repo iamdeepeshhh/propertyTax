@@ -1,4 +1,4 @@
-package com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.AfterHearing_Entity;
+package com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.AfterHearing_MasterEntity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

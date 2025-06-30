@@ -1,5 +1,6 @@
 package com.GAssociatesWeb.GAssociates.Controller;
 
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.RegisterObjection_Dto.RegisterObjection_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AgeFactor_MasterDto.AgeFactor_MasterDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentDate_MasterDto.AssessmentDate_MasterDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.ConsolidatedTaxes_MasterDto.ConsolidatedTaxes_MasterDto;
@@ -39,6 +40,8 @@ import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.Prop
 import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.PropertyNumberGenerator_Service.UniqueIdGenerator;
 import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.PropertyOldDetails_Service.PropertyOldDetails_Service;
 import com.GAssociatesWeb.GAssociates.Service.ImageUtils;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.RegisterObjection_MasterService.RegisterObjection_MasterService;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.SpecialNotice_MasterServices.SpecialNotice_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AgeFactor_MasterService.AgeFactor_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentDate_MasterService.AssessmentDate_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.ConolidatedTaxes_MasterService.ConsolidatedTaxes_MasterService;
@@ -147,9 +150,12 @@ public class MasterWebController {
     private final UniqueIdGenerator uniqueIdGenerator;
     private final PreLoadCache preLoadCache;
     private final JobLauncher jobLauncher;
+
+    private final SpecialNotice_MasterService specialNoticeMasterService;
     private final Job processPropertyDetailsJob;
     private final CouncilDetails_MasterService councilDetails_masterService;
     private final RVTypeCategory_MasterService rvTypeCategory_masterService;
+    private final RegisterObjection_MasterService registerObjection_masterService;
     private static final Logger logger = Logger.getLogger(MasterWebController.class.getName());
     public MasterWebController(Ward_MasterService ward_masterService, PropClassification_MasterService propClassification_masterService,
                                PropSubClassification_MasterService propSubClassification_masterService,
@@ -165,8 +171,9 @@ public class MasterWebController {
                                AgeFactor_MasterService ageFactor_MasterService, Remarks_MasterService remarks_MasterService, PropertyOldDetails_Service propertyOldDetailsService, ExcelService excelService,
                                PropertyManagement_Service property_ManagementService, PropertyDeletionLog_Repository propertyDeletionLogRepository, TaxDepreciation_MasterService taxDepreciation_MasterService,
                                RVTypes_MasterService rvTypes_MasterService, ConsolidatedTaxes_MasterService consolidatedTaxes_MasterService, EduCessAndEmpCess_MasterService eduCessAndEmpCess_MasterService, PropertyRates_MasterService propertyRates_MasterService,
-                               TaxAssessment_MasterService taxAssessment_MasterService, BatchReportGenerator_MasterService batchReportGenerator_MasterService, CalculationSheetGenerator_MasterService calculationSheetGenerator_MasterService, UniqueIdGenerator uniqueIdGenerator, PreLoadCache preLoadCache, JobLauncher jobLauncher, Job processPropertyDetailsJob,
-                               CouncilDetails_MasterService councilDetails_MasterService, RVTypeCategory_MasterService rvTypeCategory_MasterService) {
+                               TaxAssessment_MasterService taxAssessment_MasterService, BatchReportGenerator_MasterService batchReportGenerator_MasterService, CalculationSheetGenerator_MasterService calculationSheetGenerator_MasterService, UniqueIdGenerator uniqueIdGenerator,
+                               PreLoadCache preLoadCache, JobLauncher jobLauncher,SpecialNotice_MasterService specialNotice_MasterService, Job processPropertyDetailsJob,
+                               CouncilDetails_MasterService councilDetails_MasterService, RVTypeCategory_MasterService rvTypeCategory_MasterService, RegisterObjection_MasterService registerObjection_MasterService) {
         this.ward_masterService = ward_masterService;
         this.propClassification_masterService = propClassification_masterService;
         this.propSubClassification_masterService = propSubClassification_masterService;
@@ -208,9 +215,11 @@ public class MasterWebController {
         this.uniqueIdGenerator = uniqueIdGenerator;
         this.preLoadCache = preLoadCache;
         this.jobLauncher = jobLauncher;
+        this.specialNoticeMasterService = specialNotice_MasterService;
         this.processPropertyDetailsJob = processPropertyDetailsJob;
         this.councilDetails_masterService = councilDetails_MasterService;
         this.rvTypeCategory_masterService = rvTypeCategory_MasterService;
+        this.registerObjection_masterService = registerObjection_MasterService;
     }
 
     @GetMapping(value = "/MasterWebLogin")
@@ -465,9 +474,9 @@ public class MasterWebController {
             List<PropClassification_MasterDto> classifications = propClassification_masterService.findAll();
             List<Map<String, Object>> responseData = classifications.stream().map(type -> {
                 Map<String, Object> item = new HashMap<>();
-                item.put("name", type.getLocalPropertyTypeName());
-                item.put("englishname", type.getPropertyTypeName());// Assuming PropertyType has getName()
-                item.put("value", type.getPcmId()); // Assuming PropertyType has getId()
+                item.put("localName", type.getLocalPropertyTypeName());
+                item.put("standardName", type.getPropertyTypeName());// Assuming PropertyType has getName()
+                item.put("id", type.getPcmId()); // Assuming PropertyType has getId()
                 return item;
             }).collect(Collectors.toList());
             return ResponseEntity.ok(responseData);
@@ -485,9 +494,9 @@ public class MasterWebController {
         List<PropSubClassification_MasterDto> propertySubTypes = propSubClassification_masterService.findAll();
         List<Map<String, Object>> responseData = propertySubTypes.stream().map(type -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("marathiname", type.getLocalPropertySubtypeName());
-            item.put("englishname", type.getPropertySubtypeName());
-            item.put("value", type.getPropertySubClassificationId());
+            item.put("localName", type.getLocalPropertySubtypeName());
+            item.put("standardName", type.getPropertySubtypeName());
+            item.put("id", type.getPropertySubClassificationId());
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -518,9 +527,9 @@ public class MasterWebController {
         List<PropUsageType_MasterDto> usageTypes = propertyUsageType_masterService.findAll();
         List<Map<String, Object>> responseData = usageTypes.stream().map(type -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("marathiname", type.getLocalUsagetypeName());
-            item.put("englishname", type.getUsageTypeName());
-            item.put("value", type.getPropertyUsageTypeId());
+            item.put("localName", type.getLocalUsagetypeName());
+            item.put("standardName", type.getUsageTypeName());
+            item.put("id", type.getPropertyUsageTypeId());
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -551,9 +560,9 @@ public class MasterWebController {
         List<PropSubUsageType_MasterDto> subUsageTypes = propertySubUsageType_masterService.findAll();
         List<Map<String, Object>> responseData = subUsageTypes.stream().map(type -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("marathiname", type.getUsageTypeLocal());
-            item.put("englishname", type.getUsageTypeEng());
-            item.put("value", type.getId());
+            item.put("localName", type.getUsageTypeLocal());
+            item.put("standardName", type.getUsageTypeEng());
+            item.put("id", type.getId());
             return item;
         }).collect(Collectors.toList());
         return responseData;
@@ -580,9 +589,9 @@ public class MasterWebController {
         List<BuildingType_MasterDto> buildingTypes = buildingType_masterService.getAllBuildingTypes();
         List<Map<String, Object>> responseData = buildingTypes.stream().map(type -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("name", type.getBtBuildingtypellVc());
-            item.put("englishname", type.getBtBuildingtypeengVc());
-            item.put("value", type.getBtBuildingTypeId());
+            item.put("localName", type.getBtBuildingtypellVc());
+            item.put("standardName", type.getBtBuildingtypeengVc());
+            item.put("id", type.getBtBuildingTypeId());
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -1519,8 +1528,18 @@ public class MasterWebController {
     }
 
 //for registering the objection of citizen he below methood is getting used
+    @PostMapping("/submitObjection")
+    public ResponseEntity<String> submitObjection(@RequestBody RegisterObjection_Dto dto) {
+        registerObjection_masterService.saveObjection(dto);
+        return ResponseEntity.ok("Objection submitted successfully");
+    }
 
+//    For the Special Notice
 
-
+    @GetMapping("/specialNotices/{wardNo}")
+    public ResponseEntity<?> getSpecialNoticesByWard(@PathVariable int wardNo) {
+        List<AssessmentResultsDto> results = specialNoticeMasterService.getSpecialNoticesByWard(wardNo);
+        return ResponseEntity.ok(results);
+    }
 }
 

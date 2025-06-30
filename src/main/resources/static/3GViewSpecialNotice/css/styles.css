@@ -1,92 +1,104 @@
-@page {
-  margin: 1mm;
-  size: A4 landscape;
-}
+
 
 body {
   font-family: 'Noto Sans Devanagari', sans-serif;
-  margin: 20px;
+  margin: 30px;
   background-color: white;
 
 }
 
 .page-container {
   /* Safe printable width in landscape */
-  margin: 30px auto;
-  padding: 30px;
+  margin: 60px auto;
+  padding: 18px;
   border: 2px solid black;
   background-color: white;
   box-sizing: border-box;
+
+
 }
 
 .councilLogo {
     display: block;
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 40px;
     object-fit: contain;
     float: left;
-    margin-right: 20px;
+    margin-right: 18px;
 }
 
 .header {
   display: flex;
   justify-content: center; /* Center the whole logo+text block */
   margin-bottom: -100px;
-padding-right: 70px;
+  padding-right: 70px;
 }
 
 .logo-title {
-  display: flex;
-  align-items: right;      /* Vertically align logo and text */
-  text-align: center;       /* Center text inside */
+   display: flex;
+    flex-direction: row;     /*  fixed  logo side */
+    align-items: right;
+    text-align:center;
+    gap: 15px;
 }
 
 .logo-title img {
-  height: 60px;
+  height: 40px;
   margin-right: 10px;       /* Smaller gap between logo and text */
 }
 
 .title-text h1 {
   background-color: #4a1313;
-  font-size: 24px;
+  font-size: 14px;
   margin: 0;
   color: white;
-  padding: 10px;
+  padding: 9px;
+
 }
 
 .title-text p {
-  margin: 4px 0;
+   margin: 4px 0;
+    font-size: 10px;
+
+}
+
+
+.header4 {
+  display: flex;
+  justify-content: center; /* Center the whole logo+text block */
+  margin-top: 10px;
+padding-right: 30px;
 }
 
 
 .date-boxes {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+   flex-direction: column;
+   align-items: flex-end;
+   margin-top: 20px;
 }
-
 .date-boxes input {
-
-    display: inline-block;
-    padding: 4px 8px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    text-align: center;
-    vertical-align: center;
-    float: right; /* This moves the box to the right */
-
+   display: inline-block;
+     border: 1px solid #000;
+     padding: 3px 7px;
+     font-family: Arial, sans-serif;
+     font-size: 12px;
+     text-align: center;
+     vertical-align: middle;
+     float: right;
+     margin-top: 6px; /* ↓ decreased space above inputs */
 }
-
 .red-label {
   color: red;
-  font-weight: bold;
-  font-size: 12px;
-  margin-top: 15px;
+   font-weight: bold;
+   font-size: 10px;
+   margin-top: 6px;      /* space above label */
+   margin-bottom: 2px;   /* ✅ decreased space before 2nd input */
 }
 
 
 .section {
-  margin: 15px 0;
+  margin: 12px 0;
 }
 
 .highlight {
@@ -96,25 +108,21 @@ padding-right: 70px;
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 15px;
+  margin-top: 11px;
 }
 
 th, td {
   border: 1px solid black;
-  padding: 6px 10px;
+  padding: 4px 8px;
   text-align: center;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 th {
   background-color: #f8cccc;
 }
 
-.f1 {
-  margin-top: 10px;
-  text-align: right;
-  font-weight: bold;
-}
+
 .f2 {
   margin-top: 2px;
   text-align: left;
@@ -128,7 +136,7 @@ th {
  .dashed-line {
       border: none;
       border-top: 2px dashed lightgray;
-      margin: 0px auto;
+      margin: 10px auto;
       width: 100%;
     }
 
@@ -140,44 +148,44 @@ th {
   align-items: center;
   justify-content: center;
   color: white;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
   margin-top: 0px;
 }
 
 .logo {
-  width: 60px;
+  width: 40px;
   height: auto;
   margin-right: 10px;
-  gap: 200px;
+  gap: 120px;
 }
 
 h1 {
   background-color: #4a1313;
-   font-size: 24px;
-   margin-bottom: 4px;
+   font-size: 12px;
+   margin-bottom: 3px;
    color: white ;
-   padding: 10px;
+   padding: 9px;
 }
 
 
 .subheading {
   text-align: center;
-  margin-top:  0px;
+  margin-top:  10px;
   padding-left: 0px;
 
 }
 
 h2 {
   text-align: center;
-  margin: 2px 0;
+  margin: 0px 0;
   font-weight: bold;
-  font-size: 20PX;
+  font-size: 14PX;
 }
 
 .act {
   text-align: center;
-  font-size: 14px;
+  font-size: 10px;
   margin: 1px 0;
 }
 
@@ -189,24 +197,20 @@ h2 {
 }
 
 .dates input {
-
-    display: inline-block;
-    border: 1px solid #000;
-    padding: 4px 8px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    text-align: center;
-    vertical-align: middle;
-    float: right; /* This moves the box to the right */
-
-
+   display: inline-block;
+       border: 1px solid #000;
+       padding: 3px 7px;
+       font-family: Arial, sans-serif;
+       font-size: 12px;
+       text-align: center;
+       vertical-align: middle;
+       float: right; /* This moves the box to the right */
 }
-
 .red-label {
   color: red;
   font-weight: bold;
-  font-size: 12px;
-  margin-top: 5px;
+  font-size: 9px;
+  margin-top: 4px;
 }
 
 .details {
@@ -216,14 +220,15 @@ h2 {
 
 .G1 {
   font-family: 'Devanagari', Arial, sans-serif;
-  font-size: 16px;
+  font-size: 12px;
   line-height: 1.8;
   text-align: justify;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .G1 p {
   text-indent: 50px; /* This gives space at the front of paragraph */
+  font-size: 12px;
 }
 
 
@@ -231,13 +236,16 @@ h2 {
 .G1-paragraph a {
   color: black;
   text-decoration: underline;
+  font-size: 12px;
 }
+
+
 
 
 .styled-table {
   font-weight: bold;
-  font-size: 12px;
-  margin-bottom: 6px;
+  font-size: 10px;
+  margin-bottom: 10px;
 }
 
 table {
@@ -265,13 +273,13 @@ th {
 /*---------------*------------------*/
 .j1 {
   font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 6px;
+  font-size: 12px;
+  margin-bottom: 10px;
 }
 
 .j1 table {
   border-collapse: collapse;
-  width: 40%;
+  width: 100%;
 }
 
 .j1 th, td {
@@ -303,8 +311,8 @@ body {
 
 /* Section header */
 h3 {
-  margin-top: 30px;
-  font-size: 16px;
+  margin-top: 20px;
+  font-size: 10px;
   font-weight: bold;
 }
 
@@ -312,16 +320,16 @@ h3 {
 .styled-table {
   border-collapse: collapse;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 /* Borders and alignment */
 .styled-table th,
 .styled-table td {
   border: 1px solid black;
-  padding: 8px 12px;
+  padding: 7px 12px;
   text-align: center;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 /* Header styling */
@@ -333,7 +341,7 @@ h3 {
   color: black;
   font-weight: bold;
   font-size: 12px;
-  margin-top: 5px;
+  margin-top: 10px;
   background-color: #f8cccc;
 }
 
@@ -342,99 +350,90 @@ h3 {
   font-weight: bold;
   background-color: white; /* light yellow for emphasis */
 }
-
-/* Main container for the left and right sections */
-.main-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
-  padding: 20px;
-  border: 2px solid #ddd;
-  border-radius: 10px;
-  background-color: #f9f9f9;
+.tight-heading {
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 
-
-.right-section {
-  flex: 1;
-}
-
-.left-section {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.left-section img
- {
-  width: 300%;
-  max-width: 250px;
-  height: 300px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  object-fit: cover;
-  border-right: 2px solid #999; /* This is your partition line */
-  padding-right: 40px;
-}
-.right-section img {
-  width: 300%;
-  max-width: 250px; /* adjust as needed */
-  height: 400px; /* adjust as needed */
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  align-items: center;
-  margin-top: 30px;
-  border-left: 2px solid #999; /* This is your partition line */
-  padding-left: 60px;
-}
 
 
 .signature-section {
   display: flex;
   justify-content: space-between;
-  margin-top: 50px;
-  padding: 0 40px;
+  font-size: 7px;
+  padding: 0 20px;
+  margin-top: 10px;
 }
 
 .signature {
   text-align: center;
-  font-size: 16px;
+  font-size: 7px;
   line-height: 1.5;
   width: 30%;
+
 }
 .signature img {
   width: 120px;
   height: auto;
-  margin-bottom: 15px;
+
   padding: 10px;
 }
 
 
+
 @media print {
-    body {
-      margin: 0;
-      padding: 0;
-      zoom: 0.5; /* scale down to fit on one page */
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      height: auto !important;
-      overflow: visible !important;
-    }
-
-    /* Avoid page breaks inside elements */
-    .no-break, .container, main, section, article, div {
-      page-break-inside: avoid;
-    }
-
-    /* Force everything onto one page */
-    @page {
-      size: A4 portrait;
-      margin: 5cm;
-    }
+  html, body {
+    width: 210mm;
+    height: 297mm;
+    margin: 0;
+    padding: 0;
+    font-size: 9px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    overflow: visible;
   }
+
+  @page {
+    size: A4 portrait;
+     margin: 15mm 7mm 3mm 7mm; /* top right bottom left */
+  }
+
+  .page-container {
+    page-break-after: always !important;
+    break-after: page !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    margin: 0 auto;
+  }
+
+  .page-container:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  /* Avoid breaking inside important sections */
+  .header, .header1,
+  .title-text, .section,
+  .G1, .tax-container, .j1,
+  .total-section, .signature-section,
+  table {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  table, th, td {
+    font-size: 8.5px !important;
+    padding: 3px 4px !important;
+  }
+
+  .signature-section {
+    margin-top: 5px;
+    font-size: 7px !important;
+  }
+
+  .signature img {
+    width: 80px !important;
+  }
+}

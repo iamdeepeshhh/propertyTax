@@ -1,2 +1,7 @@
-package com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AfterAssessmentModule_MasterRepository.RegisterObjection_MasterRepository;public interface RegisterObjection_MasterRepository {
+package com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AfterAssessmentModule_MasterRepository.RegisterObjection_MasterRepository;
+
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.RegisterObjection_Entity.RegisterObjection_Entity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RegisterObjection_MasterRepository extends JpaRepository<RegisterObjection_Entity, Long> {
 }

@@ -19,29 +19,74 @@ public class RegisterObjection_Entity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private Integer rg_wardno_i;
-    private Integer rg_zoneno_i;
-    private String rg_surveyno_vc;
-    private String rg_finalpropno_vc;
-    private String rg_newpropertyno_vc;
-    private String rg_ownername_vc;
-    private String rg_reasons_vc;
-    private String rg_others_vc;
-    private String rg_respondent_vc;
-    private String rg_objectiondate_dt;
-    private String rg_oldpropno_vc;
-    private String rg_userdate_vc;
-    private String rg_usertime_vc;
-    private Integer notice_no;
-    private String rg_hearingdate_vc;
-    private String rg_hearingtime_vc;
-    private String rg_hearingstatus_vc;
-    private String rg_applicationno_vc;
-    private String rg_phoneno_vc;
-    private LocalDateTime created_at;
-    private LocalDateTime updated_at;
-    private String rg_applicationreceiveddate_dt;
-    private String rg_changedvalue_vc;
+    @Column(name = "rg_wardno_i")
+    private Integer wardNo;
+
+    @Column(name = "rg_zoneno_i")
+    private Integer zoneNo;
+
+    @Column(name = "rg_surveyno_vc")
+    private String surveyNo;
+
+    @Column(name = "rg_finalpropno_vc")
+    private String finalPropertyNo;
+
+    @Column(name = "rg_newpropertyno_vc")
+    private String newPropertyNo;
+
+    @Column(name = "rg_ownername_vc")
+    private String ownerName;
+
+    @Column(name = "rg_reasons_vc" , columnDefinition = "TEXT")
+    private String reasons;
+
+    @Column(name = "rg_others_vc")
+    private String others;
+
+    @Column(name = "rg_respondent_vc")
+    private String respondent;
+
+    @Column(name = "rg_objectiondate_dt")
+    private String objectionDate;
+
+    @Column(name = "rg_oldpropno_vc")
+    private String oldPropertyNo;
+
+    @Column(name = "rg_userdate_vc")
+    private String userDate;
+
+    @Column(name = "rg_usertime_vc")
+    private String userTime;
+
+    @Column(name = "notice_no")
+    private Integer noticeNo;
+
+    @Column(name = "rg_hearingdate_vc")
+    private String hearingDate;
+
+    @Column(name = "rg_hearingtime_vc")
+    private String hearingTime;
+
+    @Column(name = "rg_hearingstatus_vc")
+    private String hearingStatus;
+
+    @Column(name = "rg_applicationno_vc")
+    private String applicationNo;
+
+    @Column(name = "rg_phoneno_vc")
+    private String phoneNo;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "rg_applicationreceiveddate_dt")
+    private String applicationReceivedDate;
+
+    @Column(name = "rg_changedvalue_vc")
+    private String changedValue;
 
 }
 

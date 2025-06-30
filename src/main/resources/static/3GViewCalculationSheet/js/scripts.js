@@ -35,7 +35,7 @@ $.ajax({
                 $('.siteNameLocal').text(councilDetails.localSiteNameVC);
                 $('.districtNameLocal').text(councilDetails.localDistrictNameVC);
                 $('.districtNameStd').text(councilDetails.standardDistrictNameVC);
-                
+
                 if (councilDetails.imageBase64) {
                     $('#councilLogo').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
                     $('#councilLogo1').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
@@ -63,9 +63,13 @@ $.ajax({
     // Construct the URL for the API call
     var apiUrl = '/3g/calculatedDetails/' + propertyId;
 
+
+
     $.ajax({
         url: apiUrl,
         type: 'GET',
+
+
         success: function(data) {
             // Check if data is available
             if (data) {
@@ -238,7 +242,7 @@ $.ajax({
                 $('#proposedMobileTowerFl').text(data.proposedRatableValues.mobileTowerFl || '0');
                 $('#proposedElectricSubstationFl').text(data.proposedRatableValues.electricSubstationFl || '0');
                 $('#proposedTotalFl').text(data.proposedRatableValues.aggregateFl || '0');
-                
+
                 $('#proposedResidentFl1').text(data.proposedRatableValues.residentialFl || '0');
                 $('#proposedCommercialFl1').text(data.proposedRatableValues.commercialFl || '0');
                 $('#proposedReligiousFl1').text(data.proposedRatableValues.religiousFl || '0');
@@ -296,7 +300,7 @@ function populateUnitDetails(units) {
     units.sort((a,b) => {
         const numA = parseInt(a.unitNoVc);
         const numB = parseInt(b.unitNoVc);
-        
+
         if(isNaN(numA) || isNaN(numB)){
             return (a.unitNoVc || '').localeCompare(b.unitNoVc || '');
         }

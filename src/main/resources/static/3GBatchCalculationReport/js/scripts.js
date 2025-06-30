@@ -222,3 +222,94 @@ $(document).ready(function () {
             });
         return Object.values(grouped); // Convert grouped object into an array
     }
+
+
+    // ----------- Chunked Printing Script -----------
+    $(document).ready(function () {
+      $.ajax({
+        url: '/3g/getCouncilDetails',
+        type: 'GET',
+        success: function(data) {
+          if (data && data.length > 0) {
+            const councilDetails = data[0];
+            $('#councilName').text(councilDetails.localName + ' / ' + councilDetails.standardName || 'नगर परिषद');
+            $('#councilName1').text(councilDetails.localName + ' / ' + councilDetails.standardName || 'नगर परिषद');
+            if (councilDetails.imageBase64) {
+              $('#councilLogo').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
+              $('#councilLogo1').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
+            } else {
+              $('#councilLogo').attr('src', 'https://example.com/fallback-image.png');
+              $('#councilLogo1').attr('src', 'https://example.com/fallback-image.png');
+            }
+          } else {
+            $('#councilLogo').attr('src', 'https://example.com/no-data-image.png');
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error fetching council name:', error);
+          $('#councilName').text('-');
+        }
+      });
+
+      // Chunked printing logic
+      let offset = 0;
+      const limit = 100;
+      const wardNo = window.location.pathname.split('/').pop();
+
+      function loadAndPrintChunk(offset) {
+        const apiUrl = `/3g/propertyCalculationSheetReport?wardNo=${wardNo}&offset=${offset}&limit=${limit}`;
+
+        fetch(apiUrl)
+          .then(res => res.json())
+          .then(data => {
+            if (!data || data.length === 0) {
+              alert("✅ All records printed.");
+              return;
+            }
+
+            const groupedProperties = groupByPropertyNumber(data);
+            let htmlContent = '';
+
+            groupedProperties.forEach((property, index) => {
+              let clonedDiv = $('#maindiv').clone().removeAttr('id');
+              populateReportData(clonedDiv, property);
+              htmlContent += `<div style="page-break-after: always;">${clonedDiv.prop('outerHTML')}</div>`;
+            });
+
+            openAndPrint(htmlContent, offset + limit);
+          })
+          .catch(error => console.error('Error fetching data:', error));
+      }
+
+      function openAndPrint(content, nextOffset) {
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Print Chunk</title>
+              <link rel="stylesheet" href="/3GViewCalculationSheet/css/styles.css">
+            </head>
+            <body>${content}</body>
+          </html>
+        `);
+        printWindow.document.close();
+
+        printWindow.onload = () => {
+          printWindow.focus();
+          printWindow.print();
+          printWindow.onafterprint = () => {
+            printWindow.close();
+            loadAndPrintChunk(nextOffset);
+          };
+        };
+      }
+
+      const printBtn = $('<button id="chunkPrintBtn">Start Chunked Printing</button>')
+        .css({ margin: "10px", padding: "8px 16px", fontSize: "16px" })
+        .click(() => {
+          offset = 0;
+          loadAndPrintChunk(offset);
+        });
+
+      $('body').prepend(printBtn);
+    });

@@ -2,7 +2,7 @@
 //then we are getting the ward number with the function getWardNoFromURL(); this is also called on start
 //we are having another ajax to fetch the details with parameters such as wardno
 //to sort the data coming from the server we have groupByPropertyNumber which is sorting the data according there finalpropertynumber
-const getTranslations = new Map();
+const getUnitUsages = new Map();
 let globalYearRange = '';
 document.addEventListener('DOMContentLoaded', () => {
     fetch('/3g/getAllUnitUsageTypes', {
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .then(data => {
         data.forEach(item => {
-            getTranslations.set(item.value, item.uum_usagetypell_vc);
+            getUnitUsages.set(item.value, item.uum_usagetypell_vc);
         });
     })
     .catch(error => console.error('Error fetching unit usage types:', error));
@@ -227,7 +227,7 @@ $(document).ready(function () {
                 return `<div style="display: flex; flex-direction: column; width: 100%; height: 100%;">
                     ${arr.map((item, i) => {
                         const id = Number(item);
-                        const description = isUsageType ? getTranslations.get(id) || '-' : item;
+                        const description = isUsageType ? getUnitUsages.get(id) || '-' : item;
                         return `<div style="border-top: ${i !== 0 ? '1px solid #000' : 'none'}; padding: 5px;">${description}</div>`;
                     }).join('')}
                 </div>`;

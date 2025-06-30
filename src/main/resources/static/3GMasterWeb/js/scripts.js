@@ -271,11 +271,11 @@ if (isValid) {
                     'ownerTypeForm': ['ownerType', 'ownerTypeMarathi'],
                     'ownerCategoryForm': ['englishname', 'marathiname'],
                     'waterConnectionForm': ['waterConnection', 'waterConnectionMarathi'],
-                    'propertyTypeForm': ['englishname', 'name'],
-                    'propertySubTypeForm': ['value', 'englishname', 'marathiname'],
-                    'propertyUsageTypeForm': ['value', 'englishname', 'marathiname'],
-                    'propertyUsageSubTypeForm': ['value', 'englishname', 'marathiname'],
-                    'buildingTypeForm': ['value', 'englishname', 'name'],
+                    'propertyTypeForm': ['standardName', 'localName'],
+                    'propertySubTypeForm': ['id', 'standardName', 'localName'],
+                    'propertyUsageTypeForm': ['id', 'standardName', 'localName'],
+                    'propertyUsageSubTypeForm': ['id', 'standardName', 'localName'],
+                    'buildingTypeForm': ['id', 'standardName', 'localName'],
                     'buildingSubtypeForm': ['value', 'englishname', 'marathiname'],
                     'sewerageForm': ['englishname'],
                     'unitNoForm': ['englishname'],
@@ -327,11 +327,11 @@ populateDropdown('constructionTypeVc', '/3g/constructionClassMasters', 'marathin
 
 
 // populateDropdown('taxRateZoneI', '/3g/getAllZones', 'name');
-fetchAndPopulateTable('/3g/propertytypes', 'existingPropertyTypesTableBody', ['value','englishname', 'name']);
-fetchAndPopulateTable('/3g/propertysubtypes', 'existingPropertySubtypes', ['value','englishname', 'marathiname']);
-fetchAndPopulateTable('/3g/propertyusagetypes', 'existingPropertyUsageTypes', ['value','englishname', 'marathiname']);
-fetchAndPopulateTable('/3g/getSubUsageTypes', 'existingPropertyUsageSubtypesTableBody', ['value', 'englishname', 'marathiname']);
-fetchAndPopulateTable('/3g/getBuildingTypes', 'existingBuildingTypesTableBody', ['value', 'englishname', 'name']);
+fetchAndPopulateTable('/3g/propertytypes', 'existingPropertyTypesTableBody', ['id','standardName', 'localName']);
+fetchAndPopulateTable('/3g/propertysubtypes', 'existingPropertySubtypes', ['id','standardName', 'localName']);
+fetchAndPopulateTable('/3g/propertyusagetypes', 'existingPropertyUsageTypes', ['id','standardName', 'localName']);
+fetchAndPopulateTable('/3g/getSubUsageTypes', 'existingPropertyUsageSubtypesTableBody', ['id', 'standardName', 'localName']);
+fetchAndPopulateTable('/3g/getBuildingTypes', 'existingBuildingTypesTableBody', ['id', 'standardName', 'localName']);
 fetchAndPopulateTable('/3g/getAllBuildingSubTypes', 'existingBuildingSubtypesTableBody', ['value', 'englishname', 'marathiname']);
 fetchAndPopulateTable('/3g/getSewerageTypes', 'existingSewerageTypesTableBody', ['englishname']);
 fetchAndPopulateTable('/3g/unitNumbers', 'existingUnitNumbersTableBody', ['englishname']);
@@ -387,9 +387,9 @@ try {
     let optionsHtml = '<option value="">Select a property type</option>';
     propertyTypes.forEach(type => {
         if (selectId === 'bt-property-type-select') {
-            optionsHtml += `<option value="${type.value},${type.name}">${type.name}</option>`;
+            optionsHtml += `<option value="${type.id},${type.name}">${type.name}</option>`;
         } else {
-            optionsHtml += `<option value="${type.value}">${type.name}</option>`;
+            optionsHtml += `<option value="${type.id}">${type.localName}</option>`;
         }
     });
     selectElement.innerHTML = optionsHtml;
@@ -587,7 +587,7 @@ try {
     let optionsHtml = '<option value="">Select a building type</option>';
     buildingTypes.forEach(type => {
         // Use type.value as the identifier, concatenated with type.name for the option's value
-        optionsHtml += `<option value="${type.value},${type.name}">${type.name}</option>`;
+        optionsHtml += `<option value="${type.id},${type.standardName}">${type.localName}</option>`;
     });
     selectElement.innerHTML = optionsHtml;
 
@@ -1330,6 +1330,17 @@ async function fetchAndPopulateWardsForBatch(endpointUrl, tableBodyId) {
                 viewHearingNotice(ward.wardNo);
             };
             actionsCell.appendChild(viewAssessmentRegisterButton);
+
+            // "View Tax Bills" Button
+            const viewTaxBillsButton = document.createElement('button');
+            viewTaxBillsButton.textContent = 'Tax Bills';
+            viewTaxBillsButton.classList.add('btn', 'btn-primary','mr-2');
+            viewTaxBillsButton.onclick = function() {
+                viewTaxBills(ward.wardNo);
+            };
+
+            actionsCell.appendChild(viewTaxBillsButton);
+
             row.appendChild(actionsCell);
             tableBody.appendChild(row);
 
@@ -1389,8 +1400,7 @@ function viewCalculationSheet(wardNo) {
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 function viewSpecialNotice(wardNo) {
-    window.open('/specialNotice', '_blank', 'noopener,noreferrer');
-    const url = `/3g/calculationSheet/${wardNo}`;
+    const url = `/specialNotice/${wardNo}`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 function viewHearingNotice(wardNo) {
@@ -1401,6 +1411,10 @@ function viewHearingNotice(wardNo) {
 function viewOrderSheet(wardNo) {
     window.open('/orderSheet', '_blank', 'noopener,noreferrer');
     const url = `/3g/calculationSheet/${wardNo}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+function viewTaxBills(wardNo) {
+    const url = `/taxBill/${wardNo}`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 

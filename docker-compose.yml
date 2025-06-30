@@ -16,16 +16,16 @@
 
 version: '3'
 services:
-  arvi-app:
+  arvi-app: #for different env
     build:
       context: .
       dockerfile: Dockerfile
     container_name: arvi-springboot-app
     ports:
-      - "8080:8080"
+      - "8080:8080" #for different env
     environment:
       - DB_HOST=anildb.cntcfzqepwsi.ap-south-1.rds.amazonaws.com
-      - DB_NAME=arvi
+      - DB_NAME=arvi #for different env
       - DB_USER=anildb
       - DB_PASSWORD=anildatabase
 
@@ -119,5 +119,18 @@ services:
     environment:
       - DB_HOST=anildb.cntcfzqepwsi.ap-south-1.rds.amazonaws.com
       - DB_NAME=kundalwadi
+      - DB_USER=anildb
+      - DB_PASSWORD=anildatabase
+
+  kudal-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kudal-springboot-app
+    ports:
+      - "8088:8080"
+    environment:
+      - DB_HOST=anildb.cntcfzqepwsi.ap-south-1.rds.amazonaws.com
+      - DB_NAME=kudal
       - DB_USER=anildb
       - DB_PASSWORD=anildatabase

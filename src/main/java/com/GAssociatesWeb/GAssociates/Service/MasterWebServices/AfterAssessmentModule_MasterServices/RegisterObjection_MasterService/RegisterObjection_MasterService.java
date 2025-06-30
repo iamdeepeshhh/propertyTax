@@ -1,4 +1,7 @@
-package com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.RegisterObjection_Services;
+package com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.RegisterObjection_MasterService;
 
-public interface RegisterObjection_Service {
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.RegisterObjection_Dto.RegisterObjection_Dto;
+
+public interface RegisterObjection_MasterService {
+    public void saveObjection(RegisterObjection_Dto dto);
 }
