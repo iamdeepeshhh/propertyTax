@@ -1,0 +1,2 @@
+package com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AfterAssessmentModule_MasterRepository.RegisterObjection_MasterRepository;public interface RegisterObjection_MasterRepository {
+}

@@ -1,0 +1,4 @@
+package com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.RegisterObjection_Services;
+
+public class RegisterObjection_ServiceImpl {
+}
