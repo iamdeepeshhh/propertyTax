@@ -49,7 +49,7 @@ body {
 
 .title-text h1 {
   background-color: #4a1313;
-  font-size: 14px;
+  font-size: 12px;
   margin: 0;
   color: white;
   padding: 9px;
@@ -220,7 +220,7 @@ h2 {
 
 .G1 {
   font-family: 'Devanagari', Arial, sans-serif;
-  font-size: 12px;
+  font-size: 7px;
   line-height: 1.8;
   text-align: justify;
   margin-top: 10px;
@@ -228,7 +228,7 @@ h2 {
 
 .G1 p {
   text-indent: 50px; /* This gives space at the front of paragraph */
-  font-size: 12px;
+  font-size: 7px;
 }
 
 
@@ -236,7 +236,7 @@ h2 {
 .G1-paragraph a {
   color: black;
   text-decoration: underline;
-  font-size: 12px;
+  font-size: 7px;
 }
 
 

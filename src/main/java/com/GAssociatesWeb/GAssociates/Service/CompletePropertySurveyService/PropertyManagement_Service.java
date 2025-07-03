@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface PropertyManagement_Service {
@@ -23,4 +24,5 @@ public interface PropertyManagement_Service {
     public CompleteProperty_Dto updateCompleteProperty(CompleteProperty_Dto completePropertyDto);
     public void uploadPropertyImage(String propertyId, MultipartFile propertyImage);
     public void uploadCadImage(String propertyId, MultipartFile cadImage);
+    public Map<String, String> getPropertiesCount();
 }

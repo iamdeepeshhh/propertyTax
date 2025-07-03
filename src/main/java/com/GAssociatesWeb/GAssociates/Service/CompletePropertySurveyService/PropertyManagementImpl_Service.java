@@ -5,6 +5,7 @@ import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.PropertyDetails_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.UnitBuiltUp_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.UnitDetails_Dto;
 import com.GAssociatesWeb.GAssociates.Entity.PropertySurveyEntity.CompletePropertySurvey_Entity.PropertyDetails_Entity.PropertyDetails_Entity;
+import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.WardTypes_MasterRepository.Ward_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.PropertySurveyRepository.PropertyDetails_Repository;
 import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.PropertyDetails_Service.PropertyDetails_Service;
 import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.PropertyNumberGenerator_Service.UniqueIdGenerator;
@@ -17,9 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,14 +27,16 @@ public class PropertyManagementImpl_Service implements PropertyManagement_Servic
     private final UnitDetails_Service unitDetails_Service;
     private final UnitBuiltUp_Service unitBuiltUp_Service;
     private final PropertyDetails_Repository propertyDetails_repository;
+    private final Ward_MasterRepository ward_masterRepository;
     private final UniqueIdGenerator uniqueIdGenerator;
 
     @Autowired
-    public PropertyManagementImpl_Service(PropertyDetails_Service propertyDetailsService, UnitDetails_Service unitDetailsService, UnitBuiltUp_Service unitBuiltUpService, PropertyDetails_Repository propertyDetailsRepository, UniqueIdGenerator uniqueIdGenerator) {
+    public PropertyManagementImpl_Service(PropertyDetails_Service propertyDetailsService, UnitDetails_Service unitDetailsService, UnitBuiltUp_Service unitBuiltUpService, PropertyDetails_Repository propertyDetails_Repository, Ward_MasterRepository wardMaster_Repository, UniqueIdGenerator uniqueIdGenerator) {
         this.propertyDetails_Service = propertyDetailsService;
         this.unitDetails_Service = unitDetailsService;
         this.unitBuiltUp_Service = unitBuiltUpService;
-        this.propertyDetails_repository = propertyDetailsRepository;
+        this.propertyDetails_repository = propertyDetails_Repository;
+        this.ward_masterRepository = wardMaster_Repository;
         this.uniqueIdGenerator = uniqueIdGenerator;
     }
 
@@ -242,5 +243,20 @@ public class PropertyManagementImpl_Service implements PropertyManagement_Servic
     @Override
     public void uploadCadImage(String propertyId, MultipartFile cadImage) {
         propertyDetails_Service.uploadCadImage(propertyId, cadImage);
+    }
+
+    @Override
+    public Map<String, String> getPropertiesCount(){
+        List<Object[]> result = propertyDetails_repository.getWardWiseCount();
+        Map<String, String> analysis = new LinkedHashMap<>();
+        int total = 0;
+        for (Object[] row : result) {
+            Integer wardNo = (Integer) row[0];
+            Long count = (Long) row[1];
+            analysis.put("Ward " + wardNo, String.valueOf(count));
+            total += count;
+        }
+        analysis.put("Total", String.valueOf(total));
+        return analysis;
     }
 }

@@ -1072,5 +1072,9 @@ public class PropertySurveyController {
         return "3GEditSurveyForm";
     }
 
-
+    @GetMapping("/getPropertiesCount")
+    public ResponseEntity<Map<String, String>> getWardWisePropertyCount() {
+        Map<String, String> analysis = propertyManagement_service.getPropertiesCount();
+        return ResponseEntity.ok(analysis);
+    }
 }

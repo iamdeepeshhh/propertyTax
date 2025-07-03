@@ -45,9 +45,9 @@
   </nav>
 </header>
 
-
+<main>
 <nav class="navbar navbar-expand-lg navbar-light w-10">
-  <div class="container">
+  <div class="container-fluid justify-content-start">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -56,6 +56,9 @@
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
           <a class="nav-link" href="#" onclick="showTab('home')">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/3g/userManagement">Users</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownPropertyDetails" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -199,37 +202,16 @@
 </nav>
 
 <!-- Content goes here -->
-
-
-
 <section id="home" class="container mt-5">
+  <h2>Welcome to 3G Associates Property Survey System</h2>
+  <p>This dashboard helps you manage all master records related to property tax and assessment.</p>
+
   <div class="row">
-    <div class="col-md-4">
-      <div class="card text-center mb-4">
-        <div class="card-body">
-          <h5 class="card-title">User Management</h5>
-          <a href="/3g/userManagement" class="btn btn-primary">Manage Users</a>
-        </div>
-      </div>
-    </div>
-<!--    <div class="col-md-4">-->
-<!--      <div class="card text-center mb-4">-->
-<!--        <div class="card-body">-->
-<!--          <h5 class="card-title">Download Template</h5>-->
-<!--          <a href="/3g/download-template" class="btn btn-primary">Download Excel Template</a>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-    <div class="col-md-4">
-      <div class="card text-center mb-4">
-        <div class="card-body">
-          <h5 class="card-title">Upload Old Property Details</h5>
-          <form id="uploadForm" enctype="multipart/form-data">
-            <div class="mb-3">
-              <input type="file" class="form-control" id="excelFile" name="file">
-            </div>
-            <button class="btn btn-success" type="submit">Upload</button>
-          </form>
+    <div class="col-md-6">
+      <div style="border: 1px solid #ddd; border-radius: 8px; padding: 16px; text-align: center; background-color: #f8f9fa; width: 230%">
+        <h5 style="font-weight: bold; color: #343a40;">Ward Wise Property Count</h5>
+        <div id="wardTilesContainer" class="ward-tiles-wrapper">
+          <!-- Tiles will be inserted here by JavaScript -->
         </div>
       </div>
     </div>
@@ -1926,56 +1908,54 @@
 </section>
 
 
+<!-- Survey Reports Section -->
 <section id="surveyReports" class="container mt-5">
   <h2>Survey Reports</h2>
 
   <!-- Search Form -->
   <div class="card">
     <div class="card-body">
-        <form id="searchForm" class="form-inline justify-content-center">
-            <div class="form-row align-items-center">
-                <div class="col-md-3 mx-2">
-                    <label for="spnInput" class="sr-only">SPN:</label>
-                    <input type="text" class="form-control mb-2" id="spnInput" placeholder="Enter SPN...">
-                </div>
-                <div class="col-md-3 mx-2">
-                    <label for="ownerNameInput" class="sr-only">Owner Name:</label>
-                    <input type="text" class="form-control mb-2" id="ownerNameInput" placeholder="Enter Owner Name...">
-                </div>
-                <div class="col-md-3 mx-2">
-                    <label for="wardNumberInput" class="sr-only">Ward Number:</label>
-                    <input type="number" class="form-control mb-2" id="wardNumberInput" placeholder="Enter Ward Number...">
-                </div>
-                <div class="col-md-1 mx-2">
-                    <button type="button" id="searchButtonSurvey" class="btn btn-success mb-2">Search</button>
-                </div>
-            </div>
-        </form>
+      <form id="searchForm" class="form-inline justify-content-center">
+        <div class="form-row align-items-center">
+          <div class="col-md-3 mx-2">
+            <input type="text" class="form-control mb-2" id="spnInput" placeholder="Enter SPN...">
+          </div>
+          <div class="col-md-3 mx-2">
+            <input type="text" class="form-control mb-2" id="ownerNameInput" placeholder="Enter Owner Name...">
+          </div>
+          <div class="col-md-3 mx-2">
+            <input type="number" class="form-control mb-2" id="wardNumberInput" placeholder="Enter Ward Number...">
+          </div>
+          <div class="col-md-1 mx-2">
+            <button type="button" id="searchButtonSurvey" class="btn btn-success mb-2">Search</button>
+          </div>
+        </div>
+      </form>
     </div>
-</div>
-  <!-- Survey Reports Table -->
-  <div class="container mt-5 table-container">
-      <table class="table-extended table-bordered table-hover">
-          <thead class="thead-dark">
-              <tr>
-                <th class="center-text" >#</th>
-                <th class="center-text" >SPN</th>
-                <th class="center-text" >Owner Name</th>
-                <th class="center-text" >Record Owner</th>
-                <th class="center-text" >Creation Time</th>
-                <th class="center-text" >Address</th>
-                <th class="center-text" >Ward</th>
-                <th class="center-text" >Zone</th>
-                <th class="center-text" >Actions</th>
-              </tr>
-          </thead>
-          <tbody id="searchResultsSurvey">
-              <!-- Search results will be inserted here -->
-          </tbody>
+  </div>
+
+  <!-- Centered Scrollable Table -->
+  <div class="mt-4 d-flex justify-content-center">
+    <div style="overflow-x: auto; max-height: 500px; width: auto; min-width: 80%;">
+      <table class="table-extended table-bordered table-hover" style="min-width: 1000px; text-align: center;">
+        <thead class="thead-dark">
+          <tr>
+            <th>#</th>
+            <th>SPN</th>
+            <th>Owner Name</th>
+            <th>Record Owner</th>
+            <th>Creation Time</th>
+            <th>Address</th>
+            <th>Ward</th>
+            <th>Zone</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="searchResultsSurvey">
+          <!-- Data will populate here -->
+        </tbody>
       </table>
-      <div class="no-results" style="display:none;">
-          <p class="alert alert-warning">No results found.</p>
-      </div>
+    </div>
   </div>
 </section>
 
@@ -1985,73 +1965,78 @@
   <!-- Search Form -->
   <div class="card">
     <div class="card-body">
-        <form id="searchForm" class="form-inline justify-content-center">
-            <div class="form-row align-items-center">
-                <div class="col-md-3 mx-2">
-                    <label for="spnInput" class="sr-only">SPN:</label>
-                    <input type="text" class="form-control mb-2" id="spnInput" placeholder="Enter SPN...">
-                </div>
-                <div class="col-md-3 mx-2">
-                    <label for="ownerNameInput" class="sr-only">Owner Name:</label>
-                    <input type="text" class="form-control mb-2" id="ownerNameInput" placeholder="Enter Owner Name...">
-                </div>
-                <div class="col-md-3 mx-2">
-                    <label for="wardNumberInput" class="sr-only">Ward Number:</label>
-                    <input type="number" class="form-control mb-2" id="wardNumberInput" placeholder="Enter Ward Number...">
-                </div>
-                <div class="col-md-1 mx-2">
-                    <button type="button" id="searchButtonUpload" class="btn btn-success mb-2">Search</button>
-                </div>
-            </div>
-        </form>
+      <form id="searchForm" class="form-inline justify-content-center">
+        <div class="form-row align-items-center">
+          <div class="col-md-3 mx-2">
+            <input type="text" class="form-control mb-2" id="spnInput" placeholder="Enter SPN...">
+          </div>
+          <div class="col-md-3 mx-2">
+            <input type="text" class="form-control mb-2" id="ownerNameInput" placeholder="Enter Owner Name...">
+          </div>
+          <div class="col-md-3 mx-2">
+            <input type="number" class="form-control mb-2" id="wardNumberInput" placeholder="Enter Ward Number...">
+          </div>
+          <div class="col-md-1 mx-2">
+            <button type="button" id="searchButtonUpload" class="btn btn-success mb-2">Search</button>
+          </div>
+        </div>
+      </form>
     </div>
-</div>
-  <!-- Survey Reports Table -->
-  <div class="container mt-5 table-container">
-      <table class="table-extended table-bordered table-hover">
-          <thead class="thead-dark">
-              <tr>
-                <th class="center-text" >#</th>
-                <th class="center-text" >SPN</th>
-                <th class="center-text" >Owner Name</th>
-                <th class="center-text" >Record Owner</th>
-                <th class="center-text" >Creation Time</th>
-                <th class="center-text" >Address</th>
-                <th class="center-text" >Ward</th>
-                <th class="center-text" >Zone</th>
-                <th class="center-text" >Actions</th>
-              </tr>
-          </thead>
-          <tbody id="searchResultsUpload">
-              <!-- Search results will be inserted here -->
-          </tbody>
-      </table>
-      <div class="no-results" style="display:none;">
-          <p class="alert alert-warning">No results found.</p>
-      </div>
   </div>
-</section>
 
-<section id="batchReports" class="container mt-5">
-  <h2 class="mb-4">Batch Reports</h2>
-  <div class="container mt-5" >
-    <h3>Existing Wards</h3>
-    <div class="container mt-5 table-container"  style="background-color: white">
-      <table class="table-extended table-bordered table-hover">
+  <!-- Scrollable Centered Table -->
+  <div class="mt-4 d-flex justify-content-center">
+    <div style="overflow-x: auto; max-height: 1000px; width: auto; min-width: 80%;">
+      <table class="table-extended table-bordered table-hover" style="min-width: 1000px; text-align: center;">
         <thead class="thead-dark">
-        <tr>
-          <th class="center-text">#</th>
-          <th class="center-text">Ward Number</th>
-          <th class="center-text">Reports</th>
-        </tr>
+          <tr>
+            <th>#</th>
+            <th>SPN</th>
+            <th>Owner Name</th>
+            <th>Record Owner</th>
+            <th>Creation Time</th>
+            <th>Address</th>
+            <th>Ward</th>
+            <th>Zone</th>
+            <th>Actions</th>
+          </tr>
         </thead>
-        <tbody id="wardsTableBody">
-        <!-- Dynamic rows will be populated here -->
+        <tbody id="searchResultsUpload">
+          <!-- Data will populate here -->
         </tbody>
       </table>
     </div>
   </div>
 </section>
+
+<!-- Batch Reports Section -->
+<section id="batchReports" class="container mt-5">
+  <h2 class="mb-4">Batch Reports</h2>
+
+  <div class="mt-4">
+    <h3>Existing Wards</h3>
+
+    <!-- Centered Scrollable Table Wrapper -->
+    <div class="d-flex justify-content-center mt-4">
+      <div style="overflow-x: auto; max-height: 500px; width: auto;">
+        <table class="table-extended table-bordered table-hover"
+               style="min-width: 2000px; text-align: center;">
+          <thead class="thead-dark">
+            <tr>
+              <th class="center-text">#</th>
+              <th class="center-text">Ward Number</th>
+              <th class="center-text">Reports</th>
+            </tr>
+          </thead>
+          <tbody id="wardsTableBody">
+            <!-- Dynamic rows will be populated here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
 
 <section id="councilDetails" class="container mt-4">
   <h2 class="mb-4">Council Details</h2>
@@ -2135,6 +2120,7 @@
       </div>
   </div>
 </div>
+</main>
 <footer>
   <p>© 2024 3G Associates. All rights reserved.</p>
 </footer>

@@ -142,3 +142,57 @@ body {
     font-size: 24px; /* Increased font size for navbar text */
     padding-left: 10px; /* Add left padding to move the text to the right */
 }
+
+/*Media Query*/
+
+@media (max-width : 780px) and (min-width: 150px){
+
+   .login-container{
+        flex-direction: column;
+        width: 90%;
+        height: auto;
+   }
+
+   .image-slideshow{
+       order: -1;
+       width: 100%;
+       height:auto;
+       display : block;
+       justify-content:center;
+       align-items: center;
+       padding: 30px 75px;
+   }
+
+   .image-slideshow img{
+
+       position: static;
+       width: 50%;
+       height: auto;
+       opacity:1;
+   }
+
+   .image-slideshow img.active{
+       opacity: 1;
+       z-index: 1;
+
+   }
+
+   .login-form{
+      width: 100%;
+      padding: 20px;
+   }
+
+   .form-group input,
+   .styled-dropdown,
+   .btns input{
+       width: 100%;
+       box-sizing: border-box;
+
+
+   }
+
+   .btns{
+        flex-direction: column;
+        gap: 10px;
+   }
+}

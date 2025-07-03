@@ -33,19 +33,16 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch('/3g/getCouncilDetails')
         .then(response => response.json())
         .then(data => {
-            // Check if data is an array and has at least one element
             if (Array.isArray(data) && data.length > 0 && data[0].standardName) {
                 // Set the council name in the navbar if available
                 document.getElementById('councilName').textContent = data[0].standardName;
             } else {
                 console.error('Council details not found or response is invalid.');
-                // Set a default name if there's an issue with fetching
                 document.getElementById('councilName').textContent = '3G Associates';
             }
         })
         .catch(error => {
             console.error('Error fetching council details:', error);
-            // Set a default name in case of an error
             document.getElementById('councilName').textContent = '3G Associates';
         });
 });
@@ -276,11 +273,11 @@ if (isValid) {
                     'propertyUsageTypeForm': ['id', 'standardName', 'localName'],
                     'propertyUsageSubTypeForm': ['id', 'standardName', 'localName'],
                     'buildingTypeForm': ['id', 'standardName', 'localName'],
-                    'buildingSubtypeForm': ['value', 'englishname', 'marathiname'],
+                    'buildingSubtypeForm': ['id', 'standardName', 'localName'],
                     'sewerageForm': ['englishname'],
                     'unitNoForm': ['englishname'],
                     'unitFloorNoForm': ['englishname'],
-                    'unitUsageTypeForm': ['uum_usagetypeeng_vc', 'uum_usagetypell_vc','uum_rvtype_vc'],
+                    'unitUsageTypeForm': ['standardName', 'localName','uum_rvtype_vc'],
                     'unitUsageSubTypeForm': ['uum_usagetypeeng_vc','usm_usagetypeeng_vc', 'usm_usagetypell_vc','usm_usercharges_i','usmApplyDifferentRateVc','usm_rvtype_vc'],
                     'constructionClassForm': ['englishname', 'marathiname', 'Deduction'],
                     'assessmentDatesForm': ['firstassessmentdate', 'currentassessmentdate', 'lastassessmentdate'],
@@ -332,12 +329,12 @@ fetchAndPopulateTable('/3g/propertysubtypes', 'existingPropertySubtypes', ['id',
 fetchAndPopulateTable('/3g/propertyusagetypes', 'existingPropertyUsageTypes', ['id','standardName', 'localName']);
 fetchAndPopulateTable('/3g/getSubUsageTypes', 'existingPropertyUsageSubtypesTableBody', ['id', 'standardName', 'localName']);
 fetchAndPopulateTable('/3g/getBuildingTypes', 'existingBuildingTypesTableBody', ['id', 'standardName', 'localName']);
-fetchAndPopulateTable('/3g/getAllBuildingSubTypes', 'existingBuildingSubtypesTableBody', ['value', 'englishname', 'marathiname']);
+fetchAndPopulateTable('/3g/getAllBuildingSubTypes', 'existingBuildingSubtypesTableBody', ['id', 'standardName', 'localName']);
 fetchAndPopulateTable('/3g/getSewerageTypes', 'existingSewerageTypesTableBody', ['englishname']);
 fetchAndPopulateTable('/3g/unitNumbers', 'existingUnitNumbersTableBody', ['englishname']);
 fetchAndPopulateTable('/3g/getUnitFloorNos', 'existingUnitFloorNumbersTableBody', ['englishname']);
-fetchAndPopulateTable('/3g/getAllUnitUsageTypes', 'existingUnitUsageTypesTableBody', ['uum_usagetypeeng_vc', 'uum_usagetypell_vc','uum_rvtype_vc'],'/3g/deleteUnitUsageById','/3g/updateUnitUsageById');
-fetchAndPopulateTable('/3g/getAllUnitUsageSubTypes', 'existingUnitUsageSubtypesTableBody', ['uum_usagetypeeng_vc','usm_usagetypeeng_vc', 'usm_usagetypell_vc','usm_usercharges_i','usmApplyDifferentRateVc','usm_rvtype_vc'],'/3g/deleteUnitUsagesSub','/3g/updateUnitUsagesSub');
+fetchAndPopulateTable('/3g/getAllUnitUsageTypes', 'existingUnitUsageTypesTableBody', ['standardName', 'localName','uum_rvtype_vc'],'/3g/deleteUnitUsageById','/3g/updateUnitUsageById');
+fetchAndPopulateTable('/3g/getAllUnitUsageSubTypes', 'existingUnitUsageSubtypesTableBody', ['uum_usagetypeeng_vc','standardName', 'localName','userCharges','usmApplyDifferentRateVc','usm_rvtype_vc'],'/3g/deleteUnitUsagesSub','/3g/updateUnitUsagesSub');
 fetchAndPopulateTable('/3g/constructionClassMasters', 'existingConstructionClassesTableBody', ['englishname', 'marathiname', 'Deduction'],'deleteConstructionClassMastersById');
 fetchAndPopulateTable('/3g/getAllAssessmentDates', 'existingAssessmentDatesTableBody', ['firstassessmentdate', 'currentassessmentdate', 'lastassessmentdate'], '/3g/deleteAssessmentById');
 fetchAndPopulateTable('/3g/occupancyMasters', 'existingOccupanciesTableBody', ['englishname', 'marathiname', 'value']);
@@ -387,7 +384,7 @@ try {
     let optionsHtml = '<option value="">Select a property type</option>';
     propertyTypes.forEach(type => {
         if (selectId === 'bt-property-type-select') {
-            optionsHtml += `<option value="${type.id},${type.name}">${type.name}</option>`;
+            optionsHtml += `<option value="${type.id},${type.localName}">${type.localName}</option>`;
         } else {
             optionsHtml += `<option value="${type.id}">${type.localName}</option>`;
         }
@@ -428,6 +425,8 @@ selectElement.addEventListener('change', function() {
 
 });
 }
+
+
 async function initializePropertySubtypesBasedOnType(propertyTypeId, subtypeSelectId, apiUrl) {
 const propertyTypeSelectElement = document.getElementById(propertyTypeId);
 const subtypeSelectElement = document.getElementById(subtypeSelectId);
@@ -450,7 +449,7 @@ propertyTypeSelectElement.addEventListener('change', async function() {
         // Populate the subtype select element with options based on the fetched data.
         let optionsHtml = '<option value="">Select a property subtype</option>';
         propertySubtypes.forEach(subtype => {
-            optionsHtml += `<option value="${subtype.value}">${subtype.name}</option>`;
+            optionsHtml += `<option value="${subtype.id}">${subtype.localName}</option>`;
         });
         subtypeSelectElement.innerHTML = optionsHtml;
 
@@ -477,6 +476,8 @@ subtypeSelectElement.addEventListener('change', function() {
     localStorage.setItem(`${subtypeSelectId}-name`, selectedName);
 });
 }
+
+
 async function initializePropertyUsageTypesBasedOnSubtype(propertySubtypeId, usageTypeSelectId, apiUrl) {
 const propertySubtypeSelectElement = document.getElementById(propertySubtypeId);
 const usageTypeSelectElement = document.getElementById(usageTypeSelectId);
@@ -500,7 +501,7 @@ propertySubtypeSelectElement.addEventListener('change', async function() {
         // Populate the usage type select element with options based on the fetched data.
         let optionsHtml = '<option value="">Select a property usage type</option>';
         propertyUsageTypes.forEach(usageType => {
-            optionsHtml += `<option value="${usageType.value}">${usageType.name}</option>`;
+            optionsHtml += `<option value="${usageType.id}">${usageType.localName}</option>`;
         });
         usageTypeSelectElement.innerHTML = optionsHtml;
 
@@ -527,6 +528,8 @@ usageTypeSelectElement.addEventListener('change', function() {
     localStorage.setItem(`${usageTypeSelectId}-name`, selectedName);
 });
 }
+
+
 async function initializeUnitUsageTypesBasedOnPropertyUsage(propertyUsageId, unitUsageTypeSelectId, apiUrl) {
 const propertyUsageSelectElement = document.getElementById(propertyUsageId);
 const unitUsageTypeSelectElement = document.getElementById(unitUsageTypeSelectId);
@@ -548,7 +551,7 @@ propertyUsageSelectElement.addEventListener('change', async function() {
         // Populate the unit usage type select element with options based on the fetched data.
         let optionsHtml = '<option value="">Select a unit usage type</option>';
         unitUsageTypes.forEach(usageType => {
-            optionsHtml += `<option value="${usageType.value}">${usageType.name}</option>`;
+            optionsHtml += `<option value="${usageType.id}">${usageType.localName}</option>`;
         });
         unitUsageTypeSelectElement.innerHTML = optionsHtml;
 
@@ -575,6 +578,8 @@ unitUsageTypeSelectElement.addEventListener('change', function() {
     localStorage.setItem(`${unitUsageTypeSelectId}-name`, selectedName);
 });
 }
+
+
 async function initializeBuildingTypesAndCaptureSelection(selectId, apiUrl) {
 const selectElement = document.getElementById(selectId);
 
@@ -616,6 +621,8 @@ try {
     console.error(`Error initializing building types for select #${selectId}:`, error);
 }
 }
+
+
 async function fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEndpointUrl = null, updateEndpointUrl = null) {
     try {
         const response = await fetch(endpointUrl);
@@ -657,7 +664,7 @@ async function fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEn
                 deleteButton.textContent = 'Delete';
                 deleteButton.classList.add('btn', 'btn-danger', 'mr-2');
                 deleteButton.onclick = function() {
-                    deleteRecord(item.value, deleteEndpointUrl, () => {// here we would require id to be changed to value and all should be uniform like value in usm psm n all
+                    deleteRecord(item.id, deleteEndpointUrl, () => {// here we would require id to be changed to value and all should be uniform like value in usm psm n all
                         // Refresh the table after successful deletion
                         fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEndpointUrl, updateEndpointUrl);
                     });
@@ -688,6 +695,7 @@ async function fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEn
         console.error(`Error fetching data from ${endpointUrl}:`, error);
     }
 }
+
 
 function editRecord(row, item, columns, updateEndpointUrl, onSuccess) {
     const originalCells = [];
@@ -777,6 +785,7 @@ function editRecord(row, item, columns, updateEndpointUrl, onSuccess) {
     actionsCell.appendChild(cancelButton);
 }
 
+
 function updateTaxRate() {
     const formData = new FormData(document.getElementById('updateTaxRateForm'));
     const dataObject = {};
@@ -786,6 +795,7 @@ function updateTaxRate() {
     });
     updateRecord(dataObject, '/3g/updateConsolidatedTax', () => location.reload());
 }
+
 
 function updateRvRate() {
     const formData = new FormData(document.getElementById('updateRateForm'));
@@ -820,6 +830,7 @@ function updateRvRate() {
     updateRecord(dataObject, '/3g/updateRVType', () => fetchAndPopulateTable('/3g/getAllRVTypes', 'existingRVTypesTableBody', ['typeNameVc','rateFl','appliedTaxesVc','descriptionVc']))
 }
 
+
 function updateRecord(data, updateEndpointUrl, onSuccess) {
     const id = data.value || data[Object.keys(data)[0]]; // Assuming the first key is the ID
 
@@ -843,6 +854,8 @@ function updateRecord(data, updateEndpointUrl, onSuccess) {
         alert('An unexpected error occurred. Please try again later.');
     });
 }
+
+
 function cancelEdit(row, originalCells, originalActions, updateEndpointUrl, onSuccess) {
     row.querySelectorAll('td:not(:last-child)').forEach((cell, index) => {
         cell.innerHTML = originalCells[index];
@@ -864,6 +877,7 @@ function cancelEdit(row, originalCells, originalActions, updateEndpointUrl, onSu
         });
     };
 }
+
 
 async function deleteRecord(id, deleteEndpointUrl, onSuccess) {
 if (confirm('Are you sure you want to delete this record?')) {
@@ -889,25 +903,27 @@ if (confirm('Are you sure you want to delete this record?')) {
 }
 }
 
-document.getElementById('uploadForm').addEventListener('submit', function(event) {
-event.preventDefault();
-const form = document.getElementById('uploadForm');
-const formData = new FormData(form);
 
-fetch('/3g/uploadExcel', {
-    method: 'POST',
-    body: formData
-})
-.then(response => response.text())
-.then(data => {
-    alert(data);
-    form.reset();  // Reset the form after successful submission
-})
-.catch(error => {
-    console.error('Error uploading file:', error);
-    alert('Error uploading file. Please try again.');
-});
-});
+//document.getElementById('uploadForm').addEventListener('submit', function(event) {
+//event.preventDefault();
+//const form = document.getElementById('uploadForm');
+//const formData = new FormData(form);
+//
+//fetch('/3g/uploadExcel', {
+//    method: 'POST',
+//    body: formData
+//})
+//.then(response => response.text())
+//.then(data => {
+//    alert(data);
+//    form.reset();  // Reset the form after successful submission
+//})
+//.catch(error => {
+//    console.error('Error uploading file:', error);
+//    alert('Error uploading file. Please try again.');
+//});
+//});
+
 
 // fetchPropertyRecords is the method getting used for searching the properties and setting them into the table
 function fetchPropertyRecords(endpointUrl, queryParams, tableBodyId, actionType, columns) {
@@ -970,6 +986,7 @@ function getActionButtons(actionType, item) {
     return '';
 }
 
+
 // performSearch to get the searching parameters from the sections such as surveyreports and uploadfiles
 function performSearch(sectionId) {
     const spn = document.querySelector(`#${sectionId} #spnInput`).value.trim();
@@ -987,6 +1004,7 @@ function performSearch(sectionId) {
     fetchPropertyRecords('/3g/searchNewProperties', searchParams, tableBodyId, actionType, ['pdSurypropnoVc', 'pdOwnernameVc', 'user_id', 'createddateVc', 'pdPropertyaddressVc', 'pdWardI', 'pdZoneI']);
 }
 
+
 document.getElementById('searchButtonSurvey').addEventListener('click', function() {
     performSearch('surveyReports');
 });
@@ -999,10 +1017,14 @@ function viewSurveyReport(pdNewpropertynoVc) {
 console.log('View property:', pdNewpropertynoVc);
 window.open('/3g/showsurvey/' + pdNewpropertynoVc, '_blank', 'noopener,noreferrer');
 }
+
+
 function viewCalculationSheet(pdNewpropertynoVc) {
 console.log('View property:', pdNewpropertynoVc);
 window.open('/3g/calculationSheet/' + pdNewpropertynoVc, '_blank', 'noopener,noreferrer');
 }
+
+
 function viewBatchAssessmentReport() {
  const wardNo = document.getElementById('batchReportWard').value;
     if (!wardNo) {
@@ -1012,6 +1034,8 @@ function viewBatchAssessmentReport() {
     const url = `/3g/batchAssessmentReport/${wardNo}`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
+
+
 function showDeleteModal(pdNewpropertynoVc,surveyPropNo,ownerName,createdBy,ward) {
 console.log('Show delete modal for property:', pdNewpropertynoVc);
 deletePropNo = pdNewpropertynoVc;
@@ -1022,6 +1046,8 @@ deleteWard = ward;
 // Show the delete modal
 $('#deleteModal').modal('show');
 }
+
+
 function uploadFile(newPropertyNo, fileType) {
     const fileInput = Object.assign(document.createElement('input'), { type: 'file', accept: 'image/*', style: 'display:none' });
 
@@ -1040,6 +1066,8 @@ function uploadFile(newPropertyNo, fileType) {
     fileInput.click();
     document.body.removeChild(fileInput);
 }
+
+
 //so after we upload file the image will be passed into the compressimage function then-
 //-callback function which we will use is sendCompressedBlob() given below
 function sendCompressedBlob(propertyNo, blob, fileName, uploadType) {
@@ -1057,6 +1085,7 @@ function sendCompressedBlob(propertyNo, blob, fileName, uploadType) {
         alert('Unexpected error.');
     });
 }
+
 
 // Confirm deletion button in modal
 $('#confirmDeleteButton').on('click', function() {
@@ -1541,3 +1570,37 @@ function compressImage(file,maxWidth,maxHeight, previewId, callback) {
 
     reader.readAsDataURL(file);
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  fetch('/3gSurvey/getPropertiesCount')
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('wardTilesContainer');
+      let total = 0;
+
+      Object.entries(data).forEach(([key, value]) => {
+        if (key.toLowerCase() !== 'total') {
+          const tile = document.createElement('div');
+          tile.className = 'ward-tile';
+          tile.innerHTML = `
+            <div class="ward-name">${key}</div>
+            <div class="ward-count">${value}</div>
+          `;
+          container.appendChild(tile);
+        } else {
+          total = value;
+        }
+      });
+
+      // Optional: show total as a separate tile
+      const totalTile = document.createElement('div');
+      totalTile.className = 'ward-tile';
+      totalTile.style.backgroundColor = '#d4edda';
+      totalTile.innerHTML = `
+        <div class="ward-name">Total</div>
+        <div class="ward-count">${total}</div>
+      `;
+      container.appendChild(totalTile);
+    })
+    .catch(err => console.error('Failed to load ward data:', err));
+});

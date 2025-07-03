@@ -706,12 +706,12 @@
     var totallegalarea = document.getElementById(`LegalAssmtArea1-${unitId}`).value;
     var totalillegalarea = document.getElementById(`IllegalAssmtArea1-${unitId}`).value;
     var totalareabefded = document.getElementById(`TotalAreaBeforeDeduction-${unitId}`).value;
-    
+
     if (!totalCarpetArea || isNaN(totalCarpetArea)) {
     alert("Please enter a valid carpet area.");
     return;
     }
-    
+
     document.getElementById(`totalcarpetarea${unitId}`).value = totalCarpetArea;
     document.getElementById(`totalexemptedarea${unitId}`).value = totalExemptedArea;
     document.getElementById(`totalplotarea${unitId}`).value = totalplotarea;
@@ -722,7 +722,7 @@
     updateAreas(unitId);
     closePopup(unitId);
     }
-    
+
     function closePopup(unitId) {
     var popup = document.getElementById('popup-' + unitId);
     if (popup) {
@@ -1039,14 +1039,30 @@
     }
     });
     
-    document.getElementById(`TotalCarpetArea-${unitId}`).value = totalCarpetArea ? totalCarpetArea.toFixed(2) : '0';
-    document.getElementById(`TotalPlotArea-${unitId}`).value = totalPlotArea ? totalPlotArea.toFixed(2) : '0';
-    document.getElementById(`ExemptionArea1-${unitId}`).value = totalExemptionArea ? totalExemptionArea.toFixed(2) : '0';
-    document.getElementById(`AssArea1-${unitId}`).value = totalAssumptionArea ? totalAssumptionArea.toFixed(2) : '0';
-    document.getElementById(`LegalAssmtArea1-${unitId}`).value = totalLegalArea ? totalLegalArea.toFixed(2) : '0';
-    document.getElementById(`IllegalAssmtArea1-${unitId}`).value = totalIllegalArea ? totalIllegalArea.toFixed(2) : '0';
-    document.getElementById(`TotalAreaBeforeDeduction-${unitId}`).value = totalAreaBeforeDeduction ? totalAreaBeforeDeduction.toFixed(2) : '0'; // Added line
-    document.querySelector(`#unitrooms${unitId}`).value = unitRoomCount;
+    const totalCarpetField = document.getElementById(`TotalCarpetArea-${unitId}`);
+    if (totalCarpetField) totalCarpetField.value = totalCarpetArea.toFixed(2);
+
+    const totalPlotField = document.getElementById(`TotalPlotArea-${unitId}`);
+    if (totalPlotField) totalPlotField.value = totalPlotArea.toFixed(2);
+
+    const exemptionField = document.getElementById(`ExemptionArea1-${unitId}`);
+    if (exemptionField) exemptionField.value = totalExemptionArea.toFixed(2);
+
+    const assumptionField = document.getElementById(`AssArea1-${unitId}`);
+    if (assumptionField) assumptionField.value = totalAssumptionArea.toFixed(2);
+
+    const legalField = document.getElementById(`LegalAssmtArea1-${unitId}`);
+    if (legalField) legalField.value = totalLegalArea.toFixed(2);
+
+    const illegalField = document.getElementById(`IllegalAssmtArea1-${unitId}`);
+    if (illegalField) illegalField.value = totalIllegalArea.toFixed(2);
+
+    const beforeDeductionField = document.getElementById(`TotalAreaBeforeDeduction-${unitId}`);
+    if (beforeDeductionField) beforeDeductionField.value = totalAreaBeforeDeduction.toFixed(2);
+
+    const roomCountField = document.querySelector(`#unitrooms${unitId}`);
+    if (roomCountField) roomCountField.value = unitRoomCount;
+
     updatePropertySectionTotals();
     }
     

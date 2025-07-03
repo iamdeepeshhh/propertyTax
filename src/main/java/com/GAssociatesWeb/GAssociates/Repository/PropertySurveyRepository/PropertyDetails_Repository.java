@@ -3,6 +3,7 @@ package com.GAssociatesWeb.GAssociates.Repository.PropertySurveyRepository;
 import com.GAssociatesWeb.GAssociates.Entity.PropertySurveyEntity.CompletePropertySurvey_Entity.PropertyDetails_Entity.PropertyDetails_Entity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,5 +24,6 @@ public interface PropertyDetails_Repository extends JpaRepository<PropertyDetail
     List<PropertyDetails_Entity> findAllByPdWardI(int wardNumber, Pageable pageable);
 
     List<PropertyDetails_Entity> findByPdFinalpropnoVcAndPdWardI(String pdFinalpropnoVc, Integer pdWardI);
-
+    @Query("SELECT p.pdWardI, COUNT(p) FROM PropertyDetails_Entity p GROUP BY p.pdWardI ORDER BY p.pdWardI")
+    List<Object[]> getWardWiseCount();
 }

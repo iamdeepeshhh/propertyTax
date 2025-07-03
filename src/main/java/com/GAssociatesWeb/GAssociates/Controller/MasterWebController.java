@@ -248,10 +248,12 @@ public class MasterWebController {
 
     @PostMapping(value = "/authenticate")
     public String authenticateUser(HttpServletRequest request, RedirectAttributes redirectAttributes, String username, String password) {
-        if (userAccessService.authenticateMaster(username, password)) {//this method needs to be changed for security purposes
+        Map<Boolean, String> authenticatorToken = userAccessService.authenticateMaster(username, password);
+        if (authenticatorToken.containsKey(true)) {//this method needs to be changed for security purposes
             // Authentication successful, store username in session and redirect to survey form
             HttpSession session = request.getSession();
             session.setAttribute("username", username);
+            session.setAttribute("role", authenticatorToken.get(true));
             return "redirect:/3g/masterSheet";
         } else {
             // Authentication failed, redirect back to login page
@@ -266,7 +268,11 @@ public class MasterWebController {
     }
 
     @GetMapping(value = "/getAllUsers")
-    public ResponseEntity<List<UserAccess_Dto>> getAllUsers() {
+    public ResponseEntity<?> getAllUsers(HttpSession session) {
+        Object roleObj = session.getAttribute("role");
+        if (roleObj == null || !roleObj.equals("ITA")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
+        }
         List<UserAccess_Dto> users = userAccessService.getAllUsers();
         return ResponseEntity.ok(users);
     }
@@ -507,8 +513,8 @@ public class MasterWebController {
         List<PropSubClassification_MasterDto> subclassifications = propSubClassification_masterService.getSubclassificationsByClassificationId(classificationId);
         List<Map<String, Object>> responseData = subclassifications.stream().map(type -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("name", type.getLocalPropertySubtypeName()); // Assuming PropertyType has getName()
-            item.put("value", type.getPropertySubClassificationId()); // Assuming PropertyType has getId()
+            item.put("localName", type.getLocalPropertySubtypeName()); // Assuming PropertyType has getName()
+            item.put("id", type.getPropertySubClassificationId()); // Assuming PropertyType has getId()
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -541,8 +547,8 @@ public class MasterWebController {
         List<PropUsageType_MasterDto> dtos = propertyUsageType_masterService.findUsageTypesBySubtypeId(subtypeId);
         List<Map<String, Object>> responseData = dtos.stream().map(type -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("name", type.getLocalUsagetypeName()); // Assuming PropertyType has getName()
-            item.put("value", type.getPropertyUsageTypeId()); // Assuming PropertyType has getId()
+            item.put("localName", type.getLocalUsagetypeName()); // Assuming PropertyType has getName()
+            item.put("id", type.getPropertyUsageTypeId()); // Assuming PropertyType has getId()
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -643,9 +649,9 @@ public class MasterWebController {
         List<BuildingSubType_MasterDto> buildingSubTypes = buildingSubType_masterService.getAllBuildingSubTypes();
         List<Map<String, Object>> responseData = buildingSubTypes.stream().map(type -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("marathiname", type.getBstBuildingsubtypellVc());
-            item.put("englishname", type.getBstBuildingsubtypeengVc());
-            item.put("value", type.getBuildingsubtypeid());
+            item.put("localName", type.getBstBuildingsubtypellVc());
+            item.put("standardName", type.getBstBuildingsubtypeengVc());
+            item.put("id", type.getBuildingsubtypeid());
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -688,8 +694,8 @@ public class MasterWebController {
         List<UnitUsageType_MasterDto> dtos = unitUsageType_masterService.findAllByPropUsageId(propUsageId);
         List<Map<String, Object>> responseData = dtos.stream().map(type -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("name", type.getUum_usagetypell_vc()); // Assuming PropertyType has getName()
-            item.put("value", type.getUum_usageid_i()); // Assuming PropertyType has getId()
+            item.put("localName", type.getUum_usagetypell_vc()); // Assuming PropertyType has getName()
+            item.put("id", type.getUum_usageid_i()); // Assuming PropertyType has getId()
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -700,10 +706,10 @@ public class MasterWebController {
         List<UnitUsageType_MasterDto> unitUsageTypes = unitUsageType_masterService.getAllUnitUsages();
         List<Map<String, Object>> responseData = unitUsageTypes.stream().map(type -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("uum_usagetypell_vc", type.getUum_usagetypell_vc());
-            item.put("uum_usagetypeeng_vc", type.getUum_usagetypeeng_vc());
+            item.put("localName", type.getUum_usagetypell_vc());
+            item.put("standardName", type.getUum_usagetypeeng_vc());
             item.put("uum_rvtype_vc", type.getUum_rvtype_vc());
-            item.put("value", type.getUum_usageid_i());
+            item.put("id", type.getUum_usageid_i());
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -749,10 +755,10 @@ public class MasterWebController {
         List<UnitUsageSubType_MasterDto> unitUsageSubTypes = unitUsageSubType_masterService.findAllUnitUsageSubTypeMasters();
         List<Map<String, Object>> responseData = unitUsageSubTypes.stream().map(type -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("usm_usagetypell_vc", type.getUsm_usagetypell_vc());
-            item.put("usm_usagetypeeng_vc", type.getUsm_usagetypeeng_vc());
-            item.put("usm_usercharges_i",type.getUsm_usercharges_i());
-            item.put("value", type.getUsm_usagesubid_i());
+            item.put("localName", type.getUsm_usagetypell_vc());
+            item.put("standardName", type.getUsm_usagetypeeng_vc());
+            item.put("userCharges",type.getUsm_usercharges_i());
+            item.put("id", type.getUsm_usagesubid_i());
             item.put("uum_usagetypeeng_vc", type.getUum_usagetypeeng_vc());
             item.put("usm_rvtype_vc", type.getUsm_rvtype_vc());
             item.put("usmApplyDifferentRateVc", type.getUsmApplyDifferentRateVc());
@@ -1410,8 +1416,6 @@ public class MasterWebController {
             CouncilDetails_MasterDto councilDetails_masterDto = new CouncilDetails_MasterDto();
             councilDetails_masterDto.setStandardName(standardName);
             councilDetails_masterDto.setLocalName(localName);
-
-            System.out.println(standardSiteNameVc);
             councilDetails_masterDto.setStandardDistrictNameVC(standardDistrictNameVc);
             councilDetails_masterDto.setLocalDistrictNameVC(localDistrictNameVc);
             councilDetails_masterDto.setStandardSiteNameVC(standardSiteNameVc);

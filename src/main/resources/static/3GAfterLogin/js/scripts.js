@@ -1,25 +1,35 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Function to fetch council details
-    fetch('/3g/getCouncilDetails')
-        .then(response => response.json())
-        .then(data => {
-            // Check if data is an array and has at least one element
-            if (Array.isArray(data) && data.length > 0 && data[0].standardName) {
-                // Set the council name in the navbar if available
-                document.getElementById('councilName').textContent = data[0].standardName;
-            } else {
-                console.error('Council details not found or response is invalid.');
-                // Set a default name if there's an issue with fetching
-                document.getElementById('councilName').textContent = '3G Associates';
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching council details:', error);
-            // Set a default name in case of an error
-            document.getElementById('councilName').textContent = '3G Associates';
-        });
+document.addEventListener('DOMContentLoaded', function () {
+  // Set council name
+  fetch('/3g/getCouncilDetails')
+    .then(res => res.json())
+    .then(data => {
+      const name = data[0]?.standardName || '3G Associates';
+      document.getElementById('councilName').textContent = name;
+    })
+    .catch(() => {
+      document.getElementById('councilName').textContent = '3G Associates';
+    });
+
+  // Fetch ward-wise count
+  fetch('/3gSurvey/getPropertiesCount')
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById('wardWiseTableBody');
+      tbody.innerHTML = '';
+      let totalProperties = 0;
+
+      for (const [ward, count] of Object.entries(data)) {
+        const numericCount = parseInt(count);
+        totalProperties += numericCount;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${ward}</td><td>${numericCount}</td>`;
+        tbody.appendChild(row);
+      }
+
+    })
+    .catch(() => {
+      document.getElementById('wardWiseTableBody').innerHTML =
+        '<tr><td colspan="2">Error loading data</td></tr>';
+    });
 });
-var sessionTimeout = 1 * 60 * 1000;
-setTimeout(function() {
-    window.location.reload();
-}, sessionTimeout);

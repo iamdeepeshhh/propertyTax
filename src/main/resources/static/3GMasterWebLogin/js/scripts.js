@@ -10,8 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data && data.length > 0 && data[0].standardName) {
-                console.log(data);
-                // Set the council name in the label if available
                 document.getElementById('councilLabel').textContent = data[0].standardName;
             } else {
                 console.error('Council details not found or response is invalid.');
@@ -30,7 +28,6 @@ images[0].style.display = 'block';
 let currentIndex = 0;
 
 function nextImage() {
-console.log("op");
     images[currentIndex].style.opacity = '0';
     setTimeout(() => {
         images[currentIndex].style.display = 'none';

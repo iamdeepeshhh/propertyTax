@@ -31,14 +31,24 @@ public class UserAccessService {
                 && "Active".equals(userAccess.getStatus());
         return isAuthenticated;
     }
-    public boolean authenticateMaster(String username, String password) {
+    public Map<Boolean, String> authenticateMaster(String username, String password) {
+        Map<Boolean, String> result = new HashMap<>();
         UserAccess userAccess = userAccessRepository.findByUsername(username);
         List<String> allowedProfiles = Arrays.asList("ITL", "IT", "ITA");
-        // Check if user exists, the password matches, the user is active (assuming "active" indicates an active user)
-        boolean isAuthenticated = userAccess != null
-                && userAccess.getPassword().equals(password)
-                && "Active".equals(userAccess.getStatus()) && allowedProfiles.contains(userAccess.getProfile());
-        return isAuthenticated;
+
+        if (userAccess == null) {
+            result.put(false, "User not found");
+        } else if (!userAccess.getPassword().equals(password)) {
+            result.put(false, "Invalid password");
+        } else if (!"Active".equalsIgnoreCase(userAccess.getStatus())) {
+            result.put(false, "User is not active");
+        } else if (!allowedProfiles.contains(userAccess.getProfile())) {
+            result.put(false, "User role not allowed");
+        } else {
+            result.put(true, userAccess.getProfile()); // Return the role
+        }
+
+        return result;
     }
     public UserAccess_Dto signup(UserAccess_Dto dto){
         UserAccess entity = convertToEntity(dto);

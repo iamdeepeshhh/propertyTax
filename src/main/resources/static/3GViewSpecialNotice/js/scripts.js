@@ -117,6 +117,7 @@ function renderAndPrintChunk() {
     if (dto.pdPropimageT) {
       $page.find('#pdPropimageT').attr('src', 'data:image/jpeg;base64,' + dto.pdPropimageT);
     }
+    
 
     // 📋 Summary Table
     $page.find('.pdNoticenoVc').text(dto.pdNoticenoVc || '');
@@ -125,14 +126,14 @@ function renderAndPrintChunk() {
     $page.find('.pdSurypropnoVc').text(dto.pdSurypropnoVc || '');
     $page.find('.pdNewpropertynoVc').text(dto.pdNewpropertynoVc || '');
     $page.find('.pdOldpropnoVc').text(dto.pdOldpropnoVc || '');
-    $page.find('.pdPropertytypeAndSubtype').text((dto.pdPropertytypeI || '') + ' → ' + (dto.pdPropertysubtypeI || ''));
+    $page.find('.pdPropertytypeAndSubtype').text((propertyTypeMap[dto.pdPropertytypeI] || '') + ' → ' + (propertySubtypeMap[dto.pdPropertysubtypeI] || ''));
     $page.find('.pdPlotvalueF').text(dto.pdPlotvalueF || '');
     $page.find('.fireTaxFl').text(dto.consolidatedTaxes?.fireTaxFl || '');
     $page.find('.currentAssessmentDateDt').text(dto.currentAssessmentDateDt || '');
 
     // 🏘️ Property Details Table
     $page.find('.pdFinalpropnoVc').text(dto.pdFinalpropnoVc || '');
-    $page.find('.pdUsagetypeAndSubtype').text((dto.pdUsagetypeI || '') + ' → ' + (dto.pdUsagesubtypeI || ''));
+    $page.find('.pdUsagetypeAndSubtype').text( (usageTypeMap[dto.pdUsagetypeI] || '') + ' → ' + (subUsageTypeMap[dto.pdUsagesubtypeI] || ''));
     $page.find('.pdAssesareaF').text(dto.pdAssesareaF || '');
 
     // 🏷️ Ratable Value Table
@@ -180,44 +181,47 @@ function renderAndPrintChunk() {
 }
 
 
-//Function using the four AIP by Himanshu
+let propertyTypeMap = {};
+let propertySubtypeMap = {};
+let usageTypeMap = {};
+let subUsageTypeMap = {};
 
 // 1. Property Types
-getIdValueList('/propertytypes', 'englishname').then(data => {
-    console.log("Property Types:", data);
+getIdValueList('/3g/propertytypes', 'localName').then(data => {
+    propertyTypeMap = Object.fromEntries(data.map(item => [item.id, item.value]));
 });
 
 // 2. Property Subtypes
-getIdValueList('/propertysubtypes', 'marathiname').then(data => {
-    console.log("Property Subtypes:", data);
+getIdValueList('/3g/propertysubtypes', 'localName').then(data => {
+    propertySubtypeMap = Object.fromEntries(data.map(item => [item.id, item.value]));
 });
 
-// 3. Property Usage Types
-getIdValueList('/propertyusagetypes', 'englishname').then(data => {
-    console.log("Usage Types:", data);
+getIdValueList('/3g/propertyusagetypes', 'localName').then(data => {
+    usageTypeMap = Object.fromEntries(data.map(item => [item.id, item.value]));
 });
 
-// 4. Property Sub Usage Types
-getIdValueList('/getSubUsageTypes', 'marathiname').then(data => {
-    console.log("Sub Usage Types:", data);
+getIdValueList('/3g/getSubUsageTypes', 'localName').then(data => {
+    subUsageTypeMap = Object.fromEntries(data.map(item => [item.id, item.value]));
 });
 
 
-async function getIdValueList(apiUrl, nameKey = 'englishname') {
+
+async function getIdValueList(apiUrl, nameKey = 'localName') {
     try {
-        const response = await fetch(apiUrl); // 🔗 Makes connection here
+        const response = await fetch(apiUrl);
         if (!response.ok) throw new Error(`Failed to fetch from ${apiUrl}`);
 
-        const data = await response.json(); // 🔗 Parses API response
+        const data = await response.json();
 
         return data.map(item => ({
-            id: Number(item.value),
-            value: item[nameKey]
+            id: Number(item.id),
+            value: item[nameKey] // default is 'localName', e.g. "मालमत्ता प्रकार १"
         }));
     } catch (error) {
         console.error(`Error fetching from ${apiUrl}:`, error);
         return [];
     }
 }
+
 
 
