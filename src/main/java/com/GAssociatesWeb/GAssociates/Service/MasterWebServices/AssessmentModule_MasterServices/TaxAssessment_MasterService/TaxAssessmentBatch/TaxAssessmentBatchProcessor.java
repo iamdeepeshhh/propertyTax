@@ -36,11 +36,13 @@ public class TaxAssessmentBatchProcessor implements ItemProcessor<PropertyDetail
     @Autowired
     private UnitUsageSubType_MasterRepository unitUsageSubTypeMasterRepository;
 
+    List<String> warnings = new ArrayList<>();
+
     private static final Logger logger = Logger.getLogger(TaxAssessmentBatchProcessor.class.getName());
 
     @Override
     public AssessmentResultsDto process(PropertyDetails_Entity property) throws Exception {
-
+        warnings.clear();
         Integer zone = property.getPdZoneI();
         List<UnitDetails_Entity> unitDetails = fetchUnitDetails(property.getPdNewpropertynoVc());
 
@@ -129,17 +131,37 @@ public class TaxAssessmentBatchProcessor implements ItemProcessor<PropertyDetail
         String propertyRateKey = unit.getUdConstructionclassI().trim() + "-" + zone;
         PropertyRates_MasterEntity rate = preLoadCache.getPropertyRate(unit.getUdConstructionclassI().trim(), zone.toString().trim());
         if (rate == null) {
-            String errorMessage = "Rate not found for construction type: " + unit.getUdConstructionclassI().trim() + " and zone: " + zone;
-            logger.warning(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
+            String warning = "Rate not found for construction type: " + unit.getUdConstructionclassI().trim() + " and zone: " + zone;
+            logger.warning(warning);
+            warnings.add(warning);
+            unitRecord.put("rateTypeId", null);
+            unitRecord.put("rvType", null);
+            unitRecord.put("categoryId", null);
+            unitRecord.put("ratePerSqM", 0.0);
+            unitRecord.put("rentalValue", 0.0);
+            unitRecord.put("ratableValue", 0.0);
+            unitRecord.put("amountAfterDepreciation", 0.0);
+            unitRecord.put("taxableValueByRentalRate", 0.0);
+            unitRecord.put("maintenanceRepairAmount", 0.0);
+            return unitRecord;
         }
 
         Long usageTypeId = Long.valueOf(unit.getUdUsagetypeI());
         UnitUsageType_MasterEntity unitUsageType = preLoadCache.getUnitUsageType(usageTypeId);
         if (unitUsageType == null) {
-            String errorMessage = "Unit Usage Type not found for ID: " + usageTypeId;
-            logger.warning(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
+            String warning = "Unit Usage Type not found for ID: " + usageTypeId + " for unit: " + unit.getUdUnitnoVc();
+            logger.warning(warning);
+            warnings.add(warning);
+            unitRecord.put("rateTypeId", null);
+            unitRecord.put("rvType", null);
+            unitRecord.put("categoryId", null);
+            unitRecord.put("ratePerSqM", 0.0);
+            unitRecord.put("rentalValue", 0.0);
+            unitRecord.put("ratableValue", 0.0);
+            unitRecord.put("amountAfterDepreciation", 0.0);
+            unitRecord.put("taxableValueByRentalRate", 0.0);
+            unitRecord.put("maintenanceRepairAmount", 0.0);
+            return unitRecord;
         }
 
         // Determine RV Type ID based on unit usage subtype
@@ -161,9 +183,20 @@ public class TaxAssessmentBatchProcessor implements ItemProcessor<PropertyDetail
         // Fetch RV Type entity from cache using RV Type ID
         RVTypes_MasterEntity rvType = preLoadCache.getRVType(rvTypeId);
         if (rvType == null) {
-            String errorMessage = "RV Type not found for the given ID: " + rvTypeId;
-            logger.warning(errorMessage);
-            throw new IllegalArgumentException("RV Type not found.");
+            String warning = "RV Type not found for RVType ID: " + rvTypeId + " for unit: " + unit.getUdUnitnoVc();
+            logger.warning(warning);
+            warnings.add(warning);
+
+            unitRecord.put("rateTypeId", rvTypeId);
+            unitRecord.put("rvType", null);
+            unitRecord.put("categoryId", null);
+            unitRecord.put("ratePerSqM", 0.0);
+            unitRecord.put("rentalValue", 0.0);
+            unitRecord.put("ratableValue", 0.0);
+            unitRecord.put("amountAfterDepreciation", 0.0);
+            unitRecord.put("taxableValueByRentalRate", 0.0);
+            unitRecord.put("maintenanceRepairAmount", 0.0);
+            return unitRecord;
         }
 
         unitRecord.put("rvType", rvType);
@@ -196,14 +229,23 @@ public class TaxAssessmentBatchProcessor implements ItemProcessor<PropertyDetail
         // Handle missing construction year by setting unit age to 0
         String constructionDateStr = unit.getUdConstyearDt();
         if (constructionDateStr != null && !constructionDateStr.isEmpty()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate constructionDate = LocalDate.parse(constructionDateStr, formatter);
-
-            int constructionYear = constructionDate.getYear();
-            int currentYear = LocalDate.now().getYear();
-            unitAge = currentYear - constructionYear;
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate constructionDate = LocalDate.parse(constructionDateStr.trim(), formatter);
+                int constructionYear = constructionDate.getYear();
+                int currentYear = LocalDate.now().getYear();
+                unitAge = currentYear - constructionYear;
+            } catch (Exception e) {
+                String warning = "Invalid construction year format for unit: " + unit.getUdUnitnoVc() + " | value: " + constructionDateStr;
+                logger.warning(warning);
+                warnings.add(warning);
+                unitAge = 0;
+            }
         } else {
-            logger.info("No construction year provided for unit. Setting unit age to 0.");
+            String warning = "Missing construction year for unit: " + unit.getUdUnitnoVc();
+            logger.warning(warning);
+            warnings.add(warning);
+            unitAge = 0;
         }
 
         unitRecord.put("unitAge", unitAge);
@@ -514,7 +556,7 @@ public class TaxAssessmentBatchProcessor implements ItemProcessor<PropertyDetail
         assessmentResultsDto.setPdOwnernameVc(property.getPdOwnernameVc());
         assessmentResultsDto.setPdOccupinameF(property.getPdOccupinameF());
         assessmentResultsDto.setPdPropertyaddressVc(property.getPdPropertyaddressVc());
-
+        assessmentResultsDto.setWarnings(warnings);
         // Final value to consider, which is the sum of annual rental value and taxable value of unrented units
         double finalValueToConsider = annualRentalValue + taxableValueUnrented;
         assessmentResultsDto.setFinalValueToConsiderFl(String.valueOf(finalValueToConsider));

@@ -138,5 +138,6 @@ public class AssessmentResultsDto {
     private List<PropertyUnitDetailsDto> unitDetails;
     private ConsolidatedTaxDetailsDto consolidatedTaxes;
     private ProposedRatableValueDetailsDto proposedRatableValues;
+    private List<String> warnings;
 
 }

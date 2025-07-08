@@ -58,11 +58,14 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
     @Autowired
     private PropertyOldDetails_Repository propertyOldDetails_repository;
 
+    List<String> warnings = new ArrayList<>();
+
     private static final Logger logger = Logger.getLogger(TaxAssessment_MasterServiceImpl.class.getName());
 
     //this process is basically used for realtime tax assessment process
     @Override
     public AssessmentResultsDto performAssessment(String newPropertyNumber) {
+        warnings.clear();
 
         Optional<PropertyDetails_Entity> propertyOpt = propertyDetailsRepository.findBypdNewpropertynoVc(newPropertyNumber);
         if (!propertyOpt.isPresent()) {
@@ -275,6 +278,7 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         assessmentResultsDto.setPdNoofroomsI((property.getPdNoofroomsI() != null ? property.getPdNoofroomsI().toString() : null));;
         assessmentResultsDto.setPdNooffloorsI((property.getPdNooffloorsI() != null ? property.getPdNooffloorsI().toString() : null));
 
+        assessmentResultsDto.setWarnings(warnings);
 // Derived/Calculated Fields
 //        assessmentResultsDto.setAnnualRentalValueFl("calculated_value"); // Assuming it's calculated
 //        assessmentResultsDto.setMaintenanceRepairAmountFl("calculated_value"); // Assuming it's calculated
@@ -405,7 +409,7 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         consolidatedTaxesDto.setTotalTaxFl(totalTax);
         assessmentResultsDto.setConsolidatedTaxes(consolidatedTaxesDto);
 
-        logger.info("assessmentresults: "+assessmentResultsDto);
+//        logger.info("assessmentresults: "+assessmentResultsDto);
         return assessmentResultsDto;
     }
     private Map<String, Double> calculateConsolidatedTaxes(double ratableValue, double propertyTax) {
@@ -446,9 +450,14 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
 
         Optional<EduCessAndEmpCess_MasterEntity> cessOpt = eduCessAndEmpCessMasterRepository.findByRatableValueRange(totalRatableValue);
         if (!cessOpt.isPresent()) {
-            String errorMessage = "Cess rate not found for the given ratable value range: " + totalRatableValue;
-            logger.severe(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
+            String msg = "Education Cess rate not found for ratable value range: " + totalRatableValue;
+            logger.warning(msg);
+            warnings.add(msg);
+
+            educationTaxDetails.put("Education Tax(Residential)", 0.0);
+            educationTaxDetails.put("Education Tax(Commercial)", 0.0);
+            educationTaxDetails.put("Education Tax(Total)", 0.0);
+            return educationTaxDetails;
         }
 
         EduCessAndEmpCess_MasterEntity cess = cessOpt.get();
@@ -490,7 +499,11 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
 
         Optional<EduCessAndEmpCess_MasterEntity> cessOpt = eduCessAndEmpCessMasterRepository.findByRatableValueRange(totalRatableValue);
         if (!cessOpt.isPresent()) {
-            throw new IllegalArgumentException("Cess rate not found for the given ratable value range: " + totalRatableValue);
+            String msg = "EGC rate not found for the given ratable value range: " + totalRatableValue;
+            logger.warning(msg);
+            warnings.add(msg);
+            egcDetails.put("Employment Guarantee Cess (EGC)", 0.0);
+            return egcDetails;
         }
 
         EduCessAndEmpCess_MasterEntity cess = cessOpt.get();
@@ -524,10 +537,11 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         // Fetch property rate based on construction type and zone
         Optional<PropertyRates_MasterEntity> rateOpt = propertyRateRepository.findByConstructionTypeVcAndTaxRateZoneI(unit.getUdConstructionclassI().trim(), zone.toString().trim());
         if (!rateOpt.isPresent()) {
-            String errorMessage = "Rate not found for construction type: " + unit.getUdConstructionclassI() + " and zone: " + zone;
-            logger.warning(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
-        }
+            String msg = "Rate not found for construction type: " + unit.getUdConstructionclassI() + " and zone: " + zone;
+            warnings.add(msg);
+            logger.warning(msg);
+            return unitRecord;
+            }
 
         PropertyRates_MasterEntity rate = rateOpt.get();
         //changed the further part of a code as we want to calculate the Ratable value on the
@@ -556,7 +570,12 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         }
 
         RVTypes_MasterEntity rvType = rvTypesMasterRepository.findById(rateTypeId)
-                .orElseThrow(() -> new IllegalArgumentException("Rate type not found for the given RV type ID: " + rateTypeId));
+                .orElseThrow(() -> {
+                    String msg = "RV Type not found for ID: " + rateTypeId;
+                    warnings.add(msg);
+                    return new IllegalArgumentException(msg);
+                });
+
 
         unitRecord.put("rateTypeId", rateTypeId);
         unitRecord.put("rvType", rvType);
@@ -581,18 +600,27 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         double rentalValue = Math.round(assessmentArea * ratePerSqM);
         unitRecord.put("rentalValue", rentalValue);
 
-        // Handle missing construction year by setting unit age to 0
         String constructionDateStr = unit.getUdConstyearDt();
         if (constructionDateStr != null && !constructionDateStr.isEmpty()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate constructionDate = LocalDate.parse(constructionDateStr, formatter);
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate constructionDate = LocalDate.parse(constructionDateStr, formatter);
 
-            int constructionYear = constructionDate.getYear();
-            int currentYear = LocalDate.now().getYear();
-            unitAge = currentYear - constructionYear;
+                int constructionYear = constructionDate.getYear();
+                int currentYear = LocalDate.now().getYear();
+                unitAge = currentYear - constructionYear;
+            } catch (Exception e) {
+                String msg = "Invalid construction year format for unit: " + unit.getUdUnitnoVc();
+                warnings.add(msg);
+                logger.warning(msg);
+                unitAge = 0; // fallback
+            }
         } else {
-            logger.info("No construction year provided for unit. Setting unit age to 0.");
+            String msg = "No construction year provided for unit: " + unit.getUdUnitnoVc() + ". Assuming age = 0.";
+            warnings.add(msg);
+            logger.info(msg);
         }
+
         System.out.println(unitAge+"::Unit Age");
         unitRecord.put("unitAge", unitAge);
 
@@ -628,8 +656,12 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
             unitRecord.put("maintenanceRepairAmount", maintenanceRepairAmount);
             taxableValueByRentalRate -= maintenanceRepairAmount;
             unitRecord.put("taxableValueByRentalRate",taxableValueByRentalRate);
-            String warningMessage = "No depreciation rate found for construction class: " + unit.getUdConstructionclassI() + " and age: " + unitAge;
+
+            String warningMessage = "No depreciation rate found for construction class: "
+                    + unit.getUdConstructionclassI() + " and age: " + unitAge + " for unit: " + unit.getUdUnitnoVc();
+
             logger.warning(warningMessage);
+            warnings.add(warningMessage);
         }
 
         double ratableValue = taxableValueByRentalRate;
@@ -721,7 +753,9 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
                 // Since taxType contains the amount directly, use it as user charges
                 userCharges = userChargesI.doubleValue();
             } else {
-                logger.warning("Tax type (user charges) is null for unit usage subtype ID: " + unit.getUdUsagesubtypeI());
+                String msg = "User charges for Unit usage subtype not found for ID: " + unit.getUdUsagesubtypeI();
+                logger.warning(msg);
+                warnings.add(msg);
             }
         } else {
             logger.warning("Unit usage subtype not found for ID: " + unit.getUdUsagesubtypeI());

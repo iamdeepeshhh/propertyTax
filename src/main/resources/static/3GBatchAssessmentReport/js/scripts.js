@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .then(data => {
         data.forEach(item => {
-            getUnitUsages.set(item.value, item.uum_usagetypell_vc);
+            getUnitUsages.set(item.id, item.localName);
         });
     })
     .catch(error => console.error('Error fetching unit usage types:', error));

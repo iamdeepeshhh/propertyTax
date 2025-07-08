@@ -39,4 +39,10 @@ public class MainController {
         model.addAttribute("wardNo", propertyId);
         return "3GViewTaxBill";
     }
+
+    @GetMapping("rtcc/{pdNewpropertyno}")
+    public String showRtcc(@PathVariable("pdNewpropertyno") String newPropertyNumber, Model model) {
+        model.addAttribute("newPropertyNumber", newPropertyNumber);
+        return "3GRealtimeCC"; // Thymeleaf template or just HTML
+    }
 }

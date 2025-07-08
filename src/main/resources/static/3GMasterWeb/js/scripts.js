@@ -974,6 +974,7 @@ function getActionButtons(actionType, item) {
         return `
             <button class="btn btn-primary mr-2" onclick="viewSurveyReport('${item.pdNewpropertynoVc}')">Survey Report</button>
             <button class="btn btn-primary mr-2" onclick="viewCalculationSheet('${item.pdNewpropertynoVc}')">CalculationSheet</button>
+            <button class="btn btn-primary mr-2" onclick="viewCalculationSheetRt('${item.pdNewpropertynoVc}')">Realtime cc</button>
             <button class="btn btn-danger" onclick="showDeleteModal('${item.pdNewpropertynoVc}','${item.pdSurypropnoVc}','${item.pdOwnernameVc}','${item.user_id}','${item.pdWardI}')">Delete</button>
         `;
     } else if (actionType === 'upload') {
@@ -1022,6 +1023,11 @@ window.open('/3g/showsurvey/' + pdNewpropertynoVc, '_blank', 'noopener,noreferre
 function viewCalculationSheet(pdNewpropertynoVc) {
 console.log('View property:', pdNewpropertynoVc);
 window.open('/3g/calculationSheet/' + pdNewpropertynoVc, '_blank', 'noopener,noreferrer');
+}
+
+function viewCalculationSheetRt(pdNewpropertynoVc) {
+console.log('View property:', pdNewpropertynoVc);
+window.open('/rtcc/' + pdNewpropertynoVc, '_blank', 'noopener,noreferrer');
 }
 
 

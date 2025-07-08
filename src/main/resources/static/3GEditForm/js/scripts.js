@@ -1293,7 +1293,6 @@
     var activeFormId = null;
     
     function toggleForm(formId) {
-    console.log("Toggling form:", formId);
     var form = document.getElementById(formId);
     
     var allForms = document.getElementsByClassName("formContainer");
@@ -1723,7 +1722,6 @@
     
         const imageFields = new FormData();
 
-        console.log('newproperty number: '+cachedData.propertyDetails.pdNewpropertynoVc);
         let formData = {
             propertyDetails: {
                 pdNewpropertynoVc: cachedData.propertyDetails.pdNewpropertynoVc,
@@ -2048,9 +2046,7 @@
     }
     
     async function submitFormData() {
-    // if (!await validateForm()) {
-    // return;
-    // }
+
     const { updatedFields, imageFields } = collectFormData(cachedPropertyData);
     
     document.getElementById('loadingSpinner').style.display = 'flex';

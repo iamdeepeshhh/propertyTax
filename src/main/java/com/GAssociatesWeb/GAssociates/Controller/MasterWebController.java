@@ -951,7 +951,7 @@ public class MasterWebController {
         List<AssessmentDate_MasterDto> assessmentDates = assessmentDate_masterService.getAllAssessmentDates();
         List<Map<String, Object>> responseData = assessmentDates.stream().map(type -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("value", type.getAssessmentId());
+            item.put("id", type.getAssessmentId());
             item.put("firstassessmentdate", type.getFirstAssessmentDate()); // Assuming there is a name field
             item.put("currentassessmentdate", type.getCurrentAssessmentDate());
             item.put("lastassessmentdate", type.getLastAssessmentDate());// Assuming there is an ID field
@@ -1132,7 +1132,7 @@ public class MasterWebController {
             item.put("minAgeI", type.getMinAgeI());
             item.put("maxAgeI", type.getMaxAgeI());
             item.put("depreciationPercentageI", type.getDepreciationPercentageI());
-            item.put("value", type.getId());
+            item.put("id", type.getId());
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -1158,7 +1158,7 @@ public class MasterWebController {
             item.put("constructionTypeVc", type.getConstructionTypeVc());
             item.put("taxRateZoneI", type.getTaxRateZoneI());
             item.put("rateI", type.getRateI());
-            item.put("value", type.getId());
+            item.put("id", type.getId());
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -1208,7 +1208,7 @@ public class MasterWebController {
             item.put("rateFl", type.getRateFl());
             item.put("appliedTaxesVc", type.getAppliedTaxesVc());
             item.put("descriptionVc", type.getDescriptionVc());
-            item.put("value", type.getRyTypeId());
+            item.put("id", type.getRyTypeId());
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -1228,7 +1228,6 @@ public class MasterWebController {
 
     @PostMapping("/updateRVType/{id}")
     public ResponseEntity<RVTypes_MasterDto> updateRVType(@PathVariable Long id, @RequestBody RVTypes_MasterDto rvTypeDetails) {
-        System.out.println(rvTypeDetails);
         RVTypes_MasterDto updatedRVType = rvTypes_masterService.updateRVType(id, rvTypeDetails);
         return ResponseEntity.ok(updatedRVType);
     }
@@ -1252,7 +1251,7 @@ public class MasterWebController {
             item.put("taxNameVc", type.getTaxNameVc());
             item.put("taxRateFl", type.getTaxRateFl());
             item.put("applicableonVc", type.getApplicableonVc());
-            item.put("value", type.getId());
+            item.put("id", type.getId());
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -1293,7 +1292,7 @@ public class MasterWebController {
             item.put("residentialRateFl", type.getResidentialRateFl());
             item.put("commercialRateFl", type.getCommercialRateFl());
             item.put("egcRateFl", type.getEgcRateFl());
-            item.put("value", type.getId());
+            item.put("id", type.getId());
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -1331,12 +1330,25 @@ public class MasterWebController {
         return "3GViewCalculationSheet"; // Thymeleaf template or just HTML
     }
 
+
+
     @GetMapping("/calculatedDetails/{newPropertyNumber}")
-    public ResponseEntity<List<AssessmentResultsDto>> getCalculatedDetails(@PathVariable("newPropertyNumber") String newPropertyNumber) {
+    public ResponseEntity<?> getCalculatedDetails(@PathVariable("newPropertyNumber") String newPropertyNumber) {
        List<AssessmentResultsDto> assessmentResultsDtos = calculationSheetGenerator_masterService.generateSinglePropertyReport(newPropertyNumber);
 //        AssessmentResultsDto assessmentResultsDto = taxAssessment_masterService.performAssessment(newPropertyNumber);
         if (assessmentResultsDtos != null) {
             return ResponseEntity.ok(assessmentResultsDtos);
+        } else {
+            return ResponseEntity.notFound().build(); // Return 404 if not found
+        }
+    }
+
+    @GetMapping("/realtimeCalculatedDetails/{newPropertyNumber}")
+    public ResponseEntity<?> getRealtimeCalculatedDetails(@PathVariable("newPropertyNumber") String newPropertyNumber) {
+//        List<AssessmentResultsDto> assessmentResultsDtos = calculationSheetGenerator_masterService.generateSinglePropertyReport(newPropertyNumber);
+        AssessmentResultsDto assessmentResultsDto = taxAssessment_masterService.performAssessment(newPropertyNumber);
+        if (assessmentResultsDto != null) {
+            return ResponseEntity.ok(assessmentResultsDto);
         } else {
             return ResponseEntity.notFound().build(); // Return 404 if not found
         }
@@ -1351,7 +1363,7 @@ public class MasterWebController {
     @PostMapping("/processBatch/{wardNo}")
     public ResponseEntity<String> processBatch(@PathVariable("wardNo") String wardNo) {
         try {
-            logger.info(wardNo);
+
             preLoadCache.preloadAllCaches();
             uniqueIdGenerator.assignFinalPropertyNumbers(wardNo);
             JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
@@ -1416,6 +1428,7 @@ public class MasterWebController {
             CouncilDetails_MasterDto councilDetails_masterDto = new CouncilDetails_MasterDto();
             councilDetails_masterDto.setStandardName(standardName);
             councilDetails_masterDto.setLocalName(localName);
+            councilDetails_masterDto.setLocalName(localName);
             councilDetails_masterDto.setStandardDistrictNameVC(standardDistrictNameVc);
             councilDetails_masterDto.setLocalDistrictNameVC(localDistrictNameVc);
             councilDetails_masterDto.setStandardSiteNameVC(standardSiteNameVc);
@@ -1439,7 +1452,7 @@ public class MasterWebController {
             if (councilDetailsDto != null) {
                 // Transform the CouncilDetails_MasterDto into a map structure
                 Map<String, Object> item = new HashMap<>();
-                item.put("value", councilDetailsDto.getId()); // Include the ID
+                item.put("id", councilDetailsDto.getId()); // Include the ID
                 item.put("standardName", councilDetailsDto.getStandardName());
                 item.put("localName", councilDetailsDto.getLocalName());
                 item.put("imageBase64", councilDetailsDto.getImageBase64()); // Add the Base64 image data
