@@ -21,7 +21,17 @@
         .headpart{
             text-align: center;
         }
-        .tophead{
+
+        .councilLogo {
+            display: block;
+            width: 100px;
+            height: 70px;
+            object-fit: contain;
+            float: left;
+            margin-right: 18px;
+        }
+
+        .councilLocalName{
             border-radius:100px ;
             width: 280px;
             height: 40px;

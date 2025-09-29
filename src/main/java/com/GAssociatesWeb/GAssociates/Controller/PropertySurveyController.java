@@ -569,7 +569,7 @@ public class PropertySurveyController {
                     .getPropertyOldDetailByOldPropertyNoAndWardNo(oldPropertyNo.replace(" ", ""), wardNo)
                     .orElseThrow(() -> new NoSuchElementException("Invalid old property ID: " + oldPropertyNo + " in ward: " + wardNo));
 
-            System.out.println(oldPropertyDetails);
+//            System.out.println(oldPropertyDetails);
             return ResponseEntity.ok(oldPropertyDetails);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -1077,4 +1077,6 @@ public class PropertySurveyController {
         Map<String, String> analysis = propertyManagement_service.getPropertiesCount();
         return ResponseEntity.ok(analysis);
     }
+
+
 }

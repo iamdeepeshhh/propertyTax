@@ -68,7 +68,7 @@ public class JobConfiguration {
                 .faultTolerant()
                 .skipPolicy(skipPolicy)
                 .skip(Exception.class)
-                .skipLimit(100)
+                .skipLimit(1000)
                 .build();
     }
 }

@@ -33,9 +33,7 @@ public class BuildingType_MasterServiceImpl implements BuildingType_MasterServic
         // Assuming direct reference set via a setter method (adjust if using a different field name)
         buildingType.setPropertyClassificationMaster(classificationMaster);
         updateEntityFromDto(buildingType, buildingTypeMasterDTO);
-        Integer nextId = sequenceService.getNextSequenceValue("buildingtype_master_buildingtypeid_seq");
-        buildingType.setBuildingtypeid(nextId);
-        sequenceService.resetSequenceIfTableIsEmpty("buildingtype_master", "buildingtype_master_buildingtypeid_seq");
+        sequenceService.adjustSequence(BuildingType_MasterEntity.class, "buildingtype_master_buildingtypeid_seq");
         BuildingType_MasterEntity savedEntity = buildingType_masterRepository.save(buildingType);
         return convertToDTO(savedEntity);
     }

@@ -4,8 +4,12 @@ import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDt
 
 import java.util.List;
 
-public interface SpecialNotice_MasterService {
+public interface PostAssessmentReports_MasterService {
    // List<AssessmentResultsDto> getAllResults();
 
     List<AssessmentResultsDto> getSpecialNoticesByWard(int wardNo);
+    public long getSpecialNoticeCount(Integer wardNo, String newPropertyNo);
+    public List<AssessmentResultsDto> getSpecialNoticesByNewPropertyNo(String newPropertyNo);
+    public List<AssessmentResultsDto> getObjectionReceipt();
+
 }

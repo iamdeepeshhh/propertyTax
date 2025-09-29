@@ -59,7 +59,7 @@ public class RegisterObjection_Entity {
     private String userTime;
 
     @Column(name = "notice_no")
-    private Integer noticeNo;
+    private String noticeNo;
 
     @Column(name = "rg_hearingdate_vc")
     private String hearingDate;

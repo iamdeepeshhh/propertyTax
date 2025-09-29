@@ -49,6 +49,64 @@ public class Property_TaxDetails {
     @Column(name = "pt_edutax_fl")
     private Double ptEduTaxFl;
 
+    // ✅ New Taxes
+    @Column(name = "pt_watertax_fl")
+    private Double ptWaterTaxFl;
+
+    @Column(name = "pt_seweragetax_fl")
+    private Double ptSewerageTaxFl;
+
+    @Column(name = "pt_seweragebenefittax_fl")
+    private Double ptSewerageBenefitTaxFl;
+
+    @Column(name = "pt_waterbenefittax_fl")
+    private Double ptWaterBenefitTaxFl;
+
+    @Column(name = "pt_streettax_fl")
+    private Double ptStreetTaxFl;
+
+    @Column(name = "pt_specialconservancytax_fl")
+    private Double ptSpecialConservancyTaxFl;
+
+    @Column(name = "pt_municipaledutax_fl")
+    private Double ptMunicipalEduTaxFl;
+
+    @Column(name = "pt_specialedutax_fl")
+    private Double ptSpecialEduTaxFl;
+
+    @Column(name = "pt_servicecharges_fl")
+    private Double ptServiceChargesFl;
+
+    @Column(name = "pt_miscellaneouscharges_fl")
+    private Double ptMiscellaneousChargesFl;
+
+    // ✅ Reserve fields for future taxes (tax1 to tax25)
+    @Column(name = "pt_tax1_fl") private Double ptTax1Fl;
+    @Column(name = "pt_tax2_fl") private Double ptTax2Fl;
+    @Column(name = "pt_tax3_fl") private Double ptTax3Fl;
+    @Column(name = "pt_tax4_fl") private Double ptTax4Fl;
+    @Column(name = "pt_tax5_fl") private Double ptTax5Fl;
+    @Column(name = "pt_tax6_fl") private Double ptTax6Fl;
+    @Column(name = "pt_tax7_fl") private Double ptTax7Fl;
+    @Column(name = "pt_tax8_fl") private Double ptTax8Fl;
+    @Column(name = "pt_tax9_fl") private Double ptTax9Fl;
+    @Column(name = "pt_tax10_fl") private Double ptTax10Fl;
+    @Column(name = "pt_tax11_fl") private Double ptTax11Fl;
+    @Column(name = "pt_tax12_fl") private Double ptTax12Fl;
+    @Column(name = "pt_tax13_fl") private Double ptTax13Fl;
+    @Column(name = "pt_tax14_fl") private Double ptTax14Fl;
+    @Column(name = "pt_tax15_fl") private Double ptTax15Fl;
+    @Column(name = "pt_tax16_fl") private Double ptTax16Fl;
+    @Column(name = "pt_tax17_fl") private Double ptTax17Fl;
+    @Column(name = "pt_tax18_fl") private Double ptTax18Fl;
+    @Column(name = "pt_tax19_fl") private Double ptTax19Fl;
+    @Column(name = "pt_tax20_fl") private Double ptTax20Fl;
+    @Column(name = "pt_tax21_fl") private Double ptTax21Fl;
+    @Column(name = "pt_tax22_fl") private Double ptTax22Fl;
+    @Column(name = "pt_tax23_fl") private Double ptTax23Fl;
+    @Column(name = "pt_tax24_fl") private Double ptTax24Fl;
+    @Column(name = "pt_tax25_fl") private Double ptTax25Fl;
+
     @Column(name = "pt_final_tax_fl")
     private Double ptFinalTaxFl;
 

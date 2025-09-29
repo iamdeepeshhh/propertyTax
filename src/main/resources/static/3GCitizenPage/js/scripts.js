@@ -130,7 +130,9 @@ function viewObjectionSection(pdNewpropertynoVc) {
     .then(response => response.json())
     .then(data => {
     document.getElementById('objectionWardNo').value = data.propertyDetails.pdWardI;
+    document.getElementById('objectionNoticeNo').value = data.propertyDetails.pdNoticenoVc;
     document.getElementById('objectionFinalPropertyNo').value = data.propertyDetails.pdFinalpropnoVc;
+    document.getElementById('objectionSurveyNo').value = data.propertyDetails.pdSurypropnoVc;
     document.getElementById('objectionOwnerName').value = data.propertyDetails.pdOwnernameVc;})
     .catch(err => console.error(err));
 
@@ -147,7 +149,7 @@ function submitObjection() {
     const form = document.getElementById("objectionForm");
 
     const data = {
-        wardNo: +form.objectionWardNo.value,
+        wardNo: form.objectionWardNo.value,
         finalPropertyNo: form.objectionFinalPropertyNo.value,
         ownerName: form.objectionOwnerName.value,
         respondent: form.respondentname.value,
@@ -155,6 +157,8 @@ function submitObjection() {
         userDate: form.userdate.value,
         applicationReceivedDate: form.applicationdate.value,
         others: form.others.value,
+        noticeNo: form.objectionNoticeNo.value,
+        surveyNo: form.objectionSurveyNo.value,
         reasons: Array.from(document.querySelectorAll(".chk:checked"))
                       .map(cb => cb.value)
                       .join(", "),

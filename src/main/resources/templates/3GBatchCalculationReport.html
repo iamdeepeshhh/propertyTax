@@ -3,7 +3,7 @@
 <head>
     <title>Calculation Sheet</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="/3GViewCalculationSheet/css/styles.css" rel="stylesheet">
+    <link href="/3GBatchCalculationReport/CSS/styles.css" rel="stylesheet">
 </head>
 <body>
 <form class="form" style="max-width: none; width: 99%;">
@@ -16,9 +16,9 @@
                         <img id="councilLogo" src="https://example.com/default-image.png" alt="Council Logo" style="height: 80px; width: 80px;">
                     </td>
                     <td style="text-align: center;width:59%;border:none!important;">
-                        <span style="color: black; font-size: 25px;" id="councilName">नगर परिषद SiteName/Municipal Council SiteName</span><br>
+                        <span style="color: black; font-size: 25px;" id="councilName">नगर परिषद <span class="siteNameLocal"></span>/Municipal Council <span class="siteNameLocal"></span></span><br>
                         (नमुना ४३ नियम ७४ पहा)/(Form No. 43 See Rule No. 74)<br>
-                        सन २०२४-२५ ते २०२७-२८ या वर्षाकरिता कर आकारणीस पात्र असलेल्या इमारती व जमीन यांची आकारणी सूची/Assessment List of Buildings and Lands for the Year of 2024-25 To 2027-28
+                        सन <span class="yearRangeDev">year range</span> या वर्षाकरिता कर आकारणीस पात्र असलेल्या इमारती व जमीन यांची आकारणी सूची/Assessment List of Buildings and Lands for the Year of <span class="yearRangeEng">year range</span>
                     </td>
                     <td style="text-align: center;width:26%;  border:none!important;"></td>
                 </tr>
@@ -30,16 +30,16 @@
         <div id="secondDiv" style="margin-top:4px; border: 1px solid black;background-color:#F5F6CE;">
             <table style="border-radius: 1px;">
                 <tr>
-                    <td style="width: 25%;" class=" t-a-l b-n">आर्थिक वर्ष/F.Y.: <span id="financialYear"></span></td>
-                    <td style="width: 30%;" class="t-a-l b-n">दिनांक/Date: <span id="assessmentDate"></span></td>
-                    <td style="width: 30%;" class="t-a-c b-n">वेळ/Time: <span id="assessmentTime"></span></td>
-                    <td style="width: 15%;" class="t-a-l b-n">पान क्र./Page No.: <span id="pageNo"></span></td>
+                    <td style="width: 25%;" class=" t-a-l b-n">आर्थिक वर्ष/F.Y.: <span id="financialYear" class="financialYear"></span></td>
+                    <td style="width: 30%;" class="t-a-l b-n">दिनांक/Date: <span id="assessmentDate" class="assessmentDate"></span></td>
+                    <td style="width: 30%;" class="t-a-c b-n">वेळ/Time: <span id="assessmentTime" class="assessmentTime"></span></td>
+                    <td style="width: 15%;" class="t-a-l b-n">पान क्र./Page No.: 01 of 02</td>
                 </tr>
                 <tr>
-                    <td class="f-w-b t-a-l b-n">नविन मालमत्ता क्र./New Property No.: <span id="pdFinalpropnoVc"></span></td>
-                    <td style="" class="t-a-l b-n">वार्ड क्र./Ward No.: <span id="pdWardI"></span></td>
-                    <td style="" class="t-a-c b-n">झोन क्र./Zone No.: <span id="pdZoneI"></span></td>
-                    <td style="" class="t-a-l b-n">जुना मालमत्ता क्र./Property No.: <span id="pdOldpropnoVc"></span></td>
+                    <td class="f-w-b t-a-l b-n">नविन मालमत्ता क्र./New Property No.: <span id="pdFinalpropnoVc" class="pdFinalpropnoVc"></span></td>
+                    <td style="" class="t-a-l b-n">वार्ड क्र./Ward No.: <span id="pdWardI" class="pdWardI"></span></td>
+                    <td style="" class="t-a-c b-n">झोन क्र./Zone No.: <span id="pdZoneI" class="pdZoneI"></span></td>
+                    <td style="" class="t-a-l b-n">जुना मालमत्ता क्र./Property No.: <span id="pdOldpropnoVc" class="pdOldpropnoVc"></span></td>
                 </tr>
             </table>
         </div>
@@ -157,7 +157,7 @@
             <tr class="t-a-c h-25">
                 <td id="oldWardNoVc"></td>
                 <td id="oldZoneNoVc"></td>
-                <td id="pdOldpropnoVc"></td>
+                <td id="pdOldpropnoVc" class="pdOldpropnoVc"></td>
                 <td id="oldPropertyTypeVc"></td>
                 <td id="oldPropertySubTypeVc"></td>
                 <td id="oldUsageTypeVc"></td>
@@ -338,72 +338,44 @@
                     <td>शासकीय</td>
                     <td>औद्योगिक</td>
                 </tr>
-                <tr class="h-25 t-a-c">
-                    <td id="proposedResidentFl"></td>
-                    <td id="proposedCommercialFl"></td>
-                    <td id="proposedReligiousFl"></td>
-                    <td id="proposedOpenPlotResidentialFl"></td>
-                    <td id="proposedOpenPlotCommercialFl"></td>
-                    <td id="proposedOpenPlotReligiousFl"></td>
-                    <td id="proposedOpenPlotEducationFl"></td>
-                    <td id="proposedOpenPlotGovernmentFl"></td>
-                    <td id="proposedOpenPlotIndustrialFl"></td>
-                    <td id="proposedEducationFl"></td>
-                    <td id="proposedGovernmentFl"></td>
-                    <td id="proposedIndustrialFl"></td>
-                    <td id="proposedMobileTowerFl"></td>
-                    <td id="proposedElectricSubstationFl"></td>
-                    <td id="proposedTotalFl"></td>
-                </tr>
+                    <tr class="h-25 t-a-c">
+                        <td id="proposedResidentFl" class="proposedResidentFl"></td>
+                        <td id="proposedCommercialFl" class="proposedCommercialFl"></td>
+                        <td id="proposedReligiousFl" class="proposedReligiousFl"></td>
+                        <td id="proposedOpenPlotResidentialFl" class="proposedOpenPlotResidentialFl"></td>
+                        <td id="proposedOpenPlotCommercialFl" class="proposedOpenPlotCommercialFl"></td>
+                        <td id="proposedOpenPlotReligiousFl" class="proposedOpenPlotReligiousFl"></td>
+                        <td id="proposedOpenPlotEducationFl" class="proposedOpenPlotEducationFl"></td>
+                        <td id="proposedOpenPlotGovernmentFl" class="proposedOpenPlotGovernmentFl"></td>
+                        <td id="proposedOpenPlotIndustrialFl" class="proposedOpenPlotIndustrialFl"></td>
+                        <td id="proposedEducationFl" class="proposedEducationFl"></td>
+                        <td id="proposedGovernmentFl" class="proposedGovernmentFl"></td>
+                        <td id="proposedIndustrialFl" class="proposedIndustrialFl"></td>
+                        <td id="proposedMobileTowerFl" class="proposedMobileTowerFl"></td>
+                        <td id="proposedElectricSubstationFl" class="proposedElectricSubstationFl"></td>
+                        <td id="proposedTotalFl" class="proposedTotalFl"></td>
+                    </tr>
             </table>
         </div>
-        <div>
-            <table id="rightTable" style="margin-top:2px;width:64%;">
-                <tr height="5">
-                    <td colspan="12" style="background-color:#F6CECE;" class="f-w-b p-l-8">&gt;&gt;Consolidate Tax Details/एकत्रित कराचे तपशील&lt;&lt;</td>
+        <div class="styled-table total-section">
+            <table id="calculationSheetTaxTable" style="margin-top:2px;width:64%;">
+                <tr>
+                    <td colspan="100" style="background-color:#F6CECE;" class="f-w-bp-l-8">
+                        &gt;&gt; Consolidate Tax Details / एकत्रित कराचे तपशील &lt;&lt;
+                    </td>
                 </tr>
-                <tr height="5" style="background-color: #CEF6CE;" class="t-a-c">
-                    <td rowspan="2">मालमत्ता कर</td>
-                    <td colspan="3" class="p-n">शिक्षण कर</td>
-                    <td rowspan="2">रो.ह.यो .कर</td>
-                    <td rowspan="2">वृक्ष कर</td>
-                    <td rowspan="2">पर्यावरण कर</td>
-                    <td rowspan="2">स्वच्छता कर</td>
-                    <td rowspan="2">दिवाबत्ती कर</td>
-                    <td rowspan="2">अग्निशमन कर</td>
-                    <td rowspan="2">उपयोग कर्ता शुल्क व ईतर</td>
-                    <td rowspan="2" class="f-w-b">एकूण</td>
-                </tr>
-                <tr style="background-color:#F8E0F7" class="t-a-c">
-                    <td style="border-left:0px!important;" class="bb-n">निवासी</td>
-                    <td class="bb-n">अनिवासी</td>
-                    <td style="border-left:0px!important;border-bottom:0px!important;" class="f-w-b bb-n">एकूण कर</td>
-                </tr>
-                <tr class="h-25 t-a-c">
-                    <td id="propertyTax"></td>
-                    <td id="educationTaxResidential"></td>
-                    <td id="educationTaxNonResidential"></td>
-                    <td id="educationTaxTotal"></td>
-                    <td id="egcTax"></td>
-                    <td id="treeTax"></td>
-                    <td id="environmentTax"></td>
-                    <td id="cleannessTax"></td>
-                    <td id="lightTax"></td>
-                    <td id="fireTax"></td>
-                    <td id="userChargesTax"></td>
-                    <td id="totalTax"></td>
-                </tr>
+                <!-- dynamic rows will be injected here -->
             </table>
         </div>
         <br>
         <table class="f-w-b b-n m-t-50">
             <tr>
-                <td colspan="6" class="t-a-l b-n">Tax Inspector M.C. SiteName</td>
-                <td colspan="6" class="b-n t-a-r">Chief Officer, M.C. SiteName</td>
+                <td colspan="6" class="t-a-l b-n">Tax Inspector M.C. <span class="siteNameStd"></span></td>
+                <td colspan="6" class="b-n t-a-r">Chief Officer, M.C. <span class="siteNameStd"></span></td>
             </tr>
             <tr>
-                <td colspan="6" class="t-a-l b-n">(कर निरीक्षक, न.प. SiteName)</td>
-                <td colspan="6" class="b-n t-a-r">(मुख्याधिकारी, न.प. SiteName)</td>
+                <td colspan="6" class="t-a-l b-n">(कर निरीक्षक, न.प. <span class="siteNameLocal"></span>)</td>
+                <td colspan="6" class="b-n t-a-r">(मुख्याधिकारी, न.प. <span class="siteNameLocal"></span>)</td>
             </tr>
         </table>
         <div class="breakhere"></div>
@@ -414,9 +386,9 @@
                         <img id="councilLogo1" src="https://example.com/default-image.png" alt="Council Logo" style="height: 80px; width: 80px;">
                     </td>
                     <td style="text-align: center;width:59%;border:none!important;">
-                        <span style="color: black; font-size: 25px;" id="councilName1">नगर परिषद SiteName/Municipal Council SiteName</span><br>
+                        <span style="color: black; font-size: 25px;" id="councilName1">नगर परिषद <span class="siteNameLocal"></span>/Municipal Council <span class="siteNameLocal"></span></span><br>
                         (नमुना ४३ नियम ७४ पहा)/(Form No. 43 See Rule No. 74)<br>
-                        सन २०२४-२५ ते २०२७-२८ या वर्षाकरिता कर आकारणीस पात्र असलेल्या इमारती व जमीन यांची आकारणी सूची/Assessment List of Buildings and Lands for the Year of 2024-25 To 2027-28
+                        सन <span class="yearRangeDev">year range</span> या वर्षाकरिता कर आकारणीस पात्र असलेल्या इमारती व जमीन यांची आकारणी सूची/Assessment List of Buildings and Lands for the Year of <span class="yearRangeEng">year range</span>
                     </td>
                     <td style="text-align: center;width:26%;  border:none!important;"></td>
                 </tr>
@@ -425,16 +397,16 @@
             <div id="secondDiv" style="margin-top:8px; border: 1px solid black;background-color:#F5F6CE;">
                 <table style="border-radius: 1px;">
                     <tr>
-                        <td style="width: 25%;" class=" t-a-l b-n">आर्थिक वर्ष/F.Y.: 2024-2025</td>
-                        <td style="width: 30%;" class="t-a-l b-n">दिनांक/Date: 08/05/2024</td>
-                        <td style="width: 30%;" class="t-a-c b-n">वेळ/Time: 17:48:31</td>
+                        <td style="width: 25%;" class=" t-a-l b-n">आर्थिक वर्ष/F.Y.: <span class="financialYear"></span></td>
+                        <td style="width: 30%;" class="t-a-l b-n">दिनांक/Date: <span class="assessmentDate"></span></td>
+                        <td style="width: 30%;" class="t-a-c b-n">वेळ/Time: <span class="assessmentTime"></span></td>
                         <td style="width: 15%;" class="t-a-l b-n">पान क्र./Page No.: 02 of 02</td>
                     </tr>
                     <tr>
-                        <td class="f-w-b t-a-l b-n">नविन मालमत्ता क्र./New Property No.:<span id="pdFinalpropnoVc"></span> </td>
-                        <td style="" class="t-a-l b-n">वार्ड क्र./Ward No.: </td>
-                        <td style="" class="t-a-c b-n">झोन क्र./Zone No.: </td>
-                        <td style="" class="t-a-l b-n">जुना मालमत्ता क्र./Property No.: </td>
+                        <td class="f-w-b t-a-l b-n">नविन मालमत्ता क्र./New Property No.:<span id="pdFinalpropnoVc" class="pdFinalpropnoVc"></span> </td>
+                        <td style="" class="t-a-l b-n">वार्ड क्र./Ward No.: <span class="pdWardI"></span></td>
+                        <td style="" class="t-a-c b-n">झोन क्र./Zone No.: <span class="pdZoneI"></span></td>
+                        <td style="" class="t-a-l b-n">जुना मालमत्ता क्र./Property No.: <span class="pdOldpropnoVc"></span></td>
                     </tr>
                 </table>
             </div>
@@ -471,31 +443,31 @@
                         <td>औद्योगिक</td>
                     </tr>
                     <tr class="h-25 t-a-c">
-                        <td id="proposedResidentFl1"></td>
-                        <td id="proposedCommercialFl1"></td>
-                        <td id="proposedReligiousFl1"></td>
-                        <td id="proposedOpenPlotResidentialFl1"></td>
-                        <td id="proposedOpenPlotCommercialFl1"></td>
-                        <td id="proposedOpenPlotReligiousFl1"></td>
-                        <td id="proposedOpenPlotEducationFl1"></td>
-                        <td id="proposedOpenPlotGovernmentFl1"></td>
-                        <td id="proposedOpenPlotIndustrialFl1"></td>
-                        <td id="proposedEducationFl1"></td>
-                        <td id="proposedGovernmentFl1"></td>
-                        <td id="proposedIndustrialFl1"></td>
-                        <td id="proposedMobileTowerFl1"></td>
-                        <td id="proposedElectricSubstationFl1"></td>
-                        <td id="proposedTotalFl1"></td>
+                        <td id="proposedResidentFl1" class="proposedResidentFl"></td>
+                        <td id="proposedCommercialFl1" class="proposedCommercialFl"></td>
+                        <td id="proposedReligiousFl1" class="proposedReligiousFl"></td>
+                        <td id="proposedOpenPlotResidentialFl1" class="proposedOpenPlotResidentialFl"></td>
+                        <td id="proposedOpenPlotCommercialFl1" class="proposedOpenPlotCommercialFl"></td>
+                        <td id="proposedOpenPlotReligiousFl1" class="proposedOpenPlotReligiousFl"></td>
+                        <td id="proposedOpenPlotEducationFl1" class="proposedOpenPlotEducationFl"></td>
+                        <td id="proposedOpenPlotGovernmentFl1" class="proposedOpenPlotGovernmentFl"></td>
+                        <td id="proposedOpenPlotIndustrialFl1" class="proposedOpenPlotIndustrialFl"></td>
+                        <td id="proposedEducationFl1" class="proposedEducationFl"></td>
+                        <td id="proposedGovernmentFl1" class="proposedGovernmentFl"></td>
+                        <td id="proposedIndustrialFl1" class="proposedIndustrialFl"></td>
+                        <td id="proposedMobileTowerFl1" class="proposedMobileTowerFl"></td>
+                        <td id="proposedElectricSubstationFl1" class="proposedElectricSubstationFl"></td>
+                        <td id="proposedTotalFl1" class="proposedTotalFl"></td>
                     </tr>
                 </table>
             </div>
             <br><br><br><br>
             <table class="b-n">
                 <tr>
-                    <td class="f-w-b b-n t-a-r">Town Planner/Asst. Director, Town Planning Office SiteName &amp; Authorized Valuation Officer, MC SiteName</td>
+                    <td class="f-w-b b-n t-a-r">Town Planner/Asst. Director, Town Planning Office <span class="siteNameStd"></span> &amp; Authorized Valuation Officer, MC <span class="siteNameStd"></span></td>
                 </tr>
                 <tr class="p-r-10">
-                    <td class="f-w-b b-n t-a-r">नगर रचनाकार/सहा.संचालक, नगर रचना कार्यालय SiteName तथा प्राधिकृत मुल्यांकन अधिकारी, न.प.SiteName</td>
+                    <td class="f-w-b b-n t-a-r">नगर रचनाकार/सहा.संचालक, नगर रचना कार्यालय <span class="siteNameLocal"></span> तथा प्राधिकृत मुल्यांकन अधिकारी, न.प.<span class="siteNameLocal"></span></td>
                 </tr>
             </table>
         </div>
@@ -504,7 +476,7 @@
             <table style="width:100%;">
                 <tr>
                     <td style="width:43%;">
-                        <img style="" align="center" src="">
+                        <img id="pdPropimageT" style="width: 100%; height: 500px; object-fit: fill; border: 1px solid #000;" src="">
                     </td>
                     <td style="width:5%;text-align:center;font-size:20px;font-weight:bold;">
                         <i class="fa fa-arrow-left" aria-hidden="true"></i><br>P<br>R<br>O<br>P<br>E<br>R<br>T<br>Y<br> <br>P<br>H<br>O<br>T<br>O<br><br>
@@ -515,6 +487,7 @@
                         <i class="fa fa-arrow-left" aria-hidden="true"></i><br>
                     </td>
                     <td style="width:43%;">
+                        <img id="pdHouseplan2T" style="width: 100%; height: 500px; object-fit: fill; border: 1px solid #000;" src="">
                     </td>
                 </tr>
             </table>
@@ -526,3 +499,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="/3GBatchCalculationReport/js/scripts.js"></script>
 </html>
+
+
+

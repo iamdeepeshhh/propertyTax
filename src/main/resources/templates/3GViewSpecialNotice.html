@@ -18,7 +18,7 @@
         <div class="logo-title">
             <img class="councilLogo" src="https://example.com/default-image.png" alt="Council Logo" />
             <div class="title-text">
-                <h1><span class="councilName"></span>, कार्यालय जि. <span class="localDistrictNameVC"></span></h1>
+                <h1><span class="councilLocalName"></span>, कार्यालय जि. <span class="localDistrictNameVC"></span></h1>
                 <p>सन <span class="yearRange"></span> च्या प्रस्तावित चतुर्थ वार्षिक कर मूल्यांकन</p>
                 <p><strong>विशेष नोटीस / Special Notice-</strong></p>
             </div>
@@ -33,7 +33,7 @@
     </div>
 
     <div class="section">
-        <p><span class="highlight">प्रति , <br>मालमत्ता धारकाचे नाव: <br>भोगवटदाराचे नाव: </span></p>
+        <p><span class="highlight">प्रति , <br>मालमत्ता धारकाचे नाव: <span class="pdOwnernameVc"></span><br>भोगवटदाराचे नाव:<span class="pdOccupinameF"></span> </span></p>
 
     </div>
 
@@ -59,12 +59,12 @@
             <td class="pdWardI"></td>
             <td class="pdZoneI"></td>
             <td class="pdSurypropnoVc"></td>
-            <td class="pdNewpropertynoVc"></td>
+            <td class="pdFinalpropnoVc"></td>                       <!-- Changes by anand -->
             <td class="pdOldpropnoVc"></td>
             <td class="pdPropertytypeAndSubtype"></td>
-            <td class="pdPlotvalueF"></td>
-            <td class="fireTaxFl"></td>
-            <td class="currentAssessmentDateDt"></td>
+            <td class="aggregateFl"></td>                  <!-- Changes by anand -->
+            <td class="totalTaxFl"></td>                            <!-- Changes by anand -->
+            <td class="currentAssessmentDateDt"></td>               <!-- Changes by anand -->
         </tr>
         </tbody>
     </table>
@@ -88,7 +88,7 @@
     <div class="logo-title">
         <img class="councilLogo" src="https://example.com/default-image.png" alt="Council Logo" />
         <div class="title-text">
-            <h1><span class="councilName"></span>, कार्यालय जि. <span class="localDistrictNameVC"></span></h1>
+            <h1><span class="councilLocalName"></span>, कार्यालय जि. <span class="localDistrictNameVC"></span></h1>
             <p>सन <span class="yearRange"></span> च्या प्रस्तावित चतुर्थ वार्षिक कर मूल्यांकन</p>
             <p><strong>विशेष नोटीस / Special Notice-</strong></p>
             <p>(महाराष्ट्र नगर परिषद, नगर पंचायत व औद्योगिक नगरी अधिनियम १९६५ चे कलम ८१(१) अन्वये)</p>
@@ -105,7 +105,7 @@
     </div>
 
     <div class="details">
-        <div><strong>नोटीस क्र.: <br>नवीन मालमत्ता क्र.:<br>मालमत्तेचे नाव:<br>मालमत्ता धारकाचे नाव:<br>भोगवटादाराचे नाव:</strong> </div>
+        <div><strong>नोटीस क्र.: <span class="pdNoticenoVc"></span><br>नवीन मालमत्ता क्र.: <span class="pdFinalpropnoVc"></span><br>मालमत्तेचे नाव: <br>मालमत्ता धारकाचे नाव: <span class="pdOwnernameVc"></span><br>भोगवटादाराचे नाव: <span class="pdOccupinameF"></span></strong> </div>
 
     </div>
 
@@ -160,11 +160,11 @@
                 <td class="pdZoneI"></td>
                 <td class="pdSurypropnoVc"></td>
                 <td class="pdOldpropnoVc"></td>
-                <td class="pdFinalpropnoVc"></td>
+                <td class="pdPlotnoVc"></td>
                 <td class="pdPropertytypeAndSubtype"></td>
                 <td class="pdUsagetypeAndSubtype"></td>
-                <td class="pdAssesareaF"></td>
-                <td class="currentAssessmentDateDt"></td>
+                <td class="pdAssesareaF"></td>                             <!--Change by Anand-->
+                <td class="currentAssessmentDateDt"></td>                <!--Change by Anand-->
             </tr>
             </tbody>
 
@@ -211,10 +211,10 @@
                 <td class="industrialOpenPlotFl"></td>
                 <td class="educationAndLegalInstituteOpenPlotFl"></td>
                 <td class="governmentFl"></td>
-                <td class="pdBuildingvalueI"></td>
+                <td class="industrialFl"></td>
                 <td class="mobileTowerFl"></td>
                 <td class="electricSubstationFl"></td>
-                <td class="pdPlotvalueF"></td>
+                <td class="aggregateFl"></td>                 <!--Chane by Anand-->
             </tr>
             </tbody>
 
@@ -223,68 +223,37 @@
 
     <div class="styled-table total-section">
         <h3 class="tight-heading">प्रस्तावित एकूण कराचे तपशील:</h3>
-        <table>
-            <tr>
-                <th rowspan="2">मालमत्ता कर</th>
-                <th colspan="3">शिक्षण कर</th>
-                <th rowspan="2">रो.ह.यो. कर</th>
-                <th rowspan="2">वृक्ष कर</th>
-                <th rowspan="2">स्वच्छता  कर</th>
-                <th rowspan="2">दिवाबत्ती  कर</th>
-                <th rowspan="2">अग्निशमन कर</th>
-                <th rowspan="2">एकूण कर</th>
-            </tr>
-            <tr class="red-label">
-                <th>निवासी</th>
-                <th>अनिवासी</th>
-                <th>एकूण</th>
-            </tr>
-
-            <!-- Table 4: Consolidated Taxes -->
-            <tbody id="consolidated-tax-body">
-            <tr>
-                <td class="propertyTaxFl"></td>
-                <td class="educationTaxResid"></td>
-                <td class="educationTaxComm"></td>
-                <td class="educationTaxTotalFl"></td>
-                <td class="egcFl"></td>
-                <td class="treeTaxFl"></td>
-                <td class="cleannessTaxFl"></td>
-                <td class="lightTaxFl"></td>
-                <td class="fireTaxFl"></td>
-                <td class="totalTaxFl"></td>
-            </tr>
-            </tbody>
-
+        <table id="specialNoticeTaxTable">
+            <!-- dynamic rows will be injected here -->
         </table>
     </div>
-<div style="border: 1px solid black; padding: 2px; margin: 2px 0;">
-            <table style="width:100%;">
-                <tr>
-                    <td style="width:30%;">
-                        <img id="pdPropimageT" style="width: 100%; height: 150px; object-fit: fill; border: 1px solid #000;" src="">
-                    </td>
-                    <td style="width:5%;text-align:center;font-size:20px;font-weight:bold;">
-                        <i class="fa fa-arrow-left" aria-hidden="true"></i><br>P<br>R<br>O<br>P<br>E<br>R<br>T<br>Y<br> <br>P<br>H<br>O<br>T<br>O<br><br>
-                    </td>
-                    <td style="width:3%;border:none!important;"></td>
-                    <td style="width:5%;text-align:center;font-size:20px;font-weight:bold;">
-                        <i class="fa fa-arrow-left" aria-hidden="true"></i><br>F<br>L<br>O<br>O<br>R<br><br>P<br>L<br>A<br>N<br>
-                        <i class="fa fa-arrow-left" aria-hidden="true"></i><br>
-                    </td>
-                    <td style="width:30%;">
-                        <img id="pdHouseplan2T" style="width: 100%; height: 150px; object-fit: fill; border: 1px solid #000;" src="">
-                    </td>
-                </tr>
-            </table>
-</div>
+    <div style="border: 1px solid black; padding: 2px; margin: 2px 0;">
+        <table style="width:100%;">
+            <tr>
+                <td style="width:30%;">
+                    <img id="pdPropimageT" style="width: 100%; height: 150px; object-fit: fill; border: 1px solid #000;" src="">
+                </td>
+                <td style="width:5%;text-align:center;font-size:20px;font-weight:bold;">
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i><br>P<br>R<br>O<br>P<br>E<br>R<br>T<br>Y<br> <br>P<br>H<br>O<br>T<br>O<br><br>
+                </td>
+                <td style="width:3%;border:none!important;"></td>
+                <td style="width:5%;text-align:center;font-size:20px;font-weight:bold;">
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i><br>F<br>L<br>O<br>O<br>R<br><br>P<br>L<br>A<br>N<br>
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i><br>
+                </td>
+                <td style="width:30%;">
+                    <img id="pdHouseplan2T" style="width: 100%; height: 150px; object-fit: fill; border: 1px solid #000;" src="">
+                </td>
+            </tr>
+        </table>
+    </div>
     <br>
     <br>
     <br>
     <div class="signature-section">
-        <div class="signature"><p>कर वसूली लिपिक<br><span class="councilName"></span></p></div>
-        <div class="signature"><p>कर विभाग प्रमुख<br><span class="councilName"></span></p></div>
-        <div class="signature"><p>मुख्याधिकारी<br><span class="councilName"></span></p></div>
+        <div class="signature"><p>कर वसूली लिपिक<br><span class="councilLocalName"></span></p></div>
+        <div class="signature"><p>कर विभाग प्रमुख<br><span class="councilLocalName"></span></p></div>
+        <div class="signature"><p>मुख्याधिकारी<br><span class="councilLocalName"></span></p></div>
     </div>
 
 </div>

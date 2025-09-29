@@ -77,15 +77,20 @@
     <h5 class="mb-3">Register Objection (आक्षेप अर्ज)</h5>
     <form id="objectionForm" method="POST">
         <div class="form-row mb-3">
+            <input type="hidden" id="objectionSurveyNo" name="objectionSurveyNo">
             <div class="col-md-2">
                 <label>वार्ड क्र</label>
                 <input type="text" class="form-control" id="objectionWardNo" name="objectionWardNo" readonly>
+            </div>
+            <div class="col-md-2">
+                <label>सूचना क्र.</label>
+                <input type="text" class="form-control" id="objectionNoticeNo" name="objectionNoticeNo" readonly>
             </div>
             <div class="col-md-3">
                 <label>मालमत्ता क्र</label>
                 <input type="text" class="form-control" id="objectionFinalPropertyNo" name="objectionFinalPropertyNo" readonly>
             </div>
-            <div class="col-md-7">
+            <div class="col-md-5">
                 <label>मालमत्ता धारकाचे नाव</label>
                 <input type="text" class="form-control" id="objectionOwnerName" name="objectionOwnerName" readonly>
             </div>

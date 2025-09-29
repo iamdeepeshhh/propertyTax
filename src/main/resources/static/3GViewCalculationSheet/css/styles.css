@@ -78,3 +78,80 @@ body table, th, td {
 .m-l-5 {
     margin-left: 5px;
 }
+
+/* Consolidated Taxes table (dynamic) */
+#consolidatedTaxesTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+#consolidatedTaxesTable th,
+#consolidatedTaxesTable td {
+  border: 1px solid #000;
+  padding: 3px;
+  font-size: 10px;
+}
+#taxHeaderRow th { /* parent headers */
+  background-color: #CEF6CE;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  padding: 6px 10px;
+}
+#taxChildHeaderRow th { /* child headers */
+  background-color: #F8E0F7;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  padding: 6px 10px;
+}
+#taxValueRow td {
+  text-align: center;
+  vertical-align: middle;
+  height: 25px;
+}
+#totalTax { font-weight: bold; }
+
+/* Title band row (first row under thead) should remain bold and single-line */
+#consolidatedTaxesTable thead tr:first-child td {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* Also support rightTable (used in this template) */
+#rightTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+#rightTable th,
+#rightTable td {
+  border: 1px solid #000;
+  padding: 3px;
+  font-size: 10px;
+}
+#rightTable #taxHeaderRow th {
+  background-color: #CEF6CE;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  padding: 6px 10px;
+}
+#rightTable #taxChildHeaderRow th {
+  background-color: #F8E0F7;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  padding: 6px 10px;
+}
+#rightTable #taxValueRow td {
+  text-align: center;
+  vertical-align: middle;
+  height: 25px;
+}
+#rightTable tr:first-child td {
+  font-weight: bold;
+  white-space: nowrap;
+}

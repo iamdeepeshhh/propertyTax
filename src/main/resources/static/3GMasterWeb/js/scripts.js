@@ -87,7 +87,7 @@ function populateDropdown(selectId, endpointUrl, displayProperty, idProperty = n
         .catch(error => console.error(`Error fetching data from ${endpointUrl}:`, error));
 }
 
-let rvTypes = {}; //this is the array in all rvtypes are stored
+let rvTypes = {}; // map of rvTypeId -> RV type object (should include taxKeysL)
 
 async function fetchAllRateTypes() {
 try {
@@ -95,8 +95,12 @@ const response = await fetch('/3g/getAllRVTypes');
 if (response.ok) {
     const rateTypesData = await response.json();
     rateTypesData.forEach(rateType => {
-    rvTypes[rateType.value] = rateType;
+    const key = rateType.id ?? rateType.ryTypeId ?? rateType.rvTypeId;
+        if (key != null) {
+            rvTypes[key] = rateType;
+        }
     });
+    console.log('Loaded RV Types:', rvTypes);
 } else {
     console.error('Failed to fetch rate types');
 }
@@ -115,14 +119,43 @@ function getRateTypeDescription(params) {
     const descriptionField = document.getElementById(descriptionFieldId);
     const selectedValue = rateTypeSelect.value;
     const selectedRateType = dataSource[selectedValue];
+    // Clear any previous tax selections; will re-check if this RV type has assignments
+    try { preSelectTaxes([]); } catch (e) {}
     if (descriptionField instanceof HTMLTextAreaElement) {
         descriptionField.value = selectedRateType ? selectedRateType.descriptionVc : '';
         console.log("Description updated to:", descriptionField.value);
     } else {
         descriptionField.textContent = selectedRateType ? selectedRateType.descriptionVc : '';
     }
+
+    // ✅ Also preselect taxes
+    if (selectedRateType) { if (selectedRateType.taxKeysL && selectedRateType.taxKeysL.length) { preSelectTaxes(selectedRateType.taxKeysL); } else if (selectedRateType.appliedTaxesVc) { const names = selectedRateType.appliedTaxesVc.split(",").map(n => n.trim()).filter(Boolean); } }
 }
 
+//as we want to set the selected checkboxes whenever we select any ratetype so we are using the preselct checkboxes function
+function preSelectTaxes(selectedIds) {
+    document.querySelectorAll('#rvCheckboxesContainer .form-check-input').forEach(cb => {
+        cb.checked = false;
+    });
+
+    selectedIds.forEach(val => {
+        let checkbox = null;
+        const sval = String(val);
+        if (/^\d+$/.test(sval)) {
+            checkbox = document.querySelector(`#rvCheckboxesContainer input[data-tax-key-l='${sval}']`);
+        }
+        if (!checkbox) {
+            checkbox = Array.from(document.querySelectorAll('#rvCheckboxesContainer .form-check-input'))
+                .find(cb => cb.value && cb.value.trim() === sval.trim());
+        }
+        if (checkbox) checkbox.checked = true;
+    })
+
+     // Optionally update "Select All"
+    const allCheckboxes = document.querySelectorAll('#rvCheckboxesContainer .form-check-input:not(#selectAll)');
+    const allChecked = [...allCheckboxes].every(cb => cb.checked);
+    document.getElementById('selectAll').checked = allChecked;
+}
 function updateHiddenField(selectId, hiddenInputId) {
     const selectElement = document.getElementById(selectId);
     const selectedOptionText = selectElement.options[selectElement.selectedIndex].text;
@@ -173,6 +206,18 @@ if (dynamicTableId) {
 
 console.log('Form Data to submit:', JSON.stringify(formData, null, 2));
 if (isValid) {
+    // Attach selected tax keys when creating/updating RV Types
+    if (typeof endpointUrl === 'string' && endpointUrl.indexOf('RVType') !== -1) {
+        const selectedTaxKeys = [];
+        document.querySelectorAll('#rvCheckboxesContainer .form-check-input:checked').forEach(cb => {
+            if (cb.id !== 'selectAll') {
+                const key = parseInt(cb.dataset.taxKeyL);
+                if (!isNaN(key)) selectedTaxKeys.push(key);
+            }
+        });
+        formData.taxKeysL = selectedTaxKeys;
+    }
+
     fetch(endpointUrl, {
         method: 'POST',
         headers: {
@@ -313,10 +358,10 @@ if (isValid) {
 document.addEventListener('DOMContentLoaded', function() {
 fetchConsolidatedTaxesCheckbox();
 populateDropdown('constructionClassVc', '/3g/constructionClassMasters', 'marathiname');
-populateDropdown('taxSelect', '/3g/getAllConsolidatedTaxes', 'taxNameVc','value');
-populateDropdown('rvTypeSelect', '/3g/getAllRVTypes', 'typeNameVc','value');
-populateDropdown('uum_rvtype_vc', '/3g/getAllRVTypes', 'typeNameVc','value');
-populateDropdown('usm_rvtype_vc', '/3g/getAllRVTypes', 'typeNameVc','value');
+populateDropdown('taxSelect', '/3g/getAllConsolidatedTaxes', 'taxNameVc','id');
+populateDropdown('rvTypeSelect', '/3g/getAllRVTypes', 'typeNameVc','id');
+populateDropdown('uum_rvtype_vc', '/3g/getAllRVTypes', 'typeNameVc','id');
+populateDropdown('usm_rvtype_vc', '/3g/getAllRVTypes', 'typeNameVc','id');
 populateDropdown('categoryIdUp','/3g/getRVTypeCategories', 'categoryNameLocalVc','categoryId');
 populateDropdown('categoryId','/3g/getRVTypeCategories', 'categoryNameLocalVc','categoryId');
 populateDropdown('constructionTypeVc', '/3g/constructionClassMasters', 'marathiname');
@@ -334,10 +379,10 @@ fetchAndPopulateTable('/3g/getSewerageTypes', 'existingSewerageTypesTableBody', 
 fetchAndPopulateTable('/3g/unitNumbers', 'existingUnitNumbersTableBody', ['englishname']);
 fetchAndPopulateTable('/3g/getUnitFloorNos', 'existingUnitFloorNumbersTableBody', ['englishname']);
 fetchAndPopulateTable('/3g/getAllUnitUsageTypes', 'existingUnitUsageTypesTableBody', ['standardName', 'localName','uum_rvtype_vc'],'/3g/deleteUnitUsageById','/3g/updateUnitUsageById');
-fetchAndPopulateTable('/3g/getAllUnitUsageSubTypes', 'existingUnitUsageSubtypesTableBody', ['uum_usagetypeeng_vc','standardName', 'localName','userCharges','usmApplyDifferentRateVc','usm_rvtype_vc'],'/3g/deleteUnitUsagesSub','/3g/updateUnitUsagesSub');
+fetchAndPopulateTable('/3g/getAllUnitUsageSubTypes', 'existingUnitUsageSubtypesTableBody', ['uum_usagetypeeng_vc','usm_usagetypeeng_vc', 'usm_usagetypell_vc','usm_usercharges_i','usmApplyDifferentRateVc','usm_rvtype_vc'],'/3g/deleteUnitUsagesSub','/3g/updateUnitUsagesSub');
 fetchAndPopulateTable('/3g/constructionClassMasters', 'existingConstructionClassesTableBody', ['englishname', 'marathiname', 'Deduction'],'deleteConstructionClassMastersById');
 fetchAndPopulateTable('/3g/getAllAssessmentDates', 'existingAssessmentDatesTableBody', ['firstassessmentdate', 'currentassessmentdate', 'lastassessmentdate'], '/3g/deleteAssessmentById');
-fetchAndPopulateTable('/3g/occupancyMasters', 'existingOccupanciesTableBody', ['englishname', 'marathiname', 'value']);
+fetchAndPopulateTable('/3g/occupancyMasters', 'existingOccupanciesTableBody', ['standardName', 'localName', 'id']);
 fetchAndPopulateTable('/3g/roomTypes', 'existingRoomTypesTableBody', ['englishname', 'room']);
 fetchAndPopulateTable('/3g/getAllZones', 'existingZonesTableBody', ['name']);
 fetchAndPopulateTable('/3g/getAllRemarks', 'existingRemarksTableBody', ['remark']);
@@ -364,11 +409,13 @@ fetchAndPopulateTable('/3g/getAllWards', 'existingWardsTableBody', ['wardNo']);
 fetchAndPopulateTable('/3g/getDeletionLogs', 'existingDeletionLogsTableBody', ['wardnoVc','surveyPropNo', 'ownerName', 'recordOwner', 'remarks', 'deletionTime', 'username']);
 fetchAndPopulateTable('/3g/getAllOldWards', 'existingOldWardsTableBody', ['oldwardno']);
 fetchAndPopulateTable('/3g/getAllRVTypes', 'existingRVTypesTableBody', ['typeNameVc','rateFl','appliedTaxesVc','descriptionVc']);
-fetchAndPopulateTable('/3g/getAllConsolidatedTaxes', 'existingConsolidatedTaxesTableBody', ['taxNameVc','taxRateFl','applicableonVc']);
+fetchAndPopulateTable('/3g/getAllConsolidatedTaxes', 'existingConsolidatedTaxesTableBody', ['taxNameVc','taxRateFl','applicableonVc','isActiveBl']);
 fetchAndPopulateTable('/3g/getAllPropertyRates', 'existingPropertyRatesTableBody', ['constructionTypeVc','taxRateZoneI','rateI'],'/3g/deletePropertyRate');
 fetchAndPopulateTable('/3g/getAllCessRates', 'existingCessRatesTableBody', ['minTaxableValueFl','maxTaxableValueFl','residentialRateFl','commercialRateFl','egcRateFl'],'/3g/deleteCessRate');
 fetchAndPopulateTable('/3g/getDepreciationRates', 'existingDepreciationRatesTableBody', ['constructionClassVc','minAgeI','maxAgeI','depreciationPercentageI'],'/3g/deleteDepreciationRate');
 fetchAndPopulateTable('/3g/getCouncilDetails','councilDetailsTableBody', ['standardName', 'localName'], '/3g/deleteCouncilDetails');
+fetchAndPopulateTable('/3g/reportTaxConfigs/all','rtc-table-body', ['template', 'sequence', 'englishname', 'marathiname', 'visible', 'showTotal']);
+
 fetchAllRateTypes();
 });
 
@@ -733,7 +780,7 @@ function editRecord(row, item, columns, updateEndpointUrl, onSuccess) {
     saveButton.textContent = 'Save';
     saveButton.classList.add('btn', 'btn-success', 'mr-2');
     saveButton.onclick = function() {
-        const updatedData = { id: item.value }; // Include the ID in the updatedData object
+        const updatedData = { id: item.id }; // Include the ID in the updatedData object
 
         //added to check true or false and save it
         row.querySelectorAll('input, select').forEach((element, index) => {
@@ -744,6 +791,18 @@ function editRecord(row, item, columns, updateEndpointUrl, onSuccess) {
                 updatedData[column] = element.value;
             }
         });
+        // If updating RV Type, also include selected tax keys from checkboxes
+        if (typeof updateEndpointUrl === 'string' && updateEndpointUrl.indexOf('/3g/updateRVType') !== -1) {
+            const selectedTaxKeys = [];
+            document.querySelectorAll('#rvCheckboxesContainer .form-check-input:checked').forEach(cb => {
+                if (cb.id !== 'selectAll') {
+                    const key = parseInt(cb.dataset.taxKeyL);
+                    if (!isNaN(key)) selectedTaxKeys.push(key);
+                }
+            });
+            updatedData.taxKeysL = selectedTaxKeys;
+        }
+
         //added to check true or false 
         updateRecord(updatedData, updateEndpointUrl, () => {
             // Revert the row back to non-editable mode
@@ -805,26 +864,31 @@ function updateRvRate() {
         console.log(`Form Data - Key: ${key}, Value: ${value}`);
     });
 
-    const selectedCheckboxes = [];
+   const selectedTaxNames = [];
+   const selectedTaxKeys = [];
+
     document.querySelectorAll('#rvCheckboxesContainer .form-check-input:checked').forEach(checkbox => {
         if (checkbox.checked && checkbox.id !== 'selectAll') { // Exclude 'Select All'
-            selectedCheckboxes.push(checkbox.value);
+            selectedTaxNames.push(checkbox.value);
+            selectedTaxKeys.push(parseInt(checkbox.dataset.taxKeyL));
+            console.log('keys of checkboxes'+selectedTaxKeys);
         }
     });
 
-    const educationCessChecked = document.getElementById('educationCessOption').checked;
-    const selectedSubCessOption = document.querySelector('input[name="subCessOption"]:checked');
-    if (educationCessChecked && selectedSubCessOption) {
-        selectedCheckboxes.push(`Education Tax(${selectedSubCessOption.value})`);
-    }
+//    const educationCessChecked = document.getElementById('educationCessOption').checked;
+//    const selectedSubCessOption = document.querySelector('input[name="subCessOption"]:checked');
+//    if (educationCessChecked && selectedSubCessOption) {
+//        selectedTaxNames.push(`Education Tax(${selectedSubCessOption.value})`);
+//    }
+//
+//    // Handling EGC option
+//    const egcChecked = document.getElementById('egcOption').checked;
+//    if (egcChecked) {
+//        selectedTaxNames.push('Employment Guarantee Cess (EGC)');
+//    }
 
-    // Handling EGC option
-    const egcChecked = document.getElementById('egcOption').checked;
-    if (egcChecked) {
-        selectedCheckboxes.push('Employment Guarantee Cess (EGC)');
-    }
-
-    dataObject['appliedTaxesVc'] = selectedCheckboxes.join(', ');
+    dataObject['appliedTaxesVc'] = selectedTaxNames.join(', ');
+    dataObject['taxKeysL'] = selectedTaxKeys;
     console.log('Data to send:', dataObject);
 
     updateRecord(dataObject, '/3g/updateRVType', () => fetchAndPopulateTable('/3g/getAllRVTypes', 'existingRVTypesTableBody', ['typeNameVc','rateFl','appliedTaxesVc','descriptionVc']))
@@ -832,7 +896,7 @@ function updateRvRate() {
 
 
 function updateRecord(data, updateEndpointUrl, onSuccess) {
-    const id = data.value || data[Object.keys(data)[0]]; // Assuming the first key is the ID
+    const id = data.id || data[Object.keys(data)[0]]; // Assuming the first key is the ID
 
     fetch(`${updateEndpointUrl}/${id}`, {
         method: 'POST',
@@ -931,41 +995,41 @@ function fetchPropertyRecords(endpointUrl, queryParams, tableBodyId, actionType,
     Object.keys(queryParams).forEach(key => url.searchParams.append(key, queryParams[key]));
     
     fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                if (response.status === 204) {
-                    return [];
-                } else {
-                    document.getElementById(tableBodyId).innerHTML = '<tr><td colspan="9">No Records Found.</td></tr>';
-                    throw new Error('Failed to fetch data');
-                }
-            }
-            return response.json();
-        })
-        .then(data => {
-            const tableBody = document.getElementById(tableBodyId);
-            tableBody.innerHTML = '';
-
-            
-            if (data && data.length > 0) {
-                data.sort((a, b) => {
-                    const valA = a['pdSurypropnoVc'] ? a['pdSurypropnoVc'].toString().toLowerCase() : '';
-                    const valB = b['pdSurypropnoVc'] ? b['pdSurypropnoVc'].toString().toLowerCase() : '';
-                    return valA.localeCompare(valB); // ascending order
-                });
-
-                data.forEach((item, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td>${index + 1}</td>` + 
-                        columns.map(col => `<td>${item[col] || ''}</td>`).join('') +
-                        `<td>` + getActionButtons(actionType, item) + `</td>`;
-                    tableBody.appendChild(row);
-                });
+    .then(response => {
+        if (!response.ok) {
+            if (response.status === 204) {
+                return [];
             } else {
-                tableBody.innerHTML = '<tr><td colspan="' + (columns.length + 2) + '">No results found.</td></tr>';
+                document.getElementById(tableBodyId).innerHTML = '<tr><td colspan="9">No Records Found.</td></tr>';
+                throw new Error('Failed to fetch data');
             }
-        })
-        .catch(error => console.error('Error fetching property records:', error));
+        }
+        return response.json();
+    })
+    .then(data => {
+        const tableBody = document.getElementById(tableBodyId);
+        tableBody.innerHTML = '';
+
+
+        if (data && data.length > 0) {
+            data.sort((a, b) => {
+                const valA = a['pdSurypropnoVc'] ? a['pdSurypropnoVc'].toString().toLowerCase() : '';
+                const valB = b['pdSurypropnoVc'] ? b['pdSurypropnoVc'].toString().toLowerCase() : '';
+                return valA.localeCompare(valB); // ascending order
+            });
+
+            data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${index + 1}</td>` +
+                    columns.map(col => `<td>${item[col] || ''}</td>`).join('') +
+                    `<td>` + getActionButtons(actionType, item) + `</td>`;
+                tableBody.appendChild(row);
+            });
+        } else {
+            tableBody.innerHTML = '<tr><td colspan="' + (columns.length + 2) + '">No results found.</td></tr>';
+        }
+    })
+    .catch(error => console.error('Error fetching property records:', error));
 }
 // getActionButtons is getting used to segregate the buttons for uploading cad images and property images
 // and viewing survey report,calculationsheet also deleting reports
@@ -974,45 +1038,66 @@ function getActionButtons(actionType, item) {
         return `
             <button class="btn btn-primary mr-2" onclick="viewSurveyReport('${item.pdNewpropertynoVc}')">Survey Report</button>
             <button class="btn btn-primary mr-2" onclick="viewCalculationSheet('${item.pdNewpropertynoVc}')">CalculationSheet</button>
-            <button class="btn btn-primary mr-2" onclick="viewCalculationSheetRt('${item.pdNewpropertynoVc}')">Realtime cc</button>
+
             <button class="btn btn-danger" onclick="showDeleteModal('${item.pdNewpropertynoVc}','${item.pdSurypropnoVc}','${item.pdOwnernameVc}','${item.user_id}','${item.pdWardI}')">Delete</button>
         `;
-    } else if (actionType === 'upload') {
+    } else if (actionType === 'uploadFiles') {
         return `
             <button class="btn btn-primary mr-2" onclick="viewSurveyReport('${item.pdNewpropertynoVc}')">Survey Report</button>
             <button class="btn btn-success" onclick="uploadFile('${item.pdNewpropertynoVc}', 'cad')">Upload Cad</button>
             <button class="btn btn-success" onclick="uploadFile('${item.pdNewpropertynoVc}', 'propertyImage')">Upload Prop Image</button>
         `;
-    }
+    }else if (actionType === 'notices') {
+        return `
+            <button class="btn btn-warning mr-2" onclick="viewSpecialNotice(null, '${item.pdNewpropertynoVc}')">Special Notice</button>
+        `;
+     }
     return '';
 }
 
 
 // performSearch to get the searching parameters from the sections such as surveyreports and uploadfiles
-function performSearch(sectionId) {
-    const spn = document.querySelector(`#${sectionId} #spnInput`).value.trim();
-    const ownerName = document.querySelector(`#${sectionId} #ownerNameInput`).value.trim();
-    const wardNumber = document.querySelector(`#${sectionId} #wardNumberInput`).value.trim();
-
+function performSearch(sectionId, columns) {
+    const spn = document.querySelector(`#${sectionId} #${sectionId}-spnInput`).value.trim();
+    const ownerName = document.querySelector(`#${sectionId} #${sectionId}-ownerNameInput`).value.trim();
+    const wardNumber = document.querySelector(`#${sectionId} #${sectionId}-wardNumberInput`).value.trim();
+    const finalPropertyNo = document.querySelector(`#${sectionId} #${sectionId}-finalPropertyNoInput`).value.trim();
     const searchParams = {};
+
     if (spn) searchParams.surveyPropertyNo = spn;
     if (ownerName) searchParams.ownerName = ownerName;
     if (wardNumber) searchParams.wardNo = wardNumber;
+    if (finalPropertyNo) searchParams.finalPropertyNo = finalPropertyNo;
 
-    const tableBodyId = (sectionId === 'surveyReports') ? 'searchResultsSurvey' : 'searchResultsUpload';
-    const actionType = (sectionId === 'surveyReports') ? 'survey' : 'upload';
+    let tableBodyId, actionType;
+    if (sectionId === 'surveyReports') {
+        tableBodyId = 'searchResultsSurvey';
+        actionType = 'survey';
+    } else if (sectionId === 'uploadFiles') {
+        tableBodyId = 'searchResultsUpload';
+        actionType = 'uploadFiles';
+    } else if (sectionId === 'notices') {
+        tableBodyId = 'notices-searchResults';
+        actionType = 'notices';
+    }
 
-    fetchPropertyRecords('/3g/searchNewProperties', searchParams, tableBodyId, actionType, ['pdSurypropnoVc', 'pdOwnernameVc', 'user_id', 'createddateVc', 'pdPropertyaddressVc', 'pdWardI', 'pdZoneI']);
+    fetchPropertyRecords('/3g/searchNewProperties', searchParams, tableBodyId, actionType, columns);
 }
 
 
+
 document.getElementById('searchButtonSurvey').addEventListener('click', function() {
-    performSearch('surveyReports');
+    performSearch('surveyReports',  ['pdSurypropnoVc', 'pdOwnernameVc', 'user_id', 'createddateVc', 'pdPropertyaddressVc', 'pdWardI', 'pdZoneI']);
 });
 // For Upload Files Search
 document.getElementById('searchButtonUpload').addEventListener('click', function() {
-    performSearch('uploadFiles');
+    performSearch('uploadFiles',  ['pdSurypropnoVc', 'pdOwnernameVc', 'user_id', 'createddateVc', 'pdPropertyaddressVc', 'pdWardI', 'pdZoneI']);
 });
+// For Notices Search
+document.getElementById('notices-searchButton').addEventListener('click', function() {
+    performSearch('notices',  ['pdFinalpropnoVc', 'pdOwnernameVc', 'pdPropertyaddressVc', 'pdWardI', 'pdZoneI']);
+});
+
 
 function viewSurveyReport(pdNewpropertynoVc) {
 console.log('View property:', pdNewpropertynoVc);
@@ -1053,7 +1138,6 @@ deleteWard = ward;
 $('#deleteModal').modal('show');
 }
 
-
 function uploadFile(newPropertyNo, fileType) {
     const fileInput = Object.assign(document.createElement('input'), { type: 'file', accept: 'image/*', style: 'display:none' });
 
@@ -1091,7 +1175,6 @@ function sendCompressedBlob(propertyNo, blob, fileName, uploadType) {
         alert('Unexpected error.');
     });
 }
-
 
 // Confirm deletion button in modal
 $('#confirmDeleteButton').on('click', function() {
@@ -1255,6 +1338,7 @@ function fetchConsolidatedTaxesCheckbox() {
         checkbox.id = `tax-${tax.id}`;
         checkbox.value = tax.taxNameVc;
         checkbox.name = 'applicableonVc';
+        checkbox.dataset.taxKeyL = tax.taxKeyL;
 
         const label = document.createElement('label');
         label.className = 'form-check-label';
@@ -1268,6 +1352,14 @@ function fetchConsolidatedTaxesCheckbox() {
     })
     .catch(error => console.error('Error fetching consolidated taxes:', error));
 }
+
+
+//function preSelectTaxes(taxKeysArray) {
+//  taxKeysArray.forEach(key => {
+//    const checkbox = document.getElementById(`tax-${key}`);
+//    if (checkbox) checkbox.checked = true;
+//  });
+//}
 
 async function fetchAndPopulateWardsForBatch(endpointUrl, tableBodyId) {
     try {
@@ -1406,10 +1498,12 @@ function processBatchForWard(wardNo) {
         document.body.removeChild(spinnerOverlay);
         if (response.ok) {
             alert(`Batch job has been completed for Ward No: ${wardNo}`);
+//             downloadResultLogsPdf(wardNo);
         } else {
             response.text().then(text => {
                 alert(`Batch job has been failed: ${text}`);
             });
+//            downloadResultLogsPdf(wardNo);
         }
     })
     .catch(error => {
@@ -1417,6 +1511,26 @@ function processBatchForWard(wardNo) {
         alert('An unexpected error occurred while starting the batch. Please try again later.');
     });
 }
+
+//function downloadResultLogsPdf(wardNo) {
+//    fetch(`/3g/resultLogs/${wardNo}`)
+//        .then(res => res.blob())
+//        .then(blob => {
+//            const url = URL.createObjectURL(blob);
+//            const a = Object.assign(document.createElement('a'), {
+//                href: url,
+//                download: `Ward_${wardNo}_ResultLogs.pdf`
+//            });
+//            document.body.appendChild(a);
+//            a.click();
+//            a.remove();
+//            URL.revokeObjectURL(url);
+//        })
+//        .catch(err => {
+//            console.error('Download error:', err);
+//            alert('Result Logs PDF download failed.');
+//        });
+//}
 
 // Function to view the batch report for a ward
 function viewBatchAssessmentReport(wardNo) {
@@ -1434,18 +1548,20 @@ function viewCalculationSheet(wardNo) {
     const url = `/3g/calculationSheet/${wardNo}`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
-function viewSpecialNotice(wardNo) {
-    const url = `/specialNotice/${wardNo}`;
+function viewSpecialNotice(wardNo, newPropertyNo) {
+    let url = `/specialNotice/${wardNo}`;
+    if (newPropertyNo) {
+        url += `?newPropertyNo=${newPropertyNo}`;
+    }
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 function viewHearingNotice(wardNo) {
-    window.open('/hearingNotice', '_blank', 'noopener,noreferrer');
-    const url = `/3g/calculationSheet/${wardNo}`;
+    const url = `/hearingNotice`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 function viewOrderSheet(wardNo) {
-    window.open('/orderSheet', '_blank', 'noopener,noreferrer');
-    const url = `/3g/calculationSheet/${wardNo}`;
+
+    const url = `/orderSheet`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 function viewTaxBills(wardNo) {

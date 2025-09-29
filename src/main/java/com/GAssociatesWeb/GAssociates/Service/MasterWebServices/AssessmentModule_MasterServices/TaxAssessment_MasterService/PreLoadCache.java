@@ -4,6 +4,7 @@ import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_Ma
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.EduCessAndEmpCess_MasterEntity.EduCessAndEmpCess_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.PropertyRates_MasterEntity.PropertyRates_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.RVTypes_MasterEntity.RVTypes_MasterEntity;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.RvTypesAppliedTaxes_MasterEntity.RvTypesAppliedTaxes_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxDepreciation_MasterEntity.TaxDepreciation_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.UnitUsageTypes_MasterEntity.UnitUsageSubType_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.UnitUsageTypes_MasterEntity.UnitUsageType_MasterEntity;
@@ -11,13 +12,16 @@ import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentM
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.EduCessAndEmpCess_MasterRepository.EduCessAndEmpCess_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.PropertyRates_MasterRepository.PropertyRates_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.RVTypes_MasterRepository.RVTypes_MasterRepository;
+import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.RvTypesAppliedTaxes_MasterRepository.RvTypesAppliedTaxes_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.TaxDepreciation_MasterRepository.TaxDepreciation_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.UnitUsageTypes_MasterRepository.UnitUsageSubType_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.UnitUsageTypes_MasterRepository.UnitUsageType_MasterRepository;
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,16 +38,18 @@ public class PreLoadCache {
     private final EduCessAndEmpCess_MasterRepository eduCessAndEmpCessRepository;
     private final UnitUsageType_MasterRepository unitUsageTypeMasterRepository;
     private final UnitUsageSubType_MasterRepository unitUsageSubTypeMasterRepository;
-
+    private final RvTypesAppliedTaxes_MasterRepository rvTypesAppliedTaxesRepository;
     private static final Logger logger = Logger.getLogger(PreLoadCache.class.getName());
 
     private Map<String, PropertyRates_MasterEntity> propertyRatesCache = new HashMap<>();
     private Map<String, TaxDepreciation_MasterEntity> taxDepreciationCache = new HashMap<>();
     private Map<Long, RVTypes_MasterEntity> rvTypesCache = new HashMap<>();
-    private Map<String, ConsolidatedTaxes_MasterEntity> consolidatedTaxesCache = new HashMap<>();
+    @Getter
+    private Map<Long, ConsolidatedTaxes_MasterEntity> consolidatedTaxesCache = new HashMap<>();
     private Map<String, EduCessAndEmpCess_MasterEntity> eduCessAndEmpCessCache = new HashMap<>();
     private Map<Long, UnitUsageType_MasterEntity> unitUsageCache = new HashMap<>();
     private Map<Long, UnitUsageSubType_MasterEntity> unitUsageSubCache = new HashMap<>();
+    private Map<Long, List<Long>> rvTypesAppliedTaxesCache = new HashMap<>();
 
     @Autowired
     public PreLoadCache(PropertyRates_MasterRepository propertyRatesRepository,
@@ -52,7 +58,8 @@ public class PreLoadCache {
                         ConsolidatedTaxes_MasterRepository consolidatedTaxesRepository,
                         EduCessAndEmpCess_MasterRepository eduCessAndEmpCessRepository,
                         UnitUsageType_MasterRepository unitUsageTypeMasterRepository,
-                        UnitUsageSubType_MasterRepository unitUsageSubTypeMasterRepository) {
+                        UnitUsageSubType_MasterRepository unitUsageSubTypeMasterRepository,
+                        RvTypesAppliedTaxes_MasterRepository rvTypesAppliedTaxesRepository) {
         this.propertyRatesRepository = propertyRatesRepository;
         this.taxDepreciationRepository = taxDepreciationRepository;
         this.rvTypesRepository = rvTypesRepository;
@@ -60,6 +67,7 @@ public class PreLoadCache {
         this.eduCessAndEmpCessRepository = eduCessAndEmpCessRepository;
         this.unitUsageTypeMasterRepository = unitUsageTypeMasterRepository;
         this.unitUsageSubTypeMasterRepository = unitUsageSubTypeMasterRepository;
+        this.rvTypesAppliedTaxesRepository = rvTypesAppliedTaxesRepository;
 
         // Initialize caches to avoid null pointers
         logger.info("PreLoadCache initialized with repositories and caches initialized.");
@@ -74,6 +82,7 @@ public class PreLoadCache {
         preloadEduCessAndEmpCess();
         preloadUnitUsages();
         preloadUnitUsagesSub();
+        preloadRvTypesAppliedTaxes();
     }
 
     private void preloadPropertyRates() {
@@ -107,7 +116,7 @@ public class PreLoadCache {
         List<ConsolidatedTaxes_MasterEntity> consolidatedTaxesList = consolidatedTaxesRepository.findAll();
         consolidatedTaxesCache = new HashMap<>();
         for (ConsolidatedTaxes_MasterEntity tax : consolidatedTaxesList) {
-            consolidatedTaxesCache.put(tax.getTaxNameVc(), tax);
+            consolidatedTaxesCache.put(tax.getTaxKeyL(), tax);
         }
     }
 
@@ -135,7 +144,23 @@ public class PreLoadCache {
             unitUsageSubCache.put(Long.valueOf(unitUsageSubType.getUsm_usagesubid_i()), unitUsageSubType);
         }
     }
+    private void preloadRvTypesAppliedTaxes() {
+        List<RvTypesAppliedTaxes_MasterEntity> mappings = rvTypesAppliedTaxesRepository.findAll();
+        rvTypesAppliedTaxesCache = new HashMap<>();
+
+        for (RvTypesAppliedTaxes_MasterEntity mapping : mappings) {
+            rvTypesAppliedTaxesCache
+                    .computeIfAbsent(mapping.getRvType().getRvTypeId(), k -> new ArrayList<>())
+                    .add(mapping.getTaxKeyL());   // ✅ use taxKeyL instead of tax.id
+        }
+
+        logger.info("RVTypesAppliedTaxes Cache: " + rvTypesAppliedTaxesCache);
+    }
+
     // Getter methods for cached data
+    public List<Long> getAppliedTaxesForRVType(Long rvTypeId) {
+        return rvTypesAppliedTaxesCache.getOrDefault(rvTypeId, new ArrayList<>());
+    }
     public PropertyRates_MasterEntity getPropertyRate(String constructionType, String zone) {
         String key = constructionType.trim() + "-" + zone.trim();
         logger.info("Cache Lookup - Searching for key: " + key);  // Log key search
@@ -158,8 +183,8 @@ public class PreLoadCache {
         return rvTypesCache.get(rvTypeId);
     }
 
-    public ConsolidatedTaxes_MasterEntity getConsolidatedTax(String taxName) {
-        return consolidatedTaxesCache.get(taxName);
+    public ConsolidatedTaxes_MasterEntity getConsolidatedTax(Long taxKey) {
+        return consolidatedTaxesCache.get(taxKey);
     }
 
     public EduCessAndEmpCess_MasterEntity getEduCessAndEmpCess(double ratableValue) {
@@ -181,4 +206,5 @@ public class PreLoadCache {
     public UnitUsageSubType_MasterEntity getUnitUsageSubType(Long unitUsageSubId) {
         return unitUsageSubCache.get(unitUsageSubId);
     }
+
 }

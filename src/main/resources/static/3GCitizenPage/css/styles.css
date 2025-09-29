@@ -147,3 +147,7 @@ header {
   }
 
 
+.report-wrapper {
+  page-break-after: always;
+  margin-bottom: 40px; /* white gap on print */
+}

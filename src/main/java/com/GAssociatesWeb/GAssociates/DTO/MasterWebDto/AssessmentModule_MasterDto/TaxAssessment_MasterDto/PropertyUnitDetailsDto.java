@@ -17,6 +17,7 @@ public class PropertyUnitDetailsDto {
     private String constructionYearVc;
     private String constructionAgeVc;
     private String ageFactorVc;
+    private String areaBefDedFl;
     private String plotAreaFl;
     private String exemptedAreaFl;
     private String tenantNameVc;

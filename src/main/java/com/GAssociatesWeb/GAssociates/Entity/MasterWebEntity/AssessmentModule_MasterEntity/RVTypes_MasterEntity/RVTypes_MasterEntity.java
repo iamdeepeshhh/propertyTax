@@ -12,6 +12,7 @@ public class RVTypes_MasterEntity {
     private Long rvTypeId;
     private String typeNameVc;
     private String rateFl;
+    @Column(name = "applied_taxes_vc", columnDefinition = "TEXT")
     private String appliedTaxesVc;
     private String descriptionVc;
     @ManyToOne(fetch = FetchType.LAZY, optional = true) // optional=true allows for null category

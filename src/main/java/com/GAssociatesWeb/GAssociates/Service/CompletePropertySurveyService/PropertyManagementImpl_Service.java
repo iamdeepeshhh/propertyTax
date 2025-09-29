@@ -91,28 +91,54 @@ public class PropertyManagementImpl_Service implements PropertyManagement_Servic
     }
 
     @Transactional(readOnly = true)
-    public List<PropertyDetails_Dto> searchNewProperties(String surveyPropertyNo, String ownerName, Integer wardNo, String finalPropertyNo) {
+    public List<PropertyDetails_Dto> searchNewProperties(
+            String surveyPropertyNo,
+            String ownerName,
+            Integer wardNo,
+            String finalPropertyNo) {
+
         List<PropertyDetails_Entity> properties;
 
-         if (surveyPropertyNo != null && wardNo != null){
-            Optional<PropertyDetails_Entity> optionalProperty = propertyDetails_repository.findByPdSurypropnoVcAndPdWardI(surveyPropertyNo, wardNo);
-            properties = optionalProperty.map(Collections::singletonList).orElse(Collections.emptyList());
+        if (finalPropertyNo != null && !finalPropertyNo.trim().isEmpty() && wardNo != null) {
+            // Final Property No + Ward
+            properties = propertyDetails_repository.findByPdFinalpropnoVcAndPdWardI(finalPropertyNo, wardNo);
+
+        } else if (finalPropertyNo != null && !finalPropertyNo.trim().isEmpty()) {
+            // Final Property No only
+            properties = propertyDetails_repository.findByPdFinalpropnoVcContainingIgnoreCase(finalPropertyNo);
+
+        } else if (surveyPropertyNo != null && !surveyPropertyNo.trim().isEmpty() && wardNo != null) {
+            // Survey Property No + Ward
+            properties = propertyDetails_repository.findByPdSurypropnoVcAndPdWardI(surveyPropertyNo, wardNo)
+                    .map(Collections::singletonList)
+                    .orElse(Collections.emptyList());
+
         } else if (ownerName != null && !ownerName.trim().isEmpty() && wardNo != null) {
+            // Owner Name + Ward
             properties = propertyDetails_repository.findByPdOwnernameVcContainingIgnoreCaseAndPdWardI(ownerName, wardNo);
+
         } else if (ownerName != null && !ownerName.trim().isEmpty()) {
+            // Owner Name only
             properties = propertyDetails_repository.findByPdOwnernameVcContainingIgnoreCase(ownerName);
+
         } else if (wardNo != null) {
+            // Ward only
             properties = propertyDetails_repository.findByPdWardI(wardNo);
+
         } else if (surveyPropertyNo != null && !surveyPropertyNo.trim().isEmpty()) {
+            // Survey Property No only
             properties = propertyDetails_repository.findByPdSurypropnoVcContainingIgnoreCase(surveyPropertyNo);
+
         } else {
-            properties = List.of(); // Return an empty list if no criteria are provided
+            // No criteria
+            properties = Collections.emptyList();
         }
 
         return properties.stream()
                 .map(this::convertPropertyDetailsToDto)
                 .collect(Collectors.toList());
     }
+
 
     @Transactional(readOnly = true)
     public List<PropertyDetails_Dto> searchWardandFinalPropertyNo(String finalPropertyNo, Integer wardNo) {
@@ -129,6 +155,7 @@ public class PropertyManagementImpl_Service implements PropertyManagement_Servic
     private PropertyDetails_Dto convertPropertyDetailsToDto(PropertyDetails_Entity entity) {
         PropertyDetails_Dto dto = new PropertyDetails_Dto();
         dto.setPdNewpropertynoVc(entity.getPdNewpropertynoVc());
+        dto.setPdNoticenoVc(entity.getPdNoticenoVc());
         dto.setPdSurypropnoVc(entity.getPdSurypropnoVc());
         dto.setPdFinalpropnoVc(entity.getPdFinalpropnoVc());
         dto.setPdOwnernameVc(entity.getPdOwnernameVc());

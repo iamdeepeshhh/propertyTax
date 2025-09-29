@@ -1,12 +1,16 @@
 package com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto;
 
 import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.PropertyDetails_Dto;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AssessmentResultsDto {
 
     private String SnNoticeId;
@@ -139,5 +143,5 @@ public class AssessmentResultsDto {
     private ConsolidatedTaxDetailsDto consolidatedTaxes;
     private ProposedRatableValueDetailsDto proposedRatableValues;
     private List<String> warnings;
-
+    private Map<Long, Double> taxKeyValueMap = new HashMap<>();
 }

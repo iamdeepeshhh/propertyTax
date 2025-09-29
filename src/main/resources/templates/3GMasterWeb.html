@@ -169,6 +169,7 @@
             <a class="dropdown-item" href="#" onclick="showTab('consolidatedTaxesSection')">Consolidated Taxes</a>
             <a class="dropdown-item" href="#" onclick="showTab('educationAndEmployment')">EDU Cess and EGC Cess</a>
             <a class="dropdown-item" href="#" onclick="showTab('rvTypeMasterSection')">Rate Master</a>
+            <a class="dropdown-item" href="#" onclick="showTab('ReportTaxConfig')">Report Tax Config</a>
 <!--            <a class="dropdown-item" href="#" onclick="showTab('userChargesSection')">User Charges</a>-->
           </div>
         </li>
@@ -191,9 +192,17 @@
             Reports
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownPropertyDetails">
-            <a class="dropdown-item" href="#" onclick="showTab('surveyReports')">Survey Reports</a>
+            <a class="dropdown-item" href="#" onclick="showTab('surveyReports')">Reports</a>
             <a class="dropdown-item" href="#" onclick="showTab('batchReports')">Batch Reports</a>
+          </div>
+        </li>
 
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownNotices" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Notices
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownPropertyDetails">
+            <a class="dropdown-item" href="#" onclick="showTab('notices')">Notices</a>
           </div>
         </li>
       </ul>
@@ -444,6 +453,113 @@
 
 
 
+
+
+
+<!-- Report Tax Config Section -->
+<section id="ReportTaxConfig" style="display:none;">
+    <div class="container mt-5">
+      <h2>Report Tax Config</h2>
+      <p class="text-muted">Define order, grouping, labels, and visibility for taxes per report template.</p>
+
+      <form id="reportTaxConfigForm" class="needs-validation" novalidate>
+        <div class="form-row">
+          <!-- Template Selector -->
+          <div class="form-group col-md-4">
+            <label for="rtc-template">Template</label>
+            <select id="rtc-template" name="templateVc" class="form-control" required>
+              <option value="CALCULATION_SHEET" selected>CALCULATION_SHEET</option>
+              <option value="SPECIAL_NOTICE">SPECIAL_NOTICE</option>
+              <option value="REALTIME_CC">REALTIME_CC</option>
+            </select>
+            <div class="invalid-feedback">Please select a template.</div>
+          </div>
+
+          <!-- Tax Name Dropdown -->
+          <div class="form-group col-md-4">
+            <label for="rtc-taxselect">Tax Name</label>
+            <select id="rtc-taxselect" name="taxKeyL" class="form-control" required>
+              <option value="">Select Tax</option>
+            </select>
+            <div class="invalid-feedback">Please select a tax.</div>
+          </div>
+
+          <!-- Parent Tax Key -->
+          <div class="form-group col-md-4">
+            <label for="rtc-parentkey">Parent Tax Key (optional)</label>
+            <input type="number" id="rtc-parentkey" name="parentTaxKeyL" class="form-control" placeholder="e.g., 1001">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <!-- Standard + Local Names -->
+          <div class="form-group col-md-6">
+            <label for="rtc-standard">Standard Name (English)</label>
+            <input type="text" id="rtc-standard" name="standardNameVc" class="form-control" placeholder="e.g., Property Tax" required>
+            <div class="invalid-feedback">Standard name is required.</div>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="rtc-local">Local Name</label>
+            <input type="text" id="rtc-local" name="localNameVc" class="form-control" placeholder="स्थानिक नाव">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <!-- Sequence -->
+          <div class="form-group col-md-3">
+            <label for="rtc-sequence">Sequence</label>
+            <input type="number" id="rtc-sequence" name="sequenceI" class="form-control" placeholder="1" required>
+            <div class="invalid-feedback">Sequence is required.</div>
+          </div>
+
+          <!-- Visible -->
+          <div class="form-group col-md-3">
+            <div class="form-check" style="margin-top: 32px;">
+              <input class="form-check-input" type="checkbox" id="rtc-visible" name="visibleB" checked>
+              <label class="form-check-label" for="rtc-visible">Visible</label>
+            </div>
+          </div>
+
+          <!-- Show Total -->
+          <div class="form-group col-md-3">
+            <div class="form-check" style="margin-top: 32px;">
+              <input class="form-check-input" type="checkbox" id="rtc-showtotal" name="showTotalBl">
+              <label class="form-check-label" for="rtc-showtotal">Show Parent Total</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="form-group">
+          <button type="button" class="btn btn-primary" disabled>Save (API wiring pending)</button>
+        </div>
+      </form>
+
+      <hr/>
+      <h4>Configured Taxes</h4>
+      <p class="text-muted">A list view will appear here to edit order, visibility, and grouping.</p>
+      <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+        <tr>
+          <th>#</th>
+          <th>Template</th>
+          <th>Sequence</th>
+          <th>Standard Name</th>
+          <th>Local Name</th>
+          <th>Visible</th>
+          <th>Show Total</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="rtc-table-body">
+        <!-- To be populated by JS -->
+        </tbody>
+      </table>
+    </div>
+    <div style="height: 40px;"></div>
+    <div style="height: 40px;"></div>
+    <div style="height: 40px;"></div>
+  </section>
 
 
 <section id="property-type">
@@ -1611,6 +1727,7 @@
         </select>
         <div class="invalid-feedback">Please select a category.</div>
       </div>
+
       <button type="button" class="btn btn-primary" onclick="submitForm('rvTypeForm', ['descriptionVc','categoryId'], '/3g/addRVType')">Add</button>
     </form>
   </div>
@@ -1652,20 +1769,20 @@
                   <!-- Checkboxes will be populated here -->
               </div>
           </div>
-          <div class="bordered-container mt-4">
-              <p><b>Cess Options:</b></p>
-              <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="cessOption" id="educationCessOption" value="EducationCess" onchange="showSubOptions()">
-                  <label class="form-check-label" for="educationCessOption">Education Cess</label>
-              </div>
-              <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="cessOption" id="egcOption" value="EGC">
-                  <label class="form-check-label" for="egcOption">Employment Guarantee Cess (EGC)</label>
-              </div>
-              <div id="subOptionsContainer" class="mt-3">
-                  <!-- Sub options will be populated here -->
-              </div>
-          </div>
+<!--          <div class="bordered-container mt-4">-->
+<!--              <p><b>Cess Options:</b></p>-->
+<!--              <div class="form-check">-->
+<!--                  <input class="form-check-input" type="checkbox" name="cessOption" id="educationCessOption" value="EducationCess" onchange="showSubOptions()">-->
+<!--                  <label class="form-check-label" for="educationCessOption">Education Cess</label>-->
+<!--              </div>-->
+<!--              <div class="form-check">-->
+<!--                  <input class="form-check-input" type="checkbox" name="cessOption" id="egcOption" value="EGC">-->
+<!--                  <label class="form-check-label" for="egcOption">Employment Guarantee Cess (EGC)</label>-->
+<!--              </div>-->
+<!--              <div id="subOptionsContainer" class="mt-3">-->
+<!--                  &lt;!&ndash; Sub options will be populated here &ndash;&gt;-->
+<!--              </div>-->
+<!--          </div>-->
           <div class="col-md-4">
             <button type="button" class="btn btn-primary" onclick="updateRvRate()">Update Rate</button>
         </div>
@@ -1685,6 +1802,7 @@
           <th class="center-text" >Rate</th>
           <th class="center-text" >Applied Taxes</th>
           <th class="center-text" >Description</th>
+          <th class="center-text">Actions</th>
         </tr>
         </thead>
         <tbody id="existingRVTypesTableBody">
@@ -1717,6 +1835,15 @@
                 <div class="invalid-feedback">Please provide a rate.</div>
             </div>
             <div class="col-md-4 mb-3">
+              <label for="isActive">Active Status</label>
+              <select id="isActive" name="isActiveBl" class="form-control" required>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+              <div class="invalid-feedback">Please select active status.</div>
+            </div>
+
+            <div class="col-md-4 mb-3">
                 <label><p>Note: This Tax will get applied on the selected value:</p></label>
                 <div class="form-check">
                     <input class="form-check-input" type="radio" id="newRatableValue" name="applicableonVc" value="Ratable Value" required>
@@ -1727,6 +1854,8 @@
                     <label class="form-check-label" for="newPropertyTax">Property Tax</label>
                 </div>
                 <div class="invalid-feedback">Please select an option.</div>
+            </div>
+            <div class="col-md-4 mb-3">
             </div>
             <div class="col-md-4 mb-3">
                 <button type="button" class="btn btn-primary"  onclick="updateTaxRate()">Update Rate</button>
@@ -1765,8 +1894,11 @@
       <tr>
         <th class="center-text">#</th>
         <th class="center-text">Tax Name</th>
+
         <th class="center-text">Tax Rate (%)</th>
         <th class="center-text">Applicable on</th>
+        <th class="center-text">Is Active</th>
+        <th class="center-text">Actions</th>
       </tr>
       </thead>
       <tbody id="existingConsolidatedTaxesTableBody">
@@ -1908,37 +2040,41 @@
 </section>
 
 
-<!-- Survey Reports Section -->
-<section id="surveyReports" class="container mt-5">
-  <h2>Survey Reports</h2>
+  <section id="surveyReports" class="container mt-5">
+    <h2>Survey Reports</h2>
 
-  <!-- Search Form -->
-  <div class="card">
-    <div class="card-body">
-      <form id="searchForm" class="form-inline justify-content-center">
-        <div class="form-row align-items-center">
-          <div class="col-md-3 mx-2">
-            <input type="text" class="form-control mb-2" id="spnInput" placeholder="Enter SPN...">
+    <div class="card">
+      <div class="card-body">
+        <form id="surveyReports-searchForm">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+              <label for="surveyReports-spnInput" class="form-label">SPN</label>
+              <input type="text" class="form-control" id="surveyReports-spnInput" placeholder="Enter SPN...">
+            </div>
+            <div class="col-md-3">
+              <label for="surveyReports-finalPropertyNoInput" class="form-label">Final Property No.</label>
+              <input type="text" class="form-control" id="surveyReports-finalPropertyNoInput" placeholder="Enter Final Property No.">
+            </div>
+            <div class="col-md-3">
+              <label for="surveyReports-ownerNameInput" class="form-label">Owner Name</label>
+              <input type="text" class="form-control" id="surveyReports-ownerNameInput" placeholder="Enter Owner Name...">
+            </div>
+            <div class="col-md-2">
+              <label for="surveyReports-wardNumberInput" class="form-label">Ward</label>
+              <input type="number" class="form-control" id="surveyReports-wardNumberInput" placeholder="Ward No.">
+            </div>
+            <div class="col-md-1 d-grid">
+              <button type="button" id="searchButtonSurvey" class="btn btn-success">Search</button>
+            </div>
           </div>
-          <div class="col-md-3 mx-2">
-            <input type="text" class="form-control mb-2" id="ownerNameInput" placeholder="Enter Owner Name...">
-          </div>
-          <div class="col-md-3 mx-2">
-            <input type="number" class="form-control mb-2" id="wardNumberInput" placeholder="Enter Ward Number...">
-          </div>
-          <div class="col-md-1 mx-2">
-            <button type="button" id="searchButtonSurvey" class="btn btn-success mb-2">Search</button>
-          </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <!-- Centered Scrollable Table -->
-  <div class="mt-4 d-flex justify-content-center">
-    <div style="overflow-x: auto; max-height: 500px; width: auto; min-width: 80%;">
-      <table class="table-extended table-bordered table-hover" style="min-width: 1000px; text-align: center;">
-        <thead class="thead-dark">
+    <div class="mt-4 d-flex justify-content-center">
+      <div style="overflow-x: auto; max-height: 500px; width: auto; min-width: 80%;">
+        <table class="table table-bordered table-hover text-center" style="min-width: 1000px;">
+          <thead class="thead-dark">
           <tr>
             <th>#</th>
             <th>SPN</th>
@@ -1950,45 +2086,109 @@
             <th>Zone</th>
             <th>Actions</th>
           </tr>
-        </thead>
-        <tbody id="searchResultsSurvey">
+          </thead>
+          <tbody id="searchResultsSurvey">
           <!-- Data will populate here -->
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section id="uploadFiles" class="container mt-5">
-  <h2>Upload Files</h2>
+  <!-- Notices Section -->
+  <section id="notices" class="container mt-5">
+    <h2>Notices</h2>
 
-  <!-- Search Form -->
-  <div class="card">
-    <div class="card-body">
-      <form id="searchForm" class="form-inline justify-content-center">
-        <div class="form-row align-items-center">
-          <div class="col-md-3 mx-2">
-            <input type="text" class="form-control mb-2" id="spnInput" placeholder="Enter SPN...">
+    <div class="card">
+      <div class="card-body">
+        <form id="notices-searchForm" class="row g-3 align-items-center">
+
+          <div class="col-md-3">
+            <label for="notices-spnInput" class="form-label">SPN</label>
+            <input type="text" class="form-control" id="notices-spnInput" placeholder="Enter SPN...">
           </div>
-          <div class="col-md-3 mx-2">
-            <input type="text" class="form-control mb-2" id="ownerNameInput" placeholder="Enter Owner Name...">
+
+          <div class="col-md-3">
+            <label for="notices-finalPropertyNoInput" class="form-label">Final Property No.</label>
+            <input type="text" class="form-control" id="notices-finalPropertyNoInput" placeholder="Enter Final Property No.">
           </div>
-          <div class="col-md-3 mx-2">
-            <input type="number" class="form-control mb-2" id="wardNumberInput" placeholder="Enter Ward Number...">
+
+          <div class="col-md-3">
+            <label for="notices-ownerNameInput" class="form-label">Owner Name</label>
+            <input type="text" class="form-control" id="notices-ownerNameInput" placeholder="Enter Owner Name...">
           </div>
-          <div class="col-md-1 mx-2">
-            <button type="button" id="searchButtonUpload" class="btn btn-success mb-2">Search</button>
+
+          <div class="col-md-2">
+            <label for="notices-wardNumberInput" class="form-label">Ward</label>
+            <input type="number" class="form-control" id="notices-wardNumberInput" placeholder="Ward No.">
           </div>
-        </div>
-      </form>
+
+          <div class="col-md-1 d-grid">
+            <button type="button" id="notices-searchButton" class="btn btn-success">Search</button>
+          </div>
+
+        </form>
+      </div>
     </div>
-  </div>
 
-  <!-- Scrollable Centered Table -->
-  <div class="mt-4 d-flex justify-content-center">
-    <div style="overflow-x: auto; max-height: 1000px; width: auto; min-width: 80%;">
-      <table class="table-extended table-bordered table-hover" style="min-width: 1000px; text-align: center;">
-        <thead class="thead-dark">
+    <div class="mt-4 d-flex justify-content-center">
+      <div style="overflow-x: auto; max-height: 500px; width: auto; min-width: 80%;">
+        <table class="table-extended table-bordered table-hover" style="min-width: 1000px; text-align: center;">
+          <thead class="thead-dark">
+          <tr>
+            <th>#</th>
+            <th>Final Property No.</th>
+            <th>Owner Name</th>
+            <th>Address</th>
+            <th>Ward</th>
+            <th>Zone</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody id="notices-searchResults">
+          <!-- Data will populate here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Upload Files Section -->
+  <section id="uploadFiles" class="container mt-5">
+    <h2>Upload Files</h2>
+
+    <div class="card">
+      <div class="card-body">
+        <form id="uploadFiles-searchForm">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+              <label for="uploadFiles-spnInput" class="form-label">SPN</label>
+              <input type="text" class="form-control" id="uploadFiles-spnInput" placeholder="Enter SPN...">
+            </div>
+            <div class="col-md-3">
+              <label for="uploadFiles-finalPropertyNoInput" class="form-label">Final Property No.</label>
+              <input type="text" class="form-control" id="uploadFiles-finalPropertyNoInput" placeholder="Enter Final Property No.">
+            </div>
+            <div class="col-md-3">
+              <label for="uploadFiles-ownerNameInput" class="form-label">Owner Name</label>
+              <input type="text" class="form-control" id="uploadFiles-ownerNameInput" placeholder="Enter Owner Name...">
+            </div>
+            <div class="col-md-2">
+              <label for="uploadFiles-wardNumberInput" class="form-label">Ward</label>
+              <input type="number" class="form-control" id="uploadFiles-wardNumberInput" placeholder="Ward No.">
+            </div>
+            <div class="col-md-1 d-grid">
+              <button type="button" id="searchButtonUpload" class="btn btn-success">Search</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-center">
+      <div style="overflow-x: auto; max-height: 1000px; width: auto; min-width: 80%;">
+        <table class="table table-bordered table-hover text-center" style="min-width: 1000px;">
+          <thead class="thead-dark">
           <tr>
             <th>#</th>
             <th>SPN</th>
@@ -2000,14 +2200,15 @@
             <th>Zone</th>
             <th>Actions</th>
           </tr>
-        </thead>
-        <tbody id="searchResultsUpload">
+          </thead>
+          <tbody id="searchResultsUpload">
           <!-- Data will populate here -->
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+
 
 <!-- Batch Reports Section -->
 <section id="batchReports" class="container mt-5">
@@ -2072,10 +2273,18 @@
     </div>
     <!-- Hidden field to store the Base64 image string -->
     <input type="hidden" id="councilImagePreview" name="councilImagePreview">
+
+    <div class="form-group col-md-6">
+      <label for="agencySignImage">Agency sign Image:</label>
+      <input type="file" class="form-control" id="agencySignImage" name="image" accept="image/*">
+    </div>
+    <!-- Hidden field to store the Base64 image string -->
+    <input type="hidden" id="agencySignImagePreview" name="councilImagePreview">
     <div class="text-center mt-4">
     <button type="button" class="btn btn-primary d-block mx-auto" onclick="submitCouncilDetailsForm()">Submit</button>
+    </div>
   </form>
-  </div>
+
 
   <div class="mt-5" >
     <h3>Existing Council Details</h3>
@@ -2121,9 +2330,9 @@
   </div>
 </div>
 </main>
-<footer>
-  <p>© 2024 3G Associates. All rights reserved.</p>
-</footer>
+<!--<footer>-->
+<!--  <p>© 2024 3G Associates. All rights reserved.</p>-->
+<!--</footer>-->
 
 
 

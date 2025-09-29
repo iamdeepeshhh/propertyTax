@@ -13,4 +13,15 @@ public class ConsolidatedTaxes_MasterEntity {
     private String taxNameVc;
     private String taxRateFl;
     private String applicableonVc;
+
+    private Boolean isActiveBl = true;
+//    private String taxNameLocalVc;//for Local language
+//    private String taxNameStandardVc;//for Standard generic language
+
+//    @Enumerated(EnumType.STRING)
+//    private TaxTypeEnum taxType;
+
+    private String descriptionVc;//optional field for giving tax description
+    private Long taxKeyL;//
+//    private Integer positionI;
 }

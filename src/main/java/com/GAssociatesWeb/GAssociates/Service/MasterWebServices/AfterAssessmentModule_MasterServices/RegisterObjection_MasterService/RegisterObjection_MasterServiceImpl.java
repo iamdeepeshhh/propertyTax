@@ -19,6 +19,8 @@ public class RegisterObjection_MasterServiceImpl implements RegisterObjection_Ma
         RegisterObjection_Entity entity = new RegisterObjection_Entity();
         entity.setWardNo(dto.getWardNo());
         entity.setFinalPropertyNo(dto.getFinalPropertyNo());
+        entity.setSurveyNo(dto.getSurveyNo());
+        entity.setNoticeNo(dto.getNoticeNo());
         entity.setOwnerName(dto.getOwnerName());
         entity.setReasons(dto.getReasons());
         entity.setOthers(dto.getOthers());

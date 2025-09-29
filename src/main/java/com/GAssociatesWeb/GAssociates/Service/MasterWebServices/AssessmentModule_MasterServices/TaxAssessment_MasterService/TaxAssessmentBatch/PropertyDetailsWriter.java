@@ -62,6 +62,44 @@ public class PropertyDetailsWriter implements ItemWriter<AssessmentResultsDto> {
         property_taxDetails.setPtUserChargesFl(nullToZero(result.getConsolidatedTaxes().getUserChargesFl()));
         property_taxDetails.setPtEnvironmentTaxFl(nullToZero(result.getConsolidatedTaxes().getEnvironmentalTaxFl()));
         property_taxDetails.setPtLightTaxFl(nullToZero(result.getConsolidatedTaxes().getLightTaxFl()));
+
+        property_taxDetails.setPtWaterTaxFl(nullToZero(result.getConsolidatedTaxes().getWaterTaxFl()));
+        property_taxDetails.setPtSewerageTaxFl(nullToZero(result.getConsolidatedTaxes().getSewerageTaxFl()));
+        property_taxDetails.setPtSewerageBenefitTaxFl(nullToZero(result.getConsolidatedTaxes().getSewerageBenefitTaxFl()));
+        property_taxDetails.setPtWaterBenefitTaxFl(nullToZero(result.getConsolidatedTaxes().getWaterBenefitTaxFl()));
+        property_taxDetails.setPtStreetTaxFl(nullToZero(result.getConsolidatedTaxes().getStreetTaxFl()));
+        property_taxDetails.setPtSpecialConservancyTaxFl(nullToZero(result.getConsolidatedTaxes().getSpecialConservancyTaxFl()));
+        property_taxDetails.setPtMunicipalEduTaxFl(nullToZero(result.getConsolidatedTaxes().getMunicipalEducationTaxFl()));
+        property_taxDetails.setPtSpecialEduTaxFl(nullToZero(result.getConsolidatedTaxes().getSpecialEducationTaxFl()));
+        property_taxDetails.setPtServiceChargesFl(nullToZero(result.getConsolidatedTaxes().getServiceChargesFl()));
+        property_taxDetails.setPtMiscellaneousChargesFl(nullToZero(result.getConsolidatedTaxes().getMiscellaneousChargesFl()));
+
+// Reserved taxes (Tax1 to Tax25)
+        property_taxDetails.setPtTax1Fl(nullToZero(result.getConsolidatedTaxes().getTax1Fl()));
+        property_taxDetails.setPtTax2Fl(nullToZero(result.getConsolidatedTaxes().getTax2Fl()));
+        property_taxDetails.setPtTax3Fl(nullToZero(result.getConsolidatedTaxes().getTax3Fl()));
+        property_taxDetails.setPtTax4Fl(nullToZero(result.getConsolidatedTaxes().getTax4Fl()));
+        property_taxDetails.setPtTax5Fl(nullToZero(result.getConsolidatedTaxes().getTax5Fl()));
+        property_taxDetails.setPtTax6Fl(nullToZero(result.getConsolidatedTaxes().getTax6Fl()));
+        property_taxDetails.setPtTax7Fl(nullToZero(result.getConsolidatedTaxes().getTax7Fl()));
+        property_taxDetails.setPtTax8Fl(nullToZero(result.getConsolidatedTaxes().getTax8Fl()));
+        property_taxDetails.setPtTax9Fl(nullToZero(result.getConsolidatedTaxes().getTax9Fl()));
+        property_taxDetails.setPtTax10Fl(nullToZero(result.getConsolidatedTaxes().getTax10Fl()));
+        property_taxDetails.setPtTax11Fl(nullToZero(result.getConsolidatedTaxes().getTax11Fl()));
+        property_taxDetails.setPtTax12Fl(nullToZero(result.getConsolidatedTaxes().getTax12Fl()));
+        property_taxDetails.setPtTax13Fl(nullToZero(result.getConsolidatedTaxes().getTax13Fl()));
+        property_taxDetails.setPtTax14Fl(nullToZero(result.getConsolidatedTaxes().getTax14Fl()));
+        property_taxDetails.setPtTax15Fl(nullToZero(result.getConsolidatedTaxes().getTax15Fl()));
+        property_taxDetails.setPtTax16Fl(nullToZero(result.getConsolidatedTaxes().getTax16Fl()));
+        property_taxDetails.setPtTax17Fl(nullToZero(result.getConsolidatedTaxes().getTax17Fl()));
+        property_taxDetails.setPtTax18Fl(nullToZero(result.getConsolidatedTaxes().getTax18Fl()));
+        property_taxDetails.setPtTax19Fl(nullToZero(result.getConsolidatedTaxes().getTax19Fl()));
+        property_taxDetails.setPtTax20Fl(nullToZero(result.getConsolidatedTaxes().getTax20Fl()));
+        property_taxDetails.setPtTax21Fl(nullToZero(result.getConsolidatedTaxes().getTax21Fl()));
+        property_taxDetails.setPtTax22Fl(nullToZero(result.getConsolidatedTaxes().getTax22Fl()));
+        property_taxDetails.setPtTax23Fl(nullToZero(result.getConsolidatedTaxes().getTax23Fl()));
+        property_taxDetails.setPtTax24Fl(nullToZero(result.getConsolidatedTaxes().getTax24Fl()));
+        property_taxDetails.setPtTax25Fl(nullToZero(result.getConsolidatedTaxes().getTax25Fl()));
         property_taxDetails.setPtFinalTaxFl(nullToZero(result.getConsolidatedTaxes().getTotalTaxFl()));
         property_taxDetailsRepository.save(property_taxDetails);
     }

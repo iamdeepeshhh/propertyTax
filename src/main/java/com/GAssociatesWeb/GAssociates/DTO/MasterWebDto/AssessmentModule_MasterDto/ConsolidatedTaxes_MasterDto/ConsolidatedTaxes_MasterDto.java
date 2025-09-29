@@ -13,4 +13,11 @@ public class ConsolidatedTaxes_MasterDto {
     private String taxRateFl;
     private String applicableonVc;
 
+    private Boolean isActiveBl;
+//    private String taxNameLocalVc;//for Local language
+//    private String taxNameStandardVc;//for Standard generic language
+    private String taxType;//is it (cess or tax)
+    private String descriptionVc;//optional field for giving tax description
+    private Long taxKeyL;
+    private Integer positionI;
 }

@@ -59,6 +59,47 @@ $.ajax({
         alert('No property number found.');
         return; // Exit if no property number is found
     }
+    buildReportTaxTable("#calculationSheetTaxTable", "CALCULATION_SHEET");
+
+    // Build dynamic tax headers from report tax configs (same logic as RealtimeCC/Batch)
+//    $.get('/3g/reportTaxConfigs?template=CALCULATION_SHEET', function(configs) {
+//        if (!configs || configs.length === 0) {
+//            console.warn('No tax configs received');
+//            return;
+//        }
+//        const table = $('#rightTable');
+//        const rows = table.find('tr');
+//        if (rows.length > 1) rows.slice(1).remove();
+//        const headerRow1 = $('<tr id="taxHeaderRow" height="5" class="t-a-c"></tr>').css('background-color', '#CEF6CE');
+//        const headerRow2 = $('<tr id="taxChildHeaderRow" class="t-a-c"></tr>').css('background-color', '#F8E0F7');
+//        const valueRow   = $('<tr id="taxValueRow" class="h-25 t-a-c"></tr>');
+//        table.append(headerRow1).append(headerRow2).append(valueRow);
+//        const parentMap = {};
+//        configs.forEach(cfg => { if (!cfg.parentTaxKeyL) parentMap[cfg.taxKeyL] = { parent: cfg, children: [] }; });
+//        configs.forEach(cfg => { if (cfg.parentTaxKeyL) { (parentMap[cfg.parentTaxKeyL] ||= { parent: null, children: [] }).children.push(cfg); } });
+//        configs.sort((a,b) => a.sequenceI - b.sequenceI);
+//        configs.forEach(cfg => {
+//            if (!cfg.parentTaxKeyL) {
+//                const group = parentMap[cfg.taxKeyL];
+//                if (group && group.children.length > 0) {
+//                    headerRow1.append(`<th colspan="${group.children.length + (cfg.showTotalBl ? 1 : 0)}">${cfg.localNameVc}</th>`);
+//                    group.children.forEach(child => {
+//                        headerRow2.append(`<th>${child.localNameVc}</th>`);
+//                        valueRow.append(`<td id="tax-${child.taxKeyL}"><b>0</b></td>`);
+//                    });
+//                    if (cfg.showTotalBl) {
+//                        headerRow2.append('<th>एकूण</th>');
+//                        valueRow.append(`<td id="tax-${cfg.taxKeyL}"><b>0</b></td>`);
+//                    }
+//                } else {
+//                    headerRow1.append(`<th rowspan="2">${cfg.localNameVc}</th>`);
+//                    valueRow.append(`<td id="tax-${cfg.taxKeyL}"><b>0</b></td>`);
+//                }
+//            }
+//        });
+//        headerRow1.append('<th rowspan="2">Total</th>');
+//        valueRow.append('<td id="totalTax"><b>0</b></td>');
+//    });
 
     // Construct the URL for the API call
     var apiUrl = '/3g/calculatedDetails/' + propertyId;
@@ -93,7 +134,7 @@ $.ajax({
                 $('#pdPropertynameVc').text(data.pdPropertynameVc || '-');
                 $('#pdPropertyaddressVc').text(data.pdPropertyaddressVc || '-');
                 $('#pdPincodeVc').text(data.pdPincodeVc || '-');
-                $('#pdCategoryI').text(data.pdCategoryI || '-');
+                $('#pdCategoryI').text(translate("category", data.pdCategoryI));
                 fetchNameById('/3gSurvey/propertyTypes', data.pdPropertytypeI, function(name) {
                     $('#pdPropertytypeI').text(name);
                 });
@@ -114,13 +155,13 @@ $.ajax({
                 });
                 $('#pdConstAgeI').text(data.pdConstAgeI || '-');
                 $('#pdConstYearVc').text(data.pdConstYearVc || '-');
-                $('#pdPermissionstatusVc').text(data.pdPermissionstatusVc || '-');
+                $('#pdPermissionstatusVc').text(translate("yesNo", data.pdPermissionstatusVc));
                 $('#pdPermissionnoVc').text(data.pdPermissionnoVc || '-');
                 $('#pdPermissiondateDt').text(data.pdPermissiondateDt || '-');
                 $('#pdNooffloorsI').text(data.pdNooffloorsI || '-');
                 $('#pdNoofroomsI').text(data.pdNoofroomsI || '-');
-                $('#pdStairVc').text(data.pdStairVc || '-');
-                $('#pdLiftVc').text(data.pdLiftVc || '-');
+                $('#pdStairVc').text(translate("yesNo", data.pdStairVc));
+                $('#pdLiftVc').text(translate("yesNo", data.pdLiftVc));
                 $('#pdRoadwidthF').text(data.pdRoadwidthF || '-');
                 $('#pdToiletstatusVc').text(data.pdToiletstatusVc || '-');
                 $('#pdToiletsI').text(data.pdToiletsI || '-');
@@ -137,8 +178,8 @@ $.ajax({
                 $('#pdElectricityconnectionVc').text(data.pdElectricityconnectionVc || '-');
                 $('#pdElemeternoVc').text(data.pdElemeternoVc || '-');
                 $('#pdEleconsumernoVc').text(data.pdEleconsumernoVc || '-');
-                $('#pdRainwaterhaverstVc').text(data.pdRainwaterhaverstVc || '-');
-                $('#pdSolarunitVc').text(data.pdSolarunitVc || '-');
+                $('#pdRainwaterhaverstVc').text(translate("yesNo", data.pdRainwaterhaverstVc));
+                $('#pdSolarunitVc').text(translate("yesNo", data.pdSolarunitVc));
                 $('#pdPlotareaF').text(data.pdPlotareaF || '-');
                 $('#pdTotbuiltupareaF').text(data.pdTotbuiltupareaF || '-');
                 $('#pdTotcarpetareaF').text(data.pdTotcarpetareaF || '-');
@@ -150,7 +191,7 @@ $.ajax({
                 $('#pdOldrvFl').text(data.pdOldrvFl || '-');
                 $('#user_id').text(data.user_id || '-');
                 $('#pdPolytypeVc').text(data.pdPolytypeVc || '-');
-                $('#pdStatusbuildingVc').text(data.pdStatusbuildingVc || '-');
+                $('#pdStatusbuildingVc').text(translate("buildingStatus", data.pdStatusbuildingVc));
                 $('#pdLastassesdateDt').text(data.pdLastassesdateDt || '-');
                 $('#pdFirstassesdateDt').text(data.pdFirstassesdateDt || '-');
                 $('#pdNoticenoVc').text(data.pdNoticenoVc || '-');
@@ -167,7 +208,7 @@ $.ajax({
                 $('#pdSaledeedI').text(data.pdSaledeedI || '-');
                 $('#pdSaledateDt').text(data.pdSaledateDt || '-');
                 $('#pdCitysurveynoF').text(data.pdCitysurveynoF || '-');
-                $('#pdOwnertypeVc').text(data.pdOwnertypeVc || '-');
+                $('#pdOwnertypeVc').text(translate("ownerType", data.pdOwnertypeVc));
                 $('#pdBuildingvalueI').text(data.pdBuildingvalueI || '-');
                 $('#pdPlotvalueF').text(data.pdPlotvalueF || '-');
                 $('#pdTpdateDt').text(data.pdTpdateDt || '-');
@@ -226,7 +267,16 @@ $.ajax({
                 $('#lightTax').text(data.consolidatedTaxes.lightTaxFl || '0');
                 $('#fireTax').text(data.consolidatedTaxes.fireTaxFl || '0');
                 $('#userChargesTax').text(data.consolidatedTaxes.userChargesFl || '0');
-                $('#totalTax').text(data.consolidatedTaxes.totalTaxFl || '0');
+                // Fill dynamic taxes by keys
+                if (data.taxKeyValueMap) {
+                    const m = data.taxKeyValueMap;
+                    for (let key in m) {
+                        $(`#tax-${key}`).text(m[key] != null ? m[key] : 0);
+                    }
+                }
+                if (data.consolidatedTaxes) {
+                    $('#totalTax').text(data.consolidatedTaxes.totalTaxFl || '0');
+                }
                 $('#proposedResidentFl').text(data.proposedRatableValues.residentialFl || '0');
                 $('#proposedCommercialFl').text(data.proposedRatableValues.commercialFl || '0');
                 $('#proposedReligiousFl').text(data.proposedRatableValues.religiousFl || '0');
@@ -278,6 +328,60 @@ $.ajax({
     });
 });
 
+function buildReportTaxTable(tableSelector, templateName = "CALCULATION_SHEET") {
+    $.get('/3g/reportTaxConfigs?template=' + templateName, function(configs) {
+        if (!configs || configs.length === 0) {
+            console.warn('No tax configs received');
+            return;
+        }
+
+        const table = $(tableSelector);
+        const rows = table.find('tr');
+        if (rows.length > 1) rows.slice(1).remove();
+
+        const headerRow1 = $('<tr class="t-a-c"></tr>').css('background-color', '#CEF6CE');
+        const headerRow2 = $('<tr class="t-a-c"></tr>').css('background-color', '#F8E0F7');
+        const valueRow   = $('<tr class="t-a-c"></tr>');
+
+        table.append(headerRow1).append(headerRow2).append(valueRow);
+
+        const parentMap = {};
+        configs.forEach(cfg => {
+            if (!cfg.parentTaxKeyL) parentMap[cfg.taxKeyL] = { parent: cfg, children: [] };
+        });
+        configs.forEach(cfg => {
+            if (cfg.parentTaxKeyL) {
+                (parentMap[cfg.parentTaxKeyL] ||= { parent: null, children: [] }).children.push(cfg);
+            }
+        });
+
+        configs.sort((a,b) => a.sequenceI - b.sequenceI);
+
+        configs.forEach(cfg => {
+            if (!cfg.parentTaxKeyL) {
+                const group = parentMap[cfg.taxKeyL];
+                if (group && group.children.length > 0) {
+                    headerRow1.append(`<th colspan="${group.children.length + (cfg.showTotalBl ? 1 : 0)}">${cfg.localNameVc}</th>`);
+                    group.children.forEach(child => {
+                        headerRow2.append(`<th>${child.localNameVc}</th>`);
+                        valueRow.append(`<td id="tax-${child.taxKeyL}"><b>0</b></td>`);
+                    });
+                    if (cfg.showTotalBl) {
+                        headerRow2.append('<th>एकूण</th>');
+                        valueRow.append(`<td id="tax-${cfg.taxKeyL}"><b>0</b></td>`);
+                    }
+                } else {
+                    headerRow1.append(`<th rowspan="2">${cfg.localNameVc}</th>`);
+                    valueRow.append(`<td id="tax-${cfg.taxKeyL}"><b>0</b></td>`);
+                }
+            }
+        });
+
+        headerRow1.append('<th rowspan="2">एकूण</th>');
+        valueRow.append('<td id="totalTax"><b>0</b></td>');
+    });
+}
+
 function formatYearRange(date, useDevanagari = true) {
     if (!date || date === '-') return '-';
     const year = parseInt(date.split('-')[0]);
@@ -286,7 +390,7 @@ function formatYearRange(date, useDevanagari = true) {
     const startYearL = startYear + 1;
     const endYearL = endYear + 1;
     const toText = useDevanagari ? convertToDevanagari : (n) => n;
-    return `${toText(startYear.toString())}-${toText(startYearL.toString())} ते ${toText(endYear.toString())}-${toText(endYearL.toString())}`;
+    return `${toText(startYear.toString())}-${toText(startYearL.toString())} - ${toText(endYear.toString())}-${toText(endYearL.toString())}`;
 }
 function convertToDevanagari(numberString) {
     const devanagariDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
@@ -312,14 +416,14 @@ function populateUnitDetails(units) {
             <tr class="t-a-c h-25">
                 <td>${unit.unitNoVc || '-'}</td>
                 <td>${unit.floorNoVc || '-'}</td>
-                <td id="occupantStatus-${unit.unitNoVc}">${unit.occupantStatusI || '-'}</td>
+                <td id="occupantStatus-${unit.unitNoVc}">${translate("occupantStatus", unit.occupantStatusI)}</td>
                 <td id="usageType-${unit.unitNoVc}">${unit.usageTypeVc || '-'}</td>
                 <td id="usageSubType-${unit.unitNoVc}">${unit.usageSubTypeVc || '-'}</td>
                 <td>${unit.constructionTypeVc || '-'}</td>
                 <td>${unit.constructionYearVc || '-'}</td>
                 <td>${unit.constructionAgeVc || '-'}</td>
                 <td>${unit.ageFactorVc || '-'}</td>
-                <td>${unit.exemptedAreaFl || '0'}</td>
+                <td>${unit.areaBefDedFl || '0'}</td>
                 <td>${unit.carpetAreaFl || '0'}</td>
                 <td>${unit.plotAreaFl || '0'}</td>
                 <td>${unit.exemptedAreaFl || '0'}</td>
@@ -348,7 +452,7 @@ function populateUnitDetails(units) {
             $('#usageSubType-' + unit.unitNoVc).text(name);
         });
         fetchNameById('/3gSurvey/occupantStatus', unit.occupantStatusI, function(name) {
-            $('#occupantStatus-' + unit.unitNoVc).text(name);
+            $('#occupantStatus-' + unit.unitNoVc).text(translate("occupantStatus", name));
         });
     });
 }
@@ -368,4 +472,53 @@ function fetchNameById(url, id, callback) {
             callback('-');
         }
     });
+    }
+
+    const translationsMap = {
+      ownerType: {
+        "Private": "खाजगी",
+        "Co-operative Housing Society": "गृहनिर्माण सहकारी संस्था",
+        "Government": "शासन",
+        "Municipality": "नगर पंचायत",
+        "Public": "सार्वजनिक",
+        "Other": "इतर"
+      },
+      occupantStatus: {
+        "Owner": "मालक",
+        "Tenant": "भाडेकरी",
+        "Occupier": "भोगवटदार",
+        "Encroacher": "अतिक्रमणकारी",
+        "Owner/Tenant": "मालक/भाडेकरी"
+      },
+      category: {
+        "Owner": "मालक",
+        "Tenant": "भाडेकरू",
+        "Owner/Tenant": "मालक/भाडेकरू",
+        "Occupier": "भोगवटदार",
+        "Encroacher": "अतिक्रमणकारी"
+      },
+      buildingStatus: {
+        "Normal": "साधारण",
+        "Demolished": "पाडलेले",
+        "normal": "साधारण",
+        "demolished": "पाडलेले"
+      },
+      yesNo: {
+        "yes": "होय",
+        "no": "नाही"
+      }
+    };
+
+
+    function translate(field, value) {
+      if (!value || value === '-') return '-';
+
+      // normalize Yes/No case-insensitively
+      if (field === "yesNo") {
+        const key = value.toString().toLowerCase();
+        return translationsMap.yesNo[key] || value;
+      }
+
+      const map = translationsMap[field] || {};
+      return map[value] || value;
     }

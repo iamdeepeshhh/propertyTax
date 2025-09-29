@@ -134,3 +134,16 @@ services:
       - DB_NAME=kudal
       - DB_USER=anildb
       - DB_PASSWORD=anildatabase
+
+  kadam-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kalamb-springboot-app
+    ports:
+      - "8089:8080"
+    environment:
+      - DB_HOST=anildb.cntcfzqepwsi.ap-south-1.rds.amazonaws.com
+      - DB_NAME=kalamb
+      - DB_USER=anildb
+      - DB_PASSWORD=anildatabase

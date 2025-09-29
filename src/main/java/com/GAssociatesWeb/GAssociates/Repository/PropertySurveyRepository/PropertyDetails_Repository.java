@@ -26,4 +26,6 @@ public interface PropertyDetails_Repository extends JpaRepository<PropertyDetail
     List<PropertyDetails_Entity> findByPdFinalpropnoVcAndPdWardI(String pdFinalpropnoVc, Integer pdWardI);
     @Query("SELECT p.pdWardI, COUNT(p) FROM PropertyDetails_Entity p GROUP BY p.pdWardI ORDER BY p.pdWardI")
     List<Object[]> getWardWiseCount();
+
+    List<PropertyDetails_Entity> findByPdFinalpropnoVcContainingIgnoreCase(String finalPropertyNo);
 }

@@ -1,12 +1,13 @@
 // Show council details
 $(document).ready(function () {
+ buildReportTaxTable("#specialNoticeTaxTable", "SPECIAL_NOTICE");
   $.ajax({
     url: '/3g/getCouncilDetails',
     type: 'GET',
     success: function (data) {
       if (data && data.length > 0) {
         const councilDetails = data[0];
-        $('.councilName').text(councilDetails.localName);
+        $('.councilLocalName').text(councilDetails.localName);
         if (councilDetails.imageBase64) {
           $('.councilLogo').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
           $('.standardSiteNameVC').text(councilDetails.standardSiteNameVC);
@@ -51,6 +52,61 @@ function convertToDevanagari(numberString) {
   return numberString.toString().replace(/\d/g, d => digits[d]);
 }
 
+// ✅ Reusable function to build report tax table dynamically
+function buildReportTaxTable(tableSelector, templateName = "SPECIAL_NOTICE") {
+    $.get('/3g/reportTaxConfigs?template=' + templateName, function(configs) {
+        if (!configs || configs.length === 0) {
+            console.warn('No tax configs received');
+            return;
+        }
+
+        const table = $(tableSelector);
+        const rows = table.find('tr');
+        if (rows.length > 1) rows.slice(1).remove();
+
+        const headerRow1 = $('<tr class="t-a-c"></tr>').css('background-color', '#CEF6CE');
+        const headerRow2 = $('<tr class="t-a-c"></tr>').css('background-color', '#F8E0F7');
+        const valueRow   = $('<tr class="t-a-c"></tr>');
+
+        table.append(headerRow1).append(headerRow2).append(valueRow);
+
+        const parentMap = {};
+        configs.forEach(cfg => {
+            if (!cfg.parentTaxKeyL) parentMap[cfg.taxKeyL] = { parent: cfg, children: [] };
+        });
+        configs.forEach(cfg => {
+            if (cfg.parentTaxKeyL) {
+                (parentMap[cfg.parentTaxKeyL] ||= { parent: null, children: [] }).children.push(cfg);
+            }
+        });
+
+        configs.sort((a,b) => a.sequenceI - b.sequenceI);
+
+        configs.forEach(cfg => {
+            if (!cfg.parentTaxKeyL) {
+                const group = parentMap[cfg.taxKeyL];
+                if (group && group.children.length > 0) {
+                    headerRow1.append(`<th colspan="${group.children.length + (cfg.showTotalBl ? 1 : 0)}">${cfg.localNameVc}</th>`);
+                    group.children.forEach(child => {
+                        headerRow2.append(`<th>${child.localNameVc}</th>`);
+                        valueRow.append(`<td id="tax-${child.taxKeyL}"><b>0</b></td>`);
+                    });
+                    if (cfg.showTotalBl) {
+                        headerRow2.append('<th>एकूण</th>');
+                        valueRow.append(`<td id="tax-${cfg.taxKeyL}"><b>0</b></td>`);
+                    }
+                } else {
+                    headerRow1.append(`<th rowspan="2">${cfg.localNameVc}</th>`);
+                    valueRow.append(`<td id="tax-${cfg.taxKeyL}"><b>0</b></td>`);
+                }
+            }
+        });
+
+        headerRow1.append('<th rowspan="2">एकूण</th>');
+        valueRow.append('<td id="totalTax"><b>0</b></td>');
+    });
+}
+
 let dataList = [];
 let currentChunk = 0;
 const chunkSize = 100;
@@ -58,42 +114,44 @@ let $originalPage = null;
 
 // 2️⃣ Setup button and AJAX call
 $(document).ready(function () {
-  $('body').prepend(`<button id="startPrint">🖨 Print Special Notice</button>`);
+  const path = window.location.pathname; // e.g. /specialNotice/1
+  const wardMatch = path.match(/\/specialNotice\/(\d+)/);
+  const wardNo = wardMatch ? wardMatch[1] : null;
+  const newPropertyNo = new URLSearchParams(window.location.search).get("newPropertyNo");
 
-  $('#startPrint').on('click', function () {
-    $('#startPrint').hide();
+  if (newPropertyNo) {
+    // 👉 Directly render single property special notice
+    renderSingleSpecialNotice(newPropertyNo);
+  } else {
+    // 👉 Ward case: Add button for printing
+    $('body').prepend(`<button id="startPrint">🖨 Print Special Notice</button>`);
 
-    const pathSegments = window.location.pathname.split('/');
-    const wardNo = pathSegments.find(segment => /^\d+$/.test(segment));
+    $('#startPrint').on('click', function () {
+      $('#startPrint').hide();
 
-    if (!wardNo) {
-      alert("Ward number not found in URL.");
-      $('#startPrint').show();
-      return;
-    }
+      $.ajax({
+        url: `/3g/specialNotices?wardNo=${wardNo}`,
+        method: 'GET',
+        success: function (data) {
+          if (!data || data.length === 0) {
+            alert("No data found.");
+            $('#startPrint').show();
+            return;
+          }
 
-    $.ajax({
-      url: `/3g/specialNotices/${wardNo}`,
-      method: 'GET',
-      success: function (data) {
-        if (!data || data.length === 0) {
-          alert("No data found.");
+          dataList = data;
+          currentChunk = 0;
+          $originalPage = $('.page-container').detach();
+
+          renderAndPrintChunk();  // ✅ Ward-wise printing
+        },
+        error: function () {
+          alert("Error fetching data.");
           $('#startPrint').show();
-          return;
         }
-
-        dataList = data;
-        currentChunk = 0;
-        $originalPage = $('.page-container').detach();
-
-        renderAndPrintChunk();  // ✅ Called here
-      },
-      error: function () {
-        alert("Error fetching data.");
-        $('#startPrint').show();
-      }
+      });
     });
-  });
+  }
 });
 
 // ✅ Add print button event
@@ -117,10 +175,12 @@ function renderAndPrintChunk() {
     if (dto.pdPropimageT) {
       $page.find('#pdPropimageT').attr('src', 'data:image/jpeg;base64,' + dto.pdPropimageT);
     }
-    
+
 
     // 📋 Summary Table
     $page.find('.pdNoticenoVc').text(dto.pdNoticenoVc || '');
+    $page.find('.pdOwnernameVc').text(dto.pdOwnernameVc || '');
+    $page.find('.pdOccupinameF').text(dto.pdOccupinameF || '');
     $page.find('.pdWardI').text(dto.pdWardI || '');
     $page.find('.pdZoneI').text(dto.pdZoneI || '');
     $page.find('.pdSurypropnoVc').text(dto.pdSurypropnoVc || '');
@@ -129,12 +189,16 @@ function renderAndPrintChunk() {
     $page.find('.pdPropertytypeAndSubtype').text((propertyTypeMap[dto.pdPropertytypeI] || '') + ' → ' + (propertySubtypeMap[dto.pdPropertysubtypeI] || ''));
     $page.find('.pdPlotvalueF').text(dto.pdPlotvalueF || '');
     $page.find('.fireTaxFl').text(dto.consolidatedTaxes?.fireTaxFl || '');
-    $page.find('.currentAssessmentDateDt').text(dto.currentAssessmentDateDt || '');
+    $page.find('.currentAssessmentDateDt').text(dto.currentAssessmentDateDt || '');               //change by anand                             //change by anand
+                           //Change by anand
+
 
     // 🏘️ Property Details Table
     $page.find('.pdFinalpropnoVc').text(dto.pdFinalpropnoVc || '');
     $page.find('.pdUsagetypeAndSubtype').text( (usageTypeMap[dto.pdUsagetypeI] || '') + ' → ' + (subUsageTypeMap[dto.pdUsagesubtypeI] || ''));
     $page.find('.pdAssesareaF').text(dto.pdAssesareaF || '');
+
+
 
     // 🏷️ Ratable Value Table
     const ratable = dto.proposedRatableValues || {};
@@ -149,22 +213,21 @@ function renderAndPrintChunk() {
     $page.find('.industrialOpenPlotFl').text(dto.industrialOpenPlotFl || '');
     $page.find('.educationAndLegalInstituteOpenPlotFl').text(dto.educationAndLegalInstituteOpenPlotFl || '');
     $page.find('.governmentFl').text(dto.governmentFl || '');
-    $page.find('.pdBuildingvalueI').text(dto.pdBuildingvalueI || '');
+    $page.find('.industrialFl').text(dto.industrialFl || '');
     $page.find('.mobileTowerFl').text(dto.mobileTowerFl || '');
     $page.find('.electricSubstationFl').text(dto.electricSubstationFl || '');
+    $page.find('.aggregateFl').text(ratable.aggregateFl || '');
 
     // 💰 Consolidated Tax Table
-    const tax = dto.consolidatedTaxes || {};
-    $page.find('.propertyTaxFl').text(tax.propertyTaxFl || '');
-    $page.find('.educationTaxResid').text(dto.educationTaxResid || '');
-    $page.find('.educationTaxComm').text(dto.educationTaxComm || '');
-    $page.find('.educationTaxTotalFl').text(tax.educationTaxTotalFl || '');
-    $page.find('.egcFl').text(tax.egcFl || '');
-    $page.find('.treeTaxFl').text(tax.treeTaxFl || '');
-    $page.find('.cleannessTaxFl').text(tax.cleannessTaxFl || '');
-    $page.find('.lightTaxFl').text(tax.lightTaxFl || '');
-    $page.find('.fireTaxFl').text(tax.fireTaxFl || '');
-
+    if (dto.taxKeyValueMap) {
+        const taxKeyValueMap = dto.taxKeyValueMap;
+        for (let key in taxKeyValueMap) {
+            $page.find(`#tax-${key}`).text(taxKeyValueMap[key] != null ? taxKeyValueMap[key] : 0);
+        }
+    }
+    if (dto.consolidatedTaxes) {
+        $page.find('#totalTax').text(dto.consolidatedTaxes.totalTaxFl || '0');
+    }
     $reportContainer.append($page);
   });
 
@@ -223,5 +286,64 @@ async function getIdValueList(apiUrl, nameKey = 'localName') {
     }
 }
 
+async function renderSingleSpecialNotice(propertyNo) {
+  try {
+    const response = await fetch(`/3g/specialNotices?newPropertyNo=${propertyNo}`);
+    if (!response.ok) throw new Error("Failed to fetch special notice");
+    const data = await response.json();
 
+    if (!data || data.length === 0) {
+      alert("No special notice found for property: " + propertyNo);
+      return;
+    }
 
+    const dto = data[0]; // only one expected
+    if (!$originalPage) {
+      $originalPage = $('.page-container').detach();
+    }
+    const $page = $originalPage.clone(false, false);
+    $('body').addClass('print-preview');
+    console.log(dto);
+    // images
+    if (dto.pdHouseplan2T) $page.find('#pdHouseplan2T').attr('src', 'data:image/jpeg;base64,' + dto.pdHouseplan2T);
+    if (dto.pdPropimageT) $page.find('#pdPropimageT').attr('src', 'data:image/jpeg;base64,' + dto.pdPropimageT);
+
+    // summary
+    $page.find('.pdNoticenoVc').text(dto.pdNoticenoVc || '');
+    $page.find('.pdOwnernameVc').text(dto.pdOwnernameVc || '');
+    $page.find('.pdOccupinameF').text(dto.pdOccupinameF || '');
+    $page.find('.pdWardI').text(dto.pdWardI || '');
+    $page.find('.pdZoneI').text(dto.pdZoneI || '');
+    $page.find('.pdSurypropnoVc').text(dto.pdSurypropnoVc || '');
+    $page.find('.pdNewpropertynoVc').text(dto.pdNewpropertynoVc || '');
+    $page.find('.pdOldpropnoVc').text(dto.pdOldpropnoVc || '');
+    $page.find('.pdPropertytypeAndSubtype').text((propertyTypeMap[dto.pdPropertytypeI] || '') + ' → ' + (propertySubtypeMap[dto.pdPropertysubtypeI] || ''));
+
+    // usage
+    $page.find('.pdFinalpropnoVc').text(dto.pdFinalpropnoVc || '');
+    $page.find('.pdUsagetypeAndSubtype').text((usageTypeMap[dto.pdUsagetypeI] || '') + ' → ' + (subUsageTypeMap[dto.pdUsagesubtypeI] || ''));
+    $page.find('.pdAssesareaF').text(dto.pdAssesareaF || '');
+
+    // ratable values
+    const ratable = dto.proposedRatableValues || {};
+    $page.find('.residentialFl').text(ratable.residentialFl || '');
+    $page.find('.commercialFl').text(ratable.commercialFl || '');
+    $page.find('.aggregateFl').text(ratable.aggregateFl || '');
+
+    // consolidated taxes
+    if (dto.taxKeyValueMap) {
+      for (let key in dto.taxKeyValueMap) {
+        $page.find(`#tax-${key}`).text(dto.taxKeyValueMap[key] != null ? dto.taxKeyValueMap[key] : 0);
+      }
+    }
+    if (dto.consolidatedTaxes) {
+      $page.find('#totalTax').text(dto.consolidatedTaxes.totalTaxFl || '0');
+    }
+
+    $('body').append($('<div class="single-report"></div>').append($page));
+
+  } catch (e) {
+    console.error(e);
+    alert("Error fetching single special notice");
+  }
+}

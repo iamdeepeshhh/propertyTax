@@ -4,6 +4,7 @@ import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDt
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.ConsolidatedTaxDetailsDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.PropertyUnitDetailsDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.ProposedRatableValueDetailsDto;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.ReportConfigs_MasterServices.ReportTaxKeys;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -21,181 +22,219 @@ public class CalculationSheetGenerator_MasterServiceImpl implements CalculationS
 
     private String getBaseReportQuery() {
         return """
-
-    SELECT DISTINCT
-    p.pd_ward_i AS ward,                                   --0
-    p.pd_zone_i AS zone,                                   --1
-    p.pd_newpropertyno_vc AS newpropertyno,                --2
-    p.pd_finalpropno_vc AS finalpropertyno,                --3
-    p.pd_ownername_vc AS ownername,                        --4
-    p.pd_occupiname_f AS occupiername,                     --5
-    p.pd_surypropno_vc AS surveypropno,                    --6
-    u.ud_floorno_vc AS floorno,                            --7
-    r.prv_yearlyrent_fl AS rentalno,                       --8
-    u.ud_usagetype_i AS usagetype,                         --9
-    u.ud_constructionclass_i AS constclass,                --10
-    r.prv_agefactor_vc AS agefactor,                       --11
-    u.ud_carpetarea_f AS carpetarea,                       --12
-    u.ud_assessmentarea_f AS totalassesablearea,           --13
-    r.prv_rate_f AS ratepersqm,                            --14
-    r.prv_lentingvalue_f AS total_assessment_value,        --15
-    r.prv_depper_i AS deppercent,                          --16
-    r.prv_depamount_f AS depamount,                        --17
-    r.prv_alv_f AS amountafterdep,                         --18
-    r.prv_taxvalue_f AS taxableValueByRate,                --19
-    ROUND(COALESCE(r.prv_mainval_f, 0)) AS ten_percent_of_considered,  --20
-    r.prv_ratablevalue_f AS ratablevaluetobeconsidered,    --21
-    pr.pr_totalrv_fl AS totalratablevalue,                 --22
-    COALESCE(pr.pr_residential_fl, 0) AS residential,      --23
-    COALESCE(pr.pr_commercial_fl, 0) +                     
-    COALESCE(pr.pr_industrial_fl, 0) +                    
-    COALESCE(pr.pr_government_fl, 0) +                     
-    COALESCE(pr.pr_educational_fl, 0) +                    
-    COALESCE(pr.pr_religious_fl, 0) +
-    COALESCE(pr.pr_mobiletower_fl, 0) +
-    COALESCE(pr.pr_electricsubstation_fl, 0) +
-    COALESCE(pr.pr_commercialopenplot_fl, 0) +
-    COALESCE(pr.pr_industrialopenplot_fl, 0) +
-    COALESCE(pr.pr_governmentopenplot_fl, 0) +
-    COALESCE(pr.pr_educationlegalopenplot_fl, 0) +
-    COALESCE(pr.pr_religiousopenplot_fl, 0) +
-    COALESCE(pr.pr_residentialopenplot_fl, 0) AS non_residential, --24
-    ROUND(pt.pt_final_tax_fl) AS totaltax,                        --25
-    old.pod_totalratablevalue_i AS oldrv,                         --26
-    old.pod_totaltax_fl AS oldtax,                                --27
-    old.pod_oldpropno_vc AS oldpropertyno,                        --28
-    old.pod_zone_i AS oldpropertyzone,                            --29
-    (SELECT a.current_assessment_date FROM assessmentdate_master a LIMIT 1) AS assessmentDate, --30
-    p.pd_propertyaddress_vc AS propertyAddress,                   --31
-    p.pd_propertyname_vc AS propertyName,                         --32
-    p.pd_layoutname_vc AS layoutName,                             --33
-    p.pd_khasrano_vc AS khasraNo,                                 --34
-    p.pd_plotno_vc AS plotNo,                                     --35
-    p.pd_gridid_vc AS gridId,                                     --36
-    p.pd_parcelid_vc AS parcelId,                                 --37
-    p.pd_roadid_vc AS roadId,                                     --38
-    p.pd_contactno_vc AS contactNo,                               --39
-    p.pd_meterno_vc AS meterNo,                                   --40
-    p.pd_consumerno_vc AS consumerNo,                             --41
-    p.pd_connectiondate_dt AS connectionDate,                     --42
-    p.pd_pipesize_f AS pipeSize,                                  --43
-    p.pd_permissionstatus_vc AS permissionStatus,                 --44
-    p.pd_permissionno_vc AS permissionNo,                         --45
-    p.pd_permissiondate_dt AS permissionDate,                     --46
-    p.pd_rainwaterhaverst_vc AS rainwaterHarvest,                 --47
-    p.pd_solarunit_vc AS solarUnit,                               --48
-    p.pd_stair_vc AS stair,                                       --49
-    p.pd_lift_vc AS lift,                                         --50
-    p.pd_noofrooms_i AS noOfRooms,                                --51
-    p.pd_nooffloors_i AS noOfFloors,                              --52
-    p.pd_indexno_vc AS indexNo,                                   --53
-    p.pd_toilets_i AS toiletNo,                                   --54
-    p.pd_toiletstatus_vc AS toiletStatus,                         --55
-    p.pd_waterconnstatus_vc AS waterConnection,                   --56
-    p.pd_waterconntype_vc AS waterConnectionType,                 --57
-    old.pod_ward_i AS oldWard,                                    --58                              
-    old.pod_propertytype_i AS oldPropertyType,                    --59
-    old.pod_propertysubtype_i AS oldPropertySubType,              --60
-    old.pod_usagetype_i AS oldPropertyUsageType,                  --61
-    old.pod_constclass_vc AS constClass,                          --62
-    old.pod_totalassessmentarea_fl AS totalAssessableArea,        --63
-    (SELECT a.last_assessment_date FROM assessmentdate_master a LIMIT 1) AS lastAssessmentDate,--64
-    p.pd_propertytype_i AS propertyType,                          --65
-    p.pd_propertysubtype_i AS propertySubType,                    --66         
-    p.pd_usagetype_i AS propertyUsageType,                        --67
-    p.pd_usagesubtype_i AS propertyUsageSubType,                  --68
-    p.pd_buildingtype_i AS buildingType,                          --69
-    p.pd_buildingsubtype_i AS buildingSubType,                    --70
-    p.pd_statusbuilding_vc AS buildingStatus,                     --71
-    p.pd_ownertype_vc AS ownerType,                               --72
-    p.pd_category_i AS ownerCategory,                             --73
-    p.pd_const_age_i AS age,                                      --74
-    p.pd_plotarea_f AS totalPlotArea,                             --75
-    p.pd_totbuiltuparea_f AS totalBuiltupArea,                    --76
-    p.pd_totcarpetarea_f AS totalCarpetArea,                      --77
-    p.pd_totalexemparea_f AS totalExemption,                      --78
-    p.pd_arealetout_f AS totalAreaLetOut,                         --79
-    p.pd_areanotletout_f AS totalAreaNotLetOut,                   --80
-    u.ud_unitno_vc AS unitNo,                                     --81
-    u.ud_usagesubtype_i AS usageSubtype,                          --82
-    u.ud_constyear_dt AS constDate,                               --83
-    u.ud_const_age_i AS constAge,                                 --84
-    u.ud_exempted_area_f AS exemptedArea,                         --85
-    pr.pr_residential_fl AS residentialFl,                        --86
-    pr.pr_commercial_fl AS commercialFl,                          --87
-    pr.pr_religious_fl AS religiousFl,                            --88
-    pr.pr_residentialopenplot_fl AS residentialOpenPlotFl,        --89
-    pr.pr_commercialopenplot_fl AS commercialOpenPlotFl,          --90
-    pr.pr_governmentopenplot_fl AS governmentOpenPlotFl,          --91
-    pr.pr_educationlegalopenplot_fl AS educationAndLegalInstituteOpenPlotFl, --92
-    pr.pr_religiousopenplot_fl AS religiousOpenPlotFl,            --93
-    pr.pr_industrialopenplot_fl AS industrialOpenPlotFl,          --94
-    pr.pr_educational_fl AS educationalInstituteFl,               --95
-    pr.pr_government_fl AS governmentFl,                          --96
-    pr.pr_industrial_fl AS industrialFl,                          --97
-    pr.pr_mobiletower_fl AS mobileTowerFl,                        --98
-    pr.pr_electricsubstation_fl AS electricSubstationFl,          --99
-    pt.pt_cleantax_fl AS cleanTax,                               --100 
-    pt.pt_edunrestax_fl AS eduNonResidentialTax,                 --101
-    pt.pt_edurestax_fl AS eduResidentialTax,                     --102
-    pt.pt_edutax_fl AS totalEducationTax,                        --103         
-    pt.pt_environmenttax_fl AS environmentTax,                   --104
-    pt.pt_egctax_fl AS egcTax,                                   --105
-    pt.pt_firetax_fl AS fireTax,                                 --106
-    pt.pt_lighttax_fl AS lightTax,                               --107
-    pt.pt_propertytax_fl AS propertyTax,                         --108
-    pt.pt_treetax_fl AS treeTax,                                 --109
-    pt.pt_usercharges_fl AS userCharges,                         --110
-    r.prv_temainval_fl AS maintenanceRepairByRent,               --111
-    r.prv_tentantval_f AS taxableValueByRent,                    --112
-    u.ud_occupiername_vc AS tenantNameVc,                         --113
-    p.pd_propimage_t AS propertyImage,                           --114
-    p.pd_houseplan2_t AS cadFile,                                --115
-    rsum.alv AS annualRentalValueFl,                             --116
-    rsum.yearlyrent AS annualUnRentalValueFl,                    --117
-    rsum.considered_rv AS finalValueToConsiderFl,                --118
-    rsum.sum_maintenance_rent AS maintainenceRepairRentFl,       --119
-    rsum.sum_maintenance_unrent AS maintainenceRepairUnrentFl,   --120
-    rsum.maintenanceRepairsConsidered AS maintainenceRepairAmountConsideredFl, --121
-    rsum.considered_rv_rental AS consideredRentalFl,             --122
-    rsum.considered_rv_unrental AS consideredUnrentalFl          --123
-
-    FROM property_details p
-    JOIN unit_details u ON p.pd_newpropertyno_vc = u.pd_newpropertyno_vc
-    LEFT JOIN property_rvalues r ON p.pd_newpropertyno_vc = r.prv_propertyno_vc 
-        AND CAST(r.prv_unitno_vc AS INTEGER) = u.ud_unitno_vc
-    LEFT JOIN (
-        SELECT
-            prv_propertyno_vc,
-            SUM(COALESCE(prv_alv_f, 0)) AS alv,
-            SUM(COALESCE(prv_yearlyrent_fl, 0)) AS yearlyrent,
-            GREATEST(
-                SUM(COALESCE(prv_alv_f, 0)),
-                SUM(COALESCE(prv_yearlyrent_fl, 0))
-            ) AS considered_rv,
-            SUM(COALESCE(prv_mainval_f, 0)) AS sum_maintenance_rent,
-            SUM(COALESCE(prv_temainval_fl, 0)) AS sum_maintenance_unrent,
-            GREATEST(
-                SUM(COALESCE(prv_mainval_f, 0)),
-                SUM(COALESCE(prv_temainval_fl, 0))
-            ) AS maintenanceRepairsConsidered,
-            CASE
-                WHEN SUM(COALESCE(prv_alv_f, 0)) > SUM(COALESCE(prv_yearlyrent_fl, 0))
-                    THEN SUM(COALESCE(prv_alv_f, 0))
-                ELSE 0.0
-            END AS considered_rv_rental,
-            CASE
-                WHEN SUM(COALESCE(prv_yearlyrent_fl, 0)) > SUM(COALESCE(prv_alv_f, 0))
-                    THEN SUM(COALESCE(prv_yearlyrent_fl, 0))
-                ELSE 0.0
-            END AS considered_rv_unrental
-        FROM property_rvalues
-        GROUP BY prv_propertyno_vc
-    ) rsum ON p.pd_newpropertyno_vc = rsum.prv_propertyno_vc
-    LEFT JOIN property_taxdetails pt ON p.pd_newpropertyno_vc = pt.pt_newpropertyno_vc
-    LEFT JOIN proposed_rvalues pr ON p.pd_newpropertyno_vc = pr.pr_newpropertyno_vc
-    LEFT JOIN property_olddetails old ON CAST(NULLIF(p.prop_refno, '') AS INTEGER) = old.pod_refno_vc
-    """;
+        
+            SELECT DISTINCT
+            p.pd_ward_i AS ward,                                   --0
+            p.pd_zone_i AS zone,                                   --1
+            p.pd_newpropertyno_vc AS newpropertyno,                --2
+            p.pd_finalpropno_vc AS finalpropertyno,                --3
+            p.pd_ownername_vc AS ownername,                        --4
+            p.pd_occupiname_f AS occupiername,                     --5
+            p.pd_surypropno_vc AS surveypropno,                    --6
+            u.ud_floorno_vc AS floorno,                            --7
+            r.prv_yearlyrent_fl AS rentalno,                       --8
+            u.ud_usagetype_i AS usagetype,                         --9
+            u.ud_constructionclass_i AS constclass,                --10
+            r.prv_agefactor_vc AS agefactor,                       --11
+            u.ud_carpetarea_f AS carpetarea,                       --12
+            u.ud_assessmentarea_f AS totalassesablearea,           --13
+            r.prv_rate_f AS ratepersqm,                            --14
+            r.prv_lentingvalue_f AS total_assessment_value,        --15
+            r.prv_depper_i AS deppercent,                          --16
+            r.prv_depamount_f AS depamount,                        --17
+            r.prv_alv_f AS amountafterdep,                         --18
+            r.prv_taxvalue_f AS taxableValueByRate,                --19
+            ROUND(COALESCE(r.prv_mainval_f, 0)) AS ten_percent_of_considered,  --20
+            r.prv_ratablevalue_f AS ratablevaluetobeconsidered,    --21
+            pr.pr_totalrv_fl AS totalratablevalue,                 --22
+            COALESCE(pr.pr_residential_fl, 0) AS residential,      --23
+            COALESCE(pr.pr_commercial_fl, 0) +                     
+            COALESCE(pr.pr_industrial_fl, 0) +                    
+            COALESCE(pr.pr_government_fl, 0) +                     
+            COALESCE(pr.pr_educational_fl, 0) +                    
+            COALESCE(pr.pr_religious_fl, 0) +
+            COALESCE(pr.pr_mobiletower_fl, 0) +
+            COALESCE(pr.pr_electricsubstation_fl, 0) +
+            COALESCE(pr.pr_commercialopenplot_fl, 0) +
+            COALESCE(pr.pr_industrialopenplot_fl, 0) +
+            COALESCE(pr.pr_governmentopenplot_fl, 0) +
+            COALESCE(pr.pr_educationlegalopenplot_fl, 0) +
+            COALESCE(pr.pr_religiousopenplot_fl, 0) +
+            COALESCE(pr.pr_residentialopenplot_fl, 0) AS non_residential, --24
+            ROUND(pt.pt_final_tax_fl) AS totaltax,                        --25
+            old.pod_totalratablevalue_i AS oldrv,                         --26
+            old.pod_totaltax_fl AS oldtax,                                --27
+            old.pod_oldpropno_vc AS oldpropertyno,                        --28
+            old.pod_zone_i AS oldpropertyzone,                            --29
+            (SELECT a.current_assessment_date FROM assessmentdate_master a LIMIT 1) AS assessmentDate, --30
+            p.pd_propertyaddress_vc AS propertyAddress,                   --31
+            p.pd_propertyname_vc AS propertyName,                         --32
+            p.pd_layoutname_vc AS layoutName,                             --33
+            p.pd_khasrano_vc AS khasraNo,                                 --34
+            p.pd_plotno_vc AS plotNo,                                     --35
+            p.pd_gridid_vc AS gridId,                                     --36
+            p.pd_parcelid_vc AS parcelId,                                 --37
+            p.pd_roadid_vc AS roadId,                                     --38
+            p.pd_contactno_vc AS contactNo,                               --39
+            p.pd_meterno_vc AS meterNo,                                   --40
+            p.pd_consumerno_vc AS consumerNo,                             --41
+            p.pd_connectiondate_dt AS connectionDate,                     --42
+            p.pd_pipesize_f AS pipeSize,                                  --43
+            p.pd_permissionstatus_vc AS permissionStatus,                 --44
+            p.pd_permissionno_vc AS permissionNo,                         --45
+            p.pd_permissiondate_dt AS permissionDate,                     --46
+            p.pd_rainwaterhaverst_vc AS rainwaterHarvest,                 --47
+            p.pd_solarunit_vc AS solarUnit,                               --48
+            p.pd_stair_vc AS stair,                                       --49
+            p.pd_lift_vc AS lift,                                         --50
+            p.pd_noofrooms_i AS noOfRooms,                                --51
+            p.pd_nooffloors_i AS noOfFloors,                              --52
+            p.pd_indexno_vc AS indexNo,                                   --53
+            p.pd_toilets_i AS toiletNo,                                   --54
+            p.pd_toiletstatus_vc AS toiletStatus,                         --55
+            p.pd_waterconnstatus_vc AS waterConnection,                   --56
+            p.pd_waterconntype_vc AS waterConnectionType,                 --57
+            old.pod_ward_i AS oldWard,                                    --58                              
+            old.pod_propertytype_i AS oldPropertyType,                    --59
+            old.pod_propertysubtype_i AS oldPropertySubType,              --60
+            old.pod_usagetype_i AS oldPropertyUsageType,                  --61
+            old.pod_constclass_vc AS constClass,                          --62
+            old.pod_totalassessmentarea_fl AS totalAssessableArea,        --63
+            (SELECT a.last_assessment_date FROM assessmentdate_master a LIMIT 1) AS lastAssessmentDate,--64
+            p.pd_propertytype_i AS propertyType,                          --65
+            p.pd_propertysubtype_i AS propertySubType,                    --66         
+            p.pd_usagetype_i AS propertyUsageType,                        --67
+            p.pd_usagesubtype_i AS propertyUsageSubType,                  --68
+            p.pd_buildingtype_i AS buildingType,                          --69
+            p.pd_buildingsubtype_i AS buildingSubType,                    --70
+            p.pd_statusbuilding_vc AS buildingStatus,                     --71
+            p.pd_ownertype_vc AS ownerType,                               --72
+            p.pd_category_i AS ownerCategory,                             --73
+            p.pd_const_age_i AS age,                                      --74
+            p.pd_plotarea_f AS totalPlotArea,                             --75
+            p.pd_totbuiltuparea_f AS totalBuiltupArea,                    --76
+            p.pd_totcarpetarea_f AS totalCarpetArea,                      --77
+            p.pd_totalexemparea_f AS totalExemption,                      --78
+            p.pd_arealetout_f AS totalAreaLetOut,                         --79
+            p.pd_areanotletout_f AS totalAreaNotLetOut,                   --80
+            u.ud_unitno_vc AS unitNo,                                     --81
+            u.ud_usagesubtype_i AS usageSubtype,                          --82
+            u.ud_constyear_dt AS constDate,                               --83
+            u.ud_const_age_i AS constAge,                                 --84
+            u.ud_exempted_area_f AS exemptedArea,                         --85
+            pr.pr_residential_fl AS residentialFl,                        --86
+            pr.pr_commercial_fl AS commercialFl,                          --87
+            pr.pr_religious_fl AS religiousFl,                            --88
+            pr.pr_residentialopenplot_fl AS residentialOpenPlotFl,        --89
+            pr.pr_commercialopenplot_fl AS commercialOpenPlotFl,          --90
+            pr.pr_governmentopenplot_fl AS governmentOpenPlotFl,          --91
+            pr.pr_educationlegalopenplot_fl AS educationAndLegalInstituteOpenPlotFl, --92
+            pr.pr_religiousopenplot_fl AS religiousOpenPlotFl,            --93
+            pr.pr_industrialopenplot_fl AS industrialOpenPlotFl,          --94
+            pr.pr_educational_fl AS educationalInstituteFl,               --95
+            pr.pr_government_fl AS governmentFl,                          --96
+            pr.pr_industrial_fl AS industrialFl,                          --97
+            pr.pr_mobiletower_fl AS mobileTowerFl,                        --98
+            pr.pr_electricsubstation_fl AS electricSubstationFl,          --99
+            pt.pt_cleantax_fl AS cleanTax,                               --100 
+            pt.pt_edunrestax_fl AS eduNonResidentialTax,                 --101
+            pt.pt_edurestax_fl AS eduResidentialTax,                     --102
+            pt.pt_edutax_fl AS totalEducationTax,                        --103         
+            pt.pt_environmenttax_fl AS environmentTax,                   --104
+            pt.pt_egctax_fl AS egcTax,                                   --105
+            pt.pt_firetax_fl AS fireTax,                                 --106
+            pt.pt_lighttax_fl AS lightTax,                               --107
+            pt.pt_propertytax_fl AS propertyTax,                         --108
+            pt.pt_treetax_fl AS treeTax,                                 --109
+            pt.pt_usercharges_fl AS userCharges,                         --110
+            r.prv_temainval_fl AS maintenanceRepairByRent,               --111
+            r.prv_tentantval_f AS taxableValueByRent,                    --112
+            u.ud_occupiername_vc AS tenantNameVc,                         --113
+            p.pd_propimage_t AS propertyImage,                           --114
+            p.pd_houseplan2_t AS cadFile,                                --115
+            rsum.alv AS annualUnRentalValueFl,                             --116
+            rsum.yearlyrent AS annualRentalValueFl,                    --117
+            rsum.considered_rv AS finalValueToConsiderFl,                --118
+            rsum.sum_maintenance_rent AS maintainenceRepairRentFl,       --119
+            rsum.sum_maintenance_unrent AS maintainenceRepairUnrentFl,   --120
+            rsum.maintenanceRepairsConsidered AS maintainenceRepairAmountConsideredFl, --121
+            rsum.considered_rv_rental AS consideredRentalFl,             --122
+            rsum.considered_rv_unrental AS consideredUnrentalFl,          --123
+            u.ud_occupantstatus_i AS occupantStatus,                      --124
+            u.ud_areabefded_fl AS areaBefDed,                             --125
+            u.ud_plotarea_fl AS plotArea                                  --126
+            , COALESCE(pt.pt_watertax_fl, 0) AS waterTax                   --127
+            , COALESCE(pt.pt_seweragetax_fl, 0) AS sewerageTax             --128
+            , COALESCE(pt.pt_seweragebenefittax_fl, 0) AS sewerageBenefitTax --129
+            , COALESCE(pt.pt_waterbenefittax_fl, 0) AS waterBenefitTax     --130
+            , COALESCE(pt.pt_streettax_fl, 0) AS streetTax                 --131
+            , COALESCE(pt.pt_specialconservancytax_fl, 0) AS specialConservancyTax --132
+            , COALESCE(pt.pt_municipaledutax_fl, 0) AS municipalEducationTax --133
+            , COALESCE(pt.pt_specialedutax_fl, 0) AS specialEducationTax   --134
+            , COALESCE(pt.pt_servicecharges_fl, 0) AS serviceCharges       --135
+            , COALESCE(pt.pt_miscellaneouscharges_fl, 0) AS miscellaneousCharges --136
+            , COALESCE(pt.pt_tax1_fl, 0) AS tax1                           --137
+            , COALESCE(pt.pt_tax2_fl, 0) AS tax2                           --138
+            , COALESCE(pt.pt_tax3_fl, 0) AS tax3                           --139
+            , COALESCE(pt.pt_tax4_fl, 0) AS tax4                           --140
+            , COALESCE(pt.pt_tax5_fl, 0) AS tax5                           --141
+            , COALESCE(pt.pt_tax6_fl, 0) AS tax6                           --142
+            , COALESCE(pt.pt_tax7_fl, 0) AS tax7                           --143
+            , COALESCE(pt.pt_tax8_fl, 0) AS tax8                           --144
+            , COALESCE(pt.pt_tax9_fl, 0) AS tax9                           --145
+            , COALESCE(pt.pt_tax10_fl, 0) AS tax10                         --146
+            , COALESCE(pt.pt_tax11_fl, 0) AS tax11                         --147
+            , COALESCE(pt.pt_tax12_fl, 0) AS tax12                         --148
+            , COALESCE(pt.pt_tax13_fl, 0) AS tax13                         --149
+            , COALESCE(pt.pt_tax14_fl, 0) AS tax14                         --150
+            , COALESCE(pt.pt_tax15_fl, 0) AS tax15                         --151
+            , COALESCE(pt.pt_tax16_fl, 0) AS tax16                         --152
+            , COALESCE(pt.pt_tax17_fl, 0) AS tax17                         --153
+            , COALESCE(pt.pt_tax18_fl, 0) AS tax18                         --154
+            , COALESCE(pt.pt_tax19_fl, 0) AS tax19                         --155
+            , COALESCE(pt.pt_tax20_fl, 0) AS tax20                         --156
+            , COALESCE(pt.pt_tax21_fl, 0) AS tax21                         --157
+            , COALESCE(pt.pt_tax22_fl, 0) AS tax22                         --158
+            , COALESCE(pt.pt_tax23_fl, 0) AS tax23                         --159
+            , COALESCE(pt.pt_tax24_fl, 0) AS tax24                         --160
+            , COALESCE(pt.pt_tax25_fl, 0) AS tax25                         --161
+            
+            FROM property_details p
+            JOIN unit_details u ON p.pd_newpropertyno_vc = u.pd_newpropertyno_vc
+            LEFT JOIN property_rvalues r ON p.pd_newpropertyno_vc = r.prv_propertyno_vc 
+                AND CAST(r.prv_unitno_vc AS INTEGER) = u.ud_unitno_vc
+            LEFT JOIN (
+                SELECT
+                    prv_propertyno_vc,
+                    SUM(COALESCE(prv_alv_f, 0)) AS alv,
+                    SUM(COALESCE(prv_yearlyrent_fl, 0)) AS yearlyrent,
+                    GREATEST(
+                        SUM(COALESCE(prv_alv_f, 0)),
+                        SUM(COALESCE(prv_yearlyrent_fl, 0))
+                    ) AS considered_rv,
+                    SUM(COALESCE(prv_mainval_f, 0)) AS sum_maintenance_rent,
+                    SUM(COALESCE(prv_temainval_fl, 0)) AS sum_maintenance_unrent,
+                    GREATEST(
+                        SUM(COALESCE(prv_mainval_f, 0)),
+                        SUM(COALESCE(prv_temainval_fl, 0))
+                    ) AS maintenanceRepairsConsidered,
+                    CASE
+                        WHEN SUM(COALESCE(prv_alv_f, 0)) > SUM(COALESCE(prv_yearlyrent_fl, 0))
+                            THEN SUM(COALESCE(prv_alv_f, 0))
+                        ELSE 0.0
+                    END AS considered_rv_rental,
+                    CASE
+                        WHEN SUM(COALESCE(prv_yearlyrent_fl, 0)) > SUM(COALESCE(prv_alv_f, 0))
+                            THEN SUM(COALESCE(prv_yearlyrent_fl, 0))
+                        ELSE 0.0
+                    END AS considered_rv_unrental
+                FROM property_rvalues
+                GROUP BY prv_propertyno_vc
+            ) rsum ON p.pd_newpropertyno_vc = rsum.prv_propertyno_vc
+            LEFT JOIN property_taxdetails pt ON p.pd_newpropertyno_vc = pt.pt_newpropertyno_vc
+            LEFT JOIN proposed_rvalues pr ON p.pd_newpropertyno_vc = pr.pr_newpropertyno_vc
+            LEFT JOIN property_olddetails old ON CAST(NULLIF(p.prop_refno, '') AS INTEGER) = old.pod_refno_vc
+            """;
     }
 
 
@@ -364,7 +403,9 @@ public class CalculationSheetGenerator_MasterServiceImpl implements CalculationS
                     "pt.pt_lighttax_fl AS lightTax, " +
                     "pt.pt_propertytax_fl AS propertyTax, " +
                     "pt.pt_treetax_fl AS treeTax, " +
-                    "pt.pt_usercharges_fl AS userCharges " +
+                    "pt.pt_usercharges_fl AS userCharges, " +
+                    "u.ud_occupantstatus_i AS occupantStatus, " +
+                    "u.ud_areabefded_fl AS areaBefDed " +
 
                     "FROM property_details p " +
                     "JOIN unit_details u ON p.pd_newpropertyno_vc = u.pd_newpropertyno_vc " +
@@ -413,6 +454,7 @@ public class CalculationSheetGenerator_MasterServiceImpl implements CalculationS
                 unitDto.setUsageTypeVc(row[9] != null ? row[9].toString() : "-"); // Usage Type
                 unitDto.setConstructionTypeVc(row[10] != null ? row[10].toString() : "-"); // Construction Class
                 unitDto.setAgeFactorVc(row[11] != null ? row[11].toString() : "-"); // Age Factor
+                unitDto.setAreaBefDedFl(row[125] != null ? row[125].toString() : "-"); //area before deduction
                 unitDto.setCarpetAreaFl(row[12] != null ? row[12].toString() : null); // Carpet Area
                 unitDto.setTaxableAreaFl(row[13] != null ? row[13].toString() : null); // Total Assessable Area
                 unitDto.setRatePerSqMFl(row[14] != null ? convertToDouble(row[14]) : null); // Rate per SqM
@@ -423,6 +465,8 @@ public class CalculationSheetGenerator_MasterServiceImpl implements CalculationS
                 unitDto.setTaxableValueByRateFl(row[19] != null ? convertToDouble(row[19]) : null); // Taxable Value by Rate
                 unitDto.setMaintenanceRepairsFl(row[20] != null ? convertToDouble(row[20]) : null);
                 unitDto.setTaxableValueConsideredFl(row[21] != null ? convertToDouble(row[21]) : null); // Considered Taxable Value
+                unitDto.setOccupantStatusI(row[111] != null ? row[111].toString() : "-");
+                unitDto.setAreaBefDedFl(row[112] != null ? row[112].toString() : "-");
                 unitDto.setNewPropertyNo(dto.getPdNewpropertynoVc());
                 dto.setUnitDetails(List.of(unitDto));
 
@@ -460,9 +504,9 @@ public class CalculationSheetGenerator_MasterServiceImpl implements CalculationS
                 consolidatedTaxDto.setEducationTaxResidFl(convertToDouble(row[102]));
                 consolidatedTaxDto.setEducationTaxCommFl(convertToDouble(row[101]));
                 consolidatedTaxDto.setEducationTaxTotalFl(convertToDouble(row[103]));
-                consolidatedTaxDto.setEgcFl(convertToDouble(row[104])); // Employment Guarantee Cess
+                consolidatedTaxDto.setEgcFl(convertToDouble(row[105])); // Employment Guarantee Cess
                 consolidatedTaxDto.setTreeTaxFl(convertToDouble(row[109]));
-                consolidatedTaxDto.setEnvironmentalTaxFl(convertToDouble(row[105]));
+                consolidatedTaxDto.setEnvironmentalTaxFl(convertToDouble(row[104]));
                 consolidatedTaxDto.setCleannessTaxFl(convertToDouble(row[100]));           // //Changed 108 to 100
                 consolidatedTaxDto.setLightTaxFl(convertToDouble(row[107]));
                 consolidatedTaxDto.setFireTaxFl(convertToDouble(row[106]));
@@ -539,6 +583,52 @@ public class CalculationSheetGenerator_MasterServiceImpl implements CalculationS
         }
     }
 
+    // Added: Paged and ordered calculation-sheet fetch for sequential, deterministic printing
+    // This complements the existing non-paged variant and is invoked by the /propertyCalculationSheetReport endpoint.
+
+    public List<AssessmentResultsDto> generatePropertyCalculationReport(Integer wardNo, int page, int size) {
+        try {
+            String queryStr = getBaseReportQuery() +
+                    " WHERE p.pd_ward_i = :wardNo ORDER BY p.pd_finalpropno_vc";
+            Query query = entityManager.createNativeQuery(queryStr);
+            query.setParameter("wardNo", wardNo);
+            if (page >= 0 && size > 0) {
+                query.setFirstResult(page * size);
+                query.setMaxResults(size);
+            }
+
+            List<Object[]> rows = query.getResultList();
+            Map<String, AssessmentResultsDto> propertyMap = new HashMap<>();
+            for (Object[] row : rows) {
+                String propertyNo = row[2] != null ? row[2].toString() : "-";
+                AssessmentResultsDto dto = propertyMap.get(propertyNo);
+                if (dto == null) {
+                    dto = mapRowToDto(row);
+                    dto.setUnitDetails(new ArrayList<>());
+                    propertyMap.put(propertyNo, dto);
+                }
+                PropertyUnitDetailsDto unitDto = mapRowToUnit(row);
+                dto.getUnitDetails().add(unitDto);
+            }
+            return new ArrayList<>(propertyMap.values());
+        } catch (Exception e) {
+            System.out.println("Error generating paged property calculation report: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error generating paged property calculation report", e);
+        }
+    }
+
+    public long countPropertiesForCalculationReport(Integer wardNo) {
+        String countSql = "SELECT COUNT(DISTINCT p.pd_newpropertyno_vc) FROM property_details p WHERE p.pd_ward_i = :wardNo";
+        Query q = entityManager.createNativeQuery(countSql);
+        q.setParameter("wardNo", wardNo);
+        Object result = q.getSingleResult();
+        if (result instanceof Number) {
+            return ((Number) result).longValue();
+        }
+        return 0L;
+    }
+
     private AssessmentResultsDto mapRowToDto(Object[] row) {
         AssessmentResultsDto dto = new AssessmentResultsDto();
 
@@ -580,15 +670,108 @@ public class CalculationSheetGenerator_MasterServiceImpl implements CalculationS
         consolidatedTaxDto.setEducationTaxResidFl(toDouble(row[102]));
         consolidatedTaxDto.setEducationTaxCommFl(toDouble(row[101]));
         consolidatedTaxDto.setEducationTaxTotalFl(toDouble(row[103]));
-        consolidatedTaxDto.setEgcFl(toDouble(row[104]));
-        consolidatedTaxDto.setEnvironmentalTaxFl(toDouble(row[105]));
+        consolidatedTaxDto.setEgcFl(toDouble(row[105]));
+        consolidatedTaxDto.setEnvironmentalTaxFl(toDouble(row[104]));
         consolidatedTaxDto.setTreeTaxFl(toDouble(row[109]));
         consolidatedTaxDto.setLightTaxFl(toDouble(row[107]));
         consolidatedTaxDto.setPropertyTaxFl(toDouble(row[108]));
         consolidatedTaxDto.setFireTaxFl(toDouble(row[106]));
         consolidatedTaxDto.setUserChargesFl(toDouble(row[110]));
 
+        // Newly appended individual tax columns (indices 127..161)
+        consolidatedTaxDto.setWaterTaxFl(toDouble(row[127]));
+        consolidatedTaxDto.setSewerageTaxFl(toDouble(row[128]));
+        consolidatedTaxDto.setSewerageBenefitTaxFl(toDouble(row[129]));
+        consolidatedTaxDto.setWaterBenefitTaxFl(toDouble(row[130]));
+        consolidatedTaxDto.setStreetTaxFl(toDouble(row[131]));
+        consolidatedTaxDto.setSpecialConservancyTaxFl(toDouble(row[132]));
+        consolidatedTaxDto.setMunicipalEducationTaxFl(toDouble(row[133]));
+        consolidatedTaxDto.setSpecialEducationTaxFl(toDouble(row[134]));
+        consolidatedTaxDto.setServiceChargesFl(toDouble(row[135]));
+        consolidatedTaxDto.setMiscellaneousChargesFl(toDouble(row[136]));
+        consolidatedTaxDto.setTax1Fl(toDouble(row[137]));
+        consolidatedTaxDto.setTax2Fl(toDouble(row[138]));
+        consolidatedTaxDto.setTax3Fl(toDouble(row[139]));
+        consolidatedTaxDto.setTax4Fl(toDouble(row[140]));
+        consolidatedTaxDto.setTax5Fl(toDouble(row[141]));
+        consolidatedTaxDto.setTax6Fl(toDouble(row[142]));
+        consolidatedTaxDto.setTax7Fl(toDouble(row[143]));
+        consolidatedTaxDto.setTax8Fl(toDouble(row[144]));
+        consolidatedTaxDto.setTax9Fl(toDouble(row[145]));
+        consolidatedTaxDto.setTax10Fl(toDouble(row[146]));
+        consolidatedTaxDto.setTax11Fl(toDouble(row[147]));
+        consolidatedTaxDto.setTax12Fl(toDouble(row[148]));
+        consolidatedTaxDto.setTax13Fl(toDouble(row[149]));
+        consolidatedTaxDto.setTax14Fl(toDouble(row[150]));
+        consolidatedTaxDto.setTax15Fl(toDouble(row[151]));
+        consolidatedTaxDto.setTax16Fl(toDouble(row[152]));
+        consolidatedTaxDto.setTax17Fl(toDouble(row[153]));
+        consolidatedTaxDto.setTax18Fl(toDouble(row[154]));
+        consolidatedTaxDto.setTax19Fl(toDouble(row[155]));
+        consolidatedTaxDto.setTax20Fl(toDouble(row[156]));
+        consolidatedTaxDto.setTax21Fl(toDouble(row[157]));
+        consolidatedTaxDto.setTax22Fl(toDouble(row[158]));
+        consolidatedTaxDto.setTax23Fl(toDouble(row[159]));
+        consolidatedTaxDto.setTax24Fl(toDouble(row[160]));
+        consolidatedTaxDto.setTax25Fl(toDouble(row[161]));
+
         dto.setConsolidatedTaxes(consolidatedTaxDto);
+
+        // Populate tax map by keys for dynamic consumption
+        Map<Long, Double> taxMap = dto.getTaxKeyValueMap();
+        putIfNotNull(taxMap, ReportTaxKeys.PT_PARENT, toDouble(row[108]));
+        Double eduRes = toDouble(row[102]);
+        Double eduComm = toDouble(row[101]);
+        putIfNotNull(taxMap, ReportTaxKeys.EDUC_RES, eduRes);
+        putIfNotNull(taxMap, ReportTaxKeys.EDUC_COMM, eduComm);
+        if (eduRes != null || eduComm != null) {
+            double sum = (eduRes != null ? eduRes : 0.0) + (eduComm != null ? eduComm : 0.0);
+            putIfNotNull(taxMap, ReportTaxKeys.EDUC_PARENT, sum);
+        }
+        putIfNotNull(taxMap, ReportTaxKeys.EGC, toDouble(row[105]));
+        putIfNotNull(taxMap, ReportTaxKeys.ENV_TAX, toDouble(row[104]));
+        putIfNotNull(taxMap, ReportTaxKeys.FIRE_TAX, toDouble(row[106]));
+        putIfNotNull(taxMap, ReportTaxKeys.LIGHT_TAX, toDouble(row[107]));
+        putIfNotNull(taxMap, ReportTaxKeys.TREE_TAX, toDouble(row[109]));
+        putIfNotNull(taxMap, ReportTaxKeys.USER_CHG, toDouble(row[110]));
+        putIfNotNull(taxMap, ReportTaxKeys.CLEAN_TAX, toDouble(row[100]));
+
+        // Extended taxes
+        putIfNotNull(taxMap, ReportTaxKeys.WATER_TAX, toDouble(row[127]));
+        putIfNotNull(taxMap, ReportTaxKeys.SEWERAGE_TAX, toDouble(row[128]));
+        putIfNotNull(taxMap, ReportTaxKeys.SEWERAGE_BEN, toDouble(row[129]));
+        putIfNotNull(taxMap, ReportTaxKeys.WATER_BEN, toDouble(row[130]));
+        putIfNotNull(taxMap, ReportTaxKeys.STREET_TAX, toDouble(row[131]));
+        putIfNotNull(taxMap, ReportTaxKeys.SPEC_CONS, toDouble(row[132]));
+        putIfNotNull(taxMap, ReportTaxKeys.MUNICIPAL_EDU, toDouble(row[133]));
+        putIfNotNull(taxMap, ReportTaxKeys.SPECIAL_EDU, toDouble(row[134]));
+        putIfNotNull(taxMap, ReportTaxKeys.SERVICE_CHG, toDouble(row[135]));
+        putIfNotNull(taxMap, ReportTaxKeys.MISC_CHG, toDouble(row[136]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX1, toDouble(row[137]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX2, toDouble(row[138]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX3, toDouble(row[139]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX4, toDouble(row[140]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX5, toDouble(row[141]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX6, toDouble(row[142]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX7, toDouble(row[143]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX8, toDouble(row[144]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX9, toDouble(row[145]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX10, toDouble(row[146]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX11, toDouble(row[147]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX12, toDouble(row[148]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX13, toDouble(row[149]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX14, toDouble(row[150]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX15, toDouble(row[151]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX16, toDouble(row[152]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX17, toDouble(row[153]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX18, toDouble(row[154]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX19, toDouble(row[155]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX20, toDouble(row[156]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX21, toDouble(row[157]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX22, toDouble(row[158]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX23, toDouble(row[159]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX24, toDouble(row[160]));
+        putIfNotNull(taxMap, ReportTaxKeys.TAX25, toDouble(row[161]));
 
         // Other property info
         dto.setPdOldrvFl(valueOf(row[26]));
@@ -653,11 +836,17 @@ public class CalculationSheetGenerator_MasterServiceImpl implements CalculationS
         dto.setPdPropimageT(valueOf(row[114]));
         dto.setPdHouseplan2T(valueOf(row[115]));
 
-        dto.setAnnualRentalValueFl(valueOf(row[116]));
-        dto.setAnnualUnRentalValueFl(valueOf(row[117]));
+        dto.setAnnualRentalValueFl(valueOf(row[117]));
+        dto.setAnnualUnRentalValueFl(valueOf(row[116]));
         dto.setFinalValueToConsiderFl(valueOf(row[118]));
         dto.setMaintainenceRepairAmountConsideredFl(valueOf(row[121]));
-        // ❗ Don't set unitDetails here! That will be added separately outside
+        dto.setTaxableValueRentedFl(row[117] != null
+                ? String.valueOf(((Number) row[117]).doubleValue() - (((Number) row[117]).doubleValue() * 0.10))
+                : "0");
+
+        dto.setTaxableValueUnRentedFl(row[116] != null
+                ? String.valueOf(((Number) row[116]).doubleValue() - (((Number) row[116]).doubleValue() * 0.10))
+                : "0");
         return dto;
     }
     private PropertyUnitDetailsDto mapRowToUnit(Object[] row) {
@@ -684,6 +873,9 @@ public class CalculationSheetGenerator_MasterServiceImpl implements CalculationS
         unitDto.setMaintenanceRepairsRentFl(toDouble(row[111]));
         unitDto.setTaxableValueByRentFl(toDouble(row[112]));
         unitDto.setTenantNameVc(valueOf(row[113]));
+        unitDto.setOccupantStatusI(valueOf(row[124]));
+        unitDto.setAreaBefDedFl(valueOf(row[125]));
+        unitDto.setPlotAreaFl(valueOf(row[126]));
 
 
 
@@ -710,5 +902,11 @@ public class CalculationSheetGenerator_MasterServiceImpl implements CalculationS
             return (Double) value;
         }
         return null;
+    }
+
+    private void putIfNotNull(Map<Long, Double> map, Long key, Double value) {
+        if (value != null) {
+            map.put(key, value);
+        }
     }
 }

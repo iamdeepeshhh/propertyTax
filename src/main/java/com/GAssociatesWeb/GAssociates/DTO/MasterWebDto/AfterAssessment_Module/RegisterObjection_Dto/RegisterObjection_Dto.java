@@ -27,7 +27,7 @@ public class RegisterObjection_Dto {
     private String oldPropertyNo;
     private String userDate;
     private String userTime;
-    private Integer noticeNo;
+    private String noticeNo;
     private String hearingDate;
     private String hearingTime;
     private String hearingStatus;

@@ -6,5 +6,7 @@ import java.util.List;
 
 public interface CalculationSheetGenerator_MasterService {
     public List<AssessmentResultsDto> generatePropertyCalculationReport(Integer wardNo);
+    public List<AssessmentResultsDto> generatePropertyCalculationReport(Integer wardNo, int page, int size);
+    public long countPropertiesForCalculationReport(Integer wardNo);
     public List<AssessmentResultsDto> generateSinglePropertyReport(String newPropertyNo);
 }

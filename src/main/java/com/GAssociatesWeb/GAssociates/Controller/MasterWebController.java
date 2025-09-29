@@ -22,6 +22,7 @@ import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.PropertyTypes_MasterDto.P
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.PropertyTypes_MasterDto.PropSubUsageType_MasterDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.PropertyTypes_MasterDto.PropUsageType_MasterDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.Remarks_MasterDto.Remarks_MasterDto;
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.ReportConfig_MasterDto.ReportTaxes_MasterDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.RoomType_MasterDto.RoomType_MasterDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.SewerageTypes_MasterDto.Sewerage_MasterDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.UnitTypes_MasterDto.UnitFloorNo_MasterDto;
@@ -41,7 +42,7 @@ import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.Prop
 import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.PropertyOldDetails_Service.PropertyOldDetails_Service;
 import com.GAssociatesWeb.GAssociates.Service.ImageUtils;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.RegisterObjection_MasterService.RegisterObjection_MasterService;
-import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.SpecialNotice_MasterServices.SpecialNotice_MasterService;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.SpecialNotice_MasterServices.PostAssessmentReports_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AgeFactor_MasterService.AgeFactor_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentDate_MasterService.AssessmentDate_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.ConolidatedTaxes_MasterService.ConsolidatedTaxes_MasterService;
@@ -50,8 +51,10 @@ import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.RVTypes_MasterService.RVTypeCategory_MasterService.RVTypeCategory_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.RVTypes_MasterService.RVTypes_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.TaxAssessment_MasterService.PreLoadCache;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.TaxAssessment_MasterService.ReportGenerator.AssessmentResultsReportGenerator.AssessmentReportPdfGenerator;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.TaxAssessment_MasterService.ReportGenerator.BatchReportGenerator_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.TaxAssessment_MasterService.ReportGenerator.CalculationSheet.CalculationSheetGenerator_MasterService;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.TaxAssessment_MasterService.ResultLogsCache;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.TaxAssessment_MasterService.TaxAssessmentRealtime.TaxAssessment_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.TaxDepreciation_MasterService.TaxDepreciation_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.BuildingSubTypes_MasterServices.BuildingSubType_MasterService;
@@ -70,6 +73,7 @@ import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.PropertyTypes_Ma
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.PropertyTypes_MasterServices.PropertyUsageSubType_MasterService.PropertySubUsageType_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.PropertyTypes_MasterServices.PropertyUsageType_MasterService.PropertyUsageType_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.Remarks_MasterService.Remarks_MasterService;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.ReportConfigs_MasterServices.ReportTaxesConfigService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.RoomType_MasterService.RoomType_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.SewerageTypes_MasterServices.SewerageType_MasterServices.Sewerage_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.UnitTypes_MasterServices.UnitFloorNo_MasterService.UnitFloorNo_MasterService;
@@ -150,12 +154,14 @@ public class MasterWebController {
     private final UniqueIdGenerator uniqueIdGenerator;
     private final PreLoadCache preLoadCache;
     private final JobLauncher jobLauncher;
-
-    private final SpecialNotice_MasterService specialNoticeMasterService;
+    private final PostAssessmentReports_MasterService specialNoticeMasterService;
     private final Job processPropertyDetailsJob;
     private final CouncilDetails_MasterService councilDetails_masterService;
     private final RVTypeCategory_MasterService rvTypeCategory_masterService;
     private final RegisterObjection_MasterService registerObjection_masterService;
+    private final ResultLogsCache resultLogsCache;
+    private final ReportTaxesConfigService reportTaxesConfigService;
+    private final AssessmentReportPdfGenerator assessmentReportPdfGenerator;
     private static final Logger logger = Logger.getLogger(MasterWebController.class.getName());
     public MasterWebController(Ward_MasterService ward_masterService, PropClassification_MasterService propClassification_masterService,
                                PropSubClassification_MasterService propSubClassification_masterService,
@@ -172,8 +178,8 @@ public class MasterWebController {
                                PropertyManagement_Service property_ManagementService, PropertyDeletionLog_Repository propertyDeletionLogRepository, TaxDepreciation_MasterService taxDepreciation_MasterService,
                                RVTypes_MasterService rvTypes_MasterService, ConsolidatedTaxes_MasterService consolidatedTaxes_MasterService, EduCessAndEmpCess_MasterService eduCessAndEmpCess_MasterService, PropertyRates_MasterService propertyRates_MasterService,
                                TaxAssessment_MasterService taxAssessment_MasterService, BatchReportGenerator_MasterService batchReportGenerator_MasterService, CalculationSheetGenerator_MasterService calculationSheetGenerator_MasterService, UniqueIdGenerator uniqueIdGenerator,
-                               PreLoadCache preLoadCache, JobLauncher jobLauncher,SpecialNotice_MasterService specialNotice_MasterService, Job processPropertyDetailsJob,
-                               CouncilDetails_MasterService councilDetails_MasterService, RVTypeCategory_MasterService rvTypeCategory_MasterService, RegisterObjection_MasterService registerObjection_MasterService) {
+                               PreLoadCache preLoadCache, JobLauncher jobLauncher, ResultLogsCache resultLogsCache, PostAssessmentReports_MasterService postAssessmentReports_MasterService, Job processPropertyDetailsJob,
+                               CouncilDetails_MasterService councilDetails_MasterService, RVTypeCategory_MasterService rvTypeCategory_MasterService, RegisterObjection_MasterService registerObjection_MasterService, ReportTaxesConfigService reportTaxesConfigService, AssessmentReportPdfGenerator assessmentReportPdfGenerator) {
         this.ward_masterService = ward_masterService;
         this.propClassification_masterService = propClassification_masterService;
         this.propSubClassification_masterService = propSubClassification_masterService;
@@ -215,11 +221,14 @@ public class MasterWebController {
         this.uniqueIdGenerator = uniqueIdGenerator;
         this.preLoadCache = preLoadCache;
         this.jobLauncher = jobLauncher;
-        this.specialNoticeMasterService = specialNotice_MasterService;
+        this.resultLogsCache = resultLogsCache;
+        this.specialNoticeMasterService = postAssessmentReports_MasterService;
         this.processPropertyDetailsJob = processPropertyDetailsJob;
         this.councilDetails_masterService = councilDetails_MasterService;
         this.rvTypeCategory_masterService = rvTypeCategory_MasterService;
         this.registerObjection_masterService = registerObjection_MasterService;
+        this.reportTaxesConfigService = reportTaxesConfigService;
+        this.assessmentReportPdfGenerator = assessmentReportPdfGenerator;
     }
 
     @GetMapping(value = "/MasterWebLogin")
@@ -755,9 +764,9 @@ public class MasterWebController {
         List<UnitUsageSubType_MasterDto> unitUsageSubTypes = unitUsageSubType_masterService.findAllUnitUsageSubTypeMasters();
         List<Map<String, Object>> responseData = unitUsageSubTypes.stream().map(type -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("localName", type.getUsm_usagetypell_vc());
-            item.put("standardName", type.getUsm_usagetypeeng_vc());
-            item.put("userCharges",type.getUsm_usercharges_i());
+            item.put("usm_usagetypell_vc", type.getUsm_usagetypell_vc());
+            item.put("usm_usagetypeeng_vc", type.getUsm_usagetypeeng_vc());
+            item.put("usm_usercharges_i",type.getUsm_usercharges_i());
             item.put("id", type.getUsm_usagesubid_i());
             item.put("uum_usagetypeeng_vc", type.getUum_usagetypeeng_vc());
             item.put("usm_rvtype_vc", type.getUsm_rvtype_vc());
@@ -770,7 +779,8 @@ public class MasterWebController {
     // to update unit usageSubtypes we are using the below function
     @PostMapping("/updateUnitUsagesSub/{id}")
     public ResponseEntity<UnitUsageSubType_MasterDto> updateUnitUsageSubType(@PathVariable Integer id, @RequestBody UnitUsageSubType_MasterDto unitUsageSubTypeDto) {
-        return ResponseEntity.ok(unitUsageSubType_masterService.updateUnitUsageSubTypeMaster(id, unitUsageSubTypeDto));
+        unitUsageSubTypeDto.setUsm_usagesubid_i(id);
+       return ResponseEntity.ok(unitUsageSubType_masterService.updateUnitUsageSubTypeMaster(id, unitUsageSubTypeDto));
     }
 
     @PostMapping("/deleteUnitUsagesSub")
@@ -919,9 +929,9 @@ public class MasterWebController {
         List<Occupancy_MasterDto> occupancyMasters = occupancy_masterService.findAllOccupancy_Masters();
         List<Map<String, Object>> responseData = occupancyMasters.stream().map(type -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("marathiname", type.getOccupancy_marathi());
-            item.put("englishname", type.getOccupancy());
-            item.put("value", type.getOccupancy_id());
+            item.put("localName", type.getOccupancy_marathi());
+            item.put("standardName", type.getOccupancy());
+            item.put("id", type.getOccupancy_id());
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -1105,6 +1115,7 @@ public class MasterWebController {
             @RequestParam(required = false) Integer wardNo,
             @RequestParam(required = false) String finalPropertyNo) {
         List<PropertyDetails_Dto> results = propertyManagement_service.searchNewProperties(surveyPropertyNo, ownerName, wardNo,finalPropertyNo);
+
         if (results.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -1209,6 +1220,7 @@ public class MasterWebController {
             item.put("appliedTaxesVc", type.getAppliedTaxesVc());
             item.put("descriptionVc", type.getDescriptionVc());
             item.put("id", type.getRyTypeId());
+            item.put("taxKeysL", type.getTaxKeysL());
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -1228,6 +1240,7 @@ public class MasterWebController {
 
     @PostMapping("/updateRVType/{id}")
     public ResponseEntity<RVTypes_MasterDto> updateRVType(@PathVariable Long id, @RequestBody RVTypes_MasterDto rvTypeDetails) {
+//     System.out.println(rvTypeDetails);
         RVTypes_MasterDto updatedRVType = rvTypes_masterService.updateRVType(id, rvTypeDetails);
         return ResponseEntity.ok(updatedRVType);
     }
@@ -1252,6 +1265,10 @@ public class MasterWebController {
             item.put("taxRateFl", type.getTaxRateFl());
             item.put("applicableonVc", type.getApplicableonVc());
             item.put("id", type.getId());
+            item.put("taxKeyL", type.getTaxKeyL());
+//            item.put("taxNameStandardVc", type.getTaxNameStandardVc());
+            item.put("isActiveBl", type.getIsActiveBl()); // <-- Added this for reports dynamic structure
+//            item.put("taxNameLocalVc", type.getTaxNameLocalVc());  // <-- Added this for reports dynamic structure
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -1401,17 +1418,30 @@ public class MasterWebController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
+//these methods are used for getting the batch of calculationsheet in chunks
     @GetMapping("/propertyCalculationSheetReport")
-    public ResponseEntity<List<AssessmentResultsDto>> getPropertyCalculationSheetReport(@RequestParam("wardNo") Integer wardNo) {
+    public ResponseEntity<List<AssessmentResultsDto>> getPropertyCalculationSheetReport(
+            @RequestParam("wardNo") Integer wardNo,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "100") int size) {
         try {
-            // Call service method to get report data
-            List<AssessmentResultsDto> reportData = calculationSheetGenerator_masterService.generatePropertyCalculationReport(wardNo);
+            // Call service method to get paged report data
+            List<AssessmentResultsDto> reportData = calculationSheetGenerator_masterService.generatePropertyCalculationReport(wardNo, page, size);
             // Return the data as a JSON response
             return ResponseEntity.ok(reportData);
         } catch (Exception e) {
             // Handle exceptions
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/propertyCalculationSheetReport/count")
+    public ResponseEntity<Long> getPropertyCalculationSheetReportCount(@RequestParam("wardNo") Integer wardNo) {
+        try {
+            long count = calculationSheetGenerator_masterService.countPropertiesForCalculationReport(wardNo);
+            return ResponseEntity.ok(count);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(0L);
         }
     }
 
@@ -1544,19 +1574,121 @@ public class MasterWebController {
         return ResponseEntity.ok(result);
     }
 
-//for registering the objection of citizen he below methood is getting used
+    //for registering the objection of citizen the below methood is getting used
     @PostMapping("/submitObjection")
     public ResponseEntity<String> submitObjection(@RequestBody RegisterObjection_Dto dto) {
         registerObjection_masterService.saveObjection(dto);
         return ResponseEntity.ok("Objection submitted successfully");
     }
 
-//    For the Special Notice
+    //For the Special Notice
+    @GetMapping("/specialNotices")
+    public ResponseEntity<?> getSpecialNotices(
+            @RequestParam(value = "wardNo", required = false) Integer wardNo,
+            @RequestParam(value = "newPropertyNo", required = false) String newPropertyNo) {
 
-    @GetMapping("/specialNotices/{wardNo}")
-    public ResponseEntity<?> getSpecialNoticesByWard(@PathVariable int wardNo) {
-        List<AssessmentResultsDto> results = specialNoticeMasterService.getSpecialNoticesByWard(wardNo);
+        List<AssessmentResultsDto> results;
+
+        if (wardNo != null) {
+            results = specialNoticeMasterService.getSpecialNoticesByWard(wardNo);
+        } else if (newPropertyNo != null && !newPropertyNo.isEmpty()) {
+            results = specialNoticeMasterService.getSpecialNoticesByNewPropertyNo(newPropertyNo);
+        } else {
+            return ResponseEntity.badRequest().body("Either wardNo or newPropertyNo must be provided");
+        }
+
         return ResponseEntity.ok(results);
     }
+
+    @GetMapping("/specialNotices/count")
+    public ResponseEntity<Long> getSpecialNoticeCount(
+            @RequestParam(required = false) Integer wardNo,
+            @RequestParam(required = false) String newPropertyNo) {
+        long count = specialNoticeMasterService.getSpecialNoticeCount(wardNo, newPropertyNo);
+        return ResponseEntity.ok(count);
+    }
+
+    @GetMapping("/resultLogs/{wardNo}")
+    public ResponseEntity<byte[]> downloadResultLogs(@PathVariable String wardNo) {
+        List<AssessmentResultsDto> resultLogs = resultLogsCache.getAll();
+
+        if (resultLogs == null || resultLogs.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        byte[] pdfBytes = assessmentReportPdfGenerator.generateCombinedWarningsPdf(wardNo, resultLogs);
+
+        // Clear the cache after PDF is generated and returned
+        resultLogsCache.clear();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "Warnings_Ward_" + wardNo + ".pdf");
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+    }
+
+//    for getting taxes on the report dynamically
+        // Report Taxes Configs for dynamic rendering (e.g., REALTIME_CC, CALCULATION_SHEET)
+    @GetMapping("/reportTaxConfigs")
+    public ResponseEntity<List<ReportTaxes_MasterDto>> getReportTaxConfigs(
+          @RequestParam("template") String templateVc) {
+           try {
+            List<ReportTaxes_MasterDto> rows = reportTaxesConfigService.getVisibleConfigsByTemplate(templateVc);
+            if (rows == null || rows.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            }
+            return ResponseEntity.ok(rows);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+
+    // Management UI: full list (including invisible) for editing
+    @GetMapping("/reportTaxConfigs/all")
+    public ResponseEntity<List<Map<String,Object>>> getAllReportTaxConfigs() {
+        try {
+            List<ReportTaxes_MasterDto> configs = reportTaxesConfigService.getAllConfigs();
+
+            List<Map<String, Object>> responseData  = configs.stream().map(config -> {
+                Map<String, Object> item = new LinkedHashMap<>(); // preserves insertion order
+
+                item.put("id", config.getId());                       // hidden/internal use
+                item.put("template", config.getTemplateVc());         // Template
+                item.put("sequence", config.getSequenceI());          // Sequence
+                item.put("taxKey", config.getTaxKeyL());              // Tax Key
+                item.put("parentKey", config.getParentTaxKeyL());     // Parent Key
+                item.put("englishname", config.getStandardNameVc());  // Standard Name
+                item.put("marathiname", config.getLocalNameVc());     // Local Name
+                item.put("visible", config.getVisibleB());            // Visible
+                item.put("showTotal", config.getShowTotalBl());       // Show Total
+
+                return item;
+            }).collect(Collectors.toList());
+
+            return ResponseEntity.ok(responseData);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/reportTaxConfigs/save")
+    public ResponseEntity<Void> saveReportTaxConfigs(@RequestBody List<ReportTaxes_MasterDto> configs) {
+        try {
+            reportTaxesConfigService.saveOrUpdateReportConfigTaxes(configs);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/reportTaxConfig")
+    public String showReportTaxConfigPage() {
+        return "3GReportTaxConfig";
+    }
+
 }
 

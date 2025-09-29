@@ -151,25 +151,25 @@
                     displayBase64Image(data.propertyDetails.pdHouseplanT, 'previewHousePlan1');
                     displayBase64Image(data.propertyDetails.pdHouseplan2T, 'previewHousePlan2');
                     if (data && data.unitDetails) {
-                        data.unitDetails.forEach((unit, index) => {
-                            addUnit(unit); // Add a new unit
-                            const unitIndex = index + 1; // Unit numbering starts from 1
-                            initializeDropdown(`unitusageType${unitIndex}`, '/3gSurvey/getUnitUsageByPropUsageId', unit.udUsageTypeI, true, data.propertyDetails.pdUsagetypeI);
-                            initializeDropdown(`unitusageSubType${unitIndex}`, '/3gSurvey/getUnitUsageSub', unit.udUsageSubtypeI , true, unit.udUsageTypeI);
-                            document.getElementById(`totalcarpetarea${unitIndex}`).value = unit.udCarpetAreaF || '0'; // Carpet Area
-                            document.getElementById(`assessablearea${unitIndex}`).value = unit.udAssessmentAreaF || ''; // Built-up Area
-                            document.getElementById(`unitNo${unitIndex}`).value = unit.udUnitNoVc || unitIndex; // Unit No
-                            document.getElementById(`monthlyrent${unitIndex}`).value = unit.udRentalNoVc || ''; // Monthly Rent (Placeholder)
-                            document.getElementById(`tenantno${unitIndex}`).value = unit.udTenantNoI || ''; // Tenant Number
-                            document.getElementById(`occupiername${unitIndex}`).value = unit.udOccupierNameVc || ''; // Tenant Name
-                            // document.getElementById(`constructionYear${unitIndex}`).value = unit.udConstYearDt || ''; // Construction Year
-                            updateUnitAgeFactor(splitDatesAndSet(unit.udConstYearDt), unitIndex, data.propertyDetails.createddateVc);
-                            // document.getElementById(`constructionAge${unitIndex}`).value = unit.udConstAgeI || ''; // Construction Age
-                            // document.getElementById(`constAgeFactor${unitIndex}`).value = unit.udAgeFactorI || ''; // Construction Age Factor
-                            document.getElementById(`remark${unitIndex}`).value = unit.udUnitRemarkVc || ''; // Remark
-                            document.getElementById(`umobileNo${unitIndex}`).value = unit.udMobileNoVc || ''; // Mobile No
-                            document.getElementById(`email${unitIndex}`).value = unit.udEmailIdVc || ''; // Email
-                            document.getElementById(`establishmentName${unitIndex}`).value = unit.udEstablishmentNameVc || '';
+                        data.unitDetails.forEach((unit) => {
+                            // Add unit UI and get the assigned internal index used for element IDs
+                            const uiIndex = addUnit(unit);
+                            initializeDropdown(`unitusageType${uiIndex}`, '/3gSurvey/getUnitUsageByPropUsageId', unit.udUsageTypeI, true, data.propertyDetails.pdUsagetypeI);
+                            initializeDropdown(`unitusageSubType${uiIndex}`, '/3gSurvey/getUnitUsageSub', unit.udUsageSubtypeI , true, unit.udUsageTypeI);
+                            document.getElementById(`totalcarpetarea${uiIndex}`).value = unit.udCarpetAreaF || '0'; // Carpet Area
+                            document.getElementById(`assessablearea${uiIndex}`).value = unit.udAssessmentAreaF || ''; // Assessable Area
+                            document.getElementById(`unitNo${uiIndex}`).value = unit.udUnitNoVc || uiIndex; // Visible Unit No
+                            document.getElementById(`monthlyrent${uiIndex}`).value = unit.udRentalNoVc || ''; // Monthly Rent
+                            document.getElementById(`tenantno${uiIndex}`).value = unit.udTenantNoI || ''; // Tenant Number
+                            document.getElementById(`occupiername${uiIndex}`).value = unit.udOccupierNameVc || ''; // Tenant Name
+                            // document.getElementById(`constructionYear${uiIndex}`).value = unit.udConstYearDt || ''; // Construction Year
+                            updateUnitAgeFactor(splitDatesAndSet(unit.udConstYearDt), uiIndex, data.propertyDetails.createddateVc);
+                            // document.getElementById(`constructionAge${uiIndex}`).value = unit.udConstAgeI || ''; // Construction Age
+                            // document.getElementById(`constAgeFactor${uiIndex}`).value = unit.udAgeFactorI || ''; // Construction Age Factor
+                            document.getElementById(`remark${uiIndex}`).value = unit.udUnitRemarkVc || ''; // Remark
+                            document.getElementById(`umobileNo${uiIndex}`).value = unit.udMobileNoVc || ''; // Mobile No
+                            document.getElementById(`email${uiIndex}`).value = unit.udEmailIdVc || ''; // Email
+                            document.getElementById(`establishmentName${uiIndex}`).value = unit.udEstablishmentNameVc || '';
                                 if(unit && unit.unitBuiltupUps){
                                     unit.unitBuiltupUps = unit.unitBuiltupUps.filter((builtup) => {
                                         const isRowEmpty = Object.values(builtup).every(
@@ -177,9 +177,10 @@
                                         );
                                         return !isRowEmpty;
                                     });
-                                    openPopup(unit.udUnitNoVc)
+                                    // NEW: Use sequential unitIndex for popup/table IDs to align with form field IDs
+                                    openPopup(uiIndex)
                                     unit.unitBuiltupUps.forEach((builtup) => {
-                                        addRow(unit.udUnitNoVc, {
+                                        addRow(uiIndex, {
                                             use: builtup.ubRoomTypeVc || '',
                                             measureType: builtup.ubMeasureTypeVc || '',
                                             deduction: builtup.ubDedpercentI || '',
@@ -202,7 +203,8 @@
                                             udFloorNoVc: builtup.udFloorNoVc || '',
                                         });
                                     });
-                                    saveAndClosePopup(unit.udUnitNoVc);
+                                    // Save using uiIndex so totals map to inputs like totalcarpetarea{uiIndex}
+                                    saveAndClosePopup(uiIndex);
                                 }
                         });
                     }
@@ -343,41 +345,50 @@
     input.value = input.value.replace(/\s+/g, '');
     checkSurveyPropNo();
     }
-    
+
     function checkPodRef() {
     document.getElementById('newOwnerName').disabled = document.getElementById('podRef').value.trim() === '';
     }
-    document.getElementById('podRef').addEventListener('input', checkPodRef);
-    window.onload = checkPodRef;
-    
-    document.getElementById('sewerage').addEventListener('change', function() {
-    document.getElementById('sewerageType').disabled = this.value !== 'Drain';
-    });
+    // NEW: Guard DOM listeners to avoid null errors when elements aren’t present yet
+    const _podRefEl = document.getElementById('podRef');
+    if (_podRefEl) {
+        _podRefEl.addEventListener('input', checkPodRef);
+        // Trigger initial state after load if element exists
+        window.addEventListener('load', () => checkPodRef());
+    }
+
+    const _sewerageEl = document.getElementById('sewerage');
+    if (_sewerageEl) {
+        _sewerageEl.addEventListener('change', function() {
+            const sewerageType = document.getElementById('sewerageType');
+            if (sewerageType) sewerageType.disabled = this.value !== 'Drain';
+        });
+    }
     function openTab(tabName) {
-    
+
     var tabContents = document.getElementsByClassName("tab-content");
     for (var i = 0; i < tabContents.length; i++) {
     tabContents[i].style.display = "none";
     }
     document.getElementById(tabName + "TabContent").style.display = "block";
-    
+
     }
-    
+
     function Next(tabName) {
     openTab(tabName);
     }
-    
+
     function Back(tabName) {
     openTab(tabName);
     }
-    
+
     document.addEventListener('DOMContentLoaded', function() {
     var selectedProperty = localStorage.getItem('selectedProperty');
     selectedProperty = selectedProperty ? JSON.parse(selectedProperty) : null;
     populateYearDropdown('constYear');
     fetchAndPopulateAssessmentDates();
-    
-    
+
+
     if (selectedProperty) {
     console.log(selectedProperty);
     document.getElementById('podRef').value = selectedProperty.podRefNoVc || '';
@@ -388,36 +399,36 @@
     document.getElementById('occupierName').value = selectedProperty.podOccupierNameVc || '';
     localStorage.removeItem('selectedProperty');
     }
-    
+
     fetch('/3g/constructionAgeFactor')
     .then(response => response.json())
     .then(data => {
     constructionAgeFactors = data;
     })
     .catch(error => console.error('Error fetching construction age factors:', error));
-    
+
     document.querySelectorAll('[id^="classOfProperty"]').forEach(dropdown => {
     disableFieldsIfClassOfPropertyOp(dropdown);
     });
     });
-    
+
     function disableFieldsIfClassOfPropertyOp(dropdown) {
     console.log("disablefields");
     const unitId = dropdown.id.replace('classOfProperty', '');
     const isOpSelected = dropdown.value === 'op';
-    
-   
+
+
     const selectedOption = dropdown.selectedOptions[0];
     const dataName = selectedOption.getAttribute('data-name') || '';
     console.log(`Selected data-name: ${dataName}`);
-    
-    
+
+
     const shouldDisable = isOpSelected || dataName.toLowerCase().includes('o.p');
-    
+
     document.getElementById(`constructionYear${unitId}`).disabled = shouldDisable;
     document.getElementById(`constructionAge${unitId}`).disabled = shouldDisable;
     document.getElementById(`constAgeFactor${unitId}`).disabled = shouldDisable;
-    
+
     }
     // fetchAllTypesOfAPI('/3gSurvey/getAllZones', 'zone');
     // fetchAllTypesOfAPI('/3gSurvey/getAllWards', 'ward');
@@ -426,19 +437,19 @@
     // fetchAllTypesOfAPI('/3gSurvey/ownerCategories', 'category');
     // fetchAllTypesOfAPI('/3gSurvey/getSewerageTypes', 'sewerageType');
     // fetchAllTypesOfAPI('/3gSurvey/waterConnections', 'waterOptions');
-    
-   
-   
+
+
+
     //this is used for splitting the date of construction year
     function splitDatesAndSet(dateString) {
         if (!dateString) return null;
-    
+
         const date = new Date(dateString);
         if (isNaN(date)) {
             console.error(`Invalid date string: ${dateString}`);
             return null; // Return null for invalid dates
         }
-    
+
         return date.getFullYear(); // Extract and return the year
     }
     async function fetchAllTypesOfAPI(apiUrl, selectElementId, selectedProperty = null, callback) {
@@ -454,16 +465,16 @@
     const classOfProperty = selectElementId.replace('classOfProperty', '');
     const defaultOption = new Option("Select", "");
     selectElement.add(defaultOption);
-    
-   
+
+
     data.forEach(item => {
         const option = new Option(item.name, item.value);
-        option.setAttribute('data-name', item.name); 
+        option.setAttribute('data-name', item.name);
         option.setAttribute('data-deduction', item.deduction);
         selectElement.add(option);
     });
-    
-   
+
+
     if (selectedProperty) {
         let isOptionFound = false;
 
@@ -485,9 +496,9 @@
     } else {
         selectElement.value = "";
     }
-    
+
     selectElement.addEventListener('change', () => logDeductionPercentage(selectElementId.replace('classOfProperty', '')));
-    
+
     if (callback) {
         callback();
     }
@@ -496,12 +507,12 @@
     .catch(error => {
     console.error('Error fetching data:', error);
     });
-    
+
     }
     function openPopup(unitId) {
     var popupId = 'popup-' + unitId;
     var popup = document.getElementById(popupId);
-    
+
     if (!popup) {
     popup = document.createElement('div');
     popup.id = popupId;
@@ -509,11 +520,11 @@
     popup.innerHTML = getPopupContent(unitId);
     document.body.appendChild(popup);
     }
-    
+
     popup.style.display = 'block';
     }
-    
-    
+
+
     function getPopupContent(unitId) {
     return `
     <span class="close-btn" onclick="closePopup('${unitId}')">&times;</span>
@@ -570,18 +581,18 @@
     }
     //here i am searching survypropno if it exists show error
     let isSurveyPropNoValid = false;
-    
+
     async function checkSurveyPropNo() {
     console.log("Checking Survey Property Number");
     const surveyPropNo = document.getElementById('surveyPropNo').value;
     const ward = document.getElementById('ward').value;
     const messageElement = document.getElementById('surveyPropNoMessage');
-    
+
     if (surveyPropNo && ward) {
     try {
         const response = await fetch(`/3gSurvey/checkSurveyPropNo?surveyPropNo=${surveyPropNo}&ward=${ward}`);
         const exists = await response.json();
-    
+
         if (exists) {
             messageElement.style.display = 'block';
             isSurveyPropNoValid = false;
@@ -600,20 +611,20 @@
     }
     }
     //here done
-    
+
     //here we are populating picklist values so code is written below for it+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    
+
     //all code will be written here
-    
+
     async function initializePropertyTypesAndCaptureSelection(selectId, apiUrl) {
     const selectElement = document.getElementById(selectId);
-    
+
     // Fetch the property types from the API and populate the select element.
     try {
     const response = await fetch(apiUrl);
     if (!response.ok) throw new Error('Failed to fetch data');
     const propertyTypes = await response.json();
-    
+
     let optionsHtml = '<option value="">Select</option>';
     propertyTypes.forEach(type => {
         optionsHtml += `<option value="${type.value}" data-standard-name="${type.Standardname.replace(/\s+/g, '').toLowerCase()}">${type.name}</option>`;
@@ -622,10 +633,10 @@
     } catch (error) {
     console.error(`Error initializing property types for select #${selectId}:`, error);
     }
-    
+
     const conditionValue = 'openland'; // Ensure this is in lowercase and without spaces
     const fieldsToDeactivate = ['constYear', 'constAgeProperty', 'ageFactorProperty', 'currentDateProperty','builtUpArea'];
-    
+
     // Listen for changes to the select element to handle field deactivation.
     selectElement.addEventListener('change', function() {
     const selectedOption = this.options[this.selectedIndex];
@@ -633,8 +644,8 @@
     handleFieldDeactivation(standardName, conditionValue, fieldsToDeactivate);
     });
     }
-    
-    
+
+
     function handleFieldDeactivation(standardName, conditionValue, fieldsToDeactivate) {
     if (standardName === conditionValue) {
     fieldsToDeactivate.forEach(fieldId => {
@@ -653,40 +664,40 @@
     });
     }
     }
-    
+
     async function initializeUnitUsageTypesAndCaptureSelection(propertyTypeId, subtypeSelectId, apiUrl) {
     const subtypeSelectElement = document.getElementById(subtypeSelectId);
-    
+
     // Directly use propertyTypeId (numeric value) to fetch and populate subtypes without listening for changes on a select element
     async function fetchAndPopulateSubtypes() {
     subtypeSelectElement.innerHTML = '<option value="">Select</option>';
-    
+
     if (!propertyTypeId) {
         return;
     }
-    
+
     try {
         // Fetch the property subtypes based on the propertyTypeId.
         const response = await fetch(`${apiUrl}/${propertyTypeId}`);
         if (!response.ok) throw new Error('Failed to fetch property subtypes');
         const propertySubtypes = await response.json();
-    
+
         // Populate the subtype select element with options based on the fetched data.
         let optionsHtml = '<option value="">Select</option>';
         propertySubtypes.forEach(subtype => {
             optionsHtml += `<option value="${subtype.value}">${subtype.name}</option>`;
         });
         subtypeSelectElement.innerHTML = optionsHtml;
-    
+
     } catch (error) {
         console.error(`Error fetching property subtypes for ${propertyTypeId}:`, error);
     }
     }
-    
+
     // Immediately fetch and populate subtypes upon function call
     fetchAndPopulateSubtypes();
     }
-    
+
     //This method is written so that unit usage can be changed whenever propertyusage is changed even on same unit
     function updateUnitUsages(propertyUsageValue) {
         const unitUsageElements = document.querySelectorAll('[id^="unitusageType"]');
@@ -699,27 +710,57 @@
 
     //this is closure for populatin picklist code++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     function saveAndClosePopup(unitId) {
-    var totalCarpetArea = document.getElementById(`TotalCarpetArea-${unitId}`).value;
-    var totalplotarea = document.getElementById(`TotalPlotArea-${unitId}`).value;
-    var totalExemptedArea = document.getElementById(`ExemptionArea1-${unitId}`).value;
-    var totaAssessableArea = document.getElementById(`AssArea1-${unitId}`).value;
-    var totallegalarea = document.getElementById(`LegalAssmtArea1-${unitId}`).value;
-    var totalillegalarea = document.getElementById(`IllegalAssmtArea1-${unitId}`).value;
-    var totalareabefded = document.getElementById(`TotalAreaBeforeDeduction-${unitId}`).value;
+    // NEW: Read totals from popup (popup uses unitId as created by openPopup)
+    const getVal = (id) => {
+        const el = document.getElementById(id);
+        return el ? el.value : '';
+    };
+    const totalCarpetArea = getVal(`TotalCarpetArea-${unitId}`);
+    const totalplotarea = getVal(`TotalPlotArea-${unitId}`);
+    const totalExemptedArea = getVal(`ExemptionArea1-${unitId}`);
+    const totaAssessableArea = getVal(`AssArea1-${unitId}`);
+    const totallegalarea = getVal(`LegalAssmtArea1-${unitId}`);
+    const totalillegalarea = getVal(`IllegalAssmtArea1-${unitId}`);
+    const totalareabefded = getVal(`TotalAreaBeforeDeduction-${unitId}`);
 
     if (!totalCarpetArea || isNaN(totalCarpetArea)) {
-    alert("Please enter a valid carpet area.");
-    return;
+        alert("Please enter a valid carpet area.");
+        return;
     }
 
-    document.getElementById(`totalcarpetarea${unitId}`).value = totalCarpetArea;
-    document.getElementById(`totalexemptedarea${unitId}`).value = totalExemptedArea;
-    document.getElementById(`totalplotarea${unitId}`).value = totalplotarea;
-    document.getElementById(`assessablearea${unitId}`).value = totaAssessableArea;
-    document.getElementById(`totallegalarea${unitId}`).value = totallegalarea;
-    document.getElementById(`totaillegalarea${unitId}`).value = totalillegalarea;
-    document.getElementById(`totalareabeforeded${unitId}`).value = totalareabefded
-    updateAreas(unitId);
+    // NEW: Map popup unitId (may be udUnitNoVc) to the form’s sequential unit index if needed
+    let targetUnitIndex = unitId;
+    if (!document.getElementById(`totalcarpetarea${unitId}`)) {
+        // Try to find a form whose unitNoX equals this unitId
+        const unitNoInputs = Array.from(document.querySelectorAll('input[id^="unitNo"]'));
+        const match = unitNoInputs.find(inp => inp && inp.value && String(inp.value) === String(unitId));
+        if (match) {
+            const m = match.id.match(/^unitNo(\d+)$/);
+            if (m && m[1]) {
+                targetUnitIndex = m[1];
+            }
+        }
+    }
+
+    const setValSafe = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.value = val;
+        } else {
+            console.warn(`Element not found for id: ${id}`);
+        }
+    };
+
+    setValSafe(`totalcarpetarea${targetUnitIndex}`, totalCarpetArea);
+    setValSafe(`totalexemptedarea${targetUnitIndex}`, totalExemptedArea);
+    setValSafe(`totalplotarea${targetUnitIndex}`, totalplotarea);
+    setValSafe(`assessablearea${targetUnitIndex}`, totaAssessableArea);
+    setValSafe(`totallegalarea${targetUnitIndex}`, totallegalarea);
+    setValSafe(`totaillegalarea${targetUnitIndex}`, totalillegalarea);
+    setValSafe(`totalareabeforeded${targetUnitIndex}`, totalareabefded);
+
+    // Keep downstream behavior the same
+    updateAreas(targetUnitIndex);
     closePopup(unitId);
     }
 
@@ -1331,16 +1372,16 @@
     function addUnit(unitDetails = {}) {
     var existingUnitButtons = document.querySelectorAll('.unitbutton').length; //Added to make unit no dynamic and uniform
     unitCount = existingUnitButtons + 1;
+    var assignedIndex = unitCount; // internal index used in element IDs
     var unitButtons = document.getElementById("unitButtons");
     var formContainers = document.getElementById("formContainers");
-    var existingUnitButtons = document.querySelectorAll('.unitbutton').length;
-    unitCount = existingUnitButtons + 1;
-    var formId = "myForm" + unitCount;
+    var formId = "myForm" + assignedIndex;
     
     var button = document.createElement("button");
-    button.textContent = "Unit " + unitCount;
+    var visibleUnitNo = (unitDetails && unitDetails.udUnitNoVc != null) ? unitDetails.udUnitNoVc : assignedIndex;
+    button.textContent = "Unit " + visibleUnitNo;
     button.className = "unitbutton";
-    button.id = "unitButton" + unitCount;
+    button.id = "unitButton" + assignedIndex;
     button.type = "button";
     button.onclick = function() { toggleForm(formId); };
     unitButtons.appendChild(button);
@@ -1351,26 +1392,26 @@
     formContainer.style.display = "none";
     
     var form = document.createElement("form");
-    form.innerHTML = getFormInnerHTML(unitCount,unitDetails);
+    form.innerHTML = getFormInnerHTML(assignedIndex,unitDetails);
     formContainer.appendChild(form);
     
     document.getElementById("formContainers").appendChild(formContainer); //added for testing purpose
-    
-    fetchAllTypesOfAPI('/3gSurvey/getUnitFloorNos', `floorNo${unitCount}`, unitDetails.udFloorNoVc || null);
-    fetchAllTypesOfAPI('/3gSurvey/constructionClassMasters', `classOfProperty${unitCount}`, unitDetails.udConstructionClassI || null);
-    fetchAllTypesOfAPI('/3gSurvey/occupancyMasters', `occupancy${unitCount}`, unitDetails.udOccupantStatusI || null);
-    fetchAllTypesOfAPI('/3gSurvey/getAllRemarks', `remark${unitCount}`, unitDetails.udUnitRemarkVc || null);
+
+    fetchAllTypesOfAPI('/3gSurvey/getUnitFloorNos', `floorNo${assignedIndex}`, unitDetails.udFloorNoVc || null);
+    fetchAllTypesOfAPI('/3gSurvey/constructionClassMasters', `classOfProperty${assignedIndex}`, unitDetails.udConstructionClassI || null);
+    fetchAllTypesOfAPI('/3gSurvey/occupancyMasters', `occupancy${assignedIndex}`, unitDetails.udOccupantStatusI || null);
+    fetchAllTypesOfAPI('/3gSurvey/getAllRemarks', `remark${assignedIndex}`, unitDetails.udUnitRemarkVc || null);
     // Only update forms for the newly added unit
     const currentPropertyTypeId = document.getElementById('propertyusageType').value;
     if (currentPropertyTypeId) {
-        initializeUnitUsageTypesAndCaptureSelection(currentPropertyTypeId, `unitusageType${unitCount}`, '/3gSurvey/getUnitUsageByPropUsageId');
-        populateDependentDropdown(`unitusageType${unitCount}`, `unitusageSubType${unitCount}`, '/3gSurvey/getUnitUsageSub');
+        initializeUnitUsageTypesAndCaptureSelection(currentPropertyTypeId, `unitusageType${assignedIndex}`, '/3gSurvey/getUnitUsageByPropUsageId');
+        populateDependentDropdown(`unitusageType${assignedIndex}`, `unitusageSubType${assignedIndex}`, '/3gSurvey/getUnitUsageSub');
     }
     
     var deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete Unit " + unitCount;
+    deleteButton.textContent = "Delete Unit " + visibleUnitNo;
     deleteButton.className = "deletebtn";
-    deleteButton.id = "deleteButton" + unitCount; // Unique delete button ID
+    deleteButton.id = "deleteButton" + assignedIndex; // Unique delete button ID
     deleteButton.type = "button";
     
     deleteButton.onclick = function () {
@@ -1391,7 +1432,7 @@
     unitCount++;
     
     document.getElementById('formContainers').addEventListener('change', function (event) {
-        if (event.target && event.target.id === `classOfProperty${unitCount}`) {
+        if (event.target && event.target.id && event.target.id.startsWith('classOfProperty')) {
             disableFieldsIfClassOfPropertyOp(event.target);
         }
     });
@@ -1400,6 +1441,7 @@
     // Initial call to handle preselected value
     // disableFieldsIfClassOfPropertyOp(document.getElementById(`classOfProperty${unitCount}`));
     updatePropertySectionTotals();
+    return assignedIndex;
     }
     
     function updateFormsBasedOnPropertyType(propertyTypeId) {

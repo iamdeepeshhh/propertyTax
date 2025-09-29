@@ -7,6 +7,7 @@ import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_Ma
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.EduCessAndEmpCess_MasterEntity.EduCessAndEmpCess_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.PropertyRates_MasterEntity.PropertyRates_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.RVTypes_MasterEntity.RVTypes_MasterEntity;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.RvTypesAppliedTaxes_MasterEntity.RvTypesAppliedTaxes_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxDepreciation_MasterEntity.TaxDepreciation_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.UnitUsageTypes_MasterEntity.UnitUsageSubType_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.UnitUsageTypes_MasterEntity.UnitUsageType_MasterEntity;
@@ -17,12 +18,14 @@ import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentM
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.EduCessAndEmpCess_MasterRepository.EduCessAndEmpCess_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.PropertyRates_MasterRepository.PropertyRates_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.RVTypes_MasterRepository.RVTypes_MasterRepository;
+import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.RvTypesAppliedTaxes_MasterRepository.RvTypesAppliedTaxes_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.TaxDepreciation_MasterRepository.TaxDepreciation_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.UnitUsageTypes_MasterRepository.UnitUsageSubType_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.UnitUsageTypes_MasterRepository.UnitUsageType_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.PropertySurveyRepository.PropertyDetails_Repository;
 import com.GAssociatesWeb.GAssociates.Repository.PropertySurveyRepository.PropertyOldDetails_Repository;
 import com.GAssociatesWeb.GAssociates.Repository.PropertySurveyRepository.UnitDetails_Repository;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.ReportConfigs_MasterServices.ReportTaxKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,8 +60,10 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
     private UnitUsageSubType_MasterRepository unitUsageSubType_masterRepository;
     @Autowired
     private PropertyOldDetails_Repository propertyOldDetails_repository;
-
+    @Autowired
+    private RvTypesAppliedTaxes_MasterRepository rvTypesAppliedTaxesMasterRepository;
     List<String> warnings = new ArrayList<>();
+    Map<Long, Double> taxValueMap = new HashMap<>();
 
     private static final Logger logger = Logger.getLogger(TaxAssessment_MasterServiceImpl.class.getName());
 
@@ -68,6 +73,7 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         warnings.clear();
 
         Optional<PropertyDetails_Entity> propertyOpt = propertyDetailsRepository.findBypdNewpropertynoVc(newPropertyNumber);
+
         if (!propertyOpt.isPresent()) {
             String errorMessage = "Property not found for the given newPropertyNumber: " + newPropertyNumber;
             logger.severe(errorMessage);
@@ -167,11 +173,22 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
 
         totalRatableValue = Math.round(totalRatableValue);
 
-        Map<String, Double> educationTax = calculateEducationTax(totalRatableValue, unitRecords);
-        double propertyTax = calculatePropertyTax(unitRecords);
-        Map<String, Double> consolidatedTaxes = calculateConsolidatedTaxes(totalRatableValue, propertyTax);
+        Map<Long, Double> educationTaxMap = calculateEducationTax(totalRatableValue, unitRecords);//updated as per the new requirement
+        Map<Long, Double> propertyTaxMap = calculatePropertyTax(unitRecords); //updated as per the new requirement
+        double propertyTax = propertyTaxMap.getOrDefault(ReportTaxKeys.PT_PARENT, 0.0);//updated as per the new requirement
+        Map<Long, Double> consolidatedTaxes = calculateConsolidatedTaxes(totalRatableValue, propertyTax); //updated as per the new requirement
         totalUserCharges = Math.round(totalUserCharges);
-        Map<String, Double> egc = calculateEgc(totalRatableValue, unitRecords);
+        Map<Long, Double> egcMap = calculateEgc(totalRatableValue, unitRecords);//updated as per the new requirement
+
+        double grandTotal =
+                propertyTaxMap.values().stream().mapToDouble(Double::doubleValue).sum()
+                        + educationTaxMap.values().stream().mapToDouble(Double::doubleValue).sum()
+                        + consolidatedTaxes.values().stream().mapToDouble(Double::doubleValue).sum()
+                        + egcMap.values().stream().mapToDouble(Double::doubleValue).sum()
+                        + totalUserCharges;
+
+        // Align rounding with batch processing: store grand total as integer (rounded)
+        grandTotal = Math.round(grandTotal);
 
         logger.info("Units: "+ unitRecords);
 //        logger.info("education tax: "+educationTax);
@@ -246,7 +263,7 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
                     assessmentResultsDto.setOldPropertyTypeVc(oldDetails.getPodPropertyTypeI());
                     assessmentResultsDto.setOldPropertySubTypeVc(oldDetails.getPodPropertySubTypeI());
                     assessmentResultsDto.setOldUsageTypeVc(oldDetails.getPodUsageTypeI());
-                   // assessmentResultsDto.s(oldDetails.getPodUsageSubTypeI());
+                    // assessmentResultsDto.s(oldDetails.getPodUsageSubTypeI());
                     assessmentResultsDto.setOldConstructionTypeVc(oldDetails.getPodConstClassVc());
                     assessmentResultsDto.setOldAssessmentAreaFl(oldDetails.getPodTotalAssessmentArea());
 
@@ -384,80 +401,72 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         // Calculate the total for all proposed ratable values
         proposedRatableValuesDto.setAggregateFl(rateTypeTotals.values().stream().mapToDouble(Double::doubleValue).sum());
 
+        if (assessmentResultsDto.getConsolidatedTaxes() == null) {
+            assessmentResultsDto.setConsolidatedTaxes(new ConsolidatedTaxDetailsDto());
+        }
+        assessmentResultsDto.getConsolidatedTaxes().setTotalTaxFl(grandTotal);
+
         // Set this in the assessmentResultsDto
         assessmentResultsDto.setProposedRatableValues(proposedRatableValuesDto);
+        Map<Long, Double> taxValueMap = buildTaxValueMap(
+                propertyTax,
+                propertyTaxMap,
+                educationTaxMap,
+                egcMap,
+                consolidatedTaxes,
+                totalUserCharges,
+                assessmentResultsDto   // pass dto reference
+        );
 
-        double totalTax = propertyTax
-                + educationTax.get("Education Tax(Residential)")
-                + educationTax.get("Education Tax(Commercial)")
-                + egc.get("Employment Guarantee Cess (EGC)")
-                + totalUserCharges
-                + consolidatedTaxes.values().stream().mapToDouble(Double::doubleValue).sum();
-        // Convert and set consolidated taxes
-        ConsolidatedTaxDetailsDto consolidatedTaxesDto = new ConsolidatedTaxDetailsDto();
-        consolidatedTaxesDto.setPropertyTaxFl(propertyTax);
-        consolidatedTaxesDto.setEducationTaxResidFl(educationTax.get("Education Tax(Residential)"));
-        consolidatedTaxesDto.setEducationTaxCommFl(educationTax.get("Education Tax(Commercial)"));
-        consolidatedTaxesDto.setEducationTaxTotalFl(educationTax.get("Education Tax(Total)") != null ? educationTax.get("Education Tax(Total)"): 0);
-        consolidatedTaxesDto.setEgcFl(egc.get("Employment Guarantee Cess (EGC)"));
-        consolidatedTaxesDto.setTreeTaxFl(consolidatedTaxes.get("Tree Tax"));
-        consolidatedTaxesDto.setEnvironmentalTaxFl(consolidatedTaxes.get("Environment Tax"));
-        consolidatedTaxesDto.setCleannessTaxFl(consolidatedTaxes.get("Cleanness Tax"));
-        consolidatedTaxesDto.setLightTaxFl(consolidatedTaxes.get("Light Tax"));
-        consolidatedTaxesDto.setFireTaxFl(consolidatedTaxes.get("Fire Tax"));
-        consolidatedTaxesDto.setUserChargesFl(totalUserCharges);
-        consolidatedTaxesDto.setTotalTaxFl(totalTax);
-        assessmentResultsDto.setConsolidatedTaxes(consolidatedTaxesDto);
+//        System.out.println(taxValueMap);
+        assessmentResultsDto.setTaxKeyValueMap(taxValueMap);
 
-//        logger.info("assessmentresults: "+assessmentResultsDto);
+
+
         return assessmentResultsDto;
     }
-    private Map<String, Double> calculateConsolidatedTaxes(double ratableValue, double propertyTax) {
-        List<ConsolidatedTaxes_MasterEntity> taxRates = consolidatedTaxesMasterRepository.findAll();
-        Map<String, Double> taxDetails = new HashMap<>();
+    private Map<Long, Double> calculateConsolidatedTaxes(double finalRV, double propertyTax) {
+        // Skip keys handled separately (PT1, PT2, Education, EGC, UserCharges)
+        Set<Long> skipKeys = Set.of(
+                ReportTaxKeys.PT1, ReportTaxKeys.PT2,
+                ReportTaxKeys.EDUC_RES, ReportTaxKeys.EDUC_COMM,
+                ReportTaxKeys.EGC, ReportTaxKeys.USER_CHG
+        );
 
-        for (ConsolidatedTaxes_MasterEntity taxRate : taxRates) {
-            if (!taxRate.getTaxNameVc().equals("Property Tax") && !taxRate.getTaxNameVc().equals("Property Tax II")) {
-                double taxAmount = 0.0;
-
-                // Determine the base value for tax calculation based on 'appliedOn' field
-                double baseValue = 0.0;
-                if ("Ratable Value".equalsIgnoreCase(taxRate.getApplicableonVc())) {
-                    baseValue = ratableValue;
-                } else if ("Property Tax".equalsIgnoreCase(taxRate.getApplicableonVc())) {
-                    baseValue = propertyTax;
-                }
-
-                if (baseValue > 0) {
-                    double rate = Double.parseDouble(taxRate.getTaxRateFl());
-                    taxAmount = baseValue * (rate / 100);
-                }
-                taxDetails.put(taxRate.getTaxNameVc(), (double) Math.round(taxAmount));
-            }
-        }
-
-        return taxDetails;
+        return consolidatedTaxesMasterRepository.findAll().stream()
+                .filter(t -> !skipKeys.contains(t.getTaxKeyL())) // keep only consolidated ones
+                .collect(Collectors.toMap(
+                        ConsolidatedTaxes_MasterEntity::getTaxKeyL,
+                        tax -> {
+                            double base = "Ratable Value".equalsIgnoreCase(tax.getApplicableonVc())
+                                    ? finalRV
+                                    : propertyTax;
+                            double rate = Double.parseDouble(tax.getTaxRateFl());
+                            return (double) Math.round(base * (rate / 100.0));
+                        }
+                ));
     }
 
-    private Map<String, Double> calculateEducationTax(double totalRatableValue, List<Map<String, Object>> unitRecords) {
-        Map<String, Double> educationTaxDetails = new HashMap<>();
+    private Map<Long, Double> calculateEducationTax(double totalRatableValue, List<Map<String, Object>> unitRecords) {
+        Map<Long, Double> educationTaxMap = new HashMap<>();
 
         if (totalRatableValue == 0) {
-            educationTaxDetails.put("Education Tax(Residential)", 0.0);
-            educationTaxDetails.put("Education Tax(Commercial)", 0.0);
-            return educationTaxDetails;
+            educationTaxMap.put(ReportTaxKeys.EDUC_RES, 0.0);
+            educationTaxMap.put(ReportTaxKeys.EDUC_COMM, 0.0);
+            return educationTaxMap;
         }
 
-        Optional<EduCessAndEmpCess_MasterEntity> cessOpt = eduCessAndEmpCessMasterRepository.findByRatableValueRange(totalRatableValue);
+        Optional<EduCessAndEmpCess_MasterEntity> cessOpt =
+                eduCessAndEmpCessMasterRepository.findByRatableValueRange(totalRatableValue);
+
         if (!cessOpt.isPresent()) {
             String msg = "Education Cess rate not found for ratable value range: " + totalRatableValue;
             logger.warning(msg);
             warnings.add(msg);
 
-            educationTaxDetails.put("Education Tax(Residential)", 0.0);
-            educationTaxDetails.put("Education Tax(Commercial)", 0.0);
-            educationTaxDetails.put("Education Tax(Total)", 0.0);
-            return educationTaxDetails;
+            educationTaxMap.put(ReportTaxKeys.EDUC_RES, 0.0);
+            educationTaxMap.put(ReportTaxKeys.EDUC_COMM, 0.0);
+            return educationTaxMap;
         }
 
         EduCessAndEmpCess_MasterEntity cess = cessOpt.get();
@@ -468,42 +477,51 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         double commercialTax = 0.0;
 
         for (Map<String, Object> unitRecord : unitRecords) {
-            RVTypes_MasterEntity rvType = (RVTypes_MasterEntity) unitRecord.get("rvType");
+            Long rateTypeId = (Long) unitRecord.get("rateTypeId");
             Double unitRatableValue = (Double) unitRecord.get("ratableValue");
             if (unitRatableValue == null) {
                 unitRatableValue = 0.0;
             }
 
-            String applicableTaxes = rvType.getAppliedTaxesVc();
+            // ✅ Get applied taxes from rvtypes_applied_taxes
+            List<RvTypesAppliedTaxes_MasterEntity> appliedTaxes =
+                    rvTypesAppliedTaxesMasterRepository.findByRvtypeId(rateTypeId);
 
-            if (applicableTaxes.contains("Education Tax(Residential)")) {
-                residentialTax += unitRatableValue * (residentialRate / 100);
-            } else if (applicableTaxes.contains("Education Tax(Commercial)")) {
-                commercialTax += unitRatableValue * (commercialRate / 100);
+            for (RvTypesAppliedTaxes_MasterEntity applied : appliedTaxes) {
+                Long taxKey = applied.getTaxKeyL();
+
+                if (taxKey.equals(ReportTaxKeys.EDUC_RES)) {
+                    residentialTax += unitRatableValue * (residentialRate / 100.0);
+                } else if (taxKey.equals(ReportTaxKeys.EDUC_COMM)) {
+                    commercialTax += unitRatableValue * (commercialRate / 100.0);
+                }
             }
         }
 
-        educationTaxDetails.put("Education Tax(Residential)", (double) Math.round(residentialTax));
-        educationTaxDetails.put("Education Tax(Commercial)", (double) Math.round(commercialTax));
-        educationTaxDetails.put("Education Tax(Total)",(double) Math.round(residentialTax + commercialTax));
-        return educationTaxDetails;
+        educationTaxMap.put(ReportTaxKeys.EDUC_RES, (double) Math.round(residentialTax));
+        educationTaxMap.put(ReportTaxKeys.EDUC_COMM, (double) Math.round(commercialTax));
+
+        return educationTaxMap;
     }
 
-    private Map<String, Double> calculateEgc(double totalRatableValue, List<Map<String, Object>> unitRecords) {
-        Map<String, Double> egcDetails = new HashMap<>();
+
+    private Map<Long, Double> calculateEgc(double totalRatableValue, List<Map<String, Object>> unitRecords) {
+        Map<Long, Double> egcMap = new HashMap<>();
 
         if (totalRatableValue == 0) {
-            egcDetails.put("Employment Guarantee Cess (EGC)", 0.0);
-            return egcDetails;
+            egcMap.put(ReportTaxKeys.EGC, 0.0);
+            return egcMap;
         }
 
-        Optional<EduCessAndEmpCess_MasterEntity> cessOpt = eduCessAndEmpCessMasterRepository.findByRatableValueRange(totalRatableValue);
+        Optional<EduCessAndEmpCess_MasterEntity> cessOpt =
+                eduCessAndEmpCessMasterRepository.findByRatableValueRange(totalRatableValue);
+
         if (!cessOpt.isPresent()) {
             String msg = "EGC rate not found for the given ratable value range: " + totalRatableValue;
             logger.warning(msg);
             warnings.add(msg);
-            egcDetails.put("Employment Guarantee Cess (EGC)", 0.0);
-            return egcDetails;
+            egcMap.put(ReportTaxKeys.EGC, 0.0);
+            return egcMap;
         }
 
         EduCessAndEmpCess_MasterEntity cess = cessOpt.get();
@@ -512,20 +530,25 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         double egcAmount = 0.0;
 
         for (Map<String, Object> unitRecord : unitRecords) {
-            RVTypes_MasterEntity rvType = (RVTypes_MasterEntity) unitRecord.get("rvType");
+            Long rateTypeId = (Long) unitRecord.get("rateTypeId");
             Double unitRatableValue = (Double) unitRecord.get("ratableValue");
             if (unitRatableValue == null) {
                 unitRatableValue = 0.0;
             }
-            String applicableTaxes = rvType.getAppliedTaxesVc();
 
-            if (applicableTaxes.contains("Employment Guarantee Cess (EGC)")) {
-                egcAmount += unitRatableValue * (egcRate / 100);
+            // ✅ Check applied taxes via repo
+            List<RvTypesAppliedTaxes_MasterEntity> appliedTaxes =
+                    rvTypesAppliedTaxesMasterRepository.findByRvtypeId(rateTypeId);
+
+            for (RvTypesAppliedTaxes_MasterEntity applied : appliedTaxes) {
+                if (applied.getTaxKeyL().equals(ReportTaxKeys.EGC)) {
+                    egcAmount += unitRatableValue * (egcRate / 100.0);
+                }
             }
         }
 
-        egcDetails.put("Employment Guarantee Cess (EGC)", (double) Math.round(egcAmount));
-        return egcDetails;
+        egcMap.put(ReportTaxKeys.EGC, (double) Math.round(egcAmount));
+        return egcMap;
     }
 
     private Map<String, Object> calculateRatableValueForUnit(UnitDetails_Entity unit, Integer zone) {
@@ -541,7 +564,7 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
             warnings.add(msg);
             logger.warning(msg);
             return unitRecord;
-            }
+        }
 
         PropertyRates_MasterEntity rate = rateOpt.get();
         //changed the further part of a code as we want to calculate the Ratable value on the
@@ -580,7 +603,7 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         unitRecord.put("rateTypeId", rateTypeId);
         unitRecord.put("rvType", rvType);
         unitRecord.put("categoryId", rvType.getCategory().getCategoryId());//using this to setting the ratable values in there
-                                                            // proposed ratable category mentioned in the report
+        // proposed ratable category mentioned in the report
         double ratePerSqM = Double.parseDouble(rate.getRateI());
         ratePerSqM *= Double.parseDouble(rvType.getRateFl()); // Adjust the rate per sq.m by the multiplier
         unitRecord.put("ratePerSqM", ratePerSqM);
@@ -684,65 +707,57 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         return unitRecord;
     }
 
-    private double calculatePropertyTax(List<Map<String, Object>> unitRecords) {
+    private Map<Long, Double> calculatePropertyTax(List<Map<String, Object>> unitRecords) {
+        Map<Long, Double> propertyTaxMap = new HashMap<>();
+
+        // Group ratable values by RVType
+        Map<Long, Double> rateTypeRatableValues = unitRecords.stream()
+                .collect(Collectors.groupingBy(
+                        r -> (Long) r.get("rateTypeId"),
+                        Collectors.summingDouble(r -> {
+                            Double rv = (Double) r.get("ratableValue");
+                            return rv != null ? rv : 0.0;
+                        })
+                ));
+
         double totalPropertyTax = 0.0;
-        Map<Long, Double> rateTypeRatableValues = new HashMap<>();
 
-        // Group ratable values by rate type
-        for (Map<String, Object> unitRecord : unitRecords) {
-            Long rateTypeId = (Long) unitRecord.get("rateTypeId");
-            Double unitRatableValue = (Double) unitRecord.get("ratableValue");
-            if (unitRatableValue == null) {
-                logger.warning("Ratable value is null for unit with details: " + unitRecord.get("unit"));
-                unitRatableValue = 0.0;
-            }
-            rateTypeRatableValues.merge(rateTypeId, unitRatableValue, Double::sum);
-        }
-
-        logger.info("Grouped ratable values by rate type: " + rateTypeRatableValues);
-
-        // Calculate property tax for each rate type
         for (Map.Entry<Long, Double> entry : rateTypeRatableValues.entrySet()) {
             Long rateTypeId = entry.getKey();
             double rateTypeRatableValue = entry.getValue();
 
-            Optional<RVTypes_MasterEntity> rvTypeOpt = rvTypesMasterRepository.findById(rateTypeId);
-            if (!rvTypeOpt.isPresent()) {
-                String errorMessage = "RV Type not found for the given ID: " + rateTypeId;
-                logger.severe(errorMessage);
-                throw new IllegalArgumentException(errorMessage);
-            }
-            RVTypes_MasterEntity rvType = rvTypeOpt.get();
-            String applicableTaxes = rvType.getAppliedTaxesVc();
+            // ✅ Correct way: use the injected repo instance
+            List<RvTypesAppliedTaxes_MasterEntity> appliedTaxes =
+                    rvTypesAppliedTaxesMasterRepository.findByRvtypeId(rateTypeId);
 
-            logger.info("Rate Type ID: " + rateTypeId + ", Applicable Taxes: " + applicableTaxes);
+            for (RvTypesAppliedTaxes_MasterEntity applied : appliedTaxes) {
+                Long taxKey = applied.getTaxKeyL();
 
-            for (String taxName : applicableTaxes.split(",")) {
-                if (taxName.trim().equals("Property Tax") || taxName.trim().equals("Property Tax II")) {
-                    ConsolidatedTaxes_MasterEntity taxRate = consolidatedTaxesMasterRepository.findByTaxNameVc(taxName.trim());
-                    if (taxRate == null) {
-                        String warningMessage = "Tax rate not found for tax name: " + taxName;
-                        logger.warning(warningMessage);
-                        continue; // Skip this tax and continue with others
-                    }
+                if (taxKey.equals(ReportTaxKeys.PT1) || taxKey.equals(ReportTaxKeys.PT2)) {
+                    ConsolidatedTaxes_MasterEntity taxRate =
+                            consolidatedTaxesMasterRepository.findByTaxKeyL(taxKey).orElse(null);
+
                     if (taxRate != null) {
                         double rate = Double.parseDouble(taxRate.getTaxRateFl());
-                        double taxAmount = rateTypeRatableValue * (rate / 100);
+                        double taxAmount = Math.round(rateTypeRatableValue * (rate / 100.0));
+
+                        propertyTaxMap.merge(taxKey, taxAmount, Double::sum);
                         totalPropertyTax += taxAmount;
-                    } else {
-                        logger.warning("Tax rate not found for tax name: " + taxName);
                     }
                 }
             }
         }
 
-        return totalPropertyTax;
+        // ✅ Save parent PT key (sum of PT1 + PT2)
+        propertyTaxMap.put(ReportTaxKeys.PT_PARENT, totalPropertyTax);
+
+        return propertyTaxMap;
     }
 
     private double getUserChargesForUnit(UnitDetails_Entity unit) {
         double userCharges = 0.0;
 
-      // Fetching Unit Usage Subtype entity
+        // Fetching Unit Usage Subtype entity
         Optional<UnitUsageSubType_MasterEntity> usageSubTypeOpt = unitUsageSubType_masterRepository.findById(unit.getUdUsagesubtypeI());
         if (usageSubTypeOpt.isPresent()) {
             UnitUsageSubType_MasterEntity usageSubType = usageSubTypeOpt.get();
@@ -857,6 +872,48 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
 //
 //        return assessmentResultsDto;
 //    }
+
+    private Map<Long, Double> buildTaxValueMap(
+            double propertyTax,
+            Map<Long, Double> propertyTaxMap,
+            Map<Long, Double> educationTaxMap,
+            Map<Long, Double> egcMap,
+            Map<Long, Double> consolidatedTaxes,
+            double userCharges,
+            AssessmentResultsDto dto) {
+
+        Map<Long, Double> taxValueMap = new HashMap<>();
+
+        // ----------------- PROPERTY TAX -----------------
+        double pt1 = propertyTaxMap.getOrDefault(ReportTaxKeys.PT1, 0.0);
+        double pt2 = propertyTaxMap.getOrDefault(ReportTaxKeys.PT2, 0.0);
+
+        taxValueMap.put(ReportTaxKeys.PT1, pt1);
+        taxValueMap.put(ReportTaxKeys.PT2, pt2);
+        taxValueMap.put(ReportTaxKeys.PT_PARENT, pt1 + pt2);
+
+        // ----------------- EDUCATION CESS -----------------
+        double educRes = educationTaxMap.getOrDefault(ReportTaxKeys.EDUC_RES, 0.0);
+        double educComm = educationTaxMap.getOrDefault(ReportTaxKeys.EDUC_COMM, 0.0);
+
+        taxValueMap.put(ReportTaxKeys.EDUC_RES, educRes);
+        taxValueMap.put(ReportTaxKeys.EDUC_COMM, educComm);
+        taxValueMap.put(ReportTaxKeys.EDUC_PARENT, educRes + educComm);
+
+        // ----------------- EGC -----------------
+        double egc = egcMap.getOrDefault(ReportTaxKeys.EGC, 0.0);
+        taxValueMap.put(ReportTaxKeys.EGC, egc);
+
+        // ----------------- CONSOLIDATED TAXES -----------------
+        consolidatedTaxes.forEach(taxValueMap::put);
+
+        // ----------------- USER CHARGES -----------------
+        taxValueMap.put(ReportTaxKeys.USER_CHG, userCharges);
+
+        return taxValueMap;
+    }
+
+
 
     private Double nullToZero(Double value) {
         return value != null ? value : 0.0;

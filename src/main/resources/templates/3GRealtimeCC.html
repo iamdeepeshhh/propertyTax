@@ -355,42 +355,14 @@
                     </tr>
                 </table>
             </div>
-            <div>
-                <table id="rightTable" style="margin-top:2px;width:64%;">
-                    <tr height="5">
-                        <td colspan="12" style="background-color:#F6CECE;" class="f-w-b p-l-8">&gt;&gt;Consolidate Tax Details/एकत्रित कराचे तपशील&lt;&lt;</td>
+            <div class="styled-table total-section">
+                <table id="calculationSheetTaxTable" style="margin-top:2px;width:64%;">
+                    <tr>
+                        <td colspan="100" style="background-color:#F6CECE;" class="f-w-bp-l-8">
+                            &gt;&gt; Consolidate Tax Details / एकत्रित कराचे तपशील &lt;&lt;
+                        </td>
                     </tr>
-                    <tr height="5" style="background-color: #CEF6CE;" class="t-a-c">
-                        <td rowspan="2">मालमत्ता कर</td>
-                        <td colspan="3" class="p-n">शिक्षण कर</td>
-                        <td rowspan="2">रो.ह.यो .कर</td>
-                        <td rowspan="2">वृक्ष कर</td>
-                        <td rowspan="2">पर्यावरण कर</td>
-                        <td rowspan="2">स्वच्छता कर</td>
-                        <td rowspan="2">दिवाबत्ती कर</td>
-                        <td rowspan="2">अग्निशमन कर</td>
-                        <td rowspan="2">उपयोग कर्ता शुल्क व ईतर</td>
-                        <td rowspan="2" class="f-w-b">एकूण</td>
-                    </tr>
-                    <tr style="background-color:#F8E0F7" class="t-a-c">
-                        <td style="border-left:0px!important;" class="bb-n">निवासी</td>
-                        <td class="bb-n">अनिवासी</td>
-                        <td style="border-left:0px!important;border-bottom:0px!important;" class="f-w-b bb-n">एकूण कर</td>
-                    </tr>
-                    <tr class="h-25 t-a-c">
-                        <td id="propertyTax"></td>
-                        <td id="educationTaxResidential"></td>
-                        <td id="educationTaxNonResidential"></td>
-                        <td id="educationTaxTotal"></td>
-                        <td id="egcTax"></td>
-                        <td id="treeTax"></td>
-                        <td id="environmentTax"></td>
-                        <td id="cleannessTax"></td>
-                        <td id="lightTax"></td>
-                        <td id="fireTax"></td>
-                        <td id="userChargesTax"></td>
-                        <td id="totalTax"></td>
-                    </tr>
+                    <!-- dynamic rows will be injected here -->
                 </table>
             </div>
             <br>
@@ -502,7 +474,7 @@
                 <table style="width:100%;">
                     <tr>
                         <td style="width:43%;">
-                            <img style="" align="center" src="">
+                            <img id="pdPropimageT" style="width: 100%; height: 500px; object-fit: fill; border: 1px solid #000;" align="center" src="">
                         </td>
                         <td style="width:5%;text-align:center;font-size:20px;font-weight:bold;">
                             <i class="fa fa-arrow-left" aria-hidden="true"></i><br>P<br>R<br>O<br>P<br>E<br>R<br>T<br>Y<br> <br>P<br>H<br>O<br>T<br>O<br><br>
@@ -513,6 +485,7 @@
                             <i class="fa fa-arrow-left" aria-hidden="true"></i><br>
                         </td>
                         <td style="width:43%;">
+                            <img id="pdHouseplan2T" style="width: 100%; height: 500px; object-fit: fill; border: 1px solid #000;" src="">
                         </td>
                     </tr>
                 </table>

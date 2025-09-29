@@ -10,4 +10,5 @@ public interface ConsolidatedTaxes_MasterService {
     ConsolidatedTaxes_MasterDto createTax(ConsolidatedTaxes_MasterDto taxDto);
     ConsolidatedTaxes_MasterDto updateTax(Long id, ConsolidatedTaxes_MasterDto taxDto);
     void deleteTax(Long id);
+    public ConsolidatedTaxes_MasterDto findByTaxName(String taxNameVc);
 }

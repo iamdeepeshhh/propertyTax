@@ -3,11 +3,10 @@ package com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.S
 import lombok.Data;
 
 @Data
-public class specialNoticeDto {
+public class PostAssessmentReportDto {
 
     private String SnOccupinameF;
     private String SnOwnername;
-
 
     private String SnNoticeId;
     private String SnwardNo;
@@ -46,9 +45,5 @@ public class specialNoticeDto {
     private String SntreeTaxFl;
     private String SncleannessTaxFl;
     private String SnlightTaxFl;
-
-
-
-
 
 }

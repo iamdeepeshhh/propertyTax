@@ -42,9 +42,7 @@ public class BuildingSubType_MasterServiceImpl implements BuildingSubType_Master
         entity.setBstUpdatedDt(dto.getBstUpdatedDt());
         entity.setBstRemarksVc(dto.getBstRemarksVc());
         entity.setBtBuildingtypellVc(dto.getBtBuildingtypellVc());
-        Integer nextId = sequenceService.getNextSequenceValue("buildingsubtype_master_buildingsubtypeid_seq");
-        entity.setBuildingsubtypeid(nextId);
-        sequenceService.resetSequenceIfTableIsEmpty("buildingsubtype_master", "buildingsubtype_master_buildingsubtypeid_seq");
+        sequenceService.adjustSequence(BuildingSubType_MasterEntity.class, "buildingsubtype_master_buildingsubtypeid_seq");
         BuildingSubType_MasterEntity savedEntity = buildingSubTypeMasterRepository.save(entity);
         return convertToDTO(savedEntity);
     }
