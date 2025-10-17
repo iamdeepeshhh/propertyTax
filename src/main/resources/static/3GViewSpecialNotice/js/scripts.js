@@ -62,7 +62,7 @@ function buildReportTaxTable(tableSelector, templateName = "SPECIAL_NOTICE") {
 
         const table = $(tableSelector);
         const rows = table.find('tr');
-        if (rows.length > 1) rows.slice(1).remove();
+        if (rows.lXength > 1) rows.slice(1).remove();
 
         const headerRow1 = $('<tr class="t-a-c"></tr>').css('background-color', '#CEF6CE');
         const headerRow2 = $('<tr class="t-a-c"></tr>').css('background-color', '#F8E0F7');

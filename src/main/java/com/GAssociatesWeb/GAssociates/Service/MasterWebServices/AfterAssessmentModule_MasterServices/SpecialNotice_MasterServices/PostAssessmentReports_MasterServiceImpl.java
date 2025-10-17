@@ -106,6 +106,7 @@ public class PostAssessmentReports_MasterServiceImpl implements PostAssessmentRe
                     "FROM property_details p " +
                     "LEFT JOIN property_taxdetails pt ON p.pd_newpropertyno_vc = pt.pt_newpropertyno_vc " +
                     "LEFT JOIN proposed_rvalues pr ON p.pd_newpropertyno_vc = pr.pr_newpropertyno_vc " +
+                    "LEFT JOIN register_objection rg ON p.pd_finalpropno_vc = rg.rg_finalpropno_vc " +
                     "LEFT JOIN property_olddetails old ON CAST(NULLIF(p.prop_refno, '') AS INTEGER) = old.pod_refno_vc ";
 
     private static final Map<String, Long> TAX_COLUMN_MAP = Map.ofEntries(
@@ -175,7 +176,7 @@ public class PostAssessmentReports_MasterServiceImpl implements PostAssessmentRe
     }
 
     @Override
-    public List<AssessmentResultsDto> getObjectionReceipt(){
+    public List<AssessmentResultsDto> getObjectionReceiptByNewPropertyNo(){
         return null;
     }
 

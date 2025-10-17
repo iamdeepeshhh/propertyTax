@@ -4,6 +4,7 @@ html {
    height: 100%;
 }
 
+
 body {
   display: flex;
   flex-direction: column;
@@ -150,4 +151,10 @@ header {
 .report-wrapper {
   page-break-after: always;
   margin-bottom: 40px; /* white gap on print */
+}
+
+
+button[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
 }

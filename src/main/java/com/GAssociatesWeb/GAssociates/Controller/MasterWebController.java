@@ -32,6 +32,7 @@ import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.UnitUsageTypes_MasterDto.
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.WaterConnection_MasterDto.WaterConnection_MasterDto;
 import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.PropertyDetails_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.UserAccessDto.UserAccess_Dto;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.RegisterObjection_Entity.RegisterObjection_Entity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.WardTypes_MasterEntity.Ward_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.PropertySurveyEntity.CompletePropertySurvey_Entity.PropertyDeletionLog_Entity.PropertyDeletionLog;
 import com.GAssociatesWeb.GAssociates.Helper.ExcelHelper;
@@ -107,9 +108,9 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 
-    //Phase 1 Development for 3G Associates
-    //Data Entry Provision and MasterWeb
-    //from 01-02-2024 to 07-05-2024
+//Phase 1 Development for 3G Associates
+//Data Entry Provision and MasterWeb
+//from 01-02-2024 to 07-05-2024
 @Controller
 @RequestMapping(value = "/3g")
 public class MasterWebController {
@@ -163,6 +164,7 @@ public class MasterWebController {
     private final ReportTaxesConfigService reportTaxesConfigService;
     private final AssessmentReportPdfGenerator assessmentReportPdfGenerator;
     private static final Logger logger = Logger.getLogger(MasterWebController.class.getName());
+
     public MasterWebController(Ward_MasterService ward_masterService, PropClassification_MasterService propClassification_masterService,
                                PropSubClassification_MasterService propSubClassification_masterService,
                                Zone_MasterService zone_masterService, BuildStatus_MasterService buildStatus_masterService,
@@ -248,7 +250,7 @@ public class MasterWebController {
     }
 
     @PostMapping("/MasterWebUserSignup")
-    public ModelAndView signupUser(@ModelAttribute UserAccess_Dto userAccessDto,RedirectAttributes redirectAttributes) {
+    public ModelAndView signupUser(@ModelAttribute UserAccess_Dto userAccessDto, RedirectAttributes redirectAttributes) {
         userAccessService.signup(userAccessDto);
         // Redirecting or returning a view name after successful signup
         return new ModelAndView("redirect:/3g/masterSheet");
@@ -329,6 +331,7 @@ public class MasterWebController {
             return ResponseEntity.badRequest().body("Error updating user: " + e.getMessage());
         }
     }
+
     @DeleteMapping("/deleteUser/{username}")
     public ResponseEntity<?> deleteUserByUsername(@PathVariable String username) {
         try {
@@ -336,7 +339,7 @@ public class MasterWebController {
             if (isDeleted) {
                 return ResponseEntity.ok().body("User deleted successfully.");
             } else {
-               return ResponseEntity.badRequest().body("User could not be deleted.");
+                return ResponseEntity.badRequest().body("User could not be deleted.");
             }
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -390,6 +393,7 @@ public class MasterWebController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding zone");
         }
     }
+
     @GetMapping("/getAllZones")
     @ResponseBody
     public ResponseEntity<List<Map<String, Object>>> getAllZones() {
@@ -401,12 +405,14 @@ public class MasterWebController {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
     }
+
     //for adding buildingStatus
     @PostMapping("/addBuildStatus")
     public ResponseEntity<BuildStatus_MasterDto> createBuildStatus(@RequestBody BuildStatus_MasterDto dto) throws Exception {
         BuildStatus_MasterDto savedDto = buildStatus_masterService.saveBuildStatus(dto);
         return new ResponseEntity<>(savedDto, HttpStatus.CREATED);
     }
+
     @GetMapping("/buildstatuses")
     public ResponseEntity<List<Map<String, Object>>> getBuildStatuses() {
         List<BuildStatus_MasterDto> buildStatuses = buildStatus_masterService.findAllBuildStatuses();
@@ -425,6 +431,7 @@ public class MasterWebController {
         OwnerType_MasterDto savedDto = ownerType_masterService.addOwnerType(ownerTypeMasterDto);
         return new ResponseEntity<>(savedDto, HttpStatus.CREATED);
     }
+
     @GetMapping("/getOwnerType")
     @ResponseBody
     public ResponseEntity<List<Map<String, Object>>> getAllOwnerTypes() {
@@ -485,16 +492,16 @@ public class MasterWebController {
     //for getting picklist values of propertytypes in every section which is related to property type
     @GetMapping("/propertytypes")
     public ResponseEntity<List<Map<String, Object>>> getClassifications() {
-     // Fetch all property classifications
-            List<PropClassification_MasterDto> classifications = propClassification_masterService.findAll();
-            List<Map<String, Object>> responseData = classifications.stream().map(type -> {
-                Map<String, Object> item = new HashMap<>();
-                item.put("localName", type.getLocalPropertyTypeName());
-                item.put("standardName", type.getPropertyTypeName());// Assuming PropertyType has getName()
-                item.put("id", type.getPcmId()); // Assuming PropertyType has getId()
-                return item;
-            }).collect(Collectors.toList());
-            return ResponseEntity.ok(responseData);
+        // Fetch all property classifications
+        List<PropClassification_MasterDto> classifications = propClassification_masterService.findAll();
+        List<Map<String, Object>> responseData = classifications.stream().map(type -> {
+            Map<String, Object> item = new HashMap<>();
+            item.put("localName", type.getLocalPropertyTypeName());
+            item.put("standardName", type.getPropertyTypeName());// Assuming PropertyType has getName()
+            item.put("id", type.getPcmId()); // Assuming PropertyType has getId()
+            return item;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(responseData);
     }
 
     //for adding property subtypes in property subtype section
@@ -516,6 +523,7 @@ public class MasterWebController {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
     }
+
     //for getting property subtypes after selecting property type in property usage type section
     @GetMapping("/propertySubtypes/{classificationId}")
     public ResponseEntity<List<Map<String, Object>>> getSubclassificationsByClassificationId(@PathVariable Integer classificationId) {
@@ -549,6 +557,7 @@ public class MasterWebController {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
     }
+
     //for getting property usagetypes in property usagesubtype section so that we can select one of them
     @GetMapping("/usageTypes/{id}")
     @ResponseBody
@@ -562,12 +571,14 @@ public class MasterWebController {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
     }
+
     //and then for adding property usage id and sub usage name
     @PostMapping("/addPropertySubUsageTypes")
     public ResponseEntity<PropSubUsageType_MasterDto> createPropSubUsageType(@RequestBody PropSubUsageType_MasterDto dto) {
         PropSubUsageType_MasterDto savedDto = propertySubUsageType_masterService.saveUsageSubType(dto);
         return new ResponseEntity<>(savedDto, HttpStatus.CREATED);
     }
+
     //for getting all subusage types
     @GetMapping("/getSubUsageTypes")
     @ResponseBody
@@ -611,6 +622,7 @@ public class MasterWebController {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
     }
+
     //for getting building types by there id
     @GetMapping("/getBuildingTypesByPropertyClassification/{propertyClassificationId}")
     public ResponseEntity<List<Map<String, Object>>> getBuildingTypesByPropertyClassificationId(@PathVariable Integer propertyClassificationId) {
@@ -623,12 +635,14 @@ public class MasterWebController {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
     }
+
     //for updating buildingTypes with id
     @PutMapping("/updateBuildingTypes/{id}")
     public ResponseEntity<BuildingType_MasterDto> updateBuildingType(@PathVariable Integer id, @RequestBody BuildingType_MasterDto buildingTypeMasterDTO) {
         BuildingType_MasterDto updatedDto = buildingType_masterService.updateBuildingType(buildingTypeMasterDTO, id);
         return ResponseEntity.ok(updatedDto);
     }
+
     //for Deleting buildingTypes
     @DeleteMapping("/buildingtypes/{id}")
     public ResponseEntity<?> deleteBuildingType(@PathVariable Integer id) {
@@ -636,7 +650,6 @@ public class MasterWebController {
         return ResponseEntity.ok().build();
     }
     //BuildingTypes
-
 
 
     //BuildingSubTypes
@@ -766,7 +779,7 @@ public class MasterWebController {
             Map<String, Object> item = new HashMap<>();
             item.put("usm_usagetypell_vc", type.getUsm_usagetypell_vc());
             item.put("usm_usagetypeeng_vc", type.getUsm_usagetypeeng_vc());
-            item.put("usm_usercharges_i",type.getUsm_usercharges_i());
+            item.put("usm_usercharges_i", type.getUsm_usercharges_i());
             item.put("id", type.getUsm_usagesubid_i());
             item.put("uum_usagetypeeng_vc", type.getUum_usagetypeeng_vc());
             item.put("usm_rvtype_vc", type.getUsm_rvtype_vc());
@@ -780,7 +793,7 @@ public class MasterWebController {
     @PostMapping("/updateUnitUsagesSub/{id}")
     public ResponseEntity<UnitUsageSubType_MasterDto> updateUnitUsageSubType(@PathVariable Integer id, @RequestBody UnitUsageSubType_MasterDto unitUsageSubTypeDto) {
         unitUsageSubTypeDto.setUsm_usagesubid_i(id);
-       return ResponseEntity.ok(unitUsageSubType_masterService.updateUnitUsageSubTypeMaster(id, unitUsageSubTypeDto));
+        return ResponseEntity.ok(unitUsageSubType_masterService.updateUnitUsageSubTypeMaster(id, unitUsageSubTypeDto));
     }
 
     @PostMapping("/deleteUnitUsagesSub")
@@ -796,6 +809,7 @@ public class MasterWebController {
         OwnerCategory_MasterDto savedDto = ownerCategory_masterService.addOwnerCategory(ownerCategoryMasterDto);
         return new ResponseEntity<>(savedDto, HttpStatus.CREATED);
     }
+
     //for getting owner category
     @GetMapping("/ownerCategories")
     public ResponseEntity<List<Map<String, Object>>> getOwnerCategories() {
@@ -808,12 +822,14 @@ public class MasterWebController {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
     }
+
     //for adding water-connections
     @PostMapping("/addWaterConnection")
     public ResponseEntity<WaterConnection_MasterDto> addWaterConnection(@RequestBody WaterConnection_MasterDto waterConnectionMasterDto) {
         WaterConnection_MasterDto savedDto = waterConnection_masterService.addWaterConnection(waterConnectionMasterDto);
         return new ResponseEntity<>(savedDto, HttpStatus.CREATED);
     }
+
     //for getting water-connections
     @GetMapping("/waterConnections")
     public ResponseEntity<List<Map<String, Object>>> listWaterConnections() {
@@ -826,6 +842,7 @@ public class MasterWebController {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
     }
+
     //for getting sewerage types
     @GetMapping("/getSewerageTypes")
     public ResponseEntity<List<Map<String, Object>>> listSewerageTypes() {
@@ -837,6 +854,7 @@ public class MasterWebController {
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
     }
+
     //for adding sewerage types
     @PostMapping("/addSewerage")
     public ResponseEntity<Sewerage_MasterDto> addSewerageType(@RequestBody Sewerage_MasterDto sewerageMasterDto) {
@@ -892,7 +910,7 @@ public class MasterWebController {
             item.put("marathiname", type.getCcm_classnamell_vc());
             item.put("englishname", type.getCcm_classnameeng_vc());
             item.put("Deduction", type.getCcm_percentageofdeduction_i());
-            item.put("value",type.getCcm_conclassid_i());
+            item.put("value", type.getCcm_conclassid_i());
             return item;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(responseData);
@@ -1114,7 +1132,7 @@ public class MasterWebController {
             @RequestParam(required = false) String ownerName,
             @RequestParam(required = false) Integer wardNo,
             @RequestParam(required = false) String finalPropertyNo) {
-        List<PropertyDetails_Dto> results = propertyManagement_service.searchNewProperties(surveyPropertyNo, ownerName, wardNo,finalPropertyNo);
+        List<PropertyDetails_Dto> results = propertyManagement_service.searchNewProperties(surveyPropertyNo, ownerName, wardNo, finalPropertyNo);
 
         if (results.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -1127,13 +1145,13 @@ public class MasterWebController {
     //15-05-2024
 
 
-
     //***endpoints for tax depreciation***
     @PostMapping("/depreciationRates")
     public ResponseEntity<List<TaxDepreciation_MasterDto>> addDepreciationRates(@RequestBody Map<String, Object> payload) {
         List<TaxDepreciation_MasterDto> savedDtos = taxDepreciation_masterService.addDepreciationRates(payload);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDtos);
     }
+
     @GetMapping("/getDepreciationRates")
     public ResponseEntity<List<Map<String, Object>>> getAllDepreciationRates() {
         List<TaxDepreciation_MasterDto> rates = taxDepreciation_masterService.getAllDepreciationRates();
@@ -1154,10 +1172,6 @@ public class MasterWebController {
         taxDepreciation_masterService.deleteDepreciationRate(id);
         return ResponseEntity.noContent().build();
     }
-
-
-
-
 
 
     //***endpoints for propertyrates***
@@ -1198,9 +1212,6 @@ public class MasterWebController {
         propertyRates_masterService.deletePropertyRate(id);
         return ResponseEntity.noContent().build();
     }
-
-
-
 
 
     //***endpoints for RVtypes***
@@ -1246,8 +1257,6 @@ public class MasterWebController {
     }
 
 
-
-
     //***endpoints for consolidated taxes***
     @PostMapping("/addConsolidatedTax")
     public ResponseEntity<ConsolidatedTaxes_MasterDto> addConsolidatedTax(@RequestBody ConsolidatedTaxes_MasterDto taxDto) {
@@ -1287,15 +1296,13 @@ public class MasterWebController {
         ConsolidatedTaxes_MasterDto taxDto = consolidatedTaxes_masterService.getTaxById(id);
         return taxDto != null ? ResponseEntity.ok(taxDto) : ResponseEntity.notFound().build();
     }
+
     //update consolidated tax
     @PostMapping("/updateConsolidatedTax/{id}")
     public ResponseEntity<ConsolidatedTaxes_MasterDto> updateConsolidatedTax(@PathVariable Long id, @RequestBody ConsolidatedTaxes_MasterDto taxDetails) {
         ConsolidatedTaxes_MasterDto updatedTax = consolidatedTaxes_masterService.updateTax(id, taxDetails);
         return ResponseEntity.ok(updatedTax);
     }
-
-
-
 
 
     //***endpoints for education cess and employment cess
@@ -1340,7 +1347,6 @@ public class MasterWebController {
     }
 
 
-
     @GetMapping("/calculationSheet/{newPropertyNumber}")
     public String showCalculationSheet(@PathVariable("newPropertyNumber") String newPropertyNumber, Model model) {
         model.addAttribute("newPropertyNumber", newPropertyNumber);
@@ -1348,10 +1354,9 @@ public class MasterWebController {
     }
 
 
-
     @GetMapping("/calculatedDetails/{newPropertyNumber}")
     public ResponseEntity<?> getCalculatedDetails(@PathVariable("newPropertyNumber") String newPropertyNumber) {
-       List<AssessmentResultsDto> assessmentResultsDtos = calculationSheetGenerator_masterService.generateSinglePropertyReport(newPropertyNumber);
+        List<AssessmentResultsDto> assessmentResultsDtos = calculationSheetGenerator_masterService.generateSinglePropertyReport(newPropertyNumber);
 //        AssessmentResultsDto assessmentResultsDto = taxAssessment_masterService.performAssessment(newPropertyNumber);
         if (assessmentResultsDtos != null) {
             return ResponseEntity.ok(assessmentResultsDtos);
@@ -1389,7 +1394,7 @@ public class MasterWebController {
             jobLauncher.run(processPropertyDetailsJob, jobParametersBuilder.toJobParameters());
             return ResponseEntity.ok("Batch job has been started for Ward No: " + wardNo);
         } catch (Exception e) {
-            logger.info("Failed to start batch job for Ward No: {}:"+wardNo+e);
+            logger.info("Failed to start batch job for Ward No: {}:" + wardNo + e);
             return ResponseEntity.status(500).body("Failed to start batch job: " + e.getMessage());
         }
     }
@@ -1418,7 +1423,8 @@ public class MasterWebController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-//these methods are used for getting the batch of calculationsheet in chunks
+
+    //these methods are used for getting the batch of calculationsheet in chunks
     @GetMapping("/propertyCalculationSheetReport")
     public ResponseEntity<List<AssessmentResultsDto>> getPropertyCalculationSheetReport(
             @RequestParam("wardNo") Integer wardNo,
@@ -1445,7 +1451,7 @@ public class MasterWebController {
         }
     }
 
-//This is Additional feature to get council names and images so that application can become standard
+    //This is Additional feature to get council names and images so that application can become standard
     @PostMapping(value = "/saveCouncilDetails", consumes = "multipart/form-data")
     public ResponseEntity<String> saveCouncilDetails(@RequestParam("standardName") String standardName,
                                                      @RequestParam("localName") String localName,
@@ -1453,8 +1459,8 @@ public class MasterWebController {
                                                      @RequestParam("localSiteNameVc") String localSiteNameVc,
                                                      @RequestParam("standardDistrictNameVc") String standardDistrictNameVc,
                                                      @RequestParam("localDistrictNameVc") String localDistrictNameVc,
-                                                     @RequestParam(name = "councilImage", required = false) MultipartFile councilImage){
-        try{
+                                                     @RequestParam(name = "councilImage", required = false) MultipartFile councilImage) {
+        try {
             CouncilDetails_MasterDto councilDetails_masterDto = new CouncilDetails_MasterDto();
             councilDetails_masterDto.setStandardName(standardName);
             councilDetails_masterDto.setLocalName(localName);
@@ -1469,7 +1475,7 @@ public class MasterWebController {
             }
             councilDetails_masterService.saveCouncilDetails(councilDetails_masterDto);
             return ResponseEntity.ok("Success");
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while saving council details.");
         }
@@ -1508,7 +1514,7 @@ public class MasterWebController {
 
             boolean isDeleted = councilDetails_masterService.deleteCouncilDetailById(id);
             return ResponseEntity.noContent().build();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
 
             return ResponseEntity.noContent().build();
@@ -1524,11 +1530,11 @@ public class MasterWebController {
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
-//for uploading cad images and property images we will be using seperate api endpoints-
+    //for uploading cad images and property images we will be using seperate api endpoints-
 //-so below are endpoints
     @PostMapping(value = "/uploadCadImage", consumes = "multipart/form-data")
     public ResponseEntity<String> uploadCadImage(@RequestParam("newPropertyNo") String newPropertyNo,
-                                                 @RequestParam("cadImage") MultipartFile cadImage){
+                                                 @RequestParam("cadImage") MultipartFile cadImage) {
         try {
             if (cadImage == null || cadImage.isEmpty()) {
                 return ResponseEntity.badRequest().body("No property image uploaded.");
@@ -1545,7 +1551,7 @@ public class MasterWebController {
 
     @PostMapping(value = "/uploadPropertyImage", consumes = "multipart/form-data")
     public ResponseEntity<String> uploadPropertyImage(@RequestParam("newPropertyNo") String newPropertyNo,
-                                                      @RequestParam("propertyImage") MultipartFile propertyImage){
+                                                      @RequestParam("propertyImage") MultipartFile propertyImage) {
         try {
             if (propertyImage == null || propertyImage.isEmpty()) {
                 return ResponseEntity.badRequest().body("No property image uploaded.");
@@ -1560,13 +1566,13 @@ public class MasterWebController {
         }
     }
 
-//for specially citizens when they are required to search there property with specified final property number and ward
+    //for specially citizens when they are required to search there property with specified final property number and ward
     @GetMapping("/searchByFinalPropertyNoAndWardNo")
     public ResponseEntity<?> getByFinalPropertyNoAndWard(
             @RequestParam String finalPropertyNo,
             @RequestParam Integer wardNo) {
 
-        List<PropertyDetails_Dto> result = propertyManagement_service.searchWardandFinalPropertyNo(finalPropertyNo,wardNo);
+        List<PropertyDetails_Dto> result = propertyManagement_service.searchWardandFinalPropertyNo(finalPropertyNo, wardNo);
 
         if (result.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -1574,12 +1580,7 @@ public class MasterWebController {
         return ResponseEntity.ok(result);
     }
 
-    //for registering the objection of citizen the below methood is getting used
-    @PostMapping("/submitObjection")
-    public ResponseEntity<String> submitObjection(@RequestBody RegisterObjection_Dto dto) {
-        registerObjection_masterService.saveObjection(dto);
-        return ResponseEntity.ok("Objection submitted successfully");
-    }
+
 
     //For the Special Notice
     @GetMapping("/specialNotices")
@@ -1628,12 +1629,12 @@ public class MasterWebController {
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 
-//    for getting taxes on the report dynamically
-        // Report Taxes Configs for dynamic rendering (e.g., REALTIME_CC, CALCULATION_SHEET)
+    //    for getting taxes on the report dynamically
+    // Report Taxes Configs for dynamic rendering (e.g., REALTIME_CC, CALCULATION_SHEET)
     @GetMapping("/reportTaxConfigs")
     public ResponseEntity<List<ReportTaxes_MasterDto>> getReportTaxConfigs(
-          @RequestParam("template") String templateVc) {
-           try {
+            @RequestParam("template") String templateVc) {
+        try {
             List<ReportTaxes_MasterDto> rows = reportTaxesConfigService.getVisibleConfigsByTemplate(templateVc);
             if (rows == null || rows.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -1647,11 +1648,11 @@ public class MasterWebController {
 
     // Management UI: full list (including invisible) for editing
     @GetMapping("/reportTaxConfigs/all")
-    public ResponseEntity<List<Map<String,Object>>> getAllReportTaxConfigs() {
+    public ResponseEntity<List<Map<String, Object>>> getAllReportTaxConfigs() {
         try {
             List<ReportTaxes_MasterDto> configs = reportTaxesConfigService.getAllConfigs();
 
-            List<Map<String, Object>> responseData  = configs.stream().map(config -> {
+            List<Map<String, Object>> responseData = configs.stream().map(config -> {
                 Map<String, Object> item = new LinkedHashMap<>(); // preserves insertion order
 
                 item.put("id", config.getId());                       // hidden/internal use
@@ -1690,5 +1691,37 @@ public class MasterWebController {
         return "3GReportTaxConfig";
     }
 
+
+    //-----------------------Objection --------------------------------------------------------------
+
+
+    @GetMapping("/checkObjectionExists/{newPropertyNo}")
+    public ResponseEntity<Boolean> checkObjectionExists(@PathVariable String newPropertyNo) {
+        boolean exists = registerObjection_masterService.existsObjection(newPropertyNo);
+        return ResponseEntity.ok(exists);
+    }
+
+    //for registering the objection of citizen the below methood is getting used
+    @PostMapping("/submitObjection")
+    public ResponseEntity<String> submitObjection(@RequestBody RegisterObjection_Dto dto) {
+        if (! registerObjection_masterService.existsObjection(dto.getNewPropertyNo())) {
+            registerObjection_masterService.saveObjection(dto);
+            return ResponseEntity.ok("Objection submitted successfully");
+        }else{
+            return ResponseEntity.badRequest().body("Already Objection is present ");
+        }
+    }
+
+    @GetMapping("getObjectionDetails/{newPropertyNo}")
+    public ResponseEntity<RegisterObjection_Dto> getObjectionDetails(@PathVariable String newPropertyNo) {
+
+        RegisterObjection_Dto objection = registerObjection_masterService.getObjection(newPropertyNo);
+        if (objection != null){
+            return ResponseEntity.ok(objection);
+        }
+
+        return ResponseEntity.notFound().build();
+
+    }
 }
 

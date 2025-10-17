@@ -31,8 +31,7 @@ public class UnitFloorNo_MasterServiceImpl implements UnitFloorNo_MasterService 
         unitFloorNo_masterEntity.setUnitfloorno(unitFloorNo_masterDto.getUnitfloorno());
         sequenceService.resetSequenceIfTableIsEmpty("unitfloorno_master", "unitfloorno_master_id_seq");
         if (unitFloorNo_masterEntity.getId() == null) {
-            long minvalue = SequenceConstants.MIN_VALUE;
-            sequenceService.ensureSequenceExists("unitfloorno_master_id_seq", "unitfloorno_master.id",minvalue );
+            sequenceService.adjustSequence(UnitFloorNo_MasterEntity.class, "unitfloorno_master_id_seq");
             Integer nextId = sequenceService.getNextSequenceValue("unitfloorno_master_id_seq");
             unitFloorNo_masterEntity.setId(nextId);
         }

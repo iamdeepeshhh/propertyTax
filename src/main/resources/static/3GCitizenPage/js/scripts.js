@@ -1,3 +1,6 @@
+var newPropertyNo = null;
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // Function to fetch council details
     fetch('/3g/getCouncilDetails')
@@ -79,19 +82,49 @@ function fetchPropertyRecords(endpointUrl, queryParams, tableBodyId, actionType,
 // and viewing survey report,calculationsheet also deleting reports
 function getActionButtons(actionType, item) {
     if (actionType === 'survey') {
-        return `
-            <button class="btn btn-primary mr-2" onclick="viewObjectionSection('${item.pdNewpropertynoVc}')">Register Objection</button>
+        const newPropNo = item.pdNewpropertynoVc;
 
-        `;
-    } else if (actionType === 'upload') {
+        // Placeholder HTML while checking
+        const btnId = `btn-${newPropNo}`;
+        const viewBtnId = `view-${newPropNo}`;
+        setTimeout(() => checkObjectionStatus(newPropNo, btnId, viewBtnId), 0);
+
         return `
-            <button class="btn btn-primary mr-2" onclick="viewSurveyReport('${item.pdNewpropertynoVc}')">Survey Report</button>
-            <button class="btn btn-success" onclick="uploadFile('${item.pdNewpropertynoVc}', 'cad')">Upload Cad</button>
-            <button class="btn btn-success" onclick="uploadFile('${item.pdNewpropertynoVc}', 'propertyImage')">Upload Prop Image</button>
+            <button id="${btnId}" class="btn btn-primary mr-2">Register Objection</button> 
+            <br>
+            <button id="${viewBtnId}" class="btn btn-info" style="display:none;">View Objection</button>
         `;
     }
     return '';
 }
+
+
+function checkObjectionStatus(newPropertyNo, btnId, viewBtnId) {
+    fetch(`/3g/checkObjectionExists/${encodeURIComponent(newPropertyNo)}`)
+        .then(res => res.json())
+        .then(exists => {
+            const registerBtn = document.getElementById(btnId);
+            const viewBtn = document.getElementById(viewBtnId);
+
+            if (exists) {
+                // Disable and fade out register button
+                registerBtn.disabled = true;
+                registerBtn.style.opacity = "0.5";
+                registerBtn.style.visibility= "hidden";
+                registerBtn.innerText = "Objection Exists";
+
+
+                // Show View button
+                viewBtn.style.display = "inline-block";
+                viewBtn.onclick = () => window.location.href = `/objectionReciept?newPropertyNo=${encodeURIComponent(newPropertyNo)}`;
+            } else {
+                // Enable the register button if no objection exists
+                registerBtn.onclick = () => viewObjectionSection(newPropertyNo);
+            }
+        })
+        .catch(err => console.error("Error checking objection:", err));
+}
+
 
 // performSearch to get the searching parameters from the sections such as surveyreports and uploadfiles
 function performSearch(sectionId) {
@@ -126,6 +159,7 @@ function viewObjectionSection(pdNewpropertynoVc) {
     document.getElementById("objections").style.display = "none";
     document.getElementById("objectionSection").style.display = "block";
     const apiUrl = '/3gSurvey/detailsComplete/' + pdNewpropertynoVc;
+    newPropertyNo = pdNewpropertynoVc; // initilizing new property no
     fetch(apiUrl)
     .then(response => response.json())
     .then(data => {
@@ -135,6 +169,7 @@ function viewObjectionSection(pdNewpropertynoVc) {
     document.getElementById('objectionSurveyNo').value = data.propertyDetails.pdSurypropnoVc;
     document.getElementById('objectionOwnerName').value = data.propertyDetails.pdOwnernameVc;})
     .catch(err => console.error(err));
+    console.log(newPropertyNo);
 
 }
 
@@ -143,7 +178,6 @@ function cancelObjection() {
     document.getElementById("objections").style.display = "block";
 //    document.getElementById("objectionForm").reset(); // Optional reset
 }
-
 
 function submitObjection() {
     const form = document.getElementById("objectionForm");
@@ -159,6 +193,7 @@ function submitObjection() {
         others: form.others.value,
         noticeNo: form.objectionNoticeNo.value,
         surveyNo: form.objectionSurveyNo.value,
+        newPropertyNo: newPropertyNo, // ✅ important
         reasons: Array.from(document.querySelectorAll(".chk:checked"))
                       .map(cb => cb.value)
                       .join(", "),
@@ -170,20 +205,33 @@ function submitObjection() {
         return alert("Please enter respondent name and contact number.");
     }
 
-    fetch("/3g/submitObjection", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    })
-    .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
-    .then(() => {
-        alert("Objection submitted successfully!");
-        form.reset();
-        window.location.replace('/objectionReciept');
-        document.getElementById("objectionSection").style.display = "none";
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Failed to submit objection.");
-    });
+    // ✅ Step 1: Check if objection already exists before submitting
+    fetch(`/3g/checkObjectionExists/${encodeURIComponent(newPropertyNo)}`)
+        .then(res => res.json())
+        .then(exists => {
+            if (exists) {
+                alert("⚠️ An objection already exists for this property.");
+                return;
+            }
+
+            // ✅ Step 2: If not exists, submit the objection
+            return fetch("/3g/submitObjection", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+        })
+        .then(res => {
+            if (res && res.ok) {
+                alert("Objection submitted successfully!");
+                form.reset();
+                window.location.replace('/objectionReciept?newPropertyNo=' + encodeURIComponent(newPropertyNo));
+            } else if (res) {
+                alert("Failed to submit objection.");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("An error occurred while submitting objection.");
+        });
 }

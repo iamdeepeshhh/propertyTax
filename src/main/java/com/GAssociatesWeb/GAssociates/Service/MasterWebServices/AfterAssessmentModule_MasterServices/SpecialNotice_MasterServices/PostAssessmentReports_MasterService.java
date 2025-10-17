@@ -10,6 +10,6 @@ public interface PostAssessmentReports_MasterService {
     List<AssessmentResultsDto> getSpecialNoticesByWard(int wardNo);
     public long getSpecialNoticeCount(Integer wardNo, String newPropertyNo);
     public List<AssessmentResultsDto> getSpecialNoticesByNewPropertyNo(String newPropertyNo);
-    public List<AssessmentResultsDto> getObjectionReceipt();
+    public List<AssessmentResultsDto> getObjectionReceiptByNewPropertyNo();
 
 }
