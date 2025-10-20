@@ -1402,7 +1402,7 @@ public class MasterWebController {
     @GetMapping("/batchAssessmentReport/{wardNo}")
     public String showBatchAssessmentReport(@PathVariable("wardNo") Integer wardNo, Model model) {
         // Return the name of the view that will render the batch assessment report
-        return "3GBatchAssessmentReport"; // This should be the name of your HTML/Thymeleaf template
+        return "3GPrimaryBatchAssessmentReport"; // This should be the name of your HTML/Thymeleaf template
     }
 
     @GetMapping("/batchCalculationReport/{wardNo}")
@@ -1722,6 +1722,20 @@ public class MasterWebController {
 
         return ResponseEntity.notFound().build();
 
+    }
+
+    @GetMapping("getObjectionList")
+    public ResponseEntity<List<RegisterObjection_Dto>> getObjectionList(){
+        List<RegisterObjection_Dto> list = registerObjection_masterService.getList();
+        if (list != null &&!list.isEmpty()){
+            return ResponseEntity.ok(list);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("viewObjectionList")
+    public String viewObjectionList(){
+        return "3gViewObjectionSheet";
     }
 }
 

@@ -12,4 +12,6 @@ public interface RegisterObjection_MasterService {
     public void saveObjection(RegisterObjection_Dto dto);
 
     public RegisterObjection_Dto getObjection(String applicationNo);
+
+    public List<RegisterObjection_Dto> getList();
 }

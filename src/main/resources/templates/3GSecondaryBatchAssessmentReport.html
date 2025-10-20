@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Assessment Register (Preview + Print Parts)</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; font-size: 12px; }
+        .controls { position: sticky; top: 0; background: #fff; padding: 10px; border-bottom: 1px solid #ccc; display: flex; gap: 10px; z-index: 10; }
+        button { background: #004aad; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+        button.secondary { background: #0e7c3a; }
+
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 12px; }
+        th, td { border: 1px solid #000; padding: 4px; text-align: center; }
+
+        /* Group coloring (preview) */
+        th.p1, td.p1 { background: #e7f1ff; }   /* light blue */
+        th.p2, td.p2 { background: #e8f7e8; }   /* light green */
+
+        th.group { background: #d9e8ff; font-weight: 700; }
+        th.group.p2 { background: #d6f2d6; }
+
+        .v { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; }
+        .seam, td.seam, th.seam { width: 12px; min-width: 12px; background: repeating-linear-gradient(90deg,#999 0 1px, transparent 1px 12px); border-left: 0; border-right: 0; }
+
+        /* PRINT: hide the non-selected half by class (robust to column count changes) */
+        @media print {
+          .controls { display: none !important; }
+          body.print1 .p2, body.print1 .seam { display: none !important; }
+          body.print2 .p1, body.print2 .seam { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <button onclick="printPart(1)">🖨️ Print Part 1 (till Tax 11)</button>
+    <button class="secondary" onclick="printPart(2)">🖨️ Print Part 2 (after Tax 11)</button>
+</div>
+
+<!-- Top heading -->
+<div style="text-align:center">
+    <h2 style="margin:0 0 4px">नगर परिषद आरवी / Nagar Parishad Arvi</h2>
+    <div style="opacity:.9">Assessment List of Buildings and Lands Liable to Taxation for the Year 2025-26 to 2028-29</div>
+</div>
+
+<table>
+    <thead>
+    <!-- Row 1: top bands -->
+    <tr>
+        <th class="group p1" rowspan="3">क्र.</th>
+        <th class="group p1" colspan="4">स्वा., विभाग, ब्लॉक, मालमत्ता क्र.</th>
+        <th class="group p1" colspan="2">मालमत्तेचे वर्णन</th>
+        <th class="group p1" colspan="3">मोजमाप / क्षेत्रफळ</th>
+        <!-- Part 1 taxes (कर 1..11) -->
+        <th class="group p1" colspan="11">आकारण्यात येणाऱ्या करांची रक्कम (दरवार्षिक)</th>
+
+        <th class="seam" rowspan="3"></th>
+
+        <!-- Part 2 continuation (कर 12+) — keep labels to your needs -->
+        <th class="group p2" colspan="10">आकारण्यात येणाऱ्या करांची रक्कम (पुढील भाग)</th>
+    </tr>
+
+    <!-- Row 2: sub labels (vertical where needed) -->
+    <tr>
+        <!-- P1 left side -->
+        <th class="p1 v">विभाग</th>
+        <th class="p1 v">भाग</th>
+        <th class="p1 v">मालमत्ता क्रमांक</th>
+        <th class="p1 v">जुना क्रमांक</th>
+
+        <th class="p1">मालकाचे नाव</th>
+        <th class="p1">भोगवटादाराचे नाव</th>
+
+        <th class="p1">मजला</th>
+        <th class="p1">वापर</th>
+        <th class="p1">कार्पेट एरिया</th>
+
+        <th class="p1 v">कर 1</th>
+        <th class="p1 v">कर 2</th>
+        <th class="p1 v">कर 3</th>
+        <th class="p1 v">कर 4</th>
+        <th class="p1 v">कर 5</th>
+        <th class="p1 v">कर 6</th>
+        <th class="p1 v">कर 7</th>
+        <th class="p1 v">कर 8</th>
+        <th class="p1 v">कर 9</th>
+        <th class="p1 v">कर 10</th>
+        <th class="p1 v">कर 11</th>
+
+        <!-- P2 right side (example: 12..14 + total; adjust as needed) -->
+        <th class="p2 v">कर 12</th>
+        <th class="p2 v">कर 13</th>
+        <th class="p2 v">कर 14</th>
+        <th class="p2 v">कर 15</th>
+        <th class="p2 v">कर 16</th>
+        <th class="p2 v">कर 17</th>
+        <th class="p2 v">कर 18</th>
+        <th class="p2 v">कर 19</th>
+        <th class="p2 v">कर 20</th>
+        <th class="p2 v">एकूण</th>
+    </tr>
+
+    <!-- Row 3: reference number line (optional) -->
+    <tr>
+        <th class="p1">२</th><th class="p1">३</th><th class="p1">४</th><th class="p1">५</th>
+        <th class="p1">६</th><th class="p1">७</th>
+        <th class="p1">८</th><th class="p1">९</th><th class="p1">१०</th>
+        <th class="p1">११</th><th class="p1">१२</th><th class="p1">१३</th><th class="p1">१४</th><th class="p1">१५</th><th class="p1">१६</th><th class="p1">१७</th><th class="p1">१८</th><th class="p1">१९</th><th class="p1">२०</th><th class="p1">२१</th>
+        <!-- seam has rowspan -->
+        <th class="p2">२२</th><th class="p2">२३</th><th class="p2">२४</th><th class="p2">२५</th><th class="p2">२६</th><th class="p2">२७</th><th class="p2">२८</th><th class="p2">२९</th><th class="p2">३०</th><th class="p2">३१</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <!-- 1 -->
+    <tr>
+        <td class="p1">1</td><td class="p1">2</td><td class="p1">1</td><td class="p1">020001</td><td class="p1">0001</td>
+        <td class="p1">श्री. राम पाटील</td><td class="p1">स्वतः</td>
+        <td class="p1">G</td><td class="p1">व्यावसायिक</td><td class="p1">100</td>
+        <td class="p1">750</td><td class="p1">500</td><td class="p1">300</td><td class="p1">200</td><td class="p1">100</td>
+        <td class="p1">80</td><td class="p1">60</td><td class="p1">40</td><td class="p1">30</td><td class="p1">20</td><td class="p1">10</td>
+        <td class="seam"></td>
+        <td class="p2">5</td><td class="p2">3</td><td class="p2">2</td><td class="p2">1</td><td class="p2">0</td><td class="p2">0</td><td class="p2">0</td><td class="p2">0</td><td class="p2">0</td><td class="p2">2100</td>
+    </tr>
+
+    <!-- 2 -->
+    <tr>
+        <td class="p1">2</td><td class="p1">3</td><td class="p1">2</td><td class="p1">020002</td><td class="p1">0002</td>
+        <td class="p1">सौ. सीमा देशमुख</td><td class="p1">भाडेकरू</td>
+        <td class="p1">1</td><td class="p1">निवासी</td><td class="p1">80</td>
+        <td class="p1">650</td><td class="p1">450</td><td class="p1">350</td><td class="p1">200</td><td class="p1">100</td>
+        <td class="p1">90</td><td class="p1">70</td><td class="p1">50</td><td class="p1">40</td><td class="p1">30</td><td class="p1">20</td>
+        <td class="seam"></td>
+        <td class="p2">15</td><td class="p2">10</td><td class="p2">5</td><td class="p2">4</td><td class="p2">3</td><td class="p2">2</td><td class="p2">1</td><td class="p2">0</td><td class="p2">0</td><td class="p2">2080</td>
+    </tr>
+
+    <!-- 3 -->
+    <tr>
+        <td class="p1">3</td><td class="p1">4</td><td class="p1">1</td><td class="p1">020003</td><td class="p1">0003</td>
+        <td class="p1">श्री. तुषार वाघ</td><td class="p1">स्वतः</td>
+        <td class="p1">2</td><td class="p1">व्यावसायिक</td><td class="p1">120</td>
+        <td class="p1">900</td><td class="p1">700</td><td class="p1">500</td><td class="p1">400</td><td class="p1">200</td>
+        <td class="p1">150</td><td class="p1">100</td><td class="p1">70</td><td class="p1">50</td><td class="p1">30</td><td class="p1">20</td>
+        <td class="seam"></td>
+        <td class="p2">10</td><td class="p2">5</td><td class="p2">3</td><td class="p2">2</td><td class="p2">1</td><td class="p2">0</td><td class="p2">0</td><td class="p2">0</td><td class="p2">0</td><td class="p2">3138</td>
+    </tr>
+
+    <!-- 4 -->
+    <tr>
+        <td class="p1">4</td><td class="p1">5</td><td class="p1">2</td><td class="p1">020004</td><td class="p1">0004</td>
+        <td class="p1">श्री. सुरेश शिंदे</td><td class="p1">भाडेकरू</td>
+        <td class="p1">G</td><td class="p1">निवासी</td><td class="p1">90</td>
+        <td class="p1">700</td><td class="p1">550</td><td class="p1">400</td><td class="p1">250</td><td class="p1">120</td>
+        <td class="p1">90</td><td class="p1">70</td><td class="p1">60</td><td class="p1">50</td><td class="p1">40</td><td class="p1">30</td>
+        <td class="seam"></td>
+        <td class="p2">20</td><td class="p2">10</td><td class="p2">5</td><td class="p2">4</td><td class="p2">3</td><td class="p2">2</td><td class="p2">1</td><td class="p2">0</td><td class="p2">0</td><td class="p2">2345</td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    function printPart(part) {
+      document.body.classList.remove('print1','print2');
+      document.body.classList.add(part === 1 ? 'print1' : 'print2');
+      window.print();
+      setTimeout(() => document.body.classList.remove('print1','print2'), 400);
+    }
+</script>
+</body>
+</html>

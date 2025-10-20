@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RegisterObjection_MasterServiceImpl implements RegisterObjection_MasterService {
@@ -49,6 +50,8 @@ public class RegisterObjection_MasterServiceImpl implements RegisterObjection_Ma
 
 
     }
+
+
 
 
     public RegisterObjection_Dto getObjection(String newPropertyNo){
@@ -93,7 +96,12 @@ public class RegisterObjection_MasterServiceImpl implements RegisterObjection_Ma
         return dto;
     }
 
-
+    @Override
+    public List<RegisterObjection_Dto> getList() {
+        List<RegisterObjection_Entity> all = repository.findAll();
+        List<RegisterObjection_Dto> collect = all.stream().map(RegisterObjection_MasterServiceImpl::toDto).toList();
+        return collect;
+    }
 
     private static class ObjectionReceiptRowMapper implements RowMapper<AssessmentResultsDto> {
         @Override

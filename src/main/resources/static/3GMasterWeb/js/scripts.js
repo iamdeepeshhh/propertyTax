@@ -1085,7 +1085,6 @@ function performSearch(sectionId, columns) {
 }
 
 
-
 document.getElementById('searchButtonSurvey').addEventListener('click', function() {
     performSearch('surveyReports',  ['pdSurypropnoVc', 'pdOwnernameVc', 'user_id', 'createddateVc', 'pdPropertyaddressVc', 'pdWardI', 'pdZoneI']);
 });
@@ -1726,3 +1725,5 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(err => console.error('Failed to load ward data:', err));
 });
+
+
