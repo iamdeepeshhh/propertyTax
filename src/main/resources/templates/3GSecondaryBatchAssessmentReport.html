@@ -166,5 +166,60 @@
       setTimeout(() => document.body.classList.remove('print1','print2'), 400);
     }
 </script>
+
+<script>
+    function buildReportTaxTable(tableSelector, templateName = "ASSESSMENT_REGISTER") {
+        $.get('/3g/reportTaxConfigs?template=' + templateName, function(configs) {
+            if (!configs || configs.length === 0) {
+                console.warn('No tax configs received for template:', templateName);
+                return;
+            }
+
+            const table = $(tableSelector);
+            const header = table.find('thead');
+            if (header.length === 0) return;
+
+            // Remove existing tax <th> columns before adding new ones
+            header.find('.tax-dynamic').remove();
+
+            // Find where to insert new tax columns
+            const headerRows = header.find('tr');
+
+            // Row 2 = label row (tax names)
+            const labelRow = headerRows.eq(1);
+            const numberRow = headerRows.eq(2);
+
+            // Sort configs by sequence
+            configs.sort((a, b) => a.sequenceI - b.sequenceI);
+
+            // Append tax name headers dynamically
+            configs.forEach((cfg, idx) => {
+                const taxLabel = cfg.localNameVc || cfg.taxNameVc || `Tax ${idx + 1}`;
+                labelRow.append(`<th class="p1 v tax-dynamic">${taxLabel}</th>`);
+                numberRow.append(`<th class="p1 tax-dynamic">${21 + idx}</th>`); // continue numbering
+            });
+
+            // Also update the right-side (Part 2) headers if needed
+            // Example: split after 11 taxes
+            const part1Count = 11;
+            const part2Taxes = configs.slice(part1Count);
+            const rightGroupRow = headerRows.eq(0);
+
+            if (part2Taxes.length > 0) {
+                rightGroupRow.append(`<th class="seam" rowspan="3"></th>`);
+                rightGroupRow.append(`<th class="group p2" colspan="${part2Taxes.length}">आकारण्यात येणाऱ्या करांची रक्कम (पुढील भाग)</th>`);
+            }
+
+            console.log("Assessment Register tax headers populated:", configs);
+        });
+    }
+
+    // Call this once DOM is ready
+    $(document).ready(function() {
+        buildReportTaxTable('table', 'ASSESSMENT_REGISTER');
+    });
+</script>
+
+<script src="/3GAssessmentRegister/js/scripts.js"></script>
 </body>
 </html>

@@ -132,7 +132,6 @@ public class DefaultTypesAndTaxes {
             );
 
 
-
             for (ConsolidatedTaxes_MasterDto tax : defaultTaxes) {
                 ConsolidatedTaxes_MasterDto existing = consolidatedTaxes_MasterService.findByTaxName(tax.getTaxNameVc());
 
@@ -148,7 +147,7 @@ public class DefaultTypesAndTaxes {
 
 
                     if (updateRequired) {
-                        consolidatedTaxes_MasterService.updateTax(existing.getId(),existing);
+                        consolidatedTaxes_MasterService.updateTax(existing.getId(), existing);
                     }
                 } else {
                     consolidatedTaxes_MasterService.createTax(tax);
@@ -340,13 +339,109 @@ public class DefaultTypesAndTaxes {
 
                     // ---- User Charges ----
                     new ReportTaxes_MasterDto(null, "User Charges", "वापर शुल्क",
-                            48, ReportTaxKeys.USER_CHG, null, true, true, "SPECIAL_NOTICE", true)
+                            48, ReportTaxKeys.USER_CHG, null, true, true, "SPECIAL_NOTICE", true),
+
+
+                    //-- ASSESSMENTS_REGISTER
+
+                    new ReportTaxes_MasterDto(null, "Property Tax", "मालमत्ता कर",
+                            1, ReportTaxKeys.PT_PARENT, null, true, true, "ASSESSMENT_REGISTER", true),
+
+                    // ===================== EDUCATION CESS =====================
+                    new ReportTaxes_MasterDto(null, "Education Cess", "शिक्षण कर",
+                            4, ReportTaxKeys.EDUC_PARENT, null, true, true, "ASSESSMENT_REGISTER", true),
+
+                    new ReportTaxes_MasterDto(null, "Residential", "निवासी",
+                            5, ReportTaxKeys.EDUC_RES, ReportTaxKeys.EDUC_PARENT, true, true, "ASSESSMENT_REGISTER", true),
+                    new ReportTaxes_MasterDto(null, "Commercial", "अनिवासी",
+                            6, ReportTaxKeys.EDUC_COMM, ReportTaxKeys.EDUC_PARENT, true, true, "ASSESSMENT_REGISTER", true),
+
+                    // ===================== STANDARD TAXES =====================
+                    new ReportTaxes_MasterDto(null, "Employment Guarantee Cess", "रो.ह.यो कर",
+                            7, ReportTaxKeys.EGC, null, true, true, "ASSESSMENT_REGISTER", true),
+
+                    new ReportTaxes_MasterDto(null, "Tree Tax", "वृक्ष कर",
+                            8, ReportTaxKeys.TREE_TAX, null, true, true, "ASSESSMENT_REGISTER", true),
+
+                    new ReportTaxes_MasterDto(null, "Environment Tax", "पर्यावरण कर",
+                            9, ReportTaxKeys.ENV_TAX, null, true, true, "ASSESSMENT_REGISTER", true),
+
+                    new ReportTaxes_MasterDto(null, "Cleanness Tax", "स्वच्छता कर",
+                            10, ReportTaxKeys.CLEAN_TAX, null, true, true, "ASSESSMENT_REGISTER", true),
+
+                    new ReportTaxes_MasterDto(null, "Light Tax", "दिवाबत्ती कर",
+                            11, ReportTaxKeys.LIGHT_TAX, null, true, true, "ASSESSMENT_REGISTER", true),
+
+                    new ReportTaxes_MasterDto(null, "Fire Tax", "अग्निशमन कर",
+                            12, ReportTaxKeys.FIRE_TAX, null, true, true, "ASSESSMENT_REGISTER", true),
+
+                    new ReportTaxes_MasterDto(null, "Water Tax", "पाणी कर",
+                            13, ReportTaxKeys.WATER_TAX, null, true, true, "ASSESSMENT_REGISTER", false),
+
+                    new ReportTaxes_MasterDto(null, "Sewerage Tax", "मलजल कर",
+                            14, ReportTaxKeys.SEWERAGE_TAX, null, true, true, "ASSESSMENT_REGISTER", false),
+
+                    new ReportTaxes_MasterDto(null, "Sewerage Benefit Tax", "मलजल लाभ कर",
+                            15, ReportTaxKeys.SEWERAGE_BEN, null, true, true, "ASSESSMENT_REGISTER", false),
+
+                    new ReportTaxes_MasterDto(null, "Water Benefit Tax", "पाणी लाभ कर",
+                            16, ReportTaxKeys.WATER_BEN, null, true, true, "ASSESSMENT_REGISTER", false),
+
+                    new ReportTaxes_MasterDto(null, "Street Tax", "पथ कर",
+                            17, ReportTaxKeys.STREET_TAX, null, true, true, "ASSESSMENT_REGISTER", false),
+
+                    new ReportTaxes_MasterDto(null, "Special Conservancy Tax", "विशेष सफाई कर",
+                            18, ReportTaxKeys.SPEC_CONS, null, true, true, "ASSESSMENT_REGISTER", false),
+
+                    new ReportTaxes_MasterDto(null, "Municipal Education Tax", "मनपा शिक्षण उपकर",
+                            19, ReportTaxKeys.MUNICIPAL_EDU, null, true, true, "ASSESSMENT_REGISTER", false),
+
+                    new ReportTaxes_MasterDto(null, "Special Education Tax", "विशेष शिक्षण कर",
+                            20, ReportTaxKeys.SPECIAL_EDU, null, true, true, "ASSESSMENT_REGISTER", false),
+
+                    new ReportTaxes_MasterDto(null, "Service Charges", "सेवा शुल्क",
+                            21, ReportTaxKeys.SERVICE_CHG, null, true, true, "ASSESSMENT_REGISTER", false),
+
+                    new ReportTaxes_MasterDto(null, "Miscellaneous Charges", "किरकोळ शुल्क",
+                            22, ReportTaxKeys.MISC_CHG, null, true, true, "ASSESSMENT_REGISTER", false),
+
+                    // ===================== FLEXIBLE TAXES (Tax1..Tax25) =====================
+                    new ReportTaxes_MasterDto(null, "Tax1", "कर १", 23, ReportTaxKeys.TAX1, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax2", "कर २", 24, ReportTaxKeys.TAX2, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax3", "कर ३", 25, ReportTaxKeys.TAX3, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax4", "कर ४", 26, ReportTaxKeys.TAX4, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax5", "कर ५", 27, ReportTaxKeys.TAX5, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax6", "कर ६", 28, ReportTaxKeys.TAX6, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax7", "कर ७", 29, ReportTaxKeys.TAX7, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax8", "कर ८", 30, ReportTaxKeys.TAX8, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax9", "कर ९", 31, ReportTaxKeys.TAX9, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax10", "कर १०", 32, ReportTaxKeys.TAX10, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax11", "कर ११", 33, ReportTaxKeys.TAX11, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax12", "कर १२", 34, ReportTaxKeys.TAX12, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax13", "कर १३", 35, ReportTaxKeys.TAX13, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax14", "कर १४", 36, ReportTaxKeys.TAX14, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax15", "कर १५", 37, ReportTaxKeys.TAX15, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax16", "कर १६", 38, ReportTaxKeys.TAX16, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax17", "कर १७", 39, ReportTaxKeys.TAX17, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax18", "कर १८", 40, ReportTaxKeys.TAX18, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax19", "कर १९", 41, ReportTaxKeys.TAX19, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax20", "कर २०", 42, ReportTaxKeys.TAX20, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax21", "कर २१", 43, ReportTaxKeys.TAX21, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax22", "कर २२", 44, ReportTaxKeys.TAX22, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax23", "कर २३", 45, ReportTaxKeys.TAX23, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax24", "कर २४", 46, ReportTaxKeys.TAX24, null, false, true, "ASSESSMENT_REGISTER", false),
+                    new ReportTaxes_MasterDto(null, "Tax25", "कर २५", 47, ReportTaxKeys.TAX25, null, false, true, "ASSESSMENT_REGISTER", false),
+
+                    // ===================== USER CHARGES =====================
+                    new ReportTaxes_MasterDto(null, "User Charges", "उपयोगकर्ता शुल्क व इतर",
+                            48, ReportTaxKeys.USER_CHG, null, true, true, "ASSESSMENT_REGISTER", true)
+
             );
 
             if (!reportsTaxes.isEmpty()) {
                 reportTaxesConfigService.saveOrUpdateReportConfigTaxes(reportsTaxes);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Initialization failed: " + e.getMessage());
         }

@@ -14,84 +14,60 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AfterHearing_ProposedRValues {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "pr_newpropertyno_vc",nullable = false)
+    private String PrNewPropertyNoVc;
 
-    @Column(name = "prorv_propertyno_vc")
-    private String propertyNo;
+    @Column(name = "pr_finalpropno_vc")
+    private String PrFinalPropNoVc;
 
-    @Column(name = "prorv_finalpropno_vc")
-    private String finalPropertyNo;
+    @Column(name = "pr_residential_fl")
+    private Double PrResidentialFl;
 
-    @Column(name = "prorv_rv_res")
-    private Double rvResidential;
+    @Column(name = "pr_commercial_fl")
+    private Double PrCommercialFl;
 
-    @Column(name = "prorv_rv_mob")
-    private Double rvMobile;
+    @Column(name = "pr_industrial_fl")
+    private Double PrIndustrialFl;
 
-    @Column(name = "prorv_rv_ele")
-    private Double rvElectric;
+    @Column(name = "pr_religious_fl")
+    private Double PrReligiousFl;
 
-    @Column(name = "prorv_rv_com")
-    private Double rvCommercial;
+    @Column(name = "pr_educational_fl")
+    private Double PrEducationalFl;
 
-    @Column(name = "prorv_rv_gov")
-    private Double rvGovernment;
+    @Column(name = "pr_mobiletower_fl")
+    private Double PrMobileTowerFl;
 
-    @Column(name = "prorv_rv_edu")
-    private Double rvEducation;
+    @Column(name = "pr_electricsubstation_fl")
+    private Double PrElectricSubstationFl;
 
-    @Column(name = "prorv_rv_reg")
-    private Double rvReligious;
+    @Column(name = "pr_government_fl")
+    private Double PrGovernmentFl;
 
-    @Column(name = "prorv_rv_comop")
-    private Double rvCommercialOpen;
+    @Column(name = "pr_residentialopenplot_fl")
+    private Double PrResidentialOpenPlotFl;
 
-    @Column(name = "prorv_rv_resop")
-    private Double rvResidentialOpen;
+    @Column(name = "pr_commercialopenplot_fl")
+    private Double PrCommercialOpenPlotFl;
 
-    @Column(name = "prorv_rv_indus")
-    private Double rvIndustrial;
+    @Column(name = "pr_industrialopenplot_fl")
+    private Double PrIndustrialOpenPlotFl;
 
-    @Column(name = "prorv_final_rv")
-    private Double finalRatableValue;
+    @Column(name = "pr_religiousopenplot_fl")
+    private Double PrReligiousOpenPlotFl;
 
-    @Column(name = "prorv_finalyear_dt")
-    private String finalYearDate;
+    @Column(name = "pr_educationlegalopenplot_fl")
+    private Double PrEducationAndLegalInstituteOpenPlotFl;
 
-    @Column(name = "propletout")
-    private Double areaLetOut;
+    @Column(name = "pr_governmentopenplot_fl")
+    private Double PrGovernmentOpenPlotFl;
 
-    @Column(name = "propnotletout")
-    private Double areaNotLetOut;
-
-    @Column(name = "prorv_finyear_vc")
-    private String financialYear;
+    @Column(name = "pr_totalrv_fl")
+    private Double PrTotalRatableValueFl;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @Column(name = "alvletout")
-    private Double alvLetOut;
-
-    @Column(name = "alvnotletout")
-    private Double alvNotLetOut;
-
-    @Column(name = "prorv_rv_regop")
-    private Double rvReligiousOpen;
-
-    @Column(name = "prorv_rv_govop")
-    private Double rvGovernmentOpen;
-
-    @Column(name = "prorv_rv_eduop")
-    private Double rvEducationOpen;
-
-    @Column(name = "prorv_rv_indusop")
-    private Double rvIndustrialOpen;
-
-    @Column(name = "noofcolvalues")
-    private Integer numberOfCollectedValues;
 }
