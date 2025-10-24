@@ -203,7 +203,7 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownPropertyDetails">
             <a class="dropdown-item" href="#" onclick="showTab('notices')">Notices</a>
-            <a class="dropdown-item" href="3g/viewObjectionList" >Objection List</a>
+            <a class="dropdown-item" href="#" onclick="showTab('objections')">Objection Status</a>
           </div>
         </li>
       </ul>
@@ -2239,8 +2239,68 @@
   </div>
 </section>
 
+  <section id="objections" class="container mt-5">
+    <h2>Objection Status</h2>
 
-<section id="councilDetails" class="container mt-4">
+    <!-- Search Card -->
+    <div class="card">
+      <div class="card-body">
+        <form id="objection-searchForm" class="row g-3 align-items-center">
+
+          <div class="col-md-3">
+            <label for="objection-spnInput" class="form-label">SPN</label>
+            <input type="text" class="form-control" id="objection-spnInput" placeholder="Enter SPN...">
+          </div>
+
+          <div class="col-md-3">
+            <label for="objection-finalPropertyNoInput" class="form-label">Final Property No.</label>
+            <input type="text" class="form-control" id="objection-finalPropertyNoInput" placeholder="Enter Final Property No...">
+          </div>
+
+          <div class="col-md-3">
+            <label for="objection-ownerNameInput" class="form-label">Owner Name</label>
+            <input type="text" class="form-control" id="objection-ownerNameInput" placeholder="Enter Owner Name...">
+          </div>
+
+          <div class="col-md-2">
+            <label for="objection-wardNumberInput" class="form-label">Ward</label>
+            <input type="number" class="form-control" id="objection-wardNumberInput" placeholder="Ward No.">
+          </div>
+
+          <div class="col-md-1 d-grid">
+            <button type="button" class="btn btn-success" onclick="loadObjectionTakenProperties()">Search</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- Results Table -->
+    <div class="mt-4 d-flex justify-content-center">
+      <div style="overflow-x: auto; max-height: 500px; width: auto; min-width: 80%;">
+        <table class="table-extended table-bordered table-hover" style="min-width: 1100px; text-align: center;">
+          <thead class="thead-dark">
+          <tr>
+            <th>#</th>
+            <th>Final Property No.</th>
+            <th>Owner Name</th>
+            <th>Ward</th>
+            <th>Zone</th>
+            <th>Objection Reason</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody id="objection-searchResults">
+          <!-- Data will populate here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="councilDetails" class="container mt-4">
   <h2 class="mb-4">Council Details</h2>
   <form id="councilDetailsForm" class=" form-row mt-4">
     <div class="form-group col-md-6">

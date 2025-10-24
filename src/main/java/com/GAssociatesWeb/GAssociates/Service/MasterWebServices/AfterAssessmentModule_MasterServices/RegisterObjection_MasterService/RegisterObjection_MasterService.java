@@ -14,4 +14,5 @@ public interface RegisterObjection_MasterService {
     public RegisterObjection_Dto getObjection(String applicationNo);
 
     public List<RegisterObjection_Dto> getList();
-}
+    public List<RegisterObjection_Dto> searchObjectionRecords(String spn, String finalPropertyNo, String ownerName, Integer ward);
+    }

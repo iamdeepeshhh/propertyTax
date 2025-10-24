@@ -31,6 +31,9 @@ public class MainController {
     @GetMapping("hearingNotice")
     public String showHearingNotice(){return "3GViewHearingNotice";}
 
+    @GetMapping("secondaryBatchAssessmentReport")
+    public String showSecondaryBatchAssessmentReport(){return "3GSecondaryBatchAssessmentReport";}
+
     @GetMapping("objectionReciept")
     public String showObjectionReciept(){return "3GViewObjectionReciept";}
 

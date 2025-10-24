@@ -8,14 +8,15 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "afterhearing_unit_details")
+@Table(name = "afterhearing_proposed_rvalues")
+@Access(AccessType.FIELD)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AfterHearing_ProposedRValues {
+public class AfterHearing_ProposedRValuesEntity {
     @Id
     @Column(name = "pr_newpropertyno_vc",nullable = false)
-    private String PrNewPropertyNoVc;
+    private String prNewPropertyNoVc;
 
     @Column(name = "pr_finalpropno_vc")
     private String PrFinalPropNoVc;

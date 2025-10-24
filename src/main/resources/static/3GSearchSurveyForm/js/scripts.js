@@ -138,7 +138,7 @@ $('#searchButton').click(function() {
                     $('.edit-btn').on('click', function(event) {
                        event.stopPropagation(); // Prevent the row click event
                        var propNo = $(this).data('propno'); // Get the property number
-                    window.location.href = '/3gSurvey/editSurveyForm?newpropertyno=' + propNo;
+                    window.location.href = `/3gSurvey/editSurveyForm?newpropertyno=${propNo}&mode=survey`;
                     });
                 } else {
                     $('.no-results').show();

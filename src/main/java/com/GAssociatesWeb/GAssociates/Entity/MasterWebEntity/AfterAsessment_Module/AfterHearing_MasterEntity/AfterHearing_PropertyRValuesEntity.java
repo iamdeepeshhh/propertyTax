@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AfterHearing_PropertyRValues {
+public class AfterHearing_PropertyRValuesEntity {
 
     @Id
     @Column(name = "prv_propertyno_vc", nullable = false)

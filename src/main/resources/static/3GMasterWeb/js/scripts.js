@@ -1037,25 +1037,38 @@ function getActionButtons(actionType, item) {
     if (actionType === 'survey') {
         return `
             <button class="btn btn-primary mr-2" onclick="viewSurveyReport('${item.pdNewpropertynoVc}')">Survey Report</button>
-            <button class="btn btn-primary mr-2" onclick="viewCalculationSheet('${item.pdNewpropertynoVc}')">CalculationSheet</button>
-
-            <button class="btn btn-danger" onclick="showDeleteModal('${item.pdNewpropertynoVc}','${item.pdSurypropnoVc}','${item.pdOwnernameVc}','${item.user_id}','${item.pdWardI}')">Delete</button>
+            <button class="btn btn-primary mr-2" onclick="viewCalculationSheet('${item.pdNewpropertynoVc}')">Calculation Sheet</button>
+            <button class="btn btn-danger" onclick="showDeleteModal('${item.pdNewpropertynoVc}', '${item.pdSurypropnoVc}', '${item.pdOwnernameVc}', '${item.user_id}', '${item.pdWardI}')">Delete</button>
         `;
-    } else if (actionType === 'uploadFiles') {
+    }
+
+    else if (actionType === 'uploadFiles') {
         return `
             <button class="btn btn-primary mr-2" onclick="viewSurveyReport('${item.pdNewpropertynoVc}')">Survey Report</button>
-            <button class="btn btn-success" onclick="uploadFile('${item.pdNewpropertynoVc}', 'cad')">Upload Cad</button>
-            <button class="btn btn-success" onclick="uploadFile('${item.pdNewpropertynoVc}', 'propertyImage')">Upload Prop Image</button>
+            <button class="btn btn-success mr-2" onclick="uploadFile('${item.pdNewpropertynoVc}', 'cad')">Upload CAD</button>
+            <button class="btn btn-success" onclick="uploadFile('${item.pdNewpropertynoVc}', 'propertyImage')">Upload Property Image</button>
         `;
-    }else if (actionType === 'notices') {
+    }
+
+    else if (actionType === 'notices') {
         return `
             <button class="btn btn-warning mr-2" onclick="viewSpecialNotice(null, '${item.pdNewpropertynoVc}')">Special Notice</button>
         `;
-     }
+    }
+
+    else if (actionType === 'objection') {
+        return `
+            <button class="btn btn-primary" onclick="editAssessment('${item.newPropertyNo}')">Edit Assessment</button>
+        `;
+    }
+
     return '';
 }
-
-
+function editAssessment(newPropertyNo) {
+    // Opens the same edit form in assessment mode (with RV & Taxes tabs)
+    const url = `/3gSurvey/editSurveyForm?newpropertyno=${newPropertyNo}&mode=assessment`;
+    window.open(url, '_blank');
+}
 // performSearch to get the searching parameters from the sections such as surveyreports and uploadfiles
 function performSearch(sectionId, columns) {
     const spn = document.querySelector(`#${sectionId} #${sectionId}-spnInput`).value.trim();
@@ -1453,7 +1466,7 @@ async function fetchAndPopulateWardsForBatch(endpointUrl, tableBodyId) {
             viewAssessmentRegisterButton.textContent = 'Batch Assessment Register';
             viewAssessmentRegisterButton.classList.add('btn', 'btn-primary','mr-2');
             viewAssessmentRegisterButton.onclick = function() {
-                viewHearingNotice(ward.wardNo);
+                viewSecondaryBatchAssessmentReport(ward.wardNo);
             };
             actionsCell.appendChild(viewAssessmentRegisterButton);
 
@@ -1556,6 +1569,10 @@ function viewSpecialNotice(wardNo, newPropertyNo) {
 }
 function viewHearingNotice(wardNo) {
     const url = `/hearingNotice`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+function viewSecondaryBatchAssessmentReport(wardNo) {
+    const url = `/secondaryBatchAssessmentReport`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 function viewOrderSheet(wardNo) {
@@ -1726,4 +1743,19 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(err => console.error('Failed to load ward data:', err));
 });
 
+function loadObjectionTakenProperties() {
+    const queryParams = {
+        spn: document.getElementById('objection-spnInput').value,
+        finalPropertyNo: document.getElementById('objection-finalPropertyNoInput').value,
+        ownerName: document.getElementById('objection-ownerNameInput').value,
+        ward: document.getElementById('objection-wardNumberInput').value
+    };
 
+    fetchPropertyRecords(
+        '/3g/getObjectionTakenProperties',
+        queryParams,
+        'objection-searchResults',
+        'objection',
+        ['finalPropertyNo', 'ownerName', 'wardNo', 'zoneNo', 'reasons', 'hearingStatus', 'objectionDate']
+    );
+}

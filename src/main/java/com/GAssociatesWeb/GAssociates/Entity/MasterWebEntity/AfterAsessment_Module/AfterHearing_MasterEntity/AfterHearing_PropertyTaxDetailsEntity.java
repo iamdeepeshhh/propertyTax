@@ -9,10 +9,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "afterhearing_property_taxdetails")
+@Access(AccessType.FIELD)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AfterHearing_PropertyTaxDetails {
+public class AfterHearing_PropertyTaxDetailsEntity {
 
     @Id
     @Column(name = "pt_newpropertyno_vc", nullable = false)

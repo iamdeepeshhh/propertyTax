@@ -3,6 +3,7 @@
     //1. displayBase64Image : this is created to fetch and show the image which is stored in db
     //2. populateDependentDropdown : this is created for fetching depending dropdowns
     //3. fetchAllTypesOfAPI : this is modified callback parameter is added in this basically we can add one more parameter as a function to call it after this method has been executed
+    let mode = 'survey';
     document.addEventListener('DOMContentLoaded', function () {
         // Initialize property types and setup cascading dropdowns
         initializeDropdown('propertyType', '/3gSurvey/propertytypes', null, false, null);
@@ -17,6 +18,49 @@
         //This eventlistener helps to check whether anything is getting changed in propertyusagetype or not
         document.getElementById('propertyusageType').addEventListener('change', function () { const propertyUsageValue = this.value; updateUnitUsages(propertyUsageValue);
         });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        mode = urlParams.get('mode') || 'survey'; // Default: survey
+
+        console.log("Mode:", mode);
+
+        const rvTab = document.querySelector("button[onclick=\"openTab('RV')\"]");
+        const taxesTab = document.querySelector("button[onclick=\"openTab('Taxes')\"]");
+        const additionalTab = document.querySelector("button[onclick=\"openTab('Additional')\"]");
+
+        const rvSection = document.getElementById('RVTabContent');
+        const taxesSection = document.getElementById('TaxesTabContent');
+        const additionalSection = document.getElementById('AdditionalTabContent');
+
+        if (mode === 'assessment') {
+            // Hide "Additional" tab + section
+            if (additionalTab) additionalTab.style.display = 'none';
+            if (additionalSection) additionalSection.style.display = 'none';
+
+            // Show "RV" and "Taxes"
+            if (rvTab) rvTab.style.display = 'inline-block';
+            if (taxesTab) taxesTab.style.display = 'inline-block';
+            if (rvSection) rvSection.style.display = 'block';
+            if (taxesSection) taxesSection.style.display = 'none';
+
+            // Auto open the RV tab on load
+            openTab('RV');
+        } else if (mode === 'survey') {
+            // Hide "RV" and "Taxes"
+            if (rvTab) rvTab.style.display = 'none';
+            if (taxesTab) taxesTab.style.display = 'none';
+            if (rvSection) rvSection.style.display = 'none';
+            if (taxesSection) taxesSection.style.display = 'none';
+
+            // Show "Additional"
+            if (additionalTab) additionalTab.style.display = 'inline-block';
+            if (additionalSection) additionalSection.style.display = 'block';
+
+            // Default open Main tab
+            openTab('Main');
+        }
+
+
     });
     let cachedPropertyData = {};
     $(document).ready(function() {
@@ -30,14 +74,25 @@
         fetchAllTypesOfAPI('/3gSurvey/waterConnections', 'waterOptions');
         
         // Fetch dropdown data from the backend
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        const propertyId = urlParams.get('newpropertyno');
-        console.log('Property ID:', propertyId);
-        
-        const apiUrl = `/3gSurvey/detailsComplete/${propertyId}`;
-        $('#editPropertyForm').prepend('<div id="loading" class="alert alert-info">Loading property details...</div>');
+       const queryString = window.location.search;
+       const urlParams = new URLSearchParams(queryString);
+       const propertyId = urlParams.get('newpropertyno');
+       const mode = urlParams.get('mode') || 'survey'; // default: survey
 
+       console.log('Property ID:', propertyId);
+       console.log('Mode:', mode);
+
+        // ✅ Choose API based on mode
+        let apiUrl = '';
+        if (mode === 'assessment') {
+           apiUrl = `/3g/getCompletePropertyAfterHearing?newPropertyNo=${propertyId}`;
+        } else {
+           apiUrl = `/3gSurvey/detailsComplete/${propertyId}`;
+        }
+
+        console.log('Using API URL:', apiUrl);
+
+        $('#editPropertyForm').prepend('<div id="loading" class="alert alert-info">Loading property details...</div>');
         $.ajax({
             url: apiUrl,
             type: 'GET',
@@ -150,6 +205,71 @@
                     displayBase64Image(data.propertyDetails.pdPropimage2T, 'previewPropertyImage2');
                     displayBase64Image(data.propertyDetails.pdHouseplanT, 'previewHousePlan1');
                     displayBase64Image(data.propertyDetails.pdHouseplan2T, 'previewHousePlan2');
+                    if (data.proposedRValues && data.proposedRValues.length > 0) {
+                        const rv = data.proposedRValues[0]; // usually single record
+                        console.log("Proposed Ratable Values:", rv);
+
+                        $('#prResidentialFl').val(rv.prResidentialFl || 0);
+                        $('#prResidentialOpenPlotFl').val(rv.prResidentialOpenPlotFl || 0);
+                        $('#prCommercialFl').val(rv.prCommercialFl || 0);
+                        $('#prCommercialOpenPlotFl').val(rv.prCommercialOpenPlotFl || 0);
+                        $('#prEducationalFl').val(rv.prEducationalFl || 0);
+                        $('#prEducationAndLegalInstituteOpenPlotFl').val(rv.prEducationAndLegalInstituteOpenPlotFl || 0);
+                        $('#prIndustrialFl').val(rv.prIndustrialFl || 0);
+                        $('#prIndustrialOpenPlotFl').val(rv.prIndustrialOpenPlotFl || 0);
+                        $('#prGovernmentFl').val(rv.prGovernmentFl || 0);
+                        $('#prGovernmentOpenPlotFl').val(rv.prGovernmentOpenPlotFl || 0);
+                        $('#prReligiousFl').val(rv.prReligiousFl || 0);
+                        $('#prReligiousOpenPlotFl').val(rv.prReligiousOpenPlotFl || 0);
+                        $('#prElectricSubstationFl').val(rv.prElectricSubstationFl || 0);
+                        $('#prMobileTowerFl').val(rv.prMobileTowerFl || 0);
+                        $('#prTotalRatableValueFl').val(rv.prTotalRatableValueFl || 0);
+                    }
+
+                    if (data.propertyTaxDetails && data.propertyTaxDetails.length > 0) {
+                        const tax = data.propertyTaxDetails[0]; // usually one record
+                        console.log("Property Tax Details:", tax);
+
+                        $('#ptPropertyTaxFl').val(tax.ptPropertyTaxFl || 0);
+                        $('#ptEduTaxFl').val(tax.ptEduTaxFl || 0);
+                        $('#ptEduResTaxFl').val(tax.ptEduResTaxFl || 0);
+                        $('#ptEduNonResTaxFl').val(tax.ptEduNonResTaxFl || 0);
+
+                        // total education tax
+                        const totalEdu = (tax.ptEduResTaxFl || 0) + (tax.ptEduNonResTaxFl || 0);
+                        $('#ptTotalEducationFl').val(totalEdu.toFixed(2));
+
+                        $('#ptEnvironmentTaxFl').val(tax.ptEnvironmentTaxFl || 0);
+                        $('#ptTreeTaxFl').val(tax.ptTreeTaxFl || 0);
+                        $('#ptCleanTaxFl').val(tax.ptCleanTaxFl || 0);
+                        $('#ptLightTaxFl').val(tax.ptLightTaxFl || 0);
+                        $('#ptFireTaxFl').val(tax.ptFireTaxFl || 0);
+                        $('#ptWaterBenefitTaxFl').val(tax.ptWaterBenefitTaxFl || 0);
+                        $('#ptWaterTaxFl').val(tax.ptWaterTaxFl || 0);
+                        $('#ptSewerageBenefitTaxFl').val(tax.ptSewerageBenefitTaxFl || 0);
+                        $('#ptSewerageTaxFl').val(tax.ptSewerageTaxFl || 0);
+                        $('#ptStreetTaxFl').val(tax.ptStreetTaxFl || 0);
+                        $('#ptEgcTaxFl').val(tax.ptEgcTaxFl || 0);
+                        $('#ptSpecialConservancyTaxFl').val(tax.ptSpecialConservancyTaxFl || 0);
+                        $('#ptSpecialEduTaxFl').val(tax.ptSpecialEduTaxFl || 0);
+                        $('#ptMunicipalEduTaxFl').val(tax.ptMunicipalEduTaxFl || 0);
+                        $('#ptUserChargesFl').val(tax.ptUserChargesFl || 0);
+                        $('#ptServiceChargesFl').val(tax.ptServiceChargesFl || 0);
+                        $('#ptMiscellaneousChargesFl').val(tax.ptMiscellaneousChargesFl || 0);
+
+                        // Fill reserved tax fields dynamically if present
+                        for (let i = 1; i <= 25; i++) {
+                            const key = `ptTax${i}Fl`;
+                            const inputId = `#ptTax${i}Fl`;
+                            if (tax[key] !== undefined) {
+                                $(inputId).val(tax[key] || 0);
+                            }
+                        }
+
+                        $('#ptFinalRvFl').val(tax.ptFinalRvFl || 0);
+                        $('#ptFinalTaxFl').val(tax.ptFinalTaxFl || 0);
+                        $('#ptFinalYearVc').val(tax.ptFinalYearVc || '');
+                    }
                     if (data && data.unitDetails) {
                         data.unitDetails.forEach((unit) => {
                             // Add unit UI and get the assigned internal index used for element IDs
@@ -1760,6 +1880,8 @@
         const updatedFields = {
             propertyDetails: {},
             unitDetails: [],
+            proposedRValues: [],
+            propertyTaxDetails: []
         };
     
         const imageFields = new FormData();
@@ -1993,8 +2115,54 @@
             }
         });
     
-    console.log('Updated Fields:', updatedFields);
-    console.log('Image Fields:', [...imageFields.entries()]); // Debugging
+    updatedFields.proposedRValues = [];
+
+    const ratableIds = [
+        "prResidentialFl", "prResidentialOpenPlotFl", "prCommercialFl", "prCommercialOpenPlotFl",
+        "prEducationalFl", "prEducationAndLegalInstituteOpenPlotFl", "prIndustrialFl", "prIndustrialOpenPlotFl",
+        "prGovernmentFl", "prGovernmentOpenPlotFl", "prReligiousFl", "prReligiousOpenPlotFl",
+        "prElectricSubstationFl", "prMobileTowerFl", "prTotalRatableValueFl"
+    ];
+
+    const proposedRValues = {};
+
+    ratableIds.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            proposedRValues[id] = parseFloat(element.value) || 0;
+        }
+    });
+
+    updatedFields.proposedRValues.push(proposedRValues);
+
+    // 💰 Collect Property Tax Details
+    updatedFields.propertyTaxDetails = [];
+
+    const taxIds = [
+        "ptPropertyTaxFl", "ptEduTaxFl", "ptEduResTaxFl", "ptEduNonResTaxFl",
+        "ptEnvironmentTaxFl", "ptTreeTaxFl", "ptCleanTaxFl", "ptLightTaxFl",
+        "ptFireTaxFl", "ptWaterBenefitTaxFl", "ptWaterTaxFl", "ptSewerageBenefitTaxFl",
+        "ptSewerageTaxFl", "ptStreetTaxFl", "ptEgcTaxFl", "ptSpecialConservancyTaxFl",
+        "ptMunicipalEduTaxFl", "ptSpecialEduTaxFl", "ptUserChargesFl",
+        "ptServiceChargesFl", "ptMiscellaneousChargesFl",
+        ...Array.from({ length: 25 }, (_, i) => `ptTax${i + 1}Fl`),
+        "ptFinalRvFl", "ptFinalTaxFl", "ptFinalYearVc"
+    ];
+
+    const propertyTax = {};
+
+    taxIds.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            propertyTax[id] = (element.type === 'number') ? parseFloat(element.value) || 0 : element.value;
+        }
+    });
+
+    updatedFields.propertyTaxDetails.push(propertyTax);
+
+    // ✅ Debug & return
+    console.log("Updated Fields:", updatedFields);
+    console.log("Image Fields:", [...imageFields.entries()]);
 
     return { updatedFields, imageFields };
     }
@@ -2088,44 +2256,61 @@
     }
     
     async function submitFormData() {
+        const { updatedFields, imageFields } = collectFormData(cachedPropertyData);
+        console.log(mode);
+        document.getElementById('loadingSpinner').style.display = 'flex';
 
-    const { updatedFields, imageFields } = collectFormData(cachedPropertyData);
-    
-    document.getElementById('loadingSpinner').style.display = 'flex';
-    const formData = new FormData();
+        try {
+            const formData = new FormData();
 
-    formData.append('updatedFields', JSON.stringify(updatedFields));
-    for (const [key, blob] of imageFields.entries()) {
-        if (blob) {
-            formData.append(key, blob, `${key}.jpg`);
-        } else {
-            console.log(`No file for key: ${key}`);
+            // append DTO data
+            formData.append('updatedFields', JSON.stringify(updatedFields));
+
+            // append images if any
+            for (const [key, blob] of imageFields.entries()) {
+                if (blob) formData.append(key, blob, `${key}.jpg`);
+            }
+
+            // ✅ choose endpoint based on mode
+            const endpoint =
+                mode === 'assessment'
+                    ? '/3g/createCompletePropertyAfterHearing' // new endpoint in MasterWebControllerII
+                    : '/3gSurvey/submitUpdatedPropertyDetails';
+
+            // ✅ method changes for assessment
+            const method = mode === 'assessment' ? 'POST' : 'PATCH';
+
+            const response = await fetch(endpoint, {
+                method,
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            alert(result.message || (mode === 'assessment'
+                ? "Assessment saved successfully!"
+                : "Survey form updated successfully!"));
+
+            // ✅ redirect after submission
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+
+            if (mode === 'assessment') {
+                // After-hearing properties list page
+                window.location.href = "/3g/secondaryBatchAssessmentReportPage";
+            } else {
+                // Back to main survey page
+                window.location.href = "/3gSurvey/newRegistration";
+            }
+
+        } catch (error) {
+            console.error('Submission failed:', error);
+            alert('❌ Form could not be submitted');
+        } finally {
+            document.getElementById('loadingSpinner').style.display = 'none';
         }
-    }
-    try {
-    const response = await fetch('/3gSurvey/submitUpdatedPropertyDetails', {
-        method: 'PATCH',
-        body: formData,
-    });
-    
-    if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
-    }
-    
-    const result = await response.json();
-    
-    alert(result.message || "Form updated successfully!");
-    
-    window.removeEventListener('beforeunload', handleBeforeUnload);
-    
-    // window.location.href = "/3gSurvey/newRegistration";
-    } catch (error) {
-    console.error('Submission failed:', error);
-    alert('Form could not be submitted');
-    } finally {
-    
-    document.getElementById('loadingSpinner').style.display = 'none';
-    }
     }
     
     function handleBeforeUnload(event) {

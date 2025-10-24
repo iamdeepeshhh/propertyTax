@@ -32,7 +32,6 @@ import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.UnitUsageTypes_MasterDto.
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.WaterConnection_MasterDto.WaterConnection_MasterDto;
 import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.PropertyDetails_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.UserAccessDto.UserAccess_Dto;
-import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.RegisterObjection_Entity.RegisterObjection_Entity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.WardTypes_MasterEntity.Ward_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.PropertySurveyEntity.CompletePropertySurvey_Entity.PropertyDeletionLog_Entity.PropertyDeletionLog;
 import com.GAssociatesWeb.GAssociates.Helper.ExcelHelper;
@@ -43,7 +42,7 @@ import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.Prop
 import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.PropertyOldDetails_Service.PropertyOldDetails_Service;
 import com.GAssociatesWeb.GAssociates.Service.ImageUtils;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.RegisterObjection_MasterService.RegisterObjection_MasterService;
-import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.SpecialNotice_MasterServices.PostAssessmentReports_MasterService;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.SpecialNotice_MasterServices.SpecialNotice_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AgeFactor_MasterService.AgeFactor_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentDate_MasterService.AssessmentDate_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.ConolidatedTaxes_MasterService.ConsolidatedTaxes_MasterService;
@@ -155,7 +154,7 @@ public class MasterWebController {
     private final UniqueIdGenerator uniqueIdGenerator;
     private final PreLoadCache preLoadCache;
     private final JobLauncher jobLauncher;
-    private final PostAssessmentReports_MasterService specialNoticeMasterService;
+    private final SpecialNotice_MasterService specialNoticeMasterService;
     private final Job processPropertyDetailsJob;
     private final CouncilDetails_MasterService councilDetails_masterService;
     private final RVTypeCategory_MasterService rvTypeCategory_masterService;
@@ -180,7 +179,7 @@ public class MasterWebController {
                                PropertyManagement_Service property_ManagementService, PropertyDeletionLog_Repository propertyDeletionLogRepository, TaxDepreciation_MasterService taxDepreciation_MasterService,
                                RVTypes_MasterService rvTypes_MasterService, ConsolidatedTaxes_MasterService consolidatedTaxes_MasterService, EduCessAndEmpCess_MasterService eduCessAndEmpCess_MasterService, PropertyRates_MasterService propertyRates_MasterService,
                                TaxAssessment_MasterService taxAssessment_MasterService, BatchReportGenerator_MasterService batchReportGenerator_MasterService, CalculationSheetGenerator_MasterService calculationSheetGenerator_MasterService, UniqueIdGenerator uniqueIdGenerator,
-                               PreLoadCache preLoadCache, JobLauncher jobLauncher, ResultLogsCache resultLogsCache, PostAssessmentReports_MasterService postAssessmentReports_MasterService, Job processPropertyDetailsJob,
+                               PreLoadCache preLoadCache, JobLauncher jobLauncher, ResultLogsCache resultLogsCache, SpecialNotice_MasterService specialNotice_MasterService, Job processPropertyDetailsJob,
                                CouncilDetails_MasterService councilDetails_MasterService, RVTypeCategory_MasterService rvTypeCategory_MasterService, RegisterObjection_MasterService registerObjection_MasterService, ReportTaxesConfigService reportTaxesConfigService, AssessmentReportPdfGenerator assessmentReportPdfGenerator) {
         this.ward_masterService = ward_masterService;
         this.propClassification_masterService = propClassification_masterService;
@@ -224,7 +223,7 @@ public class MasterWebController {
         this.preLoadCache = preLoadCache;
         this.jobLauncher = jobLauncher;
         this.resultLogsCache = resultLogsCache;
-        this.specialNoticeMasterService = postAssessmentReports_MasterService;
+        this.specialNoticeMasterService = specialNotice_MasterService;
         this.processPropertyDetailsJob = processPropertyDetailsJob;
         this.councilDetails_masterService = councilDetails_MasterService;
         this.rvTypeCategory_masterService = rvTypeCategory_MasterService;
@@ -1736,6 +1735,17 @@ public class MasterWebController {
     @GetMapping("viewObjectionList")
     public String viewObjectionList(){
         return "3gViewObjectionSheet";
+    }
+
+    @GetMapping("/getObjectionTakenProperties")
+    public ResponseEntity<List<RegisterObjection_Dto>> getObjectionTakenProperties(
+            @RequestParam(required = false) String spn,
+            @RequestParam(required = false) String finalPropertyNo,
+            @RequestParam(required = false) String ownerName,
+            @RequestParam(required = false) Integer ward) {
+
+        List<RegisterObjection_Dto> list = registerObjection_masterService.searchObjectionRecords(spn, finalPropertyNo, ownerName, ward);
+        return list.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(list);
     }
 }
 

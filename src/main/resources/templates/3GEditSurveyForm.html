@@ -14,6 +14,8 @@
         <button onclick="openTab('Main')">Main</button>
         <button onclick="openTab('Property')">Property</button>
         <button onclick="openTab('Unit')">Unit</button>
+        <button onclick="openTab('RV')">Ratable Values</button>
+        <button onclick="openTab('Taxes')">Taxes</button>
         <button onclick="openTab('Additional')">Additional</button>
     </div>
     <form id="propertyForm" action="/survey/submit" method="post">
@@ -451,8 +453,169 @@
                 <button type="button" onclick="Next('Additional')">Next</button>
             </div>
         </div>
-    
-    
+
+        <div id="RVTabContent" class="tab-content" style="display:none;">
+            <form id="rvForm">
+                <fieldset>
+                    <legend>Proposed Ratable Values</legend>
+
+                    <label for="prResidentialFl">Residential:</label>
+                    <input type="number" id="prResidentialFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prResidentialOpenPlotFl">Residential (Open Plot):</label>
+                    <input type="number" id="prResidentialOpenPlotFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prCommercialFl">Commercial:</label>
+                    <input type="number" id="prCommercialFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prCommercialOpenPlotFl">Commercial (Open Plot):</label>
+                    <input type="number" id="prCommercialOpenPlotFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prEducationalFl">Educational:</label>
+                    <input type="number" id="prEducationalFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prEducationAndLegalInstituteOpenPlotFl">Education/Legal (Open Plot):</label>
+                    <input type="number" id="prEducationAndLegalInstituteOpenPlotFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prIndustrialFl">Industrial:</label>
+                    <input type="number" id="prIndustrialFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prIndustrialOpenPlotFl">Industrial (Open Plot):</label>
+                    <input type="number" id="prIndustrialOpenPlotFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prGovernmentFl">Government:</label>
+                    <input type="number" id="prGovernmentFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prGovernmentOpenPlotFl">Government (Open Plot):</label>
+                    <input type="number" id="prGovernmentOpenPlotFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prReligiousFl">Religious:</label>
+                    <input type="number" id="prReligiousFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prReligiousOpenPlotFl">Religious (Open Plot):</label>
+                    <input type="number" id="prReligiousOpenPlotFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prElectricSubstationFl">Electric Substation:</label>
+                    <input type="number" id="prElectricSubstationFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prMobileTowerFl">Mobile Tower:</label>
+                    <input type="number" id="prMobileTowerFl" step="0.01" style="width:97%"><br>
+
+                    <label for="prTotalRatableValueFl"><strong>Total Ratable Value:</strong></label>
+                    <input type="number" id="prTotalRatableValueFl" step="0.01" style="width:97%" readonly><br>
+                </fieldset>
+
+                <div class="button-container">
+                    <button type="button" onclick="Back('Unit')">Back</button>
+                    <button type="button" onclick="Next('Taxes')">Next</button>
+                </div>
+            </form>
+        </div>
+
+
+
+        <div id="TaxesTabContent" class="tab-content" style="display:none;">
+            <form id="taxForm">
+                <fieldset>
+                    <legend>Property Taxes</legend>
+
+                    <label for="ptPropertyTaxFl">Property Tax:</label>
+                    <input type="number" id="ptPropertyTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptEduTaxFl">Education Tax:</label>
+                    <input type="number" id="ptEduTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptEduResTaxFl">Education Tax (Residential):</label>
+                    <input type="number" id="ptEduResTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptEduNonResTaxFl">Education Tax (Commercial):</label>
+                    <input type="number" id="ptEduNonResTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptEnvironmentTaxFl">Environment Tax:</label>
+                    <input type="number" id="ptEnvironmentTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptTreeTaxFl">Tree Tax:</label>
+                    <input type="number" id="ptTreeTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptCleanTaxFl">Cleanliness Tax:</label>
+                    <input type="number" id="ptCleanTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptLightTaxFl">Light Tax:</label>
+                    <input type="number" id="ptLightTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptFireTaxFl">Fire Tax:</label>
+                    <input type="number" id="ptFireTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptWaterBenefitTaxFl">Water Benefit Tax:</label>
+                    <input type="number" id="ptWaterBenefitTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptWaterTaxFl">Water Tax:</label>
+                    <input type="number" id="ptWaterTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptSewerageBenefitTaxFl">Sewerage Benefit Tax:</label>
+                    <input type="number" id="ptSewerageBenefitTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptSewerageTaxFl">Sewerage Tax:</label>
+                    <input type="number" id="ptSewerageTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptStreetTaxFl">Street Tax:</label>
+                    <input type="number" id="ptStreetTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptEgcTaxFl">Employment Guarantee Cess (EGC):</label>
+                    <input type="number" id="ptEgcTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptSpecialConservancyTaxFl">Special Conservancy Tax:</label>
+                    <input type="number" id="ptSpecialConservancyTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptMunicipalEduTaxFl">Municipal Education Tax:</label>
+                    <input type="number" id="ptMunicipalEduTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptSpecialEduTaxFl">Special Education Tax:</label>
+                    <input type="number" id="ptSpecialEduTaxFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptUserChargesFl">User Charges:</label>
+                    <input type="number" id="ptUserChargesFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptServiceChargesFl">Service Charges:</label>
+                    <input type="number" id="ptServiceChargesFl" step="0.01" style="width:97%"><br>
+
+                    <label for="ptMiscellaneousChargesFl">Miscellaneous Charges:</label>
+                    <input type="number" id="ptMiscellaneousChargesFl" step="0.01" style="width:97%"><br>
+
+                    <!-- Reserve 25 optional tax fields -->
+                    <div id="extraTaxes">
+                        <h4>Additional Tax Heads (if any)</h4>
+                        <div style="max-height:300px;overflow-y:auto;border:1px solid #ccc;padding:8px;">
+                            <script>
+                                for (let i = 1; i <= 25; i++) {
+                                  document.write(`
+                                    <label for="ptTax${i}Fl">Tax ${i}:</label>
+                                    <input type="number" id="ptTax${i}Fl" step="0.01" style="width:97%"><br>
+                                  `);
+                                }
+                            </script>
+                        </div>
+                    </div>
+
+                    <label for="ptFinalRvFl">Final Ratable Value:</label>
+                    <input type="number" id="ptFinalRvFl" step="0.01" style="width:97%" readonly><br>
+
+                    <label for="ptFinalTaxFl"><strong>Total Consolidated Tax:</strong></label>
+                    <input type="number" id="ptFinalTaxFl" step="0.01" style="width:97%" readonly><br>
+
+                    <label for="ptFinalYearVc">Financial Year:</label>
+                    <input type="text" id="ptFinalYearVc" maxlength="20" style="width:97%"><br>
+                </fieldset>
+
+                <div class="button-container">
+                    <button type="button" onclick="Back('RV')">Back</button>
+                    <button type="button" onclick="submitFormData()">Save</button>
+                </div>
+            </form>
+        </div>
+
+
+
         <div id="AdditionalTabContent" class="tab-content">
             <form>
                 <div id="memberForm1">

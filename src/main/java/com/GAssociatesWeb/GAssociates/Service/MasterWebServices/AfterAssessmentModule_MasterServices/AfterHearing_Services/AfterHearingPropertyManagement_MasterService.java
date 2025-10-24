@@ -1,0 +1,9 @@
+package com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services;
+
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto.AfterHearingCompleteProperty_Dto;
+
+public interface AfterHearingPropertyManagement_MasterService {
+
+    public AfterHearingCompleteProperty_Dto createCompleteProperty(AfterHearingCompleteProperty_Dto dto);
+    public AfterHearingCompleteProperty_Dto getCompletePropertyByNewPropertyNo(String newPropertyNo);
+}

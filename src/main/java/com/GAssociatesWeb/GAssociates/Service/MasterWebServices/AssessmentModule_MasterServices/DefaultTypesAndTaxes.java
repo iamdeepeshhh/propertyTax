@@ -434,9 +434,108 @@ public class DefaultTypesAndTaxes {
 
                     // ===================== USER CHARGES =====================
                     new ReportTaxes_MasterDto(null, "User Charges", "उपयोगकर्ता शुल्क व इतर",
-                            48, ReportTaxKeys.USER_CHG, null, true, true, "ASSESSMENT_REGISTER", true)
+                            48, ReportTaxKeys.USER_CHG, null, true, true, "ASSESSMENT_REGISTER", true),
 
-            );
+                    // ===================== PROPERTY TAX =====================
+                    new ReportTaxes_MasterDto(null, "Property Tax", "एकत्रित मालमत्ता कर",
+                            1, ReportTaxKeys.PT_PARENT, null, true, true, "TAX_BILL", true),
+
+                    // ===================== EDUCATION CESS =====================
+                    new ReportTaxes_MasterDto(null, "Education Cess", "शिक्षण कर",
+                            2, ReportTaxKeys.EDUC_PARENT, null, true, true, "TAX_BILL", true),
+
+                    new ReportTaxes_MasterDto(null, "Residential", "निवासी",
+                            3, ReportTaxKeys.EDUC_RES, ReportTaxKeys.EDUC_PARENT, true, true, "TAX_BILL", false),
+
+                    new ReportTaxes_MasterDto(null, "Commercial", "अनिवासी",
+                            4, ReportTaxKeys.EDUC_COMM, ReportTaxKeys.EDUC_PARENT, true, true, "TAX_BILL", false),
+
+                    // ===================== STANDARD TAXES =====================
+                    new ReportTaxes_MasterDto(null, "Employment Guarantee Cess", "रोजगार हमी योजन कर",
+                            5, ReportTaxKeys.EGC, null, true, true, "TAX_BILL", true),
+
+                    new ReportTaxes_MasterDto(null, "Tree Tax", "वृक्ष कर",
+                            6, ReportTaxKeys.TREE_TAX, null, true, true, "TAX_BILL", true),
+
+                    new ReportTaxes_MasterDto(null, "Environment Tax", "पर्यावरण कर",
+                            7, ReportTaxKeys.ENV_TAX, null, true, true, "TAX_BILL", true),
+
+                    new ReportTaxes_MasterDto(null, "Cleanness Tax", "स्वच्छता कर",
+                            8, ReportTaxKeys.CLEAN_TAX, null, true, true, "TAX_BILL", true),
+
+                    new ReportTaxes_MasterDto(null, "Light Tax", "दिवाबत्ती कर",
+                            9, ReportTaxKeys.LIGHT_TAX, null, true, true, "TAX_BILL", true),
+
+                    new ReportTaxes_MasterDto(null, "Fire Tax", "अग्निशमन कर",
+                            10, ReportTaxKeys.FIRE_TAX, null, true, true, "TAX_BILL", true),
+
+                    // ===================== WATER & SEWERAGE TAXES =====================
+                    new ReportTaxes_MasterDto(null, "Water Tax", "पाणी कर",
+                            11, ReportTaxKeys.WATER_TAX, null, true, true, "TAX_BILL", false),
+
+                    new ReportTaxes_MasterDto(null, "Sewerage Tax", "मलजल कर",
+                            12, ReportTaxKeys.SEWERAGE_TAX, null, true, true, "TAX_BILL", false),
+
+                    new ReportTaxes_MasterDto(null, "Sewerage Benefit Tax", "मलजल लाभ कर",
+                            13, ReportTaxKeys.SEWERAGE_BEN, null, true, true, "TAX_BILL", false),
+
+                    new ReportTaxes_MasterDto(null, "Water Benefit Tax", "पाणी लाभ कर",
+                            14, ReportTaxKeys.WATER_BEN, null, true, true, "TAX_BILL", false),
+
+                    // ===================== STREET & SPECIAL TAXES =====================
+                    new ReportTaxes_MasterDto(null, "Street Tax", "पथ कर",
+                            15, ReportTaxKeys.STREET_TAX, null, true, true, "TAX_BILL", false),
+
+                    new ReportTaxes_MasterDto(null, "Special Conservancy Tax", "विशेष सफाई कर",
+                            16, ReportTaxKeys.SPEC_CONS, null, true, true, "TAX_BILL", false),
+
+                    // ===================== EDUCATIONAL TAX VARIANTS =====================
+                    new ReportTaxes_MasterDto(null, "Municipal Education Tax", "मनपा शिक्षण उपकर",
+                            17, ReportTaxKeys.MUNICIPAL_EDU, null, true, true, "TAX_BILL", false),
+
+                    new ReportTaxes_MasterDto(null, "Special Education Tax", "विशेष शिक्षण कर",
+                            18, ReportTaxKeys.SPECIAL_EDU, null, true, true, "TAX_BILL", false),
+
+                    // ===================== SERVICE & MISC CHARGES =====================
+                    new ReportTaxes_MasterDto(null, "Service Charges", "सेवा शुल्क",
+                            19, ReportTaxKeys.SERVICE_CHG, null, true, true, "TAX_BILL", false),
+
+                    new ReportTaxes_MasterDto(null, "Miscellaneous Charges", "किरकोळ शुल्क",
+                            20, ReportTaxKeys.MISC_CHG, null, true, true, "TAX_BILL", false),
+
+                    // ===================== FLEXIBLE TAXES (Tax1–Tax25) =====================
+                    new ReportTaxes_MasterDto(null, "Tax1", "कर १", 21, ReportTaxKeys.TAX1, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax2", "कर २", 22, ReportTaxKeys.TAX2, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax3", "कर ३", 23, ReportTaxKeys.TAX3, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax4", "कर ४", 24, ReportTaxKeys.TAX4, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax5", "कर ५", 25, ReportTaxKeys.TAX5, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax6", "कर ६", 26, ReportTaxKeys.TAX6, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax7", "कर ७", 27, ReportTaxKeys.TAX7, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax8", "कर ८", 28, ReportTaxKeys.TAX8, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax9", "कर ९", 29, ReportTaxKeys.TAX9, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax10", "कर १०", 30, ReportTaxKeys.TAX10, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax11", "कर ११", 31, ReportTaxKeys.TAX11, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax12", "कर १२", 32, ReportTaxKeys.TAX12, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax13", "कर १३", 33, ReportTaxKeys.TAX13, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax14", "कर १४", 34, ReportTaxKeys.TAX14, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax15", "कर १५", 35, ReportTaxKeys.TAX15, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax16", "कर १६", 36, ReportTaxKeys.TAX16, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax17", "कर १७", 37, ReportTaxKeys.TAX17, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax18", "कर १८", 38, ReportTaxKeys.TAX18, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax19", "कर १९", 39, ReportTaxKeys.TAX19, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax20", "कर २०", 40, ReportTaxKeys.TAX20, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax21", "कर २१", 41, ReportTaxKeys.TAX21, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax22", "कर २२", 42, ReportTaxKeys.TAX22, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax23", "कर २३", 43, ReportTaxKeys.TAX23, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax24", "कर २४", 44, ReportTaxKeys.TAX24, null, false, true, "TAX_BILL", false),
+                    new ReportTaxes_MasterDto(null, "Tax25", "कर २५", 45, ReportTaxKeys.TAX25, null, false, true, "TAX_BILL", false),
+
+                    // ===================== USER CHARGES =====================
+                    new ReportTaxes_MasterDto(null, "User Charges", "उपयोगकर्ता शुल्क व इतर",
+                            46, ReportTaxKeys.USER_CHG, null, true, true, "TAX_BILL", true)
+
+
+                    );
 
             if (!reportsTaxes.isEmpty()) {
                 reportTaxesConfigService.saveOrUpdateReportConfigTaxes(reportsTaxes);

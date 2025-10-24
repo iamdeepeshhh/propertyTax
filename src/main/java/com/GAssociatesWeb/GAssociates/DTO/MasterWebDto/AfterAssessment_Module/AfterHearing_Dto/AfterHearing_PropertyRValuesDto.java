@@ -1,6 +1,5 @@
 package com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,10 +11,10 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AfterHearing_PropertyRValues {
+public class AfterHearing_PropertyRValuesDto {
 
     private Integer id;
-    private String propertyNo;
+    private String prvPropertyNoVc;
     private String finalPropertyNo;
     private String unitNo;
     private Double rate;

@@ -7,8 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -17,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 @IdClass(UnitDetailsId.class)
 @AllArgsConstructor
-public class AfterHearing_UnitDetails {
+public class AfterHearing_UnitDetailsEntity {
 
     @Id
     @Column(name = "pd_newpropertyno_vc", nullable = false, length = 50)

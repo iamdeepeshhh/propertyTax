@@ -371,6 +371,7 @@ public class PropertySurveyController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             CompleteProperty_Dto updatedPropertyDto = objectMapper.readValue(updatedFieldsJson, CompleteProperty_Dto.class);
+            System.out.println("this is updated survey"+updatedPropertyDto);
             if (propertyImage != null) {
                 updatedPropertyDto.getPropertyDetails().setPdPropimageT(
                         ImageUtils.convertToBase64(propertyImage)
@@ -1054,23 +1055,27 @@ public class PropertySurveyController {
     }
 
     @GetMapping("/editSurveyForm")
-    public String editForm(@RequestParam("newpropertyno") String newPropertyNo, HttpServletRequest request, Model model) {
+    public String editForm(@RequestParam("newpropertyno") String newPropertyNo,
+                           @RequestParam(value = "mode", required = false, defaultValue = "survey") String mode,
+                           HttpServletRequest request, Model model) {
+
         HttpSession session = request.getSession();
         if (session.getAttribute("username") == null) {
-            return "redirect:/3gSurvey/surveyLogin"; // Redirect to login page if not authenticated
+            return "redirect:/3gSurvey/surveyLogin";
         }
 
-        // Fetch property details using the newpropertyno
+        // Fetch property details using newpropertyno
         CompleteProperty_Dto property = propertyManagement_service.getCompletePropertyByNewPropertyNo(newPropertyNo);
         if (property == null) {
             throw new PropertyNotFoundException("Property with number " + newPropertyNo + " not found.");
         }
 
-        // Pass property details to the template
         model.addAttribute("property", property);
+        model.addAttribute("mode", mode); // Pass mode to template
 
         return "3GEditSurveyForm";
     }
+
 
     @GetMapping("/getPropertiesCount")
     public ResponseEntity<Map<String, String>> getWardWisePropertyCount() {

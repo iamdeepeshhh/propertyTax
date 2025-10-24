@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class PostAssessmentReports_MasterServiceImpl implements PostAssessmentReports_MasterService {
+public class SpecialNotice_MasterServiceImpl implements SpecialNotice_MasterService {
 
 
 

@@ -52,6 +52,13 @@ public class RegisterObjection_MasterServiceImpl implements RegisterObjection_Ma
     }
 
 
+    @Override
+    public List<RegisterObjection_Dto> searchObjectionRecords(String spn, String finalPropertyNo, String ownerName, Integer ward) {
+        List<RegisterObjection_Entity> records = repository.searchObjectionRecords(spn, finalPropertyNo, ownerName, ward);
+        return records.stream()
+                .map(RegisterObjection_MasterServiceImpl::toDto)
+                .collect(Collectors.toList());
+    }
 
 
     public RegisterObjection_Dto getObjection(String newPropertyNo){
