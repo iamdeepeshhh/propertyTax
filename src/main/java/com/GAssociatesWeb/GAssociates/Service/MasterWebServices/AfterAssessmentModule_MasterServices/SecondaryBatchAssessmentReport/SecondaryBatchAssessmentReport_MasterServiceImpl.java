@@ -173,10 +173,10 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
             unitDto.setTaxableValueByRateFl(getDouble(t, "ratablevalue"));          // Ratable value (from proposed_rvalues)
             unitDto.setTaxableValueConsideredFl(getDouble(t, "totalratablevalue")); // Total considered ratable value
 
-// --- Add to list ---
+            // --- Add to list ---
             propertyUnitDetails.add(unitDto);
 
-// --- Set in main DTO ---
+            // --- Set in main DTO ---
             dto.setPropertyUnitDetails(propertyUnitDetails);
 
             // ---------------- Tax Maps ----------------

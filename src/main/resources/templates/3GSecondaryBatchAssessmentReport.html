@@ -5,25 +5,25 @@
     <title>Assessment Register - Combined Header</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
     <style>
-        body {
-          font-family: 'Noto Sans Devanagari', Arial, sans-serif;
-          margin: 20px;
-          font-size: 13px;
-        }
         table {
           border-collapse: collapse;
           width: 100%;
+          border: 1px solid #000; /* full outer border */
+          table-layout: fixed;
         }
+
         th, td {
-          border: 1px solid #000;
+          border: 1px solid #000; /* uniform grid lines */
           text-align: center;
-          padding: 5px;
+          padding: 4px 3px;
+          vertical-align: middle;
+          line-height: 1.1;
         }
+
         th {
           font-weight: 600;
-          vertical-align: middle;
+          background: #f9f9f9;
         }
-        .group { background: #e9f1ff; }
 
         /* vertical headers */
         .v {
@@ -34,23 +34,43 @@
           font-size: 11px;
           line-height: 1.1;
           padding: 4px 2px;
-          max-height: 100px;       /* gives the browser room to wrap vertically */
-          height: 100px;           /* force wrapping */
-          width: 30px;             /* narrower width forces breaks */
-          overflow-wrap: break-word;
+          height: 100px;
+          width: 30px;
           overflow: hidden;
         }
-        /* Split-print styling */
-        th.p1, td.p1 { background: #e7f1ff; }
-        th.p2, td.p2 { background: #e8f7e8; }
 
+        th.p1, td.p1,
+        th.p2, td.p2 {
+          background: #fff;
+          border: 1px solid #000; /* reinforce edge consistency */
+        }
+
+        /* Seam column (visual divider) */
         .seam, td.seam, th.seam {
           width: 12px;
           min-width: 12px;
-          background: repeating-linear-gradient(90deg,#999 0 1px, transparent 1px 12px);
-          border-left: 0;
-          border-right: 0;
+          background: repeating-linear-gradient(
+            90deg,
+            #000 0 1px,
+            transparent 1px 12px
+          );
+          border-left: 1px solid #000;
+          border-right: 1px solid #000;
+          padding: 0;
         }
+
+
+
+
+
+
+        body {
+          font-family: 'Noto Sans Devanagari', Arial, sans-serif;
+          margin: 20px;
+          font-size: 13px;
+        }
+
+
 
         .controls {
           position: sticky;
@@ -73,67 +93,75 @@
         button.secondary { background: #0e7c3a; }
 
         .report-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between; /* Aligns items to the left */
-            margin-left: -10px; /* Shifts the entire header to the left by 10 pixels */
-            padding: 10px 0; /* Adds padding on top and bottom */
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-left: -10px;
+          padding: 10px 0;
         }
-
         .report-header img {
-            height: 100px; /* Increased height */
-            width: auto;  /* Auto width to maintain the aspect ratio */
-            flex-shrink: 0; /* Prevents the logo from shrinking */
-            margin-left: 120px; /* Maintains space between the logo and the text */
-            border-radius: 20px;
-            transform: scale(1.1);
-
-
-
+          height: 90px;
+          width: auto;
+          margin-left: 120px;
+          border-radius: 20px;
+          transform: scale(1.1);
         }
-
         .report-header div {
-            flex-grow: 1; /* Allows the div to take up the remaining space */
-            text-align: center; /* Centers the text inside the div */
-            padding-left: 50px; /* Optional: Adjust if text needs to shift more to the center */
-            overflow: hidden; /* Prevents text from overflowing */
-
+          flex-grow: 1;
+          text-align: center;
+          padding-left: 50px;
         }
-
         .report-header h1, .report-header p {
-            margin: 0; /* Removes any default margin */
-            padding: 0; /* Ensures there are no paddings affecting the text */
-            font-size: 22px;
-
+          margin: 0;
+          padding: 0;
+          font-size: 20px;
         }
-
         .report-header h1 {
-            color: red; /* set the color of header*/
-            font-size: 22px; /* set the font size of header*/
+          color: red;
+          font-size: 22px;
         }
-        /* PRINT visibility */
+
+        tr.divider-row td {
+          border-top: 2px double #000;
+          border-bottom: none;
+          background: #fff;
+          height: 6px;
+          padding: 0;
+        }
+
+        .column-numbers th {
+          background: rgb(136, 214, 250);
+          font-size: 11px;
+          font-weight: bold;
+          border: 1px solid #000;
+          text-align: center;
+        }
+
+        /* printing */
         @media print {
           .controls { display: none !important; }
-          body.print1 .p2, body.print1 .seam { display: none !important; }
+          header.report-header, thead {
+            display: table-header-group;
+          }
+           body.print1 .p2, body.print1 .seam { display: none !important; }
           body.print2 .p1, body.print2 .seam { display: none !important; }
+          tfoot { display: table-footer-group; }
+          tr.page-break { page-break-after: always; }
         }
-        @media print {
-          thead { display: table-header-group !important; }
-          tfoot { display: table-footer-group !important; }
-        }
+
 
 
         @page { size: A3 landscape; margin: 1cm; }
     </style>
 </head>
-
 <body>
 <div class="controls">
     <button onclick="printPart(1)">🖨️ Print Part 1 (सुनावणी आधीचे पर्यंत)</button>
     <button class="secondary" onclick="printPart(2)">🖨️ Print Part 2 (सुनावणी नंतरचे व अपील नंतर)</button>
 </div>
 
-<header class="report-header">
+<!-- Main Header (first appearance) -->
+<header class="report-header" id="mainHeader">
     <img class="councilLogo" src="https://example.com/default-image.png" alt="Council Logo">
     <div>
         <h1 class="councilName">नगर पंचायत, sitename / Nagar Panchayat sitename</h1>
@@ -141,123 +169,14 @@
         <p><span class="yearRange"></span> या वर्षांसाठी इमारती व जमीन यांची आकारणी सूची</p>
     </div>
 </header>
-<table>
-    <thead>
-    <!-- 🔹 Row 1 -->
-    <tr>
-        <!-- Left Half (Part 1) -->
-        <th class="p1" rowspan="3">क्र.</th>
-        <th class="p1" rowspan="3">रस्ता,<br>विभाग,<br>मंडळाचे नाव व वाड क्र.</th>
-        <th class="p1" rowspan="3">झोन क्र.<br>(नवीन / जुना)</th>
-        <th class="p1" rowspan="3">मालमत्ता क्रमांक<br>(नवीन / जुना / सह. मा. नं.)</th>
-        <th class="p1" rowspan="3">मालकाचे नाव</th>
-        <th class="p1" rowspan="3">भोगवटादाराचे नाव</th>
-        <th class="p1 group" colspan="3">मालमत्तेचे वर्णन</th>
-        <th class="p1 v" rowspan="3">मालमत्तेचे अंदाजित वार्षिक भाडे मूल्य</th>
-        <th class="p1 v" rowspan="3">भाड्याने दिलेल्या भागाचे वार्षिक भाडे</th>
-        <th class="p1 v" rowspan="3">भाड्याने न दिलेल्या भागाचे अंदाजित वार्षिक भाडे</th>
-        <th class="p1 v" rowspan="3">इमारतीचे वा जमिनीचे वार्षिक भाडे</th>
-        <th class="p1 v" rowspan="3">दुरुस्ती इत्यादी साठी 10% वजावट</th>
-        <th class="p1 v" rowspan="3">इमारतीचे वा जमिनीचे करयोग्य मूल्य</th>
-        <th class="p1 group" colspan="9">आकारण्यात आलेल्या करांची रक्कम (सुनावणी आधीचे)</th>
 
-        <!-- seam -->
-        <th class="seam" rowspan="3"></th>
-
-        <!-- Right Half (Part 2) -->
-        <th class="p2 group" colspan="9">आकारण्यात येणाऱ्या करांची रक्कम (आक्षेप / सुनावणी नंतरचे)</th>
-        <th class="p2 group" colspan="9">आकारण्यात आलेल्या करांच्या रकम (अपील नंतर)</th>
-        <th class="p2" rowspan="3">आक्षेपाबाबत</th>
-        <th class="p2" rowspan="3">सुनावणी निकाल</th>
-        <th class="p2" rowspan="3">अधिकृत मूल्य निर्धारण अधिकारीची सही</th>
-        <th class="p2" rowspan="3">अपील समिती सभापतीची सही</th>
-        <th class="p2" rowspan="3">फेरफार बँलचा शेरा व मुख्याधिकारी यांची सही</th>
-        <th class="p2 v" rowspan="3">वापर प्रकार / मजला / मालक, भाडेकरू</th>
-    </tr>
-
-    <!-- 🔹 Row 2 -->
-    <tr>
-        <!-- Description -->
-        <th class="p1 v">प्रकार / मजला / मालक / भाडेकरू</th>
-        <th class="p1 v">बांधकाम प्रकार / करयोग्य क्षेत्रफळ</th>
-        <th class="p1 v">एकूण करयोग्य क्षेत्रफळ</th>
-
-        <!-- Taxes (सुनावणी आधीचे) -->
-        <th class="p1">करयोग्य मूल्य</th>
-        <th class="p1">मालमत्ता कर</th>
-        <th class="p1 v">स्वच्छता कर</th>
-        <th class="p1 v">प्रकाश कर</th>
-        <th class="p1 v">अग्निशमन कर</th>
-        <th class="p1 v">झाड कर</th>
-        <th class="p1 v">पर्यावरण कर</th>
-        <th class="p1 v">रोजगार हमी सेस</th>
-        <th class="p1">एकूण</th>
-
-        <!-- Taxes (सुनावणी नंतरचे) -->
-        <th class="p2">करयोग्य मूल्य</th>
-        <th class="p2">मालमत्ता कर</th>
-        <th class="p2 v">स्वच्छता कर</th>
-        <th class="p2 v">प्रकाश कर</th>
-        <th class="p2 v">अग्निशमन कर</th>
-        <th class="p2 v">झाड कर</th>
-        <th class="p2 v">पर्यावरण कर</th>
-        <th class="p2 v">रोजगार हमी सेस</th>
-        <th class="p2">एकूण</th>
-
-        <!-- Taxes (अपील नंतर) -->
-        <th class="p2">करयोग्य मूल्य</th>
-        <th class="p2">मालमत्ता कर</th>
-        <th class="p2 v">स्वच्छता कर</th>
-        <th class="p2 v">प्रकाश कर</th>
-        <th class="p2 v">अग्निशमन कर</th>
-        <th class="p2 v">झाड कर</th>
-        <th class="p2 v">पर्यावरण कर</th>
-        <th class="p2 v">रोजगार हमी सेस</th>
-        <th class="p2">एकूण</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    <!-- Example row -->
-    <tr>
-        <td class="p1">1</td>
-        <td class="p1">गांधी चौक</td>
-        <td class="p1">3</td>
-        <td class="p1">020001</td>
-        <td class="p1">श्री. राम पाटील</td>
-        <td class="p1">स्वतः</td>
-        <td class="p1">G</td>
-        <td class="p1">आर.सी.सी.</td>
-        <td class="p1">100</td>
-        <td class="p1">2000</td>
-        <td class="p1">500</td>
-        <td class="p1">400</td>
-        <td class="p1">360</td>
-        <td class="p1">36</td>
-        <td class="p1">324</td>
-        <td class="p1">100</td><td class="p1">50</td><td class="p1">20</td><td class="p1">10</td><td class="p1">5</td><td class="p1">10</td><td class="p1">5</td><td class="p1">4</td><td class="p1">204</td>
-
-        <td class="seam"></td>
-
-        <td class="p2">120</td><td class="p2">60</td><td class="p2">20</td><td class="p2">10</td><td class="p2">5</td><td class="p2">10</td><td class="p2">5</td><td class="p2">4</td><td class="p2">234</td>
-        <td class="p2">130</td><td class="p2">70</td><td class="p2">30</td><td class="p2">15</td><td class="p2">5</td><td class="p2">15</td><td class="p2">5</td><td class="p2">4</td><td class="p2">274</td>
-        <td class="p2">नाही</td>
-        <td class="p2">पूर्ण</td>
-        <td class="p2">✔️</td>
-        <td class="p2">✔️</td>
-        <td class="p2">✔️</td>
-        <td class="p2">व्यावसायिक</td>
-    </tr>
-    </tbody>
-</table>
+<!-- Placeholder container for chunks -->
+<div id="reportContainer"></div>
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
       const wardNo = new URLSearchParams(window.location.search).get("wardNo") || 1;
-      const tbody = document.querySelector("tbody");
       const yearRange = document.querySelector(".yearRange");
-
-      // Example: dynamically set year range
       const currentYear = new Date().getFullYear();
       yearRange.textContent = `${currentYear - 1}-${currentYear}`;
 
@@ -268,118 +187,389 @@
         })
         .then(data => {
           if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="40">No records found for ward ${wardNo}</td></tr>`;
+            document.querySelector("#reportContainer").innerHTML =
+              `<p style="text-align:center;">No records found for ward ${wardNo}</p>`;
             return;
           }
-          renderAssessmentTable(data);
+          renderAssessmentChunks(data);
         })
         .catch(err => {
           console.error("❌ Error fetching report:", err);
-          tbody.innerHTML = `<tr><td colspan="40">Error loading report: ${err.message}</td></tr>`;
+          document.querySelector("#reportContainer").innerHTML =
+            `<p style="text-align:center;">Error loading report: ${err.message}</p>`;
         });
     });
 
-    // -------------------------- //
-    // 🔹 RENDERING MAIN FUNCTION //
-    // -------------------------- //
-    function renderAssessmentTable(data) {
-      const tbody = document.querySelector("tbody");
-      tbody.innerHTML = "";
 
+    // 🔹 Fetch council details and fill header
+        function fetchCouncilDetails() {
+          fetch('/3g/getCouncilDetails')
+            .then(res => res.json())
+            .then(data => {
+              if (data && data.length > 0) {
+                const c = data[0];
+                document.querySelector('.councilName').textContent =
+                  `${c.localName || 'नगर परिषद'} / ${c.standardName || 'Nagar Parishad'}`;
+                if (c.imageBase64)
+                  document.querySelector('.councilLogo').src = 'data:image/png;base64,' + c.imageBase64;
+              }
+            })
+            .catch(err => console.error('❌ Failed to fetch council details:', err));
+        }
+
+        // ✅ call it
+        fetchCouncilDetails();
+
+
+
+    /* --------------------------------------
+       🔹 Render chunks (3 reports per page)
+    -------------------------------------- */
+    function renderAssessmentChunks(data) {
       const grouped = data.reduce((acc, prop) => {
-  const key = prop.propertyDetails?.pdNewpropertynoVc;
-  if (!acc[key]) acc[key] = [];
-  acc[key].push(prop);
-  return acc;
-}, {});
+        const key = prop.propertyDetails?.pdNewpropertynoVc;
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(prop);
+        return acc;
+      }, {});
 
-let index = 0;
+      const reportContainer = document.querySelector("#reportContainer");
+      reportContainer.innerHTML = "";
+      const groups = Object.values(grouped);
 
-// 🔹 Render one row per property (with merged units)
-Object.values(grouped).forEach(group => {
-  index++;
-  const property = group[0];
-  const pd = property.propertyDetails || {};
-  const units = group.flatMap(p => p.propertyUnitDetails || []);
+      // Header HTML to clone each time
+      const councilHeaderHTML = document.querySelector("#mainHeader").outerHTML;
+      const tableHeadHTML = `
+        <thead>
+          <tr>
+            <th class="p1" rowspan="3">क्र.</th>
+            <th class="p1" rowspan="3">रस्ता,<br>विभाग,<br>मंडळाचे नाव व वाड क्र.</th>
+            <th class="p1" rowspan="3">झोन क्र.<br>(नवीन / जुना)</th>
+            <th class="p1" rowspan="3">मालमत्ता क्रमांक<br>(नवीन / जुना / सह. मा. नं.)</th>
+            <th class="p1" rowspan="3">मालकाचे नाव</th>
+            <th class="p1" rowspan="3">भोगवटादाराचे नाव</th>
+            <th class="p1 group" colspan="3">मालमत्तेचे वर्णन</th>
+            <th class="p1 v" rowspan="3">मालमत्तेचे अंदाजित वार्षिक भाडे मूल्य</th>
+            <th class="p1 v" rowspan="3">भाड्याने दिलेल्या भागाचे वार्षिक भाडे</th>
+            <th class="p1 v" rowspan="3">भाड्याने न दिलेल्या भागाचे अंदाजित वार्षिक भाडे</th>
+            <th class="p1 v" rowspan="3">इमारतीचे वा जमिनीचे वार्षिक भाडे</th>
+            <th class="p1 v" rowspan="3">दुरुस्ती इत्यादी साठी 10% वजावट</th>
+            <th class="p1 v" rowspan="3">इमारतीचे वा जमिनीचे करयोग्य मूल्य</th>
+            <th class="p1 group" colspan="9">आकारण्यात आलेल्या करांची रक्कम (सुनावणी आधीचे)</th>
+            <th class="seam" rowspan="3"></th>
+            <th class="p2 group" colspan="9">आकारण्यात येणाऱ्या करांची रक्कम (आक्षेप / सुनावणी नंतरचे)</th>
+            <th class="p2 group" colspan="9">आकारण्यात आलेल्या करांच्या रकम (अपील नंतर)</th>
+            <th class="p2" rowspan="3">आक्षेपाबाबत</th>
+            <th class="p2" rowspan="3">सुनावणी निकाल</th>
+            <th class="p2" rowspan="3">अधिकृत मूल्य निर्धारण अधिकारीची सही</th>
+            <th class="p2" rowspan="3">अपील समिती सभापतीची सही</th>
+            <th class="p2" rowspan="3">फेरफार बँलचा शेरा व मुख्याधिकारी यांची सही</th>
+            <th class="p2 v" rowspan="3">वापर प्रकार / मजला / मालक, भाडेकरू</th>
+          </tr>
+          <tr>
+            <th class="p1 v">प्रकार / मजला / मालक / भाडेकरू</th>
+            <th class="p1 v">बांधकाम प्रकार / करयोग्य क्षेत्रफळ</th>
+            <th class="p1 v">एकूण करयोग्य क्षेत्रफळ</th>
+            <th class="p1">करयोग्य मूल्य</th><th class="p1">मालमत्ता कर</th>
+            <th class="p1 v">स्वच्छता कर</th><th class="p1 v">प्रकाश कर</th>
+            <th class="p1 v">अग्निशमन कर</th><th class="p1 v">झाड कर</th>
+            <th class="p1 v">पर्यावरण कर</th><th class="p1 v">रोजगार हमी सेस</th>
+            <th class="p1">एकूण</th>
+            <th class="p2">करयोग्य मूल्य</th><th class="p2">मालमत्ता कर</th>
+            <th class="p2 v">स्वच्छता कर</th><th class="p2 v">प्रकाश कर</th>
+            <th class="p2 v">अग्निशमन कर</th><th class="p2 v">झाड कर</th>
+            <th class="p2 v">पर्यावरण कर</th><th class="p2 v">रोजगार हमी सेस</th>
+            <th class="p2">एकूण</th>
+            <th class="p2">करयोग्य मूल्य</th><th class="p2">मालमत्ता कर</th>
+            <th class="p2 v">स्वच्छता कर</th><th class="p2 v">प्रकाश कर</th>
+            <th class="p2 v">अग्निशमन कर</th><th class="p2 v">झाड कर</th>
+            <th class="p2 v">पर्यावरण कर</th><th class="p2 v">रोजगार हमी सेस</th>
+            <th class="p2">एकूण</th>
+          </tr>
 
-  // merge unit-level fields
-  const floorNos = units.map(u => u.floorNoVc || "").join("<br>");
-  const constTypes = units.map(u => u.constructionTypeVc || "").join("<br>");
-  const areas = units.map(u => u.taxableAreaFl || "").join("<br>");
-  const usages = units.map(u => u.usageTypeVc || "").join("<br>");
-  const totalArea = units.reduce((sum, u) => sum + (parseFloat(u.taxableAreaFl) || 0), 0);
+        </thead>
+        <tr class="column-numbers">
+            <th >1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>6</th>
+            <th>7</th>
+            <th>8</th>
+            <th>9</th>
+            <th>10</th>
+            <th>11</th>
+            <th>12</th>
+            <th>13</th>
+            <th>14</th>
+            <th>15</th>
+            <th>16</th>
+            <th>17</th>
+            <th>18</th>
+            <th>19</th>
+            <th>20</th>
+            <th>21</th>
+            <th>22</th>
+            <th>23</th>
+            <th>24</th>
+            <th></th>
+            <th class="p2" >25</th>
+            <th class="p2">26</th>
+            <th class="p2">27</th>
+            <th class="p2">28</th>
+            <th class="p2">29</th>
+            <th class="p2">30</th>
+            <th class="p2">31</th>
+            <th class="p2">32</th>
+            <th class="p2">33</th>
+            <th class="p2">34</th>
+            <th class="p2">35</th>
+            <th class="p2">36</th>
+            <th class="p2">37</th>
+            <th class="p2">38</th>
+            <th class="p2">39</th>
+            <th class="p2">40</th>
+            <th class="p2">41</th>
+            <th class="p2">42</th>
+            <th class="p2">43</th>
+            <th class="p2">44</th>
+            <th class="p2"">45</th>
+            <th class="p2">46</th>
+            <th class="p2">47</th>
+            <th class="p2">48</th>
+          </tr>
+        `;
 
-  // combine taxes
-  const beforeAll = group.map(p => p.taxKeyValueMapAfterAssess || {});
-  const afterAll = group.map(p => p.taxKeyValueMapAfterHearing || {});
-  const mergeTaxMaps = (arr) => {
-    const total = {};
-    arr.forEach(m => {
-      for (const [k, v] of Object.entries(m)) {
-        total[k] = (total[k] || 0) + (parseFloat(v) || 0);
+      let chunkIndex = 0;
+      for (let i = 0; i < groups.length; i += 3) {
+        chunkIndex++;
+        const chunk = groups.slice(i, i + 3);
+        const wrapper = document.createElement("div");
+
+        // only add council header from 2nd chunk onwards
+        wrapper.innerHTML = `
+          ${chunkIndex === 1 ? "" : councilHeaderHTML}
+          <table class="reportTable">${tableHeadHTML}<tbody></tbody></table>
+        `;
+        const tbody = wrapper.querySelector("tbody");
+
+        chunk.forEach((group, idx) => {
+          const property = group[0];
+          const pd = property.propertyDetails || {};
+          const usages = (group.flatMap(p => p.propertyUnitDetails || [])).map(u => u.usageTypeVc || "").join("<br>");
+          const beforeAll = group.map(p => p.taxKeyValueMapAfterAssess || {});
+          const afterAll = group.map(p => p.taxKeyValueMapAfterHearing || {});
+          const mergeTaxMaps = (arr) => {
+            const total = {};
+            arr.forEach(m => {
+              for (const [k, v] of Object.entries(m)) {
+                total[k] = (total[k] || 0) + (parseFloat(v) || 0);
+              }
+            });
+            return total;
+          };
+          const before = mergeTaxMaps(beforeAll);
+          const after = mergeTaxMaps(afterAll);
+          const totalBefore = Object.values(before).reduce((a,b)=>a+b,0);
+          const totalAfter = Object.values(after).reduce((a,b)=>a+b,0);
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="p1">${i + idx + 1}</td>
+            <td class="p1">${pd.pdWardI || ""}</td>
+            <td class="p1">${pd.pdZoneI || ""}</td>
+            <td class="p1">${pd.pdNewpropertynoVc || ""}<br>${pd.pdFinalpropnoVc || ""}</td>
+            <td class="p1">${pd.pdOwnernameVc || "—"}</td>
+            <td class="p1">${pd.pdOccupinameF || "—"}</td>
+            <td class="p1">${usages}</td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1">${before["ratepersqm"] || ""}</td>
+            <td class="p1">${before["actualrent"] || ""}</td>
+            <td class="p1">${before["ratablevalue"] || ""}</td>
+            <td class="p1">${before["amountafterdep"] || ""}</td>
+            <td class="p1">${before["depamount"] || ""}</td>
+            <td class="p1">${before["totalratablevalue"] || ""}</td>
+            <td class="p1">${before["1"] || 0}</td>
+            <td class="p1">${before["3"] || 0}</td>
+            <td class="p1">${before["4"] || 0}</td>
+            <td class="p1">${before["5"] || 0}</td>
+            <td class="p1">${before["6"] || 0}</td>
+            <td class="p1">${before["7"] || 0}</td>
+            <td class="p1">${before["27"] || 0}</td>
+            <td class="p1">${before["46"] || 0}</td>
+            <td class="p1"><b>${totalBefore.toFixed(0)}</b></td>
+            <td class="seam"></td>
+            <td class="p2">${after["taxableValueConsideredFl"] || ""}</td>
+            <td class="p2">${after["1"] || 0}</td>
+            <td class="p2">${after["3"] || 0}</td>
+            <td class="p2">${after["4"] || 0}</td>
+            <td class="p2">${after["5"] || 0}</td>
+            <td class="p2">${after["6"] || 0}</td>
+            <td class="p2">${after["7"] || 0}</td>
+            <td class="p2">${after["27"] || 0}</td>
+            <td class="p2">${after["46"] || 0}</td>
+            <td class="p2"><b>${totalAfter.toFixed(0)}</b></td>
+            <td class="p2">—</td>
+            <td class="p2">—</td>
+            <td class="p2">✔️</td>
+            <td class="p2">✔️</td>
+            <td class="p2">✔️</td>
+            <td class="p2">${usages}</td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>`
+            ;
+          tbody.appendChild(tr);
+
+          const tr1 = document.createElement("tr");
+          tr1.innerHTML = `
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="seam"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>`
+            ;
+          tbody.appendChild(tr1);
+
+           const tr2 = document.createElement("tr");
+          tr2.innerHTML = `
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="p1"></td>
+            <td class="seam"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>
+            <td class="p2"></td>`
+            ;
+          tbody.appendChild(tr2);
+
+
+<!--        for (let d = 0; d < 2; d++) {-->
+<!--          const emptyRow = document.createElement("tr");-->
+<!--          emptyRow.classList.add("divider-row");-->
+
+<!--          // Collect only .p1 and .p2 columns (ignore seam)-->
+<!--          const cols = Array.from(tr.children).filter(td =>-->
+<!--            td.classList.contains('p1') || td.classList.contains('p2')-->
+<!--          );-->
+
+<!--          // Create empty cells for each column-->
+<!--          cols.forEach(() => {-->
+<!--            const td = document.createElement("td");-->
+<!--            td.innerHTML = "&nbsp;"; // blank cell-->
+<!--            emptyRow.appendChild(td);-->
+<!--          });-->
+
+<!--          tbody.appendChild(emptyRow);-->
+<!--        }-->
+
+
+           // Page break style after each chunk
+        wrapper.style.pageBreakAfter = "always";
+        reportContainer.appendChild(wrapper);
+
+
+        });
+
+
+
       }
-    });
-    return total;
-  };
-  const before = mergeTaxMaps(beforeAll);
-  const after = mergeTaxMaps(afterAll);
-
-  const totalBefore = Object.values(before).reduce((a, b) => a + b, 0);
-  const totalAfter = Object.values(after).reduce((a, b) => a + b, 0);
-
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <td class="p1">${index}</td>
-    <td class="p1">${pd.pdWardI || ""}</td>
-    <td class="p1">${pd.pdZoneI || ""}</td>
-    <td class="p1">${pd.pdNewpropertynoVc || ""}<br>${pd.pdFinalpropnoVc || ""}</td>
-    <td class="p1">${pd.pdOwnernameVc || "—"}</td>
-    <td class="p1">${pd.pdOccupinameF || "—"}</td>
-    <td class="p1">${floorNos}</td>
-    <td class="p1">${constTypes}</td>
-    <td class="p1">${areas}<hr><b>${totalArea.toFixed(2)}</b></td>
-
-    <td class="p1">${before["ratepersqm"] || ""}</td>
-    <td class="p1">${before["actualrent"] || ""}</td>
-    <td class="p1">${before["ratablevalue"] || ""}</td>
-    <td class="p1">${before["amountafterdep"] || ""}</td>
-    <td class="p1">${before["depamount"] || ""}</td>
-    <td class="p1">${before["totalratablevalue"] || ""}</td>
-
-    <td class="p1">${before["1"] || 0}</td>
-    <td class="p1">${before["3"] || 0}</td>
-    <td class="p1">${before["4"] || 0}</td>
-    <td class="p1">${before["5"] || 0}</td>
-    <td class="p1">${before["6"] || 0}</td>
-    <td class="p1">${before["7"] || 0}</td>
-    <td class="p1">${before["27"] || 0}</td>
-    <td class="p1">${before["46"] || 0}</td>
-    <td class="p1"><b>${totalBefore.toFixed(0)}</b></td>
-
-    <td class="seam"></td>
-
-    <td class="p2">${after["taxableValueConsideredFl"] || ""}</td>
-    <td class="p2">${after["1"] || 0}</td>
-    <td class="p2">${after["3"] || 0}</td>
-    <td class="p2">${after["4"] || 0}</td>
-    <td class="p2">${after["5"] || 0}</td>
-    <td class="p2">${after["6"] || 0}</td>
-    <td class="p2">${after["7"] || 0}</td>
-    <td class="p2">${after["27"] || 0}</td>
-    <td class="p2">${after["46"] || 0}</td>
-    <td class="p2"><b>${totalAfter.toFixed(0)}</b></td>
-
-    <td class="p2">—</td>
-    <td class="p2">—</td>
-    <td class="p2">✔️</td>
-    <td class="p2">✔️</td>
-    <td class="p2">✔️</td>
-    <td class="p2">${usages}</td>
-  `;
-
-  tbody.appendChild(row);
-});
     }
+
+    /* print logic */
     function printPart(part) {
       document.body.classList.remove('print1','print2');
       document.body.classList.add(part === 1 ? 'print1' : 'print2');

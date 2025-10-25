@@ -1,4 +1,4 @@
-package com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.SpecialNotice_MasterServices;
+package com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.SpecialNotice_MasterService;
 
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.AssessmentResultsDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.ConsolidatedTaxDetailsDto;
@@ -97,10 +97,22 @@ public class SpecialNotice_MasterServiceImpl implements SpecialNotice_MasterServ
                     "pt.pt_tax25_fl AS ptTax25Fl, " +
 
                     "ROUND(pt.pt_final_tax_fl) AS finalTax, " +
-                    "pr.pr_residential_fl AS residential, " +
-                    "pr.pr_commercial_fl AS commercial, " +
-                    "pr.pr_industrial_fl AS pdBuildingvalueI, " +
-                    "pr.pr_totalrv_fl AS aggregate, " +
+                    "pr.pr_residential_fl AS residentialFl, " +
+                    "pr.pr_commercial_fl AS commercialFl, " +
+                    "pr.pr_industrial_fl AS industrialFl, " +
+                    "pr.pr_government_fl AS governmentFl, " +
+                    "pr.pr_educational_fl AS educationalInstituteFl, " +
+                    "pr.pr_religious_fl AS religiousFl, " +
+                    "pr.pr_mobiletower_fl AS mobileTowerFl, " +
+                    "pr.pr_electricsubstation_fl AS electricSubstationFl, " +
+                    "pr.pr_residentialopenplot_fl AS residentialOpenPlotFl, " +
+                    "pr.pr_commercialopenplot_fl AS commercialOpenPlotFl, " +
+                    "pr.pr_industrialopenplot_fl AS industrialOpenPlotFl, " +
+                    "pr.pr_governmentopenplot_fl AS governmentOpenPlotFl, " +
+                    "pr.pr_educationlegalopenplot_fl AS educationAndLegalInstituteOpenPlotFl, " +
+                    "pr.pr_religiousopenplot_fl AS religiousOpenPlotFl, " +
+                    "pr.pr_totalrv_fl AS aggregateFl " +
+
 
 
                     "FROM property_details p " +
@@ -221,9 +233,23 @@ public class SpecialNotice_MasterServiceImpl implements SpecialNotice_MasterServ
                 }
             }
             ProposedRatableValueDetailsDto rvDto = new ProposedRatableValueDetailsDto();
-            rvDto.setResidentialFl(rs.getDouble("Residential"));
-            rvDto.setCommercialFl(rs.getDouble("Commercial"));
-            rvDto.setAggregateFl(rs.getDouble("aggregate"));
+            rvDto.setResidentialFl(rs.getDouble("residentialFl"));
+            rvDto.setCommercialFl(rs.getDouble("commercialFl"));
+            rvDto.setIndustrialFl(rs.getDouble("industrialFl"));
+            rvDto.setGovernmentFl(rs.getDouble("governmentFl"));
+            rvDto.setEducationalInstituteFl(rs.getDouble("educationalInstituteFl"));
+            rvDto.setReligiousFl(rs.getDouble("religiousFl"));
+            rvDto.setMobileTowerFl(rs.getDouble("mobileTowerFl"));
+            rvDto.setElectricSubstationFl(rs.getDouble("electricSubstationFl"));
+            rvDto.setResidentialOpenPlotFl(rs.getDouble("residentialOpenPlotFl"));
+            rvDto.setCommercialOpenPlotFl(rs.getDouble("commercialOpenPlotFl"));
+            rvDto.setIndustrialOpenPlotFl(rs.getDouble("industrialOpenPlotFl"));
+            rvDto.setGovernmentOpenPlotFl(rs.getDouble("governmentOpenPlotFl"));
+            rvDto.setEducationAndLegalInstituteOpenPlotFl(rs.getDouble("educationAndLegalInstituteOpenPlotFl"));
+            rvDto.setReligiousOpenPlotFl(rs.getDouble("religiousOpenPlotFl"));
+            rvDto.setAggregateFl(rs.getDouble("aggregateFl"));
+//            rvDto.setFinalPropertyNoVc(rs.getString("finalPropertyNoVc"));
+//            dto.setProposedRatableValues(rvDto);
             dto.setProposedRatableValues(rvDto);
 
             return dto;

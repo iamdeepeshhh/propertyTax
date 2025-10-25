@@ -1,0 +1,4 @@
+package com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.HearingNotice_MasterService;
+
+public class HearingNotice_MasterServiceImpl {
+}

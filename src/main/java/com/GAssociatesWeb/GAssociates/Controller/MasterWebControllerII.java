@@ -2,8 +2,10 @@ package com.GAssociatesWeb.GAssociates.Controller;
 
 
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto.AfterHearingCompleteProperty_Dto;
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.AssessmentResultsDto;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearingPropertyManagement_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.SecondaryBatchAssessmentReport.SecondaryBatchAssessmentReport_MasterService;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.TaxBills.TaxBills_MasterService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -20,7 +22,7 @@ import java.util.List;
 public class MasterWebControllerII {
 
     private final AfterHearingPropertyManagement_MasterService afterHearingService;
-
+    private final TaxBills_MasterService taxBills_masterService;
     private SecondaryBatchAssessmentReport_MasterService secondaryBatchAssessmentReportService;
 
     @GetMapping("/getCompletePropertyAfterHearing")
@@ -59,6 +61,32 @@ public class MasterWebControllerII {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error generating Secondary Batch Assessment Report: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/taxBills")
+    public ResponseEntity<List<AssessmentResultsDto>> getTaxBills(
+            @RequestParam(value = "wardNo", required = false) Integer wardNo,
+            @RequestParam(value = "newPropertyNo", required = false) String newPropertyNo) {
+
+        try {
+            List<AssessmentResultsDto> results;
+            if (newPropertyNo != null) {
+                results = taxBills_masterService.getTaxBillsByNewPropertyNo(newPropertyNo);
+            } else if (wardNo != null) {
+                results = taxBills_masterService.getTaxBillsByWard(wardNo);
+            } else {
+                return ResponseEntity.badRequest().build();
+            }
+
+            if (results == null || results.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(results);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
         }
     }
 }
