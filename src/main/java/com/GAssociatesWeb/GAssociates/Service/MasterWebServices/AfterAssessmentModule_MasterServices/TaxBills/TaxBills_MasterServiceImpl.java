@@ -1,5 +1,6 @@
 package com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.TaxBills;
 
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.TaxBills_MasterDto.TaxBills_MasterDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.AssessmentResultsDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.ConsolidatedTaxDetailsDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.ProposedRatableValueDetailsDto;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -170,22 +173,32 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
             Map.entry("ptTax25Fl", ReportTaxKeys.TAX25)
     );
 
-    private List<AssessmentResultsDto> fetchTaxBills(String condition, Object[] params) {
+    private List<TaxBills_MasterDto> fetchTaxBills(String condition, Object[] params) {
         String query = BASE_QUERY + " WHERE " + condition + " ORDER BY p.pd_finalpropno_vc";
-        List<AssessmentResultsDto> bills = jdbcTemplate.query(query, params, new TaxBillRowMapper());
+        List<TaxBills_MasterDto> bills = jdbcTemplate.query(query, params, new TaxBillRowMapper());
 
-        // 🔹 Attach arrears details for each property
-        for (AssessmentResultsDto dto : bills) {
-            Map<String, Map<Long, Double>> arrearsMap = fetchYearWiseArrears(dto.getPdNewpropertynoVc());
+        for (TaxBills_MasterDto dto : bills) {
+            // 🔹 Fetch arrears safely
+            Map<String, Map<Long, Double>> arrearsMap = fetchYearWiseArrears(dto.getPdFinalpropnoVc());
+            if (arrearsMap == null) arrearsMap = new java.util.LinkedHashMap<>();
             dto.setArrearsYearWiseMap(arrearsMap);
 
-            // 🔹 Compute arrears range string
+            // 🔹 Compute arrears range
             if (!arrearsMap.isEmpty()) {
                 String firstYear = arrearsMap.keySet().iterator().next();
                 String lastYear = null;
                 for (String y : arrearsMap.keySet()) lastYear = y;
                 dto.setArrearsRangeVc(firstYear.equals(lastYear) ? firstYear : firstYear + " to " + lastYear);
             }
+
+            // 🔹 Merge current + arrears = totalTaxMap
+            Map<Long, Double> merged = new java.util.HashMap<>(dto.getCurrentTaxMap());
+            for (Map<Long, Double> yearlyTaxes : arrearsMap.values()) {
+                for (Map.Entry<Long, Double> e : yearlyTaxes.entrySet()) {
+                    merged.merge(e.getKey(), e.getValue(), Double::sum);
+                }
+            }
+            dto.setTotalTaxMap(merged);
         }
 
         return bills;
@@ -193,12 +206,13 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
 
 
 
-    public List<AssessmentResultsDto> getTaxBillsByWard(int wardNo) {
+
+    public List<TaxBills_MasterDto> getTaxBillsByWard(int wardNo) {
         return fetchTaxBills("CAST(p.pd_ward_i AS INTEGER) = ?", new Object[]{wardNo});
     }
 
     // 🔹 Get tax bills by property
-    public List<AssessmentResultsDto> getTaxBillsByNewPropertyNo(String newPropertyNo) {
+    public List<TaxBills_MasterDto> getTaxBillsByNewPropertyNo(String newPropertyNo) {
         return fetchTaxBills("p.pd_newpropertyno_vc = ?", new Object[]{newPropertyNo});
     }
 
@@ -303,8 +317,10 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
                 );
 
                 // Include reserved pt_tax1_fl … pt_tax25_fl
-                for (int i = 1; i <= 25; i++) {
-                    columnKeyMap.put("ptTax" + i + "Fl", ReportTaxKeys.class.getField("TAX" + i).getLong(null));
+                for (Map.Entry<String, Long> entry : TAX_COLUMN_MAP.entrySet()) {
+                    if (entry.getKey().startsWith("ptTax")) {
+                        columnKeyMap.put(entry.getKey(), entry.getValue());
+                    }
                 }
 
                 // Loop and populate
@@ -320,37 +336,24 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
         });
     }
 
-    private static class TaxBillRowMapper implements RowMapper<AssessmentResultsDto> {
+    private static class TaxBillRowMapper implements RowMapper<TaxBills_MasterDto> {
         @Override
-        public AssessmentResultsDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-            AssessmentResultsDto dto = new AssessmentResultsDto();
+        public TaxBills_MasterDto mapRow(ResultSet rs, int rowNum) throws SQLException {
+            TaxBills_MasterDto dto = new TaxBills_MasterDto();
 
-            // Property info
-            dto.setPdNoticenoVc(rs.getString("pdNoticenoVc"));
+            // 🏠 Property info
             dto.setPdWardI(rs.getString("pdWardI"));
             dto.setPdZoneI(rs.getString("pdZoneI"));
-            dto.setPdNewpropertynoVc(rs.getString("pdNewpropertynoVc"));
             dto.setPdFinalpropnoVc(rs.getString("pdFinalpropnoVc"));
             dto.setPdOwnernameVc(rs.getString("pdOwnernameVc"));
             dto.setPdOccupinameF(rs.getString("pdOccupinameF"));
             dto.setPdSurypropnoVc(rs.getString("pdSurypropnoVc"));
-            dto.setPdPropertytypeI(rs.getString("pdPropertytypeI"));
-            dto.setPdPropertysubtypeI(rs.getString("pdPropertysubtypeI"));
-            dto.setPdUsagetypeI(rs.getString("pdUsagetypeI"));
-            dto.setPdUsagesubtypeI(rs.getString("pdUsagesubtypeI"));
-            dto.setPdPropimageT(rs.getString("pdPropimageT"));
-            dto.setPdHouseplan2T(rs.getString("pdHouseplan2T"));
             dto.setPdOldpropnoVc(rs.getString("pdOldpropnoVc"));
-            dto.setCurrentAssessmentDateDt(rs.getString("currentAssessmentDateDt"));
-            dto.setPreviousAssessmentDateDt(rs.getString("previousAssessmentDateDt"));
-            dto.setPdAssesareaF(rs.getString("pdAssesareaF"));
+            dto.setPdAssesareaF(Double.valueOf(rs.getString("pdAssesareaF")));
             dto.setPdPropertyaddressVc(rs.getString("pdPropertyaddressVc"));
-            // Consolidated total tax
-            ConsolidatedTaxDetailsDto taxDto = new ConsolidatedTaxDetailsDto();
-            taxDto.setTotalTaxFl(rs.getDouble("finalTax"));
-            dto.setConsolidatedTaxes(taxDto);
+//            dto.setFinalTaxFl(rs.getDouble("finalTax"));
 
-            // Proposed Ratable Values
+            // 📊 Proposed Ratable Values
             ProposedRatableValueDetailsDto rvDto = new ProposedRatableValueDetailsDto();
             rvDto.setResidentialFl(rs.getDouble("residentialFl"));
             rvDto.setCommercialFl(rs.getDouble("commercialFl"));
@@ -367,20 +370,22 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
             rvDto.setEducationAndLegalInstituteOpenPlotFl(rs.getDouble("educationAndLegalInstituteOpenPlotFl"));
             rvDto.setReligiousOpenPlotFl(rs.getDouble("religiousOpenPlotFl"));
             rvDto.setAggregateFl(rs.getDouble("aggregateFl"));
-            dto.setProposedRatableValues(rvDto);
+            dto.setProposedRatableValueDetailsDto(rvDto); // ✅ use correct setter name
 
-            // Individual taxes (loop through tax map)
-            Map<Long, Double> taxMap = dto.getTaxKeyValueMap();
+            // 💰 Map individual taxes
+            Map<Long, Double> taxMap = new java.util.HashMap<>();
             for (Map.Entry<String, Long> entry : TAX_COLUMN_MAP.entrySet()) {
                 double value = rs.getDouble(entry.getKey());
                 if (!rs.wasNull()) {
                     taxMap.put(entry.getValue(), value);
                 }
             }
+            dto.setCurrentTaxMap(taxMap);
 
             return dto;
         }
     }
+
 
 
 }

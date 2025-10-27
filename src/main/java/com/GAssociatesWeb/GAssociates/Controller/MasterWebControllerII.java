@@ -3,6 +3,7 @@ package com.GAssociatesWeb.GAssociates.Controller;
 
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto.AfterHearingCompleteProperty_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.PropertyTaxDetailArrears_MasterDto.PropertyTaxDetailArrears_MasterDto;
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.TaxBills_MasterDto.TaxBills_MasterDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.AssessmentResultsDto;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearingPropertyManagement_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.PropertyTaxDetailArrears_MasterService.PropertyTaxDetailArrears_MasterService;
@@ -71,12 +72,12 @@ public class MasterWebControllerII {
     }
 
     @GetMapping("/taxBills")
-    public ResponseEntity<List<AssessmentResultsDto>> getTaxBills(
+    public ResponseEntity<List<TaxBills_MasterDto>> getTaxBills(
             @RequestParam(value = "wardNo", required = false) Integer wardNo,
             @RequestParam(value = "newPropertyNo", required = false) String newPropertyNo) {
 
         try {
-            List<AssessmentResultsDto> results;
+            List<TaxBills_MasterDto> results;
             if (newPropertyNo != null) {
                 results = taxBills_masterService.getTaxBillsByNewPropertyNo(newPropertyNo);
             } else if (wardNo != null) {
