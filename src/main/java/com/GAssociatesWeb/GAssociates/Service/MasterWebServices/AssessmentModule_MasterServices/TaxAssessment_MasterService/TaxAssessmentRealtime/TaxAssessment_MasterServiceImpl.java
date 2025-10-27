@@ -421,8 +421,6 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
 //        System.out.println(taxValueMap);
         assessmentResultsDto.setTaxKeyValueMap(taxValueMap);
 
-
-
         return assessmentResultsDto;
     }
     private Map<Long, Double> calculateConsolidatedTaxes(double finalRV, double propertyTax) {

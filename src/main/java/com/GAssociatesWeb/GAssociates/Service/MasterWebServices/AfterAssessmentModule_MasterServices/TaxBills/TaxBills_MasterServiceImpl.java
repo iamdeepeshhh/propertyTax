@@ -21,100 +21,103 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
     private final JdbcTemplate jdbcTemplate;
     private static final String BASE_QUERY =
             "SELECT DISTINCT " +
-                    "p.pd_noticeno_vc AS pdNoticenoVc, " +
-                    "p.pd_propertyaddress_vc AS pdPropertyaddressVc, " +
-                    "p.pd_ward_i AS pdWardI, " +
-                    "p.pd_zone_i AS pdZoneI, " +
+
+                    // ====================== PROPERTY DETAILS ======================
+                    "COALESCE(ah.pd_noticeno_vc, p.pd_noticeno_vc) AS pdNoticenoVc, " +
+                    "COALESCE(ah.pd_propertyaddress_vc, p.pd_propertyaddress_vc) AS pdPropertyaddressVc, " +
+                    "COALESCE(ah.pd_ward_i, p.pd_ward_i) AS pdWardI, " +
+                    "COALESCE(ah.pd_zone_i, p.pd_zone_i) AS pdZoneI, " +
                     "p.pd_newpropertyno_vc AS pdNewpropertynoVc, " +
-                    "p.pd_finalpropno_vc AS pdFinalpropnoVc, " +
-                    "p.pd_ownername_vc AS pdOwnernameVc, " +
-                    "p.pd_occupiname_f AS pdOccupinameF, " +
-                    "p.pd_surypropno_vc AS pdSurypropnoVc, " +
-                    "p.pd_propertytype_i AS pdPropertytypeI, " +
-                    "p.pd_propertysubtype_i AS pdPropertysubtypeI, " +
-                    "p.pd_usagetype_i AS pdUsagetypeI, " +
-                    "p.pd_usagesubtype_i AS pdUsagesubtypeI, " +
-                    "p.pd_propimage_t AS pdPropimageT, " +
-                    "p.pd_houseplan2_t AS pdHouseplan2T, " +
-                    "old.pod_oldpropno_vc AS pdOldpropnoVc, " +
+                    "p.pd_finalpropno_vc AS pdFinalpropnoVc, " + // ✅ no COALESCE
+                    "COALESCE(ah.pd_ownername_vc, p.pd_ownername_vc) AS pdOwnernameVc, " +
+                    "COALESCE(ah.pd_occupiname_f, p.pd_occupiname_f) AS pdOccupinameF, " +
+                    "COALESCE(ah.pd_surypropno_vc, p.pd_surypropno_vc) AS pdSurypropnoVc, " +
+                    "COALESCE(ah.pd_propertytype_i, p.pd_propertytype_i) AS pdPropertytypeI, " +
+                    "COALESCE(ah.pd_propertysubtype_i, p.pd_propertysubtype_i) AS pdPropertysubtypeI, " +
+                    "COALESCE(ah.pd_usagetype_i, p.pd_usagetype_i) AS pdUsagetypeI, " +
+                    "COALESCE(ah.pd_usagesubtype_i, p.pd_usagesubtype_i) AS pdUsagesubtypeI, " +
+                    "COALESCE(ah.pd_assesarea_f, p.pd_assesarea_f) AS pdAssesareaF, " +
+                    "COALESCE(ah.pd_propimage_t, p.pd_propimage_t) AS pdPropimageT, " +
+                    "COALESCE(ah.pd_houseplan2_t, p.pd_houseplan2_t) AS pdHouseplan2T, " +
+                    "p.pd_oldpropno_vc AS pdOldpropnoVc, " +
                     "(SELECT a.current_assessment_date FROM assessmentdate_master a LIMIT 1) AS currentAssessmentDateDt, " +
                     "(SELECT a.last_assessment_date FROM assessmentdate_master a LIMIT 1) AS previousAssessmentDateDt, " +
-                    "p.pd_assesarea_f AS pdAssesareaF, " +
 
-                    // === Taxes ===
-                    "pt.pt_propertytax_fl AS ptPropertyTaxFl, " +
-                    "pt.pt_egctax_fl AS ptEgcTaxFl, " +
-                    "pt.pt_treetax_fl AS ptTreeTaxFl, " +
-                    "pt.pt_cleantax_fl AS ptCleanTaxFl, " +
-                    "pt.pt_lighttax_fl AS ptLightTaxFl, " +
-                    "pt.pt_firetax_fl AS ptFireTaxFl, " +
-                    "pt.pt_usercharges_fl AS ptUserChargesFl, " +
-                    "pt.pt_environmenttax_fl AS ptEnvironmentTaxFl, " +
-                    "pt.pt_edurestax_fl AS ptEduResTaxFl, " +
-                    "pt.pt_edunrestax_fl AS ptEduNonResTaxFl, " +
-                    "pt.pt_edutax_fl AS ptEduTaxFl, " +
-                    "pt.pt_watertax_fl AS ptWaterTaxFl, " +
-                    "pt.pt_seweragetax_fl AS ptSewerageTaxFl, " +
-                    "pt.pt_seweragebenefittax_fl AS ptSewerageBenefitTaxFl, " +
-                    "pt.pt_waterbenefittax_fl AS ptWaterBenefitTaxFl, " +
-                    "pt.pt_streettax_fl AS ptStreetTaxFl, " +
-                    "pt.pt_specialconservancytax_fl AS ptSpecialConservancyTaxFl, " +
-                    "pt.pt_municipaledutax_fl AS ptMunicipalEduTaxFl, " +
-                    "pt.pt_specialedutax_fl AS ptSpecialEduTaxFl, " +
-                    "pt.pt_servicecharges_fl AS ptServiceChargesFl, " +
-                    "pt.pt_miscellaneouscharges_fl AS ptMiscellaneousChargesFl, " +
+                    // ====================== PROPERTY TAXES ======================
+                    "COALESCE(aht.pt_propertytax_fl, pt.pt_propertytax_fl) AS ptPropertyTaxFl, " +
+                    "COALESCE(aht.pt_egctax_fl, pt.pt_egctax_fl) AS ptEgcTaxFl, " +
+                    "COALESCE(aht.pt_treetax_fl, pt.pt_treetax_fl) AS ptTreeTaxFl, " +
+                    "COALESCE(aht.pt_cleantax_fl, pt.pt_cleantax_fl) AS ptCleanTaxFl, " +
+                    "COALESCE(aht.pt_lighttax_fl, pt.pt_lighttax_fl) AS ptLightTaxFl, " +
+                    "COALESCE(aht.pt_firetax_fl, pt.pt_firetax_fl) AS ptFireTaxFl, " +
+                    "COALESCE(aht.pt_usercharges_fl, pt.pt_usercharges_fl) AS ptUserChargesFl, " +
+                    "COALESCE(aht.pt_environmenttax_fl, pt.pt_environmenttax_fl) AS ptEnvironmentTaxFl, " +
+                    "COALESCE(aht.pt_edurestax_fl, pt.pt_edurestax_fl) AS ptEduResTaxFl, " +
+                    "COALESCE(aht.pt_edunrestax_fl, pt.pt_edunrestax_fl) AS ptEduNonResTaxFl, " +
+                    "COALESCE(aht.pt_edutax_fl, pt.pt_edutax_fl) AS ptEduTaxFl, " +
+                    "COALESCE(aht.pt_watertax_fl, pt.pt_watertax_fl) AS ptWaterTaxFl, " +
+                    "COALESCE(aht.pt_seweragetax_fl, pt.pt_seweragetax_fl) AS ptSewerageTaxFl, " +
+                    "COALESCE(aht.pt_seweragebenefittax_fl, pt.pt_seweragebenefittax_fl) AS ptSewerageBenefitTaxFl, " +
+                    "COALESCE(aht.pt_waterbenefittax_fl, pt.pt_waterbenefittax_fl) AS ptWaterBenefitTaxFl, " +
+                    "COALESCE(aht.pt_streettax_fl, pt.pt_streettax_fl) AS ptStreetTaxFl, " +
+                    "COALESCE(aht.pt_specialconservancytax_fl, pt.pt_specialconservancytax_fl) AS ptSpecialConservancyTaxFl, " +
+                    "COALESCE(aht.pt_municipaledutax_fl, pt.pt_municipaledutax_fl) AS ptMunicipalEduTaxFl, " +
+                    "COALESCE(aht.pt_specialedutax_fl, pt.pt_specialedutax_fl) AS ptSpecialEduTaxFl, " +
+                    "COALESCE(aht.pt_servicecharges_fl, pt.pt_servicecharges_fl) AS ptServiceChargesFl, " +
+                    "COALESCE(aht.pt_miscellaneouscharges_fl, pt.pt_miscellaneouscharges_fl) AS ptMiscellaneousChargesFl, " +
 
                     // === Flexible Reserved Taxes ===
-                    "pt.pt_tax1_fl AS ptTax1Fl, " +
-                    "pt.pt_tax2_fl AS ptTax2Fl, " +
-                    "pt.pt_tax3_fl AS ptTax3Fl, " +
-                    "pt.pt_tax4_fl AS ptTax4Fl, " +
-                    "pt.pt_tax5_fl AS ptTax5Fl, " +
-                    "pt.pt_tax6_fl AS ptTax6Fl, " +
-                    "pt.pt_tax7_fl AS ptTax7Fl, " +
-                    "pt.pt_tax8_fl AS ptTax8Fl, " +
-                    "pt.pt_tax9_fl AS ptTax9Fl, " +
-                    "pt.pt_tax10_fl AS ptTax10Fl, " +
-                    "pt.pt_tax11_fl AS ptTax11Fl, " +
-                    "pt.pt_tax12_fl AS ptTax12Fl, " +
-                    "pt.pt_tax13_fl AS ptTax13Fl, " +
-                    "pt.pt_tax14_fl AS ptTax14Fl, " +
-                    "pt.pt_tax15_fl AS ptTax15Fl, " +
-                    "pt.pt_tax16_fl AS ptTax16Fl, " +
-                    "pt.pt_tax17_fl AS ptTax17Fl, " +
-                    "pt.pt_tax18_fl AS ptTax18Fl, " +
-                    "pt.pt_tax19_fl AS ptTax19Fl, " +
-                    "pt.pt_tax20_fl AS ptTax20Fl, " +
-                    "pt.pt_tax21_fl AS ptTax21Fl, " +
-                    "pt.pt_tax22_fl AS ptTax22Fl, " +
-                    "pt.pt_tax23_fl AS ptTax23Fl, " +
-                    "pt.pt_tax24_fl AS ptTax24Fl, " +
-                    "pt.pt_tax25_fl AS ptTax25Fl, " +
+                    "COALESCE(aht.pt_tax1_fl, pt.pt_tax1_fl) AS ptTax1Fl, " +
+                    "COALESCE(aht.pt_tax2_fl, pt.pt_tax2_fl) AS ptTax2Fl, " +
+                    "COALESCE(aht.pt_tax3_fl, pt.pt_tax3_fl) AS ptTax3Fl, " +
+                    "COALESCE(aht.pt_tax4_fl, pt.pt_tax4_fl) AS ptTax4Fl, " +
+                    "COALESCE(aht.pt_tax5_fl, pt.pt_tax5_fl) AS ptTax5Fl, " +
+                    "COALESCE(aht.pt_tax6_fl, pt.pt_tax6_fl) AS ptTax6Fl, " +
+                    "COALESCE(aht.pt_tax7_fl, pt.pt_tax7_fl) AS ptTax7Fl, " +
+                    "COALESCE(aht.pt_tax8_fl, pt.pt_tax8_fl) AS ptTax8Fl, " +
+                    "COALESCE(aht.pt_tax9_fl, pt.pt_tax9_fl) AS ptTax9Fl, " +
+                    "COALESCE(aht.pt_tax10_fl, pt.pt_tax10_fl) AS ptTax10Fl, " +
+                    "COALESCE(aht.pt_tax11_fl, pt.pt_tax11_fl) AS ptTax11Fl, " +
+                    "COALESCE(aht.pt_tax12_fl, pt.pt_tax12_fl) AS ptTax12Fl, " +
+                    "COALESCE(aht.pt_tax13_fl, pt.pt_tax13_fl) AS ptTax13Fl, " +
+                    "COALESCE(aht.pt_tax14_fl, pt.pt_tax14_fl) AS ptTax14Fl, " +
+                    "COALESCE(aht.pt_tax15_fl, pt.pt_tax15_fl) AS ptTax15Fl, " +
+                    "COALESCE(aht.pt_tax16_fl, pt.pt_tax16_fl) AS ptTax16Fl, " +
+                    "COALESCE(aht.pt_tax17_fl, pt.pt_tax17_fl) AS ptTax17Fl, " +
+                    "COALESCE(aht.pt_tax18_fl, pt.pt_tax18_fl) AS ptTax18Fl, " +
+                    "COALESCE(aht.pt_tax19_fl, pt.pt_tax19_fl) AS ptTax19Fl, " +
+                    "COALESCE(aht.pt_tax20_fl, pt.pt_tax20_fl) AS ptTax20Fl, " +
+                    "COALESCE(aht.pt_tax21_fl, pt.pt_tax21_fl) AS ptTax21Fl, " +
+                    "COALESCE(aht.pt_tax22_fl, pt.pt_tax22_fl) AS ptTax22Fl, " +
+                    "COALESCE(aht.pt_tax23_fl, pt.pt_tax23_fl) AS ptTax23Fl, " +
+                    "COALESCE(aht.pt_tax24_fl, pt.pt_tax24_fl) AS ptTax24Fl, " +
+                    "COALESCE(aht.pt_tax25_fl, pt.pt_tax25_fl) AS ptTax25Fl, " +
 
-                    // === Total Tax ===
-                    "ROUND(pt.pt_final_tax_fl) AS finalTax, " +
+                    "ROUND(COALESCE(aht.pt_final_tax_fl, pt.pt_final_tax_fl)) AS finalTax, " +
 
-                    // === Proposed Ratable Values ===
-                    "pr.pr_residential_fl AS residentialFl, " +
-                    "pr.pr_commercial_fl AS commercialFl, " +
-                    "pr.pr_industrial_fl AS industrialFl, " +
-                    "pr.pr_government_fl AS governmentFl, " +
-                    "pr.pr_educational_fl AS educationalInstituteFl, " +
-                    "pr.pr_religious_fl AS religiousFl, " +
-                    "pr.pr_mobiletower_fl AS mobileTowerFl, " +
-                    "pr.pr_electricsubstation_fl AS electricSubstationFl, " +
-                    "pr.pr_residentialopenplot_fl AS residentialOpenPlotFl, " +
-                    "pr.pr_commercialopenplot_fl AS commercialOpenPlotFl, " +
-                    "pr.pr_industrialopenplot_fl AS industrialOpenPlotFl, " +
-                    "pr.pr_governmentopenplot_fl AS governmentOpenPlotFl, " +
-                    "pr.pr_educationlegalopenplot_fl AS educationAndLegalInstituteOpenPlotFl, " +
-                    "pr.pr_religiousopenplot_fl AS religiousOpenPlotFl, " +
-                    "pr.pr_totalrv_fl AS aggregateFl " +
+                    // ====================== PROPOSED RATABLE VALUES ======================
+                    "COALESCE(ahr.pr_residential_fl, pr.pr_residential_fl) AS residentialFl, " +
+                    "COALESCE(ahr.pr_commercial_fl, pr.pr_commercial_fl) AS commercialFl, " +
+                    "COALESCE(ahr.pr_industrial_fl, pr.pr_industrial_fl) AS industrialFl, " +
+                    "COALESCE(ahr.pr_government_fl, pr.pr_government_fl) AS governmentFl, " +
+                    "COALESCE(ahr.pr_educational_fl, pr.pr_educational_fl) AS educationalInstituteFl, " +
+                    "COALESCE(ahr.pr_religious_fl, pr.pr_religious_fl) AS religiousFl, " +
+                    "COALESCE(ahr.pr_mobiletower_fl, pr.pr_mobiletower_fl) AS mobileTowerFl, " +
+                    "COALESCE(ahr.pr_electricsubstation_fl, pr.pr_electricsubstation_fl) AS electricSubstationFl, " +
+                    "COALESCE(ahr.pr_residentialopenplot_fl, pr.pr_residentialopenplot_fl) AS residentialOpenPlotFl, " +
+                    "COALESCE(ahr.pr_commercialopenplot_fl, pr.pr_commercialopenplot_fl) AS commercialOpenPlotFl, " +
+                    "COALESCE(ahr.pr_industrialopenplot_fl, pr.pr_industrialopenplot_fl) AS industrialOpenPlotFl, " +
+                    "COALESCE(ahr.pr_governmentopenplot_fl, pr.pr_governmentopenplot_fl) AS governmentOpenPlotFl, " +
+                    "COALESCE(ahr.pr_educationlegalopenplot_fl, pr.pr_educationlegalopenplot_fl) AS educationAndLegalInstituteOpenPlotFl, " +
+                    "COALESCE(ahr.pr_religiousopenplot_fl, pr.pr_religiousopenplot_fl) AS religiousOpenPlotFl, " +
+                    "COALESCE(ahr.pr_totalrv_fl, pr.pr_totalrv_fl) AS aggregateFl " +
 
                     "FROM property_details p " +
                     "LEFT JOIN property_taxdetails pt ON p.pd_newpropertyno_vc = pt.pt_newpropertyno_vc " +
                     "LEFT JOIN proposed_rvalues pr ON p.pd_newpropertyno_vc = pr.pr_newpropertyno_vc " +
-                    "LEFT JOIN property_olddetails old ON CAST(NULLIF(p.prop_refno, '') AS INTEGER) = old.pod_refno_vc ";
+                    "LEFT JOIN afterhearing_property_details ah ON p.pd_newpropertyno_vc = ah.pd_newpropertyno_vc " +
+                    "LEFT JOIN afterhearing_property_taxdetails aht ON p.pd_newpropertyno_vc = aht.pt_newpropertyno_vc " +
+                    "LEFT JOIN afterhearing_proposed_rvalues ahr ON p.pd_newpropertyno_vc = ahr.pr_newpropertyno_vc ";
 
     private static final Map<String, Long> TAX_COLUMN_MAP = Map.ofEntries(
             Map.entry("ptPropertyTaxFl", ReportTaxKeys.PT_PARENT),
@@ -169,8 +172,25 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
 
     private List<AssessmentResultsDto> fetchTaxBills(String condition, Object[] params) {
         String query = BASE_QUERY + " WHERE " + condition + " ORDER BY p.pd_finalpropno_vc";
-        return jdbcTemplate.query(query, params, new TaxBillRowMapper());
+        List<AssessmentResultsDto> bills = jdbcTemplate.query(query, params, new TaxBillRowMapper());
+
+        // 🔹 Attach arrears details for each property
+        for (AssessmentResultsDto dto : bills) {
+            Map<String, Map<Long, Double>> arrearsMap = fetchYearWiseArrears(dto.getPdNewpropertynoVc());
+            dto.setArrearsYearWiseMap(arrearsMap);
+
+            // 🔹 Compute arrears range string
+            if (!arrearsMap.isEmpty()) {
+                String firstYear = arrearsMap.keySet().iterator().next();
+                String lastYear = null;
+                for (String y : arrearsMap.keySet()) lastYear = y;
+                dto.setArrearsRangeVc(firstYear.equals(lastYear) ? firstYear : firstYear + " to " + lastYear);
+            }
+        }
+
+        return bills;
     }
+
 
 
     public List<AssessmentResultsDto> getTaxBillsByWard(int wardNo) {
@@ -180,6 +200,124 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
     // 🔹 Get tax bills by property
     public List<AssessmentResultsDto> getTaxBillsByNewPropertyNo(String newPropertyNo) {
         return fetchTaxBills("p.pd_newpropertyno_vc = ?", new Object[]{newPropertyNo});
+    }
+
+    private Map<String, Map<Long, Double>> fetchYearWiseArrears(String newPropertyNo) {
+        String sql = """
+        SELECT 
+            arrears_financialyear_dt AS financial_year_vc,
+
+            -- Core property and cess taxes
+            SUM(COALESCE(pt_propertytax_fl, arrears_propertytax_dp)) AS ptPropertyTaxFl,
+            SUM(COALESCE(pt_egctax_fl, arrears_egctax_dp)) AS ptEgcTaxFl,
+            SUM(COALESCE(pt_treetax_fl, arrears_treetax_dp)) AS ptTreeTaxFl,
+            SUM(COALESCE(pt_envtax_fl, arrears_envtax_dp)) AS ptEnvironmentTaxFl,
+            SUM(COALESCE(pt_cleantax_fl, arrears_cleantax_dp)) AS ptCleanTaxFl,
+            SUM(COALESCE(pt_lighttax_fl, arrears_lighttax_dp)) AS ptLightTaxFl,
+            SUM(COALESCE(pt_firetax_fl, arrears_firetax_dp)) AS ptFireTaxFl,
+
+            -- User charges, service, misc
+            SUM(COALESCE(pt_usercharges_fl, arrears_usercharges_dp)) AS ptUserChargesFl,
+            SUM(COALESCE(pt_servicecharges_fl, 0)) AS ptServiceChargesFl,
+            SUM(COALESCE(pt_miscellaneouscharges_fl, arrears_miscell_dp)) AS ptMiscellaneousChargesFl,
+
+            -- Education and EGC related
+            SUM(COALESCE(pt_edutax_fl, arrears_edutax_dp)) AS ptEduTaxFl,
+            SUM(COALESCE(pt_municipaledutax_fl, 0)) AS ptMunicipalEduTaxFl,
+            SUM(COALESCE(pt_specialedutax_fl, 0)) AS ptSpecialEduTaxFl,
+
+            -- Water and Sewerage
+            SUM(COALESCE(pt_watertax_fl, arrears_water_dp)) AS ptWaterTaxFl,
+            SUM(COALESCE(pt_waterbenefittax_fl, arrears_water_dp)) AS ptWaterBenefitTaxFl,
+            SUM(COALESCE(pt_seweragetax_fl, 0)) AS ptSewerageTaxFl,
+            SUM(COALESCE(pt_seweragebenefittax_fl, 0)) AS ptSewerageBenefitTaxFl,
+
+            -- Street and conservancy
+            SUM(COALESCE(pt_streettax_fl, 0)) AS ptStreetTaxFl,
+            SUM(COALESCE(pt_specialconservancytax_fl, 0)) AS ptSpecialConservancyTaxFl,
+
+            -- Reserved and flexible tax columns (pt_tax1_fl → pt_tax25_fl)
+            SUM(COALESCE(pt_tax1_fl, 0)) AS ptTax1Fl,
+            SUM(COALESCE(pt_tax2_fl, 0)) AS ptTax2Fl,
+            SUM(COALESCE(pt_tax3_fl, 0)) AS ptTax3Fl,
+            SUM(COALESCE(pt_tax4_fl, 0)) AS ptTax4Fl,
+            SUM(COALESCE(pt_tax5_fl, 0)) AS ptTax5Fl,
+            SUM(COALESCE(pt_tax6_fl, 0)) AS ptTax6Fl,
+            SUM(COALESCE(pt_tax7_fl, 0)) AS ptTax7Fl,
+            SUM(COALESCE(pt_tax8_fl, 0)) AS ptTax8Fl,
+            SUM(COALESCE(pt_tax9_fl, 0)) AS ptTax9Fl,
+            SUM(COALESCE(pt_tax10_fl, 0)) AS ptTax10Fl,
+            SUM(COALESCE(pt_tax11_fl, 0)) AS ptTax11Fl,
+            SUM(COALESCE(pt_tax12_fl, 0)) AS ptTax12Fl,
+            SUM(COALESCE(pt_tax13_fl, 0)) AS ptTax13Fl,
+            SUM(COALESCE(pt_tax14_fl, 0)) AS ptTax14Fl,
+            SUM(COALESCE(pt_tax15_fl, 0)) AS ptTax15Fl,
+            SUM(COALESCE(pt_tax16_fl, 0)) AS ptTax16Fl,
+            SUM(COALESCE(pt_tax17_fl, 0)) AS ptTax17Fl,
+            SUM(COALESCE(pt_tax18_fl, 0)) AS ptTax18Fl,
+            SUM(COALESCE(pt_tax19_fl, 0)) AS ptTax19Fl,
+            SUM(COALESCE(pt_tax20_fl, 0)) AS ptTax20Fl,
+            SUM(COALESCE(pt_tax21_fl, 0)) AS ptTax21Fl,
+            SUM(COALESCE(pt_tax22_fl, 0)) AS ptTax22Fl,
+            SUM(COALESCE(pt_tax23_fl, 0)) AS ptTax23Fl,
+            SUM(COALESCE(pt_tax24_fl, 0)) AS ptTax24Fl,
+            SUM(COALESCE(pt_tax25_fl, 0)) AS ptTax25Fl,
+
+            -- Total final tax
+            ROUND(SUM(COALESCE(pt_final_tax_fl, arrears_totaltax_dp))) AS ptFinalTaxFl
+        FROM arrears_property_taxdetails
+        WHERE arrears_newpropertyno_vc = ?
+        GROUP BY arrears_financialyear_dt
+        ORDER BY arrears_financialyear_dt
+    """;
+
+        return jdbcTemplate.query(sql, new Object[]{newPropertyNo}, rs -> {
+            Map<String, Map<Long, Double>> yearWise = new LinkedHashMap<>();
+
+            while (rs.next()) {
+                String year = rs.getString("financial_year_vc");
+                Map<Long, Double> taxMap = new HashMap<>();
+
+                // Map columns dynamically to tax keys (every field included)
+                Map<String, Long> columnKeyMap = Map.ofEntries(
+                        Map.entry("ptPropertyTaxFl", ReportTaxKeys.PT_PARENT),
+                        Map.entry("ptEgcTaxFl", ReportTaxKeys.EGC),
+                        Map.entry("ptTreeTaxFl", ReportTaxKeys.TREE_TAX),
+                        Map.entry("ptEnvironmentTaxFl", ReportTaxKeys.ENV_TAX),
+                        Map.entry("ptCleanTaxFl", ReportTaxKeys.CLEAN_TAX),
+                        Map.entry("ptLightTaxFl", ReportTaxKeys.LIGHT_TAX),
+                        Map.entry("ptFireTaxFl", ReportTaxKeys.FIRE_TAX),
+                        Map.entry("ptUserChargesFl", ReportTaxKeys.USER_CHG),
+                        Map.entry("ptServiceChargesFl", ReportTaxKeys.SERVICE_CHG),
+                        Map.entry("ptMiscellaneousChargesFl", ReportTaxKeys.MISC_CHG),
+                        Map.entry("ptEduTaxFl", ReportTaxKeys.EDUC_PARENT),
+                        Map.entry("ptMunicipalEduTaxFl", ReportTaxKeys.MUNICIPAL_EDU),
+                        Map.entry("ptSpecialEduTaxFl", ReportTaxKeys.SPECIAL_EDU),
+                        Map.entry("ptWaterTaxFl", ReportTaxKeys.WATER_TAX),
+                        Map.entry("ptWaterBenefitTaxFl", ReportTaxKeys.WATER_BEN),
+                        Map.entry("ptSewerageTaxFl", ReportTaxKeys.SEWERAGE_TAX),
+                        Map.entry("ptSewerageBenefitTaxFl", ReportTaxKeys.SEWERAGE_BEN),
+                        Map.entry("ptStreetTaxFl", ReportTaxKeys.STREET_TAX),
+                        Map.entry("ptSpecialConservancyTaxFl", ReportTaxKeys.SPEC_CONS),
+                        Map.entry("ptFinalTaxFl", ReportTaxKeys.TOTAL_TAX)
+                );
+
+                // Include reserved pt_tax1_fl … pt_tax25_fl
+                for (int i = 1; i <= 25; i++) {
+                    columnKeyMap.put("ptTax" + i + "Fl", ReportTaxKeys.class.getField("TAX" + i).getLong(null));
+                }
+
+                // Loop and populate
+                for (Map.Entry<String, Long> entry : columnKeyMap.entrySet()) {
+                    double value = rs.getDouble(entry.getKey());
+                    if (!rs.wasNull()) taxMap.put(entry.getValue(), value);
+                }
+
+                yearWise.put(year, taxMap);
+            }
+
+            return yearWise;
+        });
     }
 
     private static class TaxBillRowMapper implements RowMapper<AssessmentResultsDto> {

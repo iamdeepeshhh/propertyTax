@@ -141,6 +141,33 @@ public class RegisterObjection_MasterServiceImpl implements RegisterObjection_Ma
     }
 
 
+    public boolean updateHearingStatus(String newPropertyNo, String status, String changedValue) {
+        RegisterObjection_Entity entity = repository.findByNewPropertyNo(newPropertyNo);
+        if (entity == null) {
+            return false; // no record found
+        }
+
+        // Store base hearing status
+        entity.setHearingStatus(status.toUpperCase());
+
+        // If changed, record what kind of change (RV or ASSESSMENT)
+        if ("CHANGED".equalsIgnoreCase(status)) {
+            if (changedValue != null && !changedValue.isBlank()) {
+                entity.setChangedValue(("CHANGED BY " + changedValue).toUpperCase());
+            } else {
+                entity.setChangedValue("CHANGED (TYPE UNKNOWN)");
+            }
+        } else {
+            entity.setChangedValue(null);
+        }
+
+        // Update audit timestamp
+        entity.setUpdatedAt(LocalDateTime.now());
+
+        repository.save(entity);
+        return true;
+    }
+
 
 
 

@@ -2,6 +2,7 @@ package com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessment
 
 
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto.AfterHearingCompleteProperty_Dto;
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto.AfterHearingPropertySummary_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.AssessmentResultsDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.ConsolidatedTaxDetailsDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.PropertyUnitDetailsDto;
@@ -15,10 +16,9 @@ import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class SecondaryBatchAssessmentReport_MasterServiceImpl implements SecondaryBatchAssessmentReport_MasterService {
@@ -26,18 +26,17 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
     @PersistenceContext
     private EntityManager entityManager;
 
-    // ----------------------------------------------------
-    // Public API
-    // ----------------------------------------------------
+    @Override
     public List<AfterHearingCompleteProperty_Dto> generateCombinedAfterHearingReport(Integer wardNo) {
         String sql = buildSql();
         List<Tuple> tuples = executeQuery(sql, wardNo);
-        return mapTuplesToDtos(tuples);
+        List<AfterHearingCompleteProperty_Dto> flatList = mapTuplesToDtos(tuples);
+        return aggregateProperties(flatList);
     }
 
-    // ----------------------------------------------------
-    // SQL Builder
-    // ----------------------------------------------------
+    // ============================================================
+    // SQL BUILDER (includes before + after taxes)
+    // ============================================================
     private String buildSql() {
         StringBuilder flexBefore = new StringBuilder();
         StringBuilder flexAfter = new StringBuilder();
@@ -51,29 +50,45 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
 
         return """
             SELECT DISTINCT
-                p.pd_newpropertyno_vc AS newpropertyno,
-                p.pd_finalpropno_vc AS finalpropertyno,
-                p.pd_ownername_vc AS ownername,
-                p.pd_occupiname_f AS occupiername,
-                p.pd_surypropno_vc AS surveypropno,
-                p.pd_zone_i AS zone,
-                p.pd_ward_i AS ward,
+                COALESCE(apd.pd_newpropertyno_vc, p.pd_newpropertyno_vc) AS newpropertyno,
+                COALESCE(apd.pd_finalpropno_vc, p.pd_finalpropno_vc) AS finalpropertyno,
+                COALESCE(apd.pd_ownername_vc, p.pd_ownername_vc) AS ownername,
+                COALESCE(apd.pd_occupiname_f, p.pd_occupiname_f) AS occupiername,
+                COALESCE(apd.pd_surypropno_vc, p.pd_surypropno_vc) AS surveypropno,
+                COALESCE(apd.pd_zone_i, p.pd_zone_i) AS zone,
+                COALESCE(apd.pd_ward_i, p.pd_ward_i) AS ward,
 
-                u.ud_floorno_vc AS floorno,
-                u.ud_usagetype_i AS usagetype,
-                u.ud_constructionclass_i AS constclass,
-                u.ud_carpetarea_f AS carpetarea,
-                u.ud_assessmentarea_f AS assessmentarea,
+                COALESCE(aud.ud_floorno_vc, u.ud_floorno_vc) AS floorno,
+                COALESCE(aud.ud_usagetype_i, u.ud_usagetype_i) AS usagetype,
+                COALESCE(aud.ud_constructionclass_i, u.ud_constructionclass_i) AS constclass,
+                COALESCE(aud.ud_carpetarea_f, u.ud_carpetarea_f) AS carpetarea,
+                COALESCE(aud.ud_assessmentarea_f, u.ud_assessmentarea_f) AS assessmentarea,
 
-                r.prv_rate_f AS ratepersqm,
-                r.prv_lentingvalue_f AS lentingvalue,
-                r.prv_depper_i AS deppercent,
-                r.prv_depamount_f AS depamount,
-                r.prv_alv_f AS amountafterdep,
-                r.prv_ratablevalue_f AS ratablevalue,
-                pr.pr_totalrv_fl AS totalratablevalue,
+                COALESCE(ar.prv_yearlyrent_fl, r.prv_yearlyrent_fl, 0) AS yearly_rent,
+                CASE 
+                    WHEN COALESCE(ar.prv_rent_fl, r.prv_rent_fl, 0) = 0 
+                     AND COALESCE(ar.prv_yearlyrent_fl, r.prv_yearlyrent_fl, 0) = 0
+                    THEN COALESCE(ar.prv_alv_f, r.prv_alv_f, 0)
+                    ELSE 0
+                END AS alv,
+                (
+                    COALESCE(ar.prv_yearlyrent_fl, r.prv_yearlyrent_fl, 0) +
+                    CASE 
+                        WHEN COALESCE(ar.prv_rent_fl, r.prv_rent_fl, 0) = 0 
+                         AND COALESCE(ar.prv_yearlyrent_fl, r.prv_yearlyrent_fl, 0) = 0
+                        THEN COALESCE(ar.prv_alv_f, r.prv_alv_f, 0)
+                        ELSE 0
+                    END
+                ) AS total_alv,
+                COALESCE(ar.prv_mainval_f, r.prv_mainval_f, 0) AS maintenance_value,
+                COALESCE(ar.prv_taxvalue_f, r.prv_taxvalue_f, 0) AS tax_value,
+                COALESCE(ar.prv_ratablevalue_f, r.prv_ratablevalue_f, 0) AS ratable_value,
+                GREATEST(
+                    COALESCE(ar.prv_ratablevalue_f, r.prv_ratablevalue_f, 0),
+                    COALESCE(ar.prv_taxvalue_f, r.prv_taxvalue_f, 0)
+                ) AS considered_rv,
 
-                -- BEFORE assessment taxes
+                -- ========== BEFORE taxes ==========
                 pt.pt_propertytax_fl AS before_propertytax,
                 pt.pt_cleantax_fl AS before_cleantax,
                 pt.pt_lighttax_fl AS before_lighttax,
@@ -83,10 +98,21 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
                 pt.pt_egctax_fl AS before_egctax,
                 pt.pt_usercharges_fl AS before_usercharges,
                 pt.pt_miscellaneouscharges_fl AS before_miscellaneouscharges,
+                pt.pt_waterbenefittax_fl AS before_water_ben,
+                pt.pt_watertax_fl AS before_water_tax,
+                pt.pt_seweragebenefittax_fl AS before_sewerage_ben,
+                pt.pt_seweragetax_fl AS before_sewerage_tax,
+                pt.pt_streettax_fl AS before_street_tax,
+                pt.pt_specialconservancytax_fl AS before_spec_cons,
+                pt.pt_municipaledutax_fl AS before_municipal_edu,
+                pt.pt_specialedutax_fl AS before_special_edu,
+                pt.pt_edurestax_fl AS before_educ_res,
+                pt.pt_edunrestax_fl AS before_educ_comm,
+                pt.pt_servicecharges_fl AS before_service_chg,
                 pt.pt_final_tax_fl AS before_finaltax,
                 pt.pt_finalrv_fl AS before_finalrv,
             """ + flexBefore + """
-                -- AFTER hearing taxes (fallback)
+                -- ========== AFTER taxes ==========
                 COALESCE(a.pt_propertytax_fl, pt.pt_propertytax_fl, 0) AS after_propertytax,
                 COALESCE(a.pt_cleantax_fl, pt.pt_cleantax_fl, 0) AS after_cleantax,
                 COALESCE(a.pt_lighttax_fl, pt.pt_lighttax_fl, 0) AS after_lighttax,
@@ -96,6 +122,17 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
                 COALESCE(a.pt_egctax_fl, pt.pt_egctax_fl, 0) AS after_egctax,
                 COALESCE(a.pt_usercharges_fl, pt.pt_usercharges_fl, 0) AS after_usercharges,
                 COALESCE(a.pt_miscellaneouscharges_fl, pt.pt_miscellaneouscharges_fl, 0) AS after_miscellaneouscharges,
+                COALESCE(a.pt_waterbenefittax_fl, pt.pt_waterbenefittax_fl, 0) AS after_water_ben,
+                COALESCE(a.pt_watertax_fl, pt.pt_watertax_fl, 0) AS after_water_tax,
+                COALESCE(a.pt_seweragebenefittax_fl, pt.pt_seweragebenefittax_fl, 0) AS after_sewerage_ben,
+                COALESCE(a.pt_seweragetax_fl, pt.pt_seweragetax_fl, 0) AS after_sewerage_tax,
+                COALESCE(a.pt_streettax_fl, pt.pt_streettax_fl, 0) AS after_street_tax,
+                COALESCE(a.pt_specialconservancytax_fl, pt.pt_specialconservancytax_fl, 0) AS after_spec_cons,
+                COALESCE(a.pt_municipaledutax_fl, pt.pt_municipaledutax_fl, 0) AS after_municipal_edu,
+                COALESCE(a.pt_specialedutax_fl, pt.pt_specialedutax_fl, 0) AS after_special_edu,
+                COALESCE(a.pt_edurestax_fl, pt.pt_edurestax_fl, 0) AS after_educ_res,
+                COALESCE(a.pt_edunrestax_fl, pt.pt_edunrestax_fl, 0) AS after_educ_comm,
+                COALESCE(a.pt_servicecharges_fl, pt.pt_servicecharges_fl, 0) AS after_service_chg,
                 COALESCE(a.pt_final_tax_fl, pt.pt_final_tax_fl, 0) AS after_finaltax,
                 COALESCE(a.pt_finalrv_fl, pt.pt_finalrv_fl, 0) AS after_finalrv,
             """ + flexAfter + """
@@ -103,125 +140,175 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
                 old.pod_totaltax_fl AS oldtax,
                 old.pod_oldpropno_vc AS oldpropertyno,
                 old.pod_zone_i AS oldzone
-
             FROM property_details p
+            LEFT JOIN afterhearing_property_details apd
+              ON p.pd_newpropertyno_vc = apd.pd_newpropertyno_vc
             JOIN unit_details u
-                ON p.pd_newpropertyno_vc = u.pd_newpropertyno_vc
+              ON p.pd_newpropertyno_vc = u.pd_newpropertyno_vc
+            LEFT JOIN afterhearing_unit_details aud
+              ON u.pd_newpropertyno_vc = aud.pd_newpropertyno_vc
+             AND u.ud_unitno_vc = aud.ud_unitno_vc
+             AND u.ud_floorno_vc = aud.ud_floorno_vc
             LEFT JOIN property_rvalues r
-                ON p.pd_newpropertyno_vc = r.prv_propertyno_vc
-               AND CAST(r.prv_unitno_vc AS INTEGER) = u.ud_unitno_vc
-            LEFT JOIN proposed_rvalues pr
-                ON p.pd_newpropertyno_vc = pr.pr_newpropertyno_vc
+              ON p.pd_newpropertyno_vc = r.prv_propertyno_vc
+             AND CAST(r.prv_unitno_vc AS INTEGER) = u.ud_unitno_vc
+            LEFT JOIN afterhearing_property_rvalues ar
+              ON p.pd_newpropertyno_vc = ar.prv_propertyno_vc
+             AND CAST(ar.prv_unitno_vc AS INTEGER) = u.ud_unitno_vc
             LEFT JOIN property_taxdetails pt
-                ON p.pd_newpropertyno_vc = pt.pt_newpropertyno_vc
+              ON p.pd_newpropertyno_vc = pt.pt_newpropertyno_vc
             LEFT JOIN afterhearing_property_taxdetails a
-                ON p.pd_newpropertyno_vc = a.pt_newpropertyno_vc
+              ON p.pd_newpropertyno_vc = a.pt_newpropertyno_vc
             LEFT JOIN property_olddetails old
-                ON CAST(NULLIF(p.prop_refno, '') AS INTEGER) = old.pod_refno_vc
-            WHERE CAST(p.pd_ward_i AS INTEGER) = :wardNo
-            ORDER BY p.pd_finalpropno_vc
+              ON CAST(NULLIF(p.prop_refno, '') AS INTEGER) = old.pod_refno_vc
+            WHERE CAST(COALESCE(apd.pd_ward_i, p.pd_ward_i) AS INTEGER) = :wardNo
+            ORDER BY COALESCE(apd.pd_finalpropno_vc, p.pd_finalpropno_vc)
         """;
     }
 
-    // ----------------------------------------------------
-    // Query Execution
-    // ----------------------------------------------------
     private List<Tuple> executeQuery(String sql, Integer wardNo) {
         Query query = entityManager.createNativeQuery(sql, Tuple.class);
         query.setParameter("wardNo", wardNo);
         return query.getResultList();
     }
 
-    // ----------------------------------------------------
-    // Mapping Logic
-    // ----------------------------------------------------
+    // ============================================================
+    // MAP + AGGREGATE
+    // ============================================================
     private List<AfterHearingCompleteProperty_Dto> mapTuplesToDtos(List<Tuple> tuples) {
         List<AfterHearingCompleteProperty_Dto> result = new ArrayList<>();
 
         for (Tuple t : tuples) {
             AfterHearingCompleteProperty_Dto dto = new AfterHearingCompleteProperty_Dto();
 
-            PropertyDetails_Dto propertyDetails = new PropertyDetails_Dto();
-            propertyDetails.setPdNewpropertynoVc(getString(t, "newpropertyno"));
-            propertyDetails.setPdFinalpropnoVc(getString(t, "finalpropertyno"));
-            propertyDetails.setPdZoneI(getString(t, "zone"));
-            propertyDetails.setPdWardI(getString(t, "ward"));
-            propertyDetails.setPdOwnernameVc(getString(t, "ownername"));
-            propertyDetails.setPdOccupinameF(getString(t, "occupiername"));
-            propertyDetails.setPdSurypropnoVc(getString(t, "surveypropno"));
-            dto.setPropertyDetails(propertyDetails);
-            // ---------------- Property details ----------------
-            List<PropertyUnitDetailsDto> propertyUnitDetails = new ArrayList<>();
+            PropertyDetails_Dto pd = new PropertyDetails_Dto();
+            pd.setPdNewpropertynoVc(getString(t, "newpropertyno"));
+            pd.setPdFinalpropnoVc(getString(t, "finalpropertyno"));
+            pd.setPdZoneI(getString(t, "zone"));
+            pd.setPdWardI(getString(t, "ward"));
+            pd.setPdOwnernameVc(getString(t, "ownername"));
+            pd.setPdOccupinameF(getString(t, "occupiername"));
+            pd.setPdSurypropnoVc(getString(t, "surveypropno"));
+            dto.setPropertyDetails(pd);
 
-            PropertyUnitDetailsDto unitDto = new PropertyUnitDetailsDto();
+            PropertyUnitDetailsDto unit = new PropertyUnitDetailsDto();
+            unit.setNewPropertyNo(getString(t, "newpropertyno"));
+            unit.setFinalPropertyNo(getString(t, "finalpropertyno"));
+            unit.setFloorNoVc(getString(t, "floorno"));
+            unit.setUsageTypeVc(String.valueOf(getString(t, "usagetype")));
+            unit.setConstructionTypeVc(String.valueOf(getString(t, "constclass")));
+            unit.setCarpetAreaFl(String.valueOf(getDouble(t, "carpetarea")));
+            unit.setTaxableAreaFl(String.valueOf(getDouble(t, "assessmentarea")));
+            unit.setYearlyRentFl(getDouble(t, "yearly_rent"));
+            unit.setAlvFl(getDouble(t, "alv"));
+            unit.setTotalAlvFl(getDouble(t, "total_alv"));
+            unit.setMaintenanceValueFl(getDouble(t, "maintenance_value"));
+            unit.setTaxValueFl(getDouble(t, "tax_value"));
+            unit.setRatableValueFl(getDouble(t, "ratable_value"));
+            unit.setConsideredRvFl(getDouble(t, "considered_rv"));
 
-// --- Basic property-unit identifiers ---
-            unitDto.setNewPropertyNo(getString(t, "newpropertyno"));
-            unitDto.setFinalPropertyNo(getString(t, "finalpropertyno"));
-            unitDto.setFloorNoVc(getString(t, "floorno"));
-            unitDto.setUsageTypeVc(getString(t, "usagetype"));
-            unitDto.setConstructionTypeVc(getString(t, "constclass"));
-            unitDto.setCarpetAreaFl(getString(t, "carpetarea"));
-            unitDto.setTaxableAreaFl(getString(t, "assessmentarea"));
-
-// --- Ratable value and depreciation details ---
-            unitDto.setRatePerSqMFl(getDouble(t, "ratepersqm"));                     // Rate per sq.m
-            unitDto.setRentalValAsPerRateFl(getDouble(t, "lentingvalue"));          // Lenting (rental) value
-            unitDto.setDepreciationRateFl(getDouble(t, "deppercent"));              // Depreciation rate (%)
-            unitDto.setDepreciationAmountFl(getDouble(t, "depamount"));             // Depreciation amount
-            unitDto.setAmountAfterDepreciationFl(getDouble(t, "amountafterdep"));   // Value after depreciation
-            unitDto.setTaxableValueByRateFl(getDouble(t, "ratablevalue"));          // Ratable value (from proposed_rvalues)
-            unitDto.setTaxableValueConsideredFl(getDouble(t, "totalratablevalue")); // Total considered ratable value
-
-            // --- Add to list ---
-            propertyUnitDetails.add(unitDto);
-
-            // --- Set in main DTO ---
-            dto.setPropertyUnitDetails(propertyUnitDetails);
-
-            // ---------------- Tax Maps ----------------
             Map<Long, Double> beforeMap = new HashMap<>();
             Map<Long, Double> afterMap = new HashMap<>();
 
-            // Standard taxes BEFORE (using ReportTaxKeys)
-            beforeMap.put(ReportTaxKeys.PT1, getDouble(t, "before_propertytax"));
-            beforeMap.put(ReportTaxKeys.CLEAN_TAX, getDouble(t, "before_cleantax"));
-            beforeMap.put(ReportTaxKeys.LIGHT_TAX, getDouble(t, "before_lighttax"));
-            beforeMap.put(ReportTaxKeys.FIRE_TAX, getDouble(t, "before_firetax"));
-            beforeMap.put(ReportTaxKeys.TREE_TAX, getDouble(t, "before_treetax"));
-            beforeMap.put(ReportTaxKeys.ENV_TAX, getDouble(t, "before_environmenttax"));
-            beforeMap.put(ReportTaxKeys.EGC, getDouble(t, "before_egctax"));
-            beforeMap.put(ReportTaxKeys.USER_CHG, getDouble(t, "before_usercharges"));
-            beforeMap.put(ReportTaxKeys.MISC_CHG, getDouble(t, "before_miscellaneouscharges"));
+            beforeMap.put(ReportTaxKeys.PT1,           getDouble(t, "before_propertytax"));
+            beforeMap.put(ReportTaxKeys.PT2,           0.0); // add actual column if exists
+            beforeMap.put(ReportTaxKeys.EDUC_RES,      getDouble(t, "before_educ_res"));
+            beforeMap.put(ReportTaxKeys.EDUC_COMM,     getDouble(t, "before_educ_comm"));
+            beforeMap.put(ReportTaxKeys.EGC,           getDouble(t, "before_egctax"));
+            beforeMap.put(ReportTaxKeys.TREE_TAX,      getDouble(t, "before_treetax"));
+            beforeMap.put(ReportTaxKeys.ENV_TAX,       getDouble(t, "before_environmenttax"));
+            beforeMap.put(ReportTaxKeys.CLEAN_TAX,     getDouble(t, "before_cleantax"));
+            beforeMap.put(ReportTaxKeys.LIGHT_TAX,     getDouble(t, "before_lighttax"));
+            beforeMap.put(ReportTaxKeys.FIRE_TAX,      getDouble(t, "before_firetax"));
+            beforeMap.put(ReportTaxKeys.WATER_TAX,     getDouble(t, "before_water_tax"));
+            beforeMap.put(ReportTaxKeys.SEWERAGE_TAX,  getDouble(t, "before_sewerage_tax"));
+            beforeMap.put(ReportTaxKeys.SEWERAGE_BEN,  getDouble(t, "before_sewerage_ben"));
+            beforeMap.put(ReportTaxKeys.WATER_BEN,     getDouble(t, "before_water_ben"));
+            beforeMap.put(ReportTaxKeys.STREET_TAX,    getDouble(t, "before_street_tax"));
+            beforeMap.put(ReportTaxKeys.SPEC_CONS,     getDouble(t, "before_spec_cons"));
+            beforeMap.put(ReportTaxKeys.MUNICIPAL_EDU, getDouble(t, "before_municipal_edu"));
+            beforeMap.put(ReportTaxKeys.SPECIAL_EDU,   getDouble(t, "before_special_edu"));
+            beforeMap.put(ReportTaxKeys.SERVICE_CHG,   getDouble(t, "before_service_chg"));
+            beforeMap.put(ReportTaxKeys.MISC_CHG,      getDouble(t, "before_miscellaneouscharges"));
+            beforeMap.put(ReportTaxKeys.USER_CHG,      getDouble(t, "before_usercharges"));
 
-            // Standard taxes AFTER
-            afterMap.put(ReportTaxKeys.PT1, getDouble(t, "after_propertytax"));
-            afterMap.put(ReportTaxKeys.CLEAN_TAX, getDouble(t, "after_cleantax"));
-            afterMap.put(ReportTaxKeys.LIGHT_TAX, getDouble(t, "after_lighttax"));
-            afterMap.put(ReportTaxKeys.FIRE_TAX, getDouble(t, "after_firetax"));
-            afterMap.put(ReportTaxKeys.TREE_TAX, getDouble(t, "after_treetax"));
-            afterMap.put(ReportTaxKeys.ENV_TAX, getDouble(t, "after_environmenttax"));
-            afterMap.put(ReportTaxKeys.EGC, getDouble(t, "after_egctax"));
-            afterMap.put(ReportTaxKeys.USER_CHG, getDouble(t, "after_usercharges"));
-            afterMap.put(ReportTaxKeys.MISC_CHG, getDouble(t, "after_miscellaneouscharges"));
+            afterMap.put(ReportTaxKeys.PT1,           getDouble(t, "after_propertytax"));
+            afterMap.put(ReportTaxKeys.PT2,           0.0);
+            afterMap.put(ReportTaxKeys.EDUC_RES,      getDouble(t, "after_educ_res"));
+            afterMap.put(ReportTaxKeys.EDUC_COMM,     getDouble(t, "after_educ_comm"));
+            afterMap.put(ReportTaxKeys.EGC,           getDouble(t, "after_egctax"));
+            afterMap.put(ReportTaxKeys.TREE_TAX,      getDouble(t, "after_treetax"));
+            afterMap.put(ReportTaxKeys.ENV_TAX,       getDouble(t, "after_environmenttax"));
+            afterMap.put(ReportTaxKeys.CLEAN_TAX,     getDouble(t, "after_cleantax"));
+            afterMap.put(ReportTaxKeys.LIGHT_TAX,     getDouble(t, "after_lighttax"));
+            afterMap.put(ReportTaxKeys.FIRE_TAX,      getDouble(t, "after_firetax"));
+            afterMap.put(ReportTaxKeys.WATER_TAX,     getDouble(t, "after_water_tax"));
+            afterMap.put(ReportTaxKeys.SEWERAGE_TAX,  getDouble(t, "after_sewerage_tax"));
+            afterMap.put(ReportTaxKeys.SEWERAGE_BEN,  getDouble(t, "after_sewerage_ben"));
+            afterMap.put(ReportTaxKeys.WATER_BEN,     getDouble(t, "after_water_ben"));
+            afterMap.put(ReportTaxKeys.STREET_TAX,    getDouble(t, "after_street_tax"));
+            afterMap.put(ReportTaxKeys.SPEC_CONS,     getDouble(t, "after_spec_cons"));
+            afterMap.put(ReportTaxKeys.MUNICIPAL_EDU, getDouble(t, "after_municipal_edu"));
+            afterMap.put(ReportTaxKeys.SPECIAL_EDU,   getDouble(t, "after_special_edu"));
+            afterMap.put(ReportTaxKeys.SERVICE_CHG,   getDouble(t, "after_service_chg"));
+            afterMap.put(ReportTaxKeys.MISC_CHG,      getDouble(t, "after_miscellaneouscharges"));
+            afterMap.put(ReportTaxKeys.USER_CHG,      getDouble(t, "after_usercharges"));
 
-            // Dynamic tax1..25
             for (int i = 1; i <= 25; i++) {
-                beforeMap.put(getDynamicKey(i), getDouble(t, "before_tax" + i));
-                afterMap.put(getDynamicKey(i), getDouble(t, "after_tax" + i));
+                beforeMap.put(1000L + i, getDouble(t, "before_tax" + i)); // use offset or mapping if needed
+                afterMap.put(1000L + i,  getDouble(t, "after_tax" + i));
             }
-
             dto.setTaxKeyValueMapAfterAssess(beforeMap);
             dto.setTaxKeyValueMapAfterHearing(afterMap);
 
+            dto.setPropertyUnitDetails(List.of(unit));
             result.add(dto);
         }
         return result;
     }
 
-    // ----------------------------------------------------
-    // Helpers
-    // ----------------------------------------------------
+    private List<AfterHearingCompleteProperty_Dto> aggregateProperties(List<AfterHearingCompleteProperty_Dto> list) {
+        Map<String, List<AfterHearingCompleteProperty_Dto>> grouped =
+                list.stream()
+                        .filter(d -> d.getPropertyDetails() != null)
+                        .collect(Collectors.groupingBy(d -> d.getPropertyDetails().getPdNewpropertynoVc()));
+
+        List<AfterHearingCompleteProperty_Dto> finalList = new ArrayList<>();
+
+        for (var entry : grouped.entrySet()) {
+            AfterHearingCompleteProperty_Dto main = entry.getValue().get(0);
+            List<PropertyUnitDetailsDto> allUnits = entry.getValue().stream()
+                    .flatMap(d -> Optional.ofNullable(d.getPropertyUnitDetails()).orElse(List.of()).stream())
+                    .collect(Collectors.toList());
+
+            AfterHearingPropertySummary_Dto summary = new AfterHearingPropertySummary_Dto();
+            summary.setNewPropertyNoVc(main.getPropertyDetails().getPdNewpropertynoVc());
+            summary.setFinalPropertyNoVc(main.getPropertyDetails().getPdFinalpropnoVc());
+            summary.setOwnerNameVc(main.getPropertyDetails().getPdOwnernameVc());
+            summary.setWardNoVc(main.getPropertyDetails().getPdWardI());
+            summary.setZoneNoVc(main.getPropertyDetails().getPdZoneI());
+
+            summary.setTotalCarpetAreaFl(sum(allUnits, u -> parseDoubleSafe(u.getCarpetAreaFl())));
+            summary.setTotalAssessmentAreaFl(sum(allUnits, u -> parseDoubleSafe(u.getTaxableAreaFl())));
+            summary.setTotalYearlyRentFl(sum(allUnits, PropertyUnitDetailsDto::getYearlyRentFl));
+            summary.setTotalAlvFl(sum(allUnits, PropertyUnitDetailsDto::getAlvFl));
+            summary.setTotalCombinedAlvRentFl(summary.getTotalYearlyRentFl() + summary.getTotalAlvFl());
+            summary.setTotalDepreciationAmountFl(sum(allUnits, PropertyUnitDetailsDto::getMaintenanceValueFl));
+            summary.setTotalRatableValueFl(sum(allUnits, PropertyUnitDetailsDto::getRatableValueFl));
+            summary.setConsideredRvFl(Math.max(summary.getTotalRatableValueFl(), summary.getTotalCombinedAlvRentFl()));
+
+            main.setPropertyUnitDetails(allUnits);
+            main.setPropertySummary(summary);
+            finalList.add(main);
+        }
+        return finalList;
+    }
+
+    private double sum(List<PropertyUnitDetailsDto> list, Function<PropertyUnitDetailsDto, Double> getter) {
+        return list.stream()
+                .mapToDouble(u -> Optional.ofNullable(getter.apply(u)).orElse(0.0))
+                .sum();
+    }
 
     private String getString(Tuple t, String key) {
         Object v = t.get(key);
@@ -239,35 +326,12 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
         }
     }
 
-    /** Map dynamic tax number (1–25) to correct ReportTaxKeys constant. */
-    private Long getDynamicKey(int i) {
-        return switch (i) {
-            case 1 -> ReportTaxKeys.TAX1;
-            case 2 -> ReportTaxKeys.TAX2;
-            case 3 -> ReportTaxKeys.TAX3;
-            case 4 -> ReportTaxKeys.TAX4;
-            case 5 -> ReportTaxKeys.TAX5;
-            case 6 -> ReportTaxKeys.TAX6;
-            case 7 -> ReportTaxKeys.TAX7;
-            case 8 -> ReportTaxKeys.TAX8;
-            case 9 -> ReportTaxKeys.TAX9;
-            case 10 -> ReportTaxKeys.TAX10;
-            case 11 -> ReportTaxKeys.TAX11;
-            case 12 -> ReportTaxKeys.TAX12;
-            case 13 -> ReportTaxKeys.TAX13;
-            case 14 -> ReportTaxKeys.TAX14;
-            case 15 -> ReportTaxKeys.TAX15;
-            case 16 -> ReportTaxKeys.TAX16;
-            case 17 -> ReportTaxKeys.TAX17;
-            case 18 -> ReportTaxKeys.TAX18;
-            case 19 -> ReportTaxKeys.TAX19;
-            case 20 -> ReportTaxKeys.TAX20;
-            case 21 -> ReportTaxKeys.TAX21;
-            case 22 -> ReportTaxKeys.TAX22;
-            case 23 -> ReportTaxKeys.TAX23;
-            case 24 -> ReportTaxKeys.TAX24;
-            case 25 -> ReportTaxKeys.TAX25;
-            default -> null;
-        };
+    private Double parseDoubleSafe(String value) {
+        if (value == null || value.trim().isEmpty()) return 0.0;
+        try {
+            return Double.parseDouble(value.trim());
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
     }
 }

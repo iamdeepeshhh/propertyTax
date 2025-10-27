@@ -27,4 +27,6 @@ public class AfterHearingCompleteProperty_Dto {
     private List<PropertyUnitDetailsDto> propertyUnitDetails;
     private List<AfterHearing_PropertyRValuesDto> propertyRValues;
     private List<AfterHearing_ProposedRValuesDto> proposedRValues;
+    private AfterHearingPropertySummary_Dto propertySummary;
+
 }

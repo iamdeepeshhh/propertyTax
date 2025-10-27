@@ -206,6 +206,14 @@
             <a class="dropdown-item" href="#" onclick="showTab('objections')">Objection Status</a>
           </div>
         </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownArrears" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Arrears
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownArrears">
+            <a class="dropdown-item" href="#" onclick="showTab('arrears')">Edit Taxes</a>
+          </div>
+        </li>
       </ul>
     </div>
   </div>
@@ -2041,6 +2049,7 @@
 </section>
 
 
+
   <section id="surveyReports" class="container mt-5">
     <h2>Survey Reports</h2>
 
@@ -2239,8 +2248,210 @@
   </div>
 </section>
 
-  <section id="objections" class="container mt-5">
-    <h2>Objection Status</h2>
+  <!-- Arrears Tax Section -->
+
+
+  <section id="arrears" class="container mt-5">
+    <h2>Arrears</h2>
+
+    <div class="card">
+      <div class="card-body">
+        <form id="arrears-searchForm" class="row g-3 align-items-center">
+
+          <div class="col-md-3">
+            <label for="arrears-spnInput" class="form-label">SPN</label>
+            <input type="text" class="form-control" id="arrears-spnInput" placeholder="Enter SPN...">
+          </div>
+
+          <div class="col-md-3">
+            <label for="arrears-finalPropertyNoInput" class="form-label">Final Property No.</label>
+            <input type="text" class="form-control" id="arrears-finalPropertyNoInput" placeholder="Enter Final Property No.">
+          </div>
+
+          <div class="col-md-3">
+            <label for="arrears-ownerNameInput" class="form-label">Owner Name</label>
+            <input type="text" class="form-control" id="arrears-ownerNameInput" placeholder="Enter Owner Name...">
+          </div>
+
+          <div class="col-md-2">
+            <label for="arrears-wardNumberInput" class="form-label">Ward</label>
+            <input type="number" class="form-control" id="arrears-wardNumberInput" placeholder="Ward No.">
+          </div>
+
+          <button
+                  type="button"
+                  id="arrears-searchButton"
+                  class="btn btn-success"
+                  onclick="loadArrearsProperties()">
+            Search
+          </button>
+
+        </form>
+      </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-center">
+      <div style="overflow-x: auto; max-height: 500px; width: auto; min-width: 80%;">
+        <table class="table-extended table-bordered table-hover" style="min-width: 1000px; text-align: center;">
+          <thead class="thead-dark">
+          <tr>
+            <th>#</th>
+            <th>Final Property No.</th>
+            <th>Owner Name</th>
+            <th>Address</th>
+            <th>Ward</th>
+            <th>Zone</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody id="arrears-searchResults">
+          <!-- Data will populate here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+
+
+
+<section id="arrears-tax">
+  <div class="container mt-5">
+    <h2>Arrears Property Tax Details / थकबाकी मालमत्ता कर तपशील</h2>
+
+    <form id="arrearsTaxForm" class="needs-validation" novalidate>
+
+      <input type="hidden" id="newPropertyNo" name="newPropertyNo" value="">
+      <!-- 📅 YEAR & STATUS -->
+      <h4 class="mt-4">Financial Year & Status / आर्थिक वर्ष व स्थिती</h4>
+      <div class="form-row">
+        <!-- 🗓️ Financial Year -->
+        <div class="form-group col-md-3">
+          <label for="financialYear">Financial Year / आर्थिक वर्ष</label>
+          <select id="financialYear" name="financialYear" class="form-control">
+            <option value="">Select Year</option>
+            <option value="2022-2023">2022-2023</option>
+            <option value="2023-2024">2023-2024</option>
+            <option value="2024-2025">2024-2025</option>
+          </select>
+        </div>
+
+        <!-- 👤 Owner Name -->
+        <div class="form-group col-md-4">
+          <label for="ownerName">Owner Name / मालकाचे नाव</label>
+          <input type="text" id="ownerName" name="ownerName" class="form-control" placeholder="Enter Owner Name">
+        </div>
+
+        <!-- 🏠 Final Property Number -->
+        <div class="form-group col-md-4">
+          <label for="finalPropertyNo">Final Property Number / अंतिम मालमत्ता क्र.</label>
+          <input type="text" id="finalPropertyNo" name="finalPropertyNo" class="form-control" placeholder="Enter Final Property No.">
+        </div>
+        <div class="form-group col-md-4">
+          <button type="button" class="btn btn-success" onclick="showTab('arrears')">Cancel</button>
+        </div>
+      </div>
+
+      <!-- 💰 ARREARS TAX COMPONENTS -->
+      <h4 class="mt-4">Arrears Tax Components / थकबाकी कर घटक</h4>
+      <div class="form-row">
+        <div class="form-group col-md-3"><label>Property Tax</label><input type="number" id="propertyTax" name="propertyTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Education Tax</label><input type="number" id="educationTax" name="educationTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Tree Tax</label><input type="number" id="treeTax" name="treeTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Environment Tax</label><input type="number" id="environmentTax" name="environmentTax" class="form-control" value="0"></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-3"><label>Fire Tax</label><input type="number" id="fireTax" name="fireTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Electricity Tax</label><input type="number" id="electricityTax" name="electricityTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>User Charges</label><input type="number" id="userCharges" name="userCharges" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Light Tax</label><input type="number" id="lightTax" name="lightTax" class="form-control" value="0"></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-3"><label>Clean Tax</label><input type="number" id="cleanTax" name="cleanTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Water Tax</label><input type="number" id="waterTax" name="waterTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>EGC Tax</label><input type="number" id="egcTax" name="egcTax" class="form-control" value="0"></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-3"><label>Miscellaneous Tax</label><input type="number" id="miscellaneousTax" name="miscellaneousTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Other Tax</label><input type="number" id="otherTax" name="otherTax" class="form-control" value="0"></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-3"><label>Misc. Charges</label><input type="number" id="ptMiscellaneousCharges" name="ptMiscellaneousCharges" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Service Charges</label><input type="number" id="ptServiceCharges" name="ptServiceCharges" class="form-control" value="0"></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-3"><label>Municipal Education Tax</label><input type="number" id="ptMunicipalEduTax" name="ptMunicipalEduTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Special Conservancy Tax</label><input type="number" id="ptSpecialConservancyTax" name="ptSpecialConservancyTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Special Education Tax</label><input type="number" id="ptSpecialEduTax" name="ptSpecialEduTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Street Tax</label><input type="number" id="ptStreetTax" name="ptStreetTax" class="form-control" value="0"></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-3"><label>Sewerage Tax</label><input type="number" id="ptSewerageTax" name="ptSewerageTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Sewerage Benefit Tax</label><input type="number" id="ptSewerageBenefitTax" name="ptSewerageBenefitTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Water Benefit Tax</label><input type="number" id="ptWaterBenefitTax" name="ptWaterBenefitTax" class="form-control" value="0"></div>
+      </div>
+
+      <!-- 📊 SUMMARY -->
+      <h4 class="mt-4">Summary / सारांश</h4>
+      <div class="form-row">
+        <div class="form-group col-md-3"><label>Penalty</label><input type="number" id="penalty" name="penalty" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Total Tax</label><input type="number" id="totalTax" name="totalTax" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Interest</label><input type="number" id="interest" name="interest" class="form-control" value="0"></div>
+        <div class="form-group col-md-3"><label>Notice Fee</label><input type="number" id="noticeFee" name="noticeFee" class="form-control" value="0"></div>
+      </div>
+
+      <!-- 🔢 Dynamic Tax Fields (ptTax1–ptTax25) -->
+      <h4 class="mt-4">Dynamic Taxes (1–25)</h4>
+      <div class="form-row">
+        <!-- Loop Example: You can replicate for all 25 -->
+        <div class="form-group col-md-2" style="margin-bottom:8px;" id="dynamicTaxContainer">
+          <label>Tax 1</label><input type="number" id="ptTax1" name="ptTax1" class="form-control" value="0">
+        </div>
+        <div class="form-group col-md-2"><label>Tax 2</label><input type="number" id="ptTax2" name="ptTax2" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 3</label><input type="number" id="ptTax3" name="ptTax3" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 4</label><input type="number" id="ptTax4" name="ptTax4" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 5</label><input type="number" id="ptTax5" name="ptTax5" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 6</label><input type="number" id="ptTax6" name="ptTax6" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 7</label><input type="number" id="ptTax7" name="ptTax7" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 8</label><input type="number" id="ptTax8" name="ptTax8" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 9</label><input type="number" id="ptTax9" name="ptTax9" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 10</label><input type="number" id="ptTax10" name="ptTax10" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 11</label><input type="number" id="ptTax11" name="ptTax11" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 12</label><input type="number" id="ptTax12" name="ptTax12" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 13</label><input type="number" id="ptTax13" name="ptTax13" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 14</label><input type="number" id="ptTax14" name="ptTax14" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 15</label><input type="number" id="ptTax15" name="ptTax15" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 16</label><input type="number" id="ptTax16" name="ptTax16" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 17</label><input type="number" id="ptTax17" name="ptTax17" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 18</label><input type="number" id="ptTax18" name="ptTax18" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 19</label><input type="number" id="ptTax19" name="ptTax19" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 20</label><input type="number" id="ptTax20" name="ptTax20" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 21</label><input type="number" id="ptTax21" name="ptTax21" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 22</label><input type="number" id="ptTax22" name="ptTax22" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 23</label><input type="number" id="ptTax23" name="ptTax23" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 24</label><input type="number" id="ptTax24" name="ptTax24" class="form-control" value="0"></div>
+        <div class="form-group col-md-2"><label>Tax 25</label><input type="number" id="ptTax25" name="ptTax25" class="form-control" value="0"></div>
+        <!-- Continue up to ptTax25 -->
+      </div>
+
+      <!-- 🔘 BUTTONS -->
+      <div class="text-center mt-4">
+        <button type="button" class="btn btn-primary" onclick="calculateArrearsTotal()">Calculate Total</button>
+        <button type="button" class="btn btn-success" onclick="saveArrearsTax()">💾 Save Arrears Tax</button>
+
+      </div>
+    </form>
+  </div>
+</section>
+
+<section id="objections" class="container mt-5">
+  <h2>Objection Status</h2>
 
     <!-- Search Card -->
     <div class="card">
@@ -2390,6 +2601,56 @@
       </div>
   </div>
 </div>
+<!-- 🔹 Decision Modal -->
+<div class="modal fade" id="hearingDecisionModal" tabindex="-1" aria-labelledby="hearingDecisionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="hearingDecisionModalLabel">After Hearing Decision</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label for="decisionSelect" class="form-label">Select Decision</label>
+        <select id="decisionSelect" class="form-select">
+          <option value="">-- Select Decision --</option>
+          <option value="retained">Retained (No Change)</option>
+          <option value="absent">Absent (Owner not present)</option>
+          <option value="changed">Changed</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmDecisionBtn">Proceed</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🔹 Change Type Modal -->
+<div class="modal fade" id="changeTypeModal" tabindex="-1" aria-labelledby="changeTypeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changeTypeModalLabel">Select Change Type</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label for="changeTypeSelect" class="form-label">Change Type</label>
+        <select id="changeTypeSelect" class="form-select">
+          <option value="">-- Select Change Type --</option>
+          <option value="rv">Changed by RV</option>
+          <option value="assessment">Changed by Assessment</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmChangeTypeBtn">Proceed</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 </main>
 <!--<footer>-->
 <!--  <p>© 2024 3G Associates. All rights reserved.</p>-->

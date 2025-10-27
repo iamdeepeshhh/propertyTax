@@ -15,4 +15,6 @@ public interface RegisterObjection_MasterService {
 
     public List<RegisterObjection_Dto> getList();
     public List<RegisterObjection_Dto> searchObjectionRecords(String spn, String finalPropertyNo, String ownerName, Integer ward);
-    }
+    public boolean updateHearingStatus(String newPropertyNo, String status, String changedValue);
+
+}

@@ -39,4 +39,13 @@ public class PropertyUnitDetailsDto {
     private Double rentalValAsPerRateFl;
     private Double amountAfterDepreciationFl;
 
+    // ------------------ Extended for After Hearing Register ------------------
+    private Double yearlyRentFl;             // वार्षिक भाडे
+    private Double alvFl;                    // वार्षिक मूल्य (ALV)
+    private Double totalAlvFl;               // ALV + Rent Combined
+    private Double maintenanceValueFl;       // देखभाल मूल्य
+    private Double taxValueFl;               // कर मूल्य
+    private Double ratableValueFl;           // करपात्र मूल्य (RV)
+    private Double consideredRvFl;           // विचाराधीन करपात्र मूल्य (Max of Rent/ALV-based)
+
 }

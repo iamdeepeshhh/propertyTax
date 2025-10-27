@@ -169,6 +169,11 @@ var form = document.getElementById(formId);
 var isValid = true;
 var formData = {};
 
+if (!input) {
+    console.warn(`⚠️ Input with ID '${inputId}' not found in the form '${formId}'.`);
+    return;
+}
+
 // Collect static form fields
 inputIds.forEach(function(inputId) {
     var input = document.getElementById(inputId);
@@ -1057,18 +1062,49 @@ function getActionButtons(actionType, item) {
     }
 
     else if (actionType === 'objection') {
+       return `
+           <button class="btn btn-primary" onclick="openAfterHearingProperty('${item.pdNewpropertynoVc}')">
+               After Hearing Decision
+           </button>
+       `;
+    }
+    else if (actionType === 'arrears') {
         return `
-            <button class="btn btn-primary" onclick="editAssessment('${item.newPropertyNo}')">Edit Assessment</button>
+            <button class="btn btn-primary"
+                onclick="editArrears(
+                    '${item.pdNewpropertynoVc}',
+                    '${item.pdFinalpropnoVc || ''}',
+                    '${item.pdOwnernameVc || ''}',
+                    '${item.pdWardI || ''}'
+                )">
+                Edit Taxes
+            </button>
         `;
     }
 
+
     return '';
 }
-function editAssessment(newPropertyNo) {
-    // Opens the same edit form in assessment mode (with RV & Taxes tabs)
-    const url = `/3gSurvey/editSurveyForm?newpropertyno=${newPropertyNo}&mode=assessment`;
-    window.open(url, '_blank');
+
+function editArrears(newPropertyNo, finalPropertyNo, ownerName, ward) {
+  document.getElementById("arrears").style.display = "none";
+  document.getElementById("arrears-tax").style.display = "block";
+
+  document.getElementById("newPropertyNo").value = newPropertyNo || '';
+  document.getElementById("finalPropertyNo").value = finalPropertyNo || '';
+
+  document.getElementById("finalPropertyNo").value = finalPropertyNo || '';
+  document.getElementById("ownerName").value = ownerName || '';
+  document.getElementById("finalPropertyNo").readOnly = true;
+  document.getElementById("ownerName").readOnly = true;
+
+  if (document.getElementById("ward")) {
+    document.getElementById("ward").value = ward || '';
+  }
+
+  document.getElementById("arrears-tax").scrollIntoView({ behavior: "smooth" });
 }
+
 // performSearch to get the searching parameters from the sections such as surveyreports and uploadfiles
 function performSearch(sectionId, columns) {
     const spn = document.querySelector(`#${sectionId} #${sectionId}-spnInput`).value.trim();
@@ -1759,3 +1795,177 @@ function loadObjectionTakenProperties() {
         ['finalPropertyNo', 'ownerName', 'wardNo', 'zoneNo', 'reasons', 'hearingStatus', 'objectionDate']
     );
 }
+
+function loadArrearsProperties() {
+    const queryParams = {
+        surveyPropertyNo: document.getElementById('arrears-spnInput').value,
+        finalPropertyNo: document.getElementById('arrears-finalPropertyNoInput').value,
+        ownerName: document.getElementById('arrears-ownerNameInput').value,
+        wardNo: document.getElementById('arrears-wardNumberInput').value
+    };
+    fetchPropertyRecords(
+        '/3g/searchNewProperties',
+        queryParams,
+        'arrears-searchResults',
+        'arrears',
+        ['pdFinalpropnoVc', 'pdOwnernameVc', 'pdPropertyaddressVc', 'pdWardI', 'pdZoneI']
+    );
+}
+
+function openAfterHearingProperty(newPropertyNo) {
+  // store globally for re-use
+  window.selectedPropertyNo = newPropertyNo;
+
+  // reset dropdowns
+  document.getElementById('decisionSelect').value = '';
+
+  // show first modal
+  const decisionModal = new bootstrap.Modal(document.getElementById('hearingDecisionModal'));
+  decisionModal.show();
+
+  // handle confirm button
+  document.getElementById('confirmDecisionBtn').onclick = function() {
+    const decision = document.getElementById('decisionSelect').value;
+    if (!decision) {
+      alert("Please select a decision before proceeding.");
+      return;
+    }
+
+    decisionModal.hide();
+
+    if (decision === 'retained' || decision === 'absent') {
+      markObjectionStatus(newPropertyNo, decision.toUpperCase());
+    } else if (decision === 'changed') {
+      openChangeTypeModal(newPropertyNo);
+    }
+  };
+}
+
+// =======================
+// 🔹 Open Change Type Modal
+// =======================
+function openChangeTypeModal(newPropertyNo) {
+  document.getElementById('changeTypeSelect').value = '';
+
+  const changeModal = new bootstrap.Modal(document.getElementById('changeTypeModal'));
+  changeModal.show();
+
+  document.getElementById('confirmChangeTypeBtn').onclick = function() {
+    const changeType = document.getElementById('changeTypeSelect').value;
+    if (!changeType) {
+      alert("Please select a change type before proceeding.");
+      return;
+    }
+
+    changeModal.hide();
+
+    // 🔹 First update the status in backend
+    fetch(`/3g/afterHearing/markStatus`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        newPropertyNo: newPropertyNo,
+        status: "CHANGED",
+        changeType: changeType // "rv" or "assessment"
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log("✅ Hearing status updated:", data);
+
+      // 🔹 Then open the assessment form
+      editAssessment(newPropertyNo);
+    })
+    .catch(err => {
+      console.error("❌ Failed to update hearing status:", err);
+      alert("Error updating hearing status!");
+    });
+  };
+}
+
+// =======================
+// 🔹 Mark Retained / Absent
+// =======================
+function markObjectionStatus(newPropertyNo, status) {
+  fetch(`/3g/afterHearing/markStatus`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      newPropertyNo: newPropertyNo,
+      status: status
+    })
+  })
+  .then(response => {
+    if (!response.ok) throw new Error('Failed to update status');
+    return response.json();
+  })
+  .then(data => {
+    alert(`Property marked as ${status}.`);
+    window.location.reload();
+  })
+  .catch(err => alert(err.message));
+}
+
+// =======================
+// 🔹 Existing function (unchanged)
+// =======================
+function editAssessment(newPropertyNo) {
+  const url = `/3gSurvey/editSurveyForm?newpropertyno=${newPropertyNo}&mode=assessment`;
+  window.open(url, '_blank');
+}
+async function saveArrearsTax() {
+  try {
+    const form = document.getElementById("arrearsTaxForm");
+    if (!form) {
+      alert("⚠️ Form not found!");
+      return;
+    }
+
+    const formData = new FormData(form);
+    const jsonData = {};
+
+    formData.forEach((value, key) => {
+      // 🔒 Do not convert IDs or codes to numbers
+      const keepAsString = [
+        "newPropertyNo",
+        "finalPropertyNo",
+        "financialYear",
+        "ownerName"
+      ];
+
+      if (keepAsString.includes(key)) {
+        jsonData[key] = value.trim(); // preserve leading zeros
+      } else if (!isNaN(value) && value.trim() !== "") {
+        jsonData[key] = parseFloat(value);
+      } else {
+        jsonData[key] = value;
+      }
+    });
+
+    console.log("📤 Submitting arrears tax data:", jsonData);
+
+    const response = await fetch("/3g/addPropertyArrearsTax", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(jsonData),
+    });
+
+    if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+    const result = await response.json();
+    alert("✅ Arrears Tax Saved Successfully!");
+
+    form.reset();
+    document.getElementById("arrears-tax").style.display = "none";
+    document.getElementById("arrears").style.display = "block";
+
+  } catch (error) {
+    console.error("❌ Error while saving arrears tax:", error);
+    alert("⚠️ Failed to save arrears tax. Please check console for details.");
+  }
+}
+
+
+
+
+

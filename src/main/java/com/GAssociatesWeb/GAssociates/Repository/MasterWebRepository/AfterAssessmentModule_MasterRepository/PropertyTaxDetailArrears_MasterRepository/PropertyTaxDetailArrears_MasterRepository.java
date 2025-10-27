@@ -1,0 +1,9 @@
+package com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AfterAssessmentModule_MasterRepository.PropertyTaxDetailArrears_MasterRepository;
+
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.PropertyTaxDetailArrears_MasterEntity.PropertyTaxDetailArrears_MasterEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PropertyTaxDetailArrears_MasterRepository extends JpaRepository<PropertyTaxDetailArrears_MasterEntity, Integer> {
+    PropertyTaxDetailArrears_MasterEntity findByNewPropertyNo(String newPropertyNo);
+
+}
