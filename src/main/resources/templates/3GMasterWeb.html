@@ -139,6 +139,7 @@
 
           </div>
         </li>
+
 <!--        <li class="nav-item dropdown">-->
 <!--          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownReports" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
 <!--            Reports-->
@@ -1219,9 +1220,9 @@
         </select>
         <span id="rate-description-usagesub" style="color: black; font-size: 22px;"></span>
       </div>
-      
+
     <button type="button" class="btn btn-primary" onclick="submitForm('unitUsageSubTypeForm', ['uusc-property-type-select', 'uusc-property-subtype-select', 'uusc-property-usage-type-select', 'uusc-unit-usage-type-select', 'unit-usage-subtype-name', 'local-unit-usage-subtype-name', 'tax-type-input','usmApplyDifferentRateVc','usm_rvtype_vc'], '/3g/addUnitUsageSub')">Add</button>
-  </form> 
+  </form>
   <!-- Existing Unit Usage Subtypes Display Section -->
   <div class="container mt-5 ">
     <h3>Existing Unit Usage Subtypes</h3>
@@ -1381,7 +1382,7 @@
       </div>
       <button type="button" class="btn btn-primary" onclick="submitForm('constructionAgeFactorForm', ['afm_agefactornameeng_vc', 'afm_agefactornamell_vc', 'afm_ageminage_vc', 'afm_agemaxage_vc', 'afm_remarks_vc'], '/3g/addConstructionAgeFactor')">Add</button>
     </form>
-  
+
     <!-- Existing Construction Age Factors Display Section -->
       <div class="container mt-5 ">
       <h3>Existing Construction Age Factors</h3>
@@ -1445,8 +1446,8 @@
       </div>
     </div>
   </section>
-  
-  
+
+
   <section id="AssessmentDates" class="container mt-5">
     <h2>Assessment Dates</h2>
     <form id="assessmentDatesForm" class="needs-validation" novalidate>
@@ -1492,8 +1493,8 @@
     </div>
 </section>
 
-  
-  
+
+
   <section id="RoomTypes">
     <div class="container mt-5">
       <h2>Room Types</h2>
@@ -1597,7 +1598,7 @@
     </div>
   </div>
 </section>
-  
+
 <section id="deletionlogs" class="container mt-5">
   <h2>Deleted Properties</h2>
   <div class="container mt-5 table-container">
@@ -2496,7 +2497,6 @@
             <th>Final Property No.</th>
             <th>Owner Name</th>
             <th>Ward</th>
-            <th>Zone</th>
             <th>Objection Reason</th>
             <th>Status</th>
             <th>Created At</th>
@@ -2538,7 +2538,7 @@
       <label for="localDistrictName">Local District Name:</label>
       <input type="text" class="form-control" id="localDistrictName" name="localDistrictName" required>
     </div>
-  
+
     <div class="form-group col-md-6">
       <label for="councilImage">Council Image:</label>
       <input type="file" class="form-control" id="councilImage" name="image" accept="image/*">
@@ -2607,7 +2607,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="hearingDecisionModalLabel">After Hearing Decision</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
       <div class="modal-body">
         <label for="decisionSelect" class="form-label">Select Decision</label>
@@ -2632,14 +2634,16 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="changeTypeModalLabel">Select Change Type</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
       <div class="modal-body">
         <label for="changeTypeSelect" class="form-label">Change Type</label>
         <select id="changeTypeSelect" class="form-select">
           <option value="">-- Select Change Type --</option>
-          <option value="rv">Changed by RV</option>
-          <option value="assessment">Changed by Assessment</option>
+          <option value="RV">Changed by RV</option>
+          <option value="ASSESSMENT">Changed by Assessment</option>
         </select>
       </div>
       <div class="modal-footer">

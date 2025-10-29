@@ -1063,7 +1063,7 @@ function getActionButtons(actionType, item) {
 
     else if (actionType === 'objection') {
        return `
-           <button class="btn btn-primary" onclick="openAfterHearingProperty('${item.pdNewpropertynoVc}')">
+           <button class="btn btn-primary" onclick="openAfterHearingProperty('${item.newPropertyNo}')">
                After Hearing Decision
            </button>
        `;
@@ -1792,7 +1792,7 @@ function loadObjectionTakenProperties() {
         queryParams,
         'objection-searchResults',
         'objection',
-        ['finalPropertyNo', 'ownerName', 'wardNo', 'zoneNo', 'reasons', 'hearingStatus', 'objectionDate']
+        ['finalPropertyNo', 'ownerName', 'wardNo', 'reasons', 'hearingStatus', 'objectionDate']
     );
 }
 
@@ -1813,19 +1813,16 @@ function loadArrearsProperties() {
 }
 
 function openAfterHearingProperty(newPropertyNo) {
-  // store globally for re-use
   window.selectedPropertyNo = newPropertyNo;
+  console.log("thisisnew " + newPropertyNo);
 
-  // reset dropdowns
-  document.getElementById('decisionSelect').value = '';
+  document.getElementById("decisionSelect").value = "";
 
-  // show first modal
-  const decisionModal = new bootstrap.Modal(document.getElementById('hearingDecisionModal'));
+  const decisionModal = new bootstrap.Modal(document.getElementById("hearingDecisionModal"));
   decisionModal.show();
 
-  // handle confirm button
-  document.getElementById('confirmDecisionBtn').onclick = function() {
-    const decision = document.getElementById('decisionSelect').value;
+  document.getElementById("confirmDecisionBtn").onclick = function () {
+    const decision = document.getElementById("decisionSelect").value;
     if (!decision) {
       alert("Please select a decision before proceeding.");
       return;
@@ -1833,25 +1830,27 @@ function openAfterHearingProperty(newPropertyNo) {
 
     decisionModal.hide();
 
-    if (decision === 'retained' || decision === 'absent') {
+    if (decision === "retained" || decision === "absent") {
+      // Immediate backend update (no data changes)
       markObjectionStatus(newPropertyNo, decision.toUpperCase());
-    } else if (decision === 'changed') {
+    } else if (decision === "changed") {
+      // If changed — open 2nd modal
       openChangeTypeModal(newPropertyNo);
     }
   };
 }
 
 // =======================
-// 🔹 Open Change Type Modal
+// 🔹 Step 2: Select Change Type (RV / Assessment)
 // =======================
 function openChangeTypeModal(newPropertyNo) {
-  document.getElementById('changeTypeSelect').value = '';
+  document.getElementById("changeTypeSelect").value = "";
 
-  const changeModal = new bootstrap.Modal(document.getElementById('changeTypeModal'));
+  const changeModal = new bootstrap.Modal(document.getElementById("changeTypeModal"));
   changeModal.show();
 
-  document.getElementById('confirmChangeTypeBtn').onclick = function() {
-    const changeType = document.getElementById('changeTypeSelect').value;
+  document.getElementById("confirmChangeTypeBtn").onclick = function () {
+    const changeType = document.getElementById("changeTypeSelect").value;
     if (!changeType) {
       alert("Please select a change type before proceeding.");
       return;
@@ -1859,60 +1858,89 @@ function openChangeTypeModal(newPropertyNo) {
 
     changeModal.hide();
 
-    // 🔹 First update the status in backend
-    fetch(`/3g/afterHearing/markStatus`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        newPropertyNo: newPropertyNo,
-        status: "CHANGED",
-        changeType: changeType // "rv" or "assessment"
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      console.log("✅ Hearing status updated:", data);
+    // ✅ Simple boolean logic — no need toUpperCase()
+    const byRv = (changeType === "RV");
+    const byAssessment = (changeType === "ASSESSMENT");
 
-      // 🔹 Then open the assessment form
-      editAssessment(newPropertyNo);
-    })
-    .catch(err => {
-      console.error("❌ Failed to update hearing status:", err);
-      alert("Error updating hearing status!");
-    });
+
+    localStorage.setItem("afterHearingDecision", "CHANGED");
+    localStorage.setItem("afterHearingChangeType", changeType);
+    localStorage.setItem("afterHearingByRv", byRv);
+    localStorage.setItem("afterHearingByAssessment", byAssessment);
+    localStorage.setItem("afterHearingProperty", newPropertyNo);
+
+    // 🟢 Open edit form
+    editAssessment(newPropertyNo);
   };
 }
 
+
 // =======================
-// 🔹 Mark Retained / Absent
+// 🔹 Mark Retained / Absent (immediate update)
 // =======================
 function markObjectionStatus(newPropertyNo, status) {
   fetch(`/3g/afterHearing/markStatus`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       newPropertyNo: newPropertyNo,
       status: status
     })
   })
-  .then(response => {
-    if (!response.ok) throw new Error('Failed to update status');
-    return response.json();
-  })
-  .then(data => {
-    alert(`Property marked as ${status}.`);
-    window.location.reload();
-  })
-  .catch(err => alert(err.message));
+    .then(response => {
+      if (!response.ok) throw new Error("Failed to update status");
+      return response.json();
+    })
+    .then(data => {
+      alert(`Property marked as ${status}.`);
+      window.location.reload();
+    })
+    .catch(err => alert(err.message));
 }
 
 // =======================
-// 🔹 Existing function (unchanged)
+// 🔹 Open Edit Form
 // =======================
 function editAssessment(newPropertyNo) {
   const url = `/3gSurvey/editSurveyForm?newpropertyno=${newPropertyNo}&mode=assessment`;
-  window.open(url, '_blank');
+  window.open(url, "_blank");
 }
+
+// =======================
+// 🔹 Called AFTER officer saves modified data
+// =======================
+async function finalizeAfterHearingStatus(newPropertyNo) {
+  try {
+    if (!window.afterHearingDecision || !window.afterHearingChangeType) {
+      console.warn("⚠️ No hearing decision stored for property " + newPropertyNo);
+      return;
+    }
+
+    const payload = {
+      newPropertyNo: newPropertyNo,
+      status: window.afterHearingDecision,
+      changeType: window.afterHearingChangeType
+    };
+
+    const res = await fetch(`/3g/afterHearing/markStatus`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error("Server error updating status");
+
+    const data = await res.json();
+    console.log("✅ Hearing status finalized:", data);
+
+    alert("After Hearing status marked as CHANGED successfully!");
+
+  } catch (error) {
+    console.error("❌ Failed to finalize hearing status:", error);
+    alert("Error marking After Hearing status. Please check console.");
+  }
+}
+
 async function saveArrearsTax() {
   try {
     const form = document.getElementById("arrearsTaxForm");

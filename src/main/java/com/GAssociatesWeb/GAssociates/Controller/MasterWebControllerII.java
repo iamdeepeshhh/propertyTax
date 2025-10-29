@@ -45,13 +45,44 @@ public class MasterWebControllerII {
             @RequestPart(value = "housePlan1", required = false) MultipartFile housePlan1,
             @RequestPart(value = "housePlan2", required = false) MultipartFile housePlan2) throws JsonProcessingException {
 
-        // Convert JSON string to DTO
         ObjectMapper mapper = new ObjectMapper();
         AfterHearingCompleteProperty_Dto dto = mapper.readValue(updatedFieldsJson, AfterHearingCompleteProperty_Dto.class);
 
-        System.out.println("✅ Received AfterHearing Property: " + dto);
-        return ResponseEntity.ok(afterHearingService.createCompleteProperty(dto));
+        String newPropertyNo = dto.getPropertyDetails().getPdNewpropertynoVc();
+        boolean byRv = dto.isByRv();
+        boolean byAssessment = dto.isByAssessment();
+
+        System.out.println("✅ Received After Hearing Property for: " + newPropertyNo);
+        System.out.println("🧾 Flags → byRv: " + byRv + ", byAssessment: " + byAssessment);
+        System.out.println("🧾 Type: " + dto.getChangeType() + " | Status: " + dto.getHearingStatus());
+
+        try {
+            // 🟢 Pass booleans explicitly
+            AfterHearingCompleteProperty_Dto saved = afterHearingService.createCompleteProperty(null,dto, byRv, byAssessment);
+
+            if (saved == null || saved.getPropertyDetails() == null)
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", "Property could not be saved"));
+
+            // 🟡 Update status only if changed
+            if ("CHANGED".equalsIgnoreCase(dto.getHearingStatus())) {
+                boolean updated = registerObjection_masterService.updateHearingStatus(
+                        newPropertyNo, dto.getHearingStatus(), dto.getChangeType());
+                System.out.println(updated
+                        ? "🟩 Hearing status updated successfully"
+                        : "⚠️ Hearing status update failed");
+            }
+
+            return ResponseEntity.ok(saved);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
+
+
 
     @GetMapping("/secondaryBatchAssessmentReport")
     public ResponseEntity<?> getSecondaryBatchAssessmentReport(@RequestParam("wardNo") Integer wardNo) {
@@ -90,6 +121,7 @@ public class MasterWebControllerII {
                 return ResponseEntity.noContent().build();
             }
             return ResponseEntity.ok(results);
+
 
         } catch (Exception e) {
             e.printStackTrace();

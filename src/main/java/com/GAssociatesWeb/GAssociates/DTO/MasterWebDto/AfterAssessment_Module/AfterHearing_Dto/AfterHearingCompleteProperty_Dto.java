@@ -19,14 +19,19 @@ public class AfterHearingCompleteProperty_Dto {
     private List<UnitDetails_Dto> unitDetails;
 
 
-    private List<AfterHearing_PropertyTaxDetailsDto> propertyTaxDetails;
+
     private Map<Long, Double> taxKeyValueMapAfterAssess = new HashMap<>();
     private Map<Long, Double> taxKeyValueMapAfterHearing = new HashMap<>();
 
     //for assessment register
+    private List<AfterHearing_PropertyTaxDetailsDto> propertyTaxDetails;
     private List<PropertyUnitDetailsDto> propertyUnitDetails;
     private List<AfterHearing_PropertyRValuesDto> propertyRValues;
     private List<AfterHearing_ProposedRValuesDto> proposedRValues;
     private AfterHearingPropertySummary_Dto propertySummary;
 
+    private boolean byRv;           // true if change is by ratable value
+    private boolean byAssessment;   // true if full reassessment
+    private String hearingStatus;   // "CHANGED", "RETAINED", etc.
+    private String changeType;      // "RV" or "ASSESSMENT"
 }

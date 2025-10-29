@@ -2261,6 +2261,21 @@
         document.getElementById('loadingSpinner').style.display = 'flex';
 
         try {
+           const hearingStatus = localStorage.getItem("afterHearingDecision");
+           const changeType = localStorage.getItem("afterHearingChangeType");
+           const byRv = localStorage.getItem("afterHearingByRv") === "true";
+           const byAssessment = localStorage.getItem("afterHearingByAssessment") === "true";
+           const propertyNo = localStorage.getItem("afterHearingProperty");
+
+
+
+           // Add them to DTO payload
+           if (mode === "assessment") {
+             updatedFields.hearingStatus = hearingStatus || "CHANGED";
+             updatedFields.changeType = changeType || "";
+             updatedFields.byRv = byRv;
+             updatedFields.byAssessment = byAssessment;
+           }
             const formData = new FormData();
 
             // append DTO data

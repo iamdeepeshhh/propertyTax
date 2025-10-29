@@ -1367,7 +1367,7 @@ public class MasterWebController {
     @GetMapping("/realtimeCalculatedDetails/{newPropertyNumber}")
     public ResponseEntity<?> getRealtimeCalculatedDetails(@PathVariable("newPropertyNumber") String newPropertyNumber) {
 //        List<AssessmentResultsDto> assessmentResultsDtos = calculationSheetGenerator_masterService.generateSinglePropertyReport(newPropertyNumber);
-        AssessmentResultsDto assessmentResultsDto = taxAssessment_masterService.performAssessment(newPropertyNumber);
+        AssessmentResultsDto assessmentResultsDto = taxAssessment_masterService.performAssessment(newPropertyNumber, false);
         if (assessmentResultsDto != null) {
             return ResponseEntity.ok(assessmentResultsDto);
         } else {

@@ -23,6 +23,7 @@ public class TaxBills_MasterDto {
     private String pdOldpropnoVc;           // Old Property No.
     private String pdSurypropnoVc;          // Survey Property No.
 
+    private String pdNewpropertynoVc;
     private String pdOwnernameVc;           // Owner Name
     private String pdOccupinameF;           // Occupier Name
 

@@ -1,13 +1,13 @@
 package com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services;
 
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto.*;
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.AssessmentResultsDto;
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.PropertyUnitDetailsDto;
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.ProposedRatableValueDetailsDto;
 import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.PropertyDetails_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.UnitBuiltUp_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.UnitDetails_Dto;
-import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.AfterHearing_MasterEntity.AfterHearing_PropertyDetailsEntity;
-import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.AfterHearing_MasterEntity.AfterHearing_PropertyRValuesEntity;
-import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.AfterHearing_MasterEntity.AfterHearing_PropertyTaxDetailsEntity;
-import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.AfterHearing_MasterEntity.AfterHearing_ProposedRValuesEntity;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.AfterHearing_MasterEntity.*;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxAssessment_Module.Property_RValues;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxAssessment_Module.Property_TaxDetails;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxAssessment_Module.Proposed_RValues;
@@ -25,15 +25,19 @@ import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.Unit
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearingPropertyDetails_Service.AfterHearingPropertyDetails_Service;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearingUnitBuiltupDetails_Service.AfterHearingUnitBuiltupDetails_Service;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearingUnitDetails_Service.AfterHearingUnitDetails_Service;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearing_TaxComputationalService.AfterHearing_TaxCalculationService;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.TaxAssessment_MasterService.TaxAssessmentRealtime.TaxAssessment_MasterService;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.ReportConfigs_MasterServices.ReportTaxKeys;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,13 +57,21 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
     private final AfterHearingPropertyRvalues_MasterRepository afterHearingPropertyRvalues_masterRepository;
     private final AfterHearingPropertyTaxDetails_MasterRepository afterHearingPropertyTaxDetails_masterRepository;
     private final AfterHearingProposedRvalues_MasterRepository afterHearingProposedRvalues_masterRepository;
+    private final TaxAssessment_MasterService taxAssessment_masterService;
+    private final AfterHearing_TaxCalculationService afterHearingTaxCalculationService;
 
-
+    private static final Logger log =
+            LoggerFactory.getLogger(AfterHearingPropertyManagement_MasterMasterServiceImpl.class);
     // ----------------------------------------------------------------------
     // CREATE COMPLETE PROPERTY
     // ----------------------------------------------------------------------
     @Transactional
-    public AfterHearingCompleteProperty_Dto createCompleteProperty(AfterHearingCompleteProperty_Dto dto) {
+    public AfterHearingCompleteProperty_Dto createCompleteProperty(
+            String newPropertyNo,
+            AfterHearingCompleteProperty_Dto dto,
+            boolean byRv,
+            boolean byAssessment) {
+
         try {
             PropertyDetails_Dto propertyDetailsDto = dto.getPropertyDetails();
 
@@ -67,113 +79,247 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
                 throw new IllegalArgumentException("Property details or property number cannot be null");
             }
 
-            String newPropertyNo = propertyDetailsDto.getPdNewpropertynoVc();
-            System.out.println("🟢 Starting After Hearing record creation for property: " + newPropertyNo);
-
-            // -------------------------------------------------------------
-            // 1️⃣ Fallback: If no data updated, load from main property table
-            // -------------------------------------------------------------
-            if (isPropertyDetailsEmpty(propertyDetailsDto)) {
-                System.out.println("⚠️ No updated property data provided — loading existing property from main repository");
-                propertyDetailsDto = propertyDetails_Service.findPropertyDetailsByNewPropertyNo(newPropertyNo);
-                dto.setPropertyDetails(propertyDetailsDto);
+            if (byAssessment) {
+                log.info("[AFTER_HEARING][FULL_ASSESSMENT] Starting reassessment for property: " + newPropertyNo);
+                handleFullAssessment(newPropertyNo, dto, propertyDetailsDto);
+            }
+            else if (byRv) {
+                log.info("[AFTER_HEARING][RV_CHANGE] Recalculating taxes by new RV for property: " + newPropertyNo);
+                handleRvChange(newPropertyNo, dto, propertyDetailsDto);
+            }
+            else {
+                log.info("[AFTER_HEARING][RETAINED] Copying data as-is for property: " + newPropertyNo);
+                handleRetained(newPropertyNo, dto, propertyDetailsDto);
             }
 
-            // -------------------------------------------------------------
-            // 2️⃣ Create After Hearing Property record
-            // -------------------------------------------------------------
-            PropertyDetails_Dto savedProperty = afterPropertyDetailsService.createAfterHearingProperty(propertyDetailsDto);
-
-            // -------------------------------------------------------------
-            // 3️⃣ Handle Unit Details (fallback to main repo if empty)
-            // -------------------------------------------------------------
-            List<UnitDetails_Dto> unitDetails = dto.getUnitDetails();
-            if (unitDetails == null || unitDetails.isEmpty()) {
-                System.out.println("⚠️ No updated unit details found — loading units from main repository");
-                unitDetails = unitDetails_Service.getAllUnitsByProperty(newPropertyNo);
-            }
-
-            List<UnitDetails_Dto> createdUnits = new ArrayList<>();
-            for (UnitDetails_Dto unitDto : unitDetails) {
-                unitDto.setPdNewpropertynoVc(newPropertyNo);
-                UnitDetails_Dto createdUnit = afterUnitDetailsService.createUnit(unitDto);
-
-                // ---- Handle Built-Ups ----
-                List<UnitBuiltUp_Dto> builtUps = unitDto.getUnitBuiltupUps();
-                if (builtUps == null || builtUps.isEmpty()) {
-                    builtUps = unitBuiltUp_Service.getBuiltUpsByUnitDetails(
-                            newPropertyNo,
-                            unitDto.getUdFloorNoVc(),
-                            unitDto.getUdUnitNoVc()
-                    );
-                }
-
-                List<UnitBuiltUp_Dto> createdBuiltUps = new ArrayList<>();
-                for (UnitBuiltUp_Dto b : builtUps) {
-                    b.setPdNewpropertynoVc(newPropertyNo);
-                    b.setUdFloorNoVc(createdUnit.getUdFloorNoVc());
-                    b.setUdUnitNoVc(createdUnit.getUdUnitNoVc());
-                    createdBuiltUps.add(afterUnitBuiltupService.createBuiltUp(b));
-                }
-
-                createdUnit.setUnitBuiltupUps(createdBuiltUps);
-                createdUnits.add(createdUnit);
-            }
-
-            dto.setPropertyDetails(savedProperty);
-            dto.setUnitDetails(createdUnits);
-
-            // -------------------------------------------------------------
-            // 4️⃣ Copy Old Property RValues from Main Table to After Hearing
-            // -------------------------------------------------------------
-            List<Property_RValues> oldRValues = property_rValuesRepository.findAllByPrvPropertyNoVc(newPropertyNo);
-
-            if (oldRValues != null && !oldRValues.isEmpty()) {
-                List<AfterHearing_PropertyRValuesEntity> copiedRValues = oldRValues.stream()
-                        .map(this::mapRValueToAfterHearing)
-                        .collect(Collectors.toList());
-
-                afterHearingPropertyRvalues_masterRepository.saveAll(copiedRValues);
-                System.out.println("✅ Copied " + copiedRValues.size() + " RValue records to After Hearing");
-            } else {
-                System.out.println("⚠️ No RValues found for property: " + newPropertyNo);
-            }
-
-            // -------------------------------------------------------------
-// 5️⃣ Save Proposed Ratable Values (if provided)
-// -------------------------------------------------------------
-            if (dto.getProposedRValues() != null && !dto.getProposedRValues().isEmpty()) {
-                dto.getProposedRValues().forEach(rv -> {
-                    rv.setPrNewPropertyNoVc(newPropertyNo);   // new property no for After Hearing
-                    rv.setPrFinalPropNoVc(dto.getPropertyDetails().getPdFinalpropnoVc()); // also set final property number
-                });
-
-                afterHearingProposedRvalues_masterRepository.saveAll(convertProposedRValues(dto.getProposedRValues()));
-                System.out.println("✅ Proposed Ratable Values saved.");
-            }
-
-// -------------------------------------------------------------
-// 6️⃣ Save Property Tax Details (if provided)
-// -------------------------------------------------------------
-            if (dto.getPropertyTaxDetails() != null && !dto.getPropertyTaxDetails().isEmpty()) {
-                dto.getPropertyTaxDetails().forEach(tax -> {
-                    tax.setPtNewPropertyNoVc(newPropertyNo);   // new property no for After Hearing
-                    tax.setPtFinalPropertyNoVc(dto.getPropertyDetails().getPdFinalpropnoVc()); // also set final property number
-                });
-
-                afterHearingPropertyTaxDetails_masterRepository.saveAll(convertPropertyTaxDetails(dto.getPropertyTaxDetails()));
-                System.out.println("✅ Property Tax Details saved.");
-            }
-
-            System.out.println("🎯 After Hearing record creation completed successfully for property: " + newPropertyNo);
+            log.info("[AFTER_HEARING] ✅ Completed processing for property: " + newPropertyNo);
             return dto;
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("❌ Failed to create After Hearing complete property record: " + e.getMessage(), e);
+            throw new RuntimeException("❌ Failed to process After Hearing property: " + e.getMessage(), e);
         }
     }
 
+    private void handleFullAssessment(
+            String newPropertyNo,
+            AfterHearingCompleteProperty_Dto dto,
+            PropertyDetails_Dto propertyDetailsDto) {
+
+        // 🔹 Step 1: Save Property into after-hearing
+        PropertyDetails_Dto savedProperty = afterPropertyDetailsService.createAfterHearingProperty(propertyDetailsDto);
+
+        // 🔹 Step 2: Handle Units + BuiltUps
+        List<UnitDetails_Dto> unitDetails = dto.getUnitDetails();
+        if (unitDetails == null || unitDetails.isEmpty()) {
+            log.info("⚠️ No updated unit details found — loading from main property");
+            unitDetails = unitDetails_Service.getAllUnitsByProperty(newPropertyNo);
+        }
+
+        List<UnitDetails_Dto> createdUnits = new ArrayList<>();
+        for (UnitDetails_Dto unit : unitDetails) {
+            unit.setPdNewpropertynoVc(newPropertyNo);
+            UnitDetails_Dto createdUnit = afterUnitDetailsService.createUnit(unit);
+
+            List<UnitBuiltUp_Dto> builtUps = unit.getUnitBuiltupUps();
+            if (builtUps == null || builtUps.isEmpty()) {
+                builtUps = unitBuiltUp_Service.getBuiltUpsByUnitDetails(
+                        newPropertyNo,
+                        unit.getUdFloorNoVc(),
+                        unit.getUdUnitNoVc()
+                );
+            }
+
+            List<UnitBuiltUp_Dto> createdBuiltUps = new ArrayList<>();
+            for (UnitBuiltUp_Dto b : builtUps) {
+                b.setPdNewpropertynoVc(newPropertyNo);
+                b.setUdFloorNoVc(createdUnit.getUdFloorNoVc());
+                b.setUdUnitNoVc(createdUnit.getUdUnitNoVc());
+                createdBuiltUps.add(afterUnitBuiltupService.createBuiltUp(b));
+            }
+
+            createdUnit.setUnitBuiltupUps(createdBuiltUps);
+            createdUnits.add(createdUnit);
+        }
+
+        dto.setUnitDetails(createdUnits);
+
+        // 🔹 Step 3: Run assessment
+        AssessmentResultsDto result = taxAssessment_masterService.performAssessment(newPropertyNo, true);
+
+        // 🔹 Step 4: Save RValues, Proposed RVs, Tax Details
+        if (result.getProposedRatableValues() != null){
+         AfterHearing_ProposedRValuesEntity proposedRValuesEntity = convertAssessmentResultsOfProposedRvaluesToEntity(result.getProposedRatableValues());
+            afterHearingProposedRvalues_masterRepository.save(proposedRValuesEntity);
+        }
+        if (result.getTaxKeyValueMap() != null){
+            AfterHearing_PropertyTaxDetailsEntity propertyTaxDetailsEntity = convertAssessmentResultsOfTaxToEntity(result.getTaxKeyValueMap(),newPropertyNo,dto.getPropertyDetails().getPdFinalpropnoVc());
+            afterHearingPropertyTaxDetails_masterRepository.save(propertyTaxDetailsEntity);
+        }
+        if (result.getUnitDetails() != null){
+            List<AfterHearing_PropertyRValuesEntity> PropertyRvalues = convertAssessmentResultsOfPropertyRvaluesToEntity(result.getUnitDetails(),newPropertyNo,dto.getPropertyDetails().getPdFinalpropnoVc());
+            afterHearingPropertyRvalues_masterRepository.saveAll(PropertyRvalues);
+        }
+
+        dto.setPropertyDetails(savedProperty);
+        dto.setByAssessment(true);
+        dto.setHearingStatus("CHANGED");
+        dto.setChangeType("ASSESSMENT");
+
+        log.info("[AFTER_HEARING][FULL_ASSESSMENT] ✅ Completed reassessment for " + newPropertyNo);
+    }
+
+    private void handleRvChange(
+            String newPropertyNo,
+            AfterHearingCompleteProperty_Dto dto,
+            PropertyDetails_Dto propertyDetailsDto) {
+
+        // 🔹 Step 1: Copy Property & Units
+        PropertyDetails_Dto savedProperty = afterPropertyDetailsService.createAfterHearingProperty(propertyDetailsDto);
+        dto.setPropertyDetails(savedProperty);
+
+        List<UnitDetails_Dto> unitDetails = unitDetails_Service.getAllUnitsByProperty(newPropertyNo);
+        List<UnitDetails_Dto> createdUnits = new ArrayList<>();
+
+        for (UnitDetails_Dto unit : unitDetails) {
+            unit.setPdNewpropertynoVc(newPropertyNo);
+            UnitDetails_Dto createdUnit = afterUnitDetailsService.createUnit(unit);
+
+            List<UnitBuiltUp_Dto> builtUps = unitBuiltUp_Service.getBuiltUpsByUnitDetails(
+                    newPropertyNo, unit.getUdFloorNoVc(), unit.getUdUnitNoVc()
+            );
+
+            List<UnitBuiltUp_Dto> createdBuiltUps = builtUps.stream()
+                    .map(b -> {
+                        b.setPdNewpropertynoVc(newPropertyNo);
+                        b.setUdFloorNoVc(createdUnit.getUdFloorNoVc());
+                        b.setUdUnitNoVc(createdUnit.getUdUnitNoVc());
+                        return afterUnitBuiltupService.createBuiltUp(b);
+                    })
+                    .collect(Collectors.toList());
+
+            createdUnit.setUnitBuiltupUps(createdBuiltUps);
+            createdUnits.add(createdUnit);
+        }
+
+        dto.setUnitDetails(createdUnits);
+
+        // 🔹 Step 2: Recalculate taxes using the new RV
+        if (dto.getProposedRValues() == null || dto.getProposedRValues().isEmpty()) {
+            throw new IllegalArgumentException("❌ Missing ProposedRValues list in DTO");
+        }
+
+        ProposedRatableValueDetailsDto proposed =
+                mapToProposedRatableValueDetailsDto(dto.getProposedRValues().get(0));
+
+        if (proposed == null)
+            throw new IllegalArgumentException("Missing ProposedRatableValueDetailsDto for RV change");
+
+        double propertyTax = afterHearingTaxCalculationService.calculatePropertyTax(proposed);
+        double eduCess = afterHearingTaxCalculationService.calculateEducationCess(proposed);
+        double egc = afterHearingTaxCalculationService.calculateEgc(proposed);
+
+        // 🧾 Consolidated taxes (Tree, Fire, Light, etc.)
+        Map<Long, Double> consolidatedTaxes =
+                afterHearingTaxCalculationService.calculateConsolidatedTaxes(proposed.getAggregateFl(), propertyTax);
+
+        // 🧮 Merge all taxes into one map (to be persisted)
+        Map<Long, Double> allTaxes = new LinkedHashMap<>();
+        allTaxes.put(ReportTaxKeys.PT1, propertyTax);
+        allTaxes.put(ReportTaxKeys.EDUC_RES, eduCess); // Education (res+comm) combined
+        allTaxes.put(ReportTaxKeys.EGC, egc);
+        allTaxes.putAll(consolidatedTaxes);
+
+        double totalTax = allTaxes.values().stream().mapToDouble(Double::doubleValue).sum();
+
+        // 🔹 Step 3: Save new Proposed RV
+        AfterHearing_ProposedRValuesDto rvDto = mapToAfterHearingProposedRvDto(proposed);
+        afterHearingProposedRvalues_masterRepository.saveAll(
+                convertProposedRValues(Collections.singletonList(rvDto))
+        );
+
+        // 🔹 Step 4: Save all Tax Details
+        AfterHearing_PropertyTaxDetailsEntity taxEntity =
+                convertAssessmentResultsOfTaxToEntity(allTaxes, newPropertyNo, propertyDetailsDto.getPdFinalpropnoVc());
+        afterHearingPropertyTaxDetails_masterRepository.save(taxEntity);
+
+        // ✅ Update DTO meta flags
+        dto.setByRv(true);
+        dto.setByAssessment(false);
+        dto.setHearingStatus("CHANGED");
+        dto.setChangeType("RV");
+
+        log.info("[AFTER_HEARING][RV_CHANGE] ♻️ Units copied and full tax recalculated for " + newPropertyNo);
+    }
+
+    private void handleRetained(
+            String newPropertyNo,
+            AfterHearingCompleteProperty_Dto dto,
+            PropertyDetails_Dto propertyDetailsDto) {
+
+        // 🔹 Step 1: Copy property
+        PropertyDetails_Dto savedProperty = afterPropertyDetailsService.createAfterHearingProperty(propertyDetailsDto);
+        dto.setPropertyDetails(savedProperty);
+
+        // 🔹 Step 2: Copy units and built-ups
+        List<UnitDetails_Dto> unitDetails = unitDetails_Service.getAllUnitsByProperty(newPropertyNo);
+        List<UnitDetails_Dto> createdUnits = new ArrayList<>();
+
+        for (UnitDetails_Dto unit : unitDetails) {
+            unit.setPdNewpropertynoVc(newPropertyNo);
+            UnitDetails_Dto createdUnit = afterUnitDetailsService.createUnit(unit);
+
+            List<UnitBuiltUp_Dto> builtUps = unitBuiltUp_Service.getBuiltUpsByUnitDetails(
+                    newPropertyNo,
+                    unit.getUdFloorNoVc(),
+                    unit.getUdUnitNoVc()
+            );
+
+            List<UnitBuiltUp_Dto> createdBuiltUps = new ArrayList<>();
+            for (UnitBuiltUp_Dto b : builtUps) {
+                b.setPdNewpropertynoVc(newPropertyNo);
+                b.setUdFloorNoVc(createdUnit.getUdFloorNoVc());
+                b.setUdUnitNoVc(createdUnit.getUdUnitNoVc());
+                createdBuiltUps.add(afterUnitBuiltupService.createBuiltUp(b));
+            }
+
+            createdUnit.setUnitBuiltupUps(createdBuiltUps);
+            createdUnits.add(createdUnit);
+        }
+
+        dto.setUnitDetails(createdUnits);
+
+        // 🔹 Step 3: Copy existing RValues, RVs, Tax Details
+        List<Property_RValues> oldRValues = property_rValuesRepository.findAllByPrvPropertyNoVc(newPropertyNo);
+        if (!oldRValues.isEmpty()) {
+            afterHearingPropertyRvalues_masterRepository.saveAll(
+                    oldRValues.stream().map(this::mapRValueToAfterHearing).collect(Collectors.toList())
+            );
+        }
+
+        List<Proposed_RValues> rvList = proposed_rValuesRepository.findByPrNewPropertyNoVc(newPropertyNo);
+        if (!rvList.isEmpty()) {
+            afterHearingProposedRvalues_masterRepository.saveAll(
+                    convertProposedRValues(rvList.stream().map(this::convertToProposedRvDto).collect(Collectors.toList()))
+            );
+        }
+
+        List<Property_TaxDetails> taxList = property_taxDetailsRepository.findAllByPtFinalPropertyNoVc(
+                propertyDetailsDto.getPdFinalpropnoVc()
+        );
+        if (!taxList.isEmpty()) {
+            afterHearingPropertyTaxDetails_masterRepository.saveAll(
+                    convertPropertyTaxDetails(taxList.stream().map(this::convertTaxEntityToDto).collect(Collectors.toList()))
+            );
+        }
+
+        dto.setByAssessment(false);
+        dto.setByRv(false);
+        dto.setHearingStatus("RETAINED");
+        dto.setChangeType("NONE");
+
+        log.info("[AFTER_HEARING][RETAINED] ✅ Property retained with all units and built-ups copied for " + newPropertyNo);
+    }
 
 
     // ----------------------------------------------------------------------
@@ -687,4 +833,229 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
     }
 
 
+    private AfterHearing_PropertyTaxDetailsEntity convertAssessmentResultsOfTaxToEntity(
+            Map<Long, Double> taxMap,
+            String newPropertyNo,
+            String finalPropertyNo
+    ) {
+        AfterHearing_PropertyTaxDetailsEntity tax = new AfterHearing_PropertyTaxDetailsEntity();
+
+        tax.setPtNewPropertyNoVc(newPropertyNo);
+        tax.setPtFinalPropertyNoVc(finalPropertyNo);
+
+        // 🏛️ PROPERTY TAX COMPOSITION
+
+        // 📚 EDUCATION + EGC
+        tax.setPtEduResTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.EDUC_RES, 0.0)));
+        tax.setPtEduNonResTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.EDUC_COMM, 0.0)));
+        tax.setPtEgcTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.EGC, 0.0)));
+
+        // 🌳 ENVIRONMENT + CITY SERVICES
+        tax.setPtTreeTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TREE_TAX, 0.0)));
+        tax.setPtEnvironmentTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.ENV_TAX, 0.0)));
+        tax.setPtCleanTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.CLEAN_TAX, 0.0)));
+        tax.setPtLightTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.LIGHT_TAX, 0.0)));
+        tax.setPtFireTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.FIRE_TAX, 0.0)));
+
+        // 💧 WATER & SEWERAGE
+        tax.setPtWaterTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.WATER_TAX, 0.0)));
+        tax.setPtSewerageTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.SEWERAGE_TAX, 0.0)));
+        tax.setPtSewerageBenefitTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.SEWERAGE_BEN, 0.0)));
+        tax.setPtWaterBenefitTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.WATER_BEN, 0.0)));
+
+        // 🛣️ STREET + CONSERVANCY
+        tax.setPtStreetTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.STREET_TAX, 0.0)));
+        tax.setPtSpecialConservancyTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.SPEC_CONS, 0.0)));
+
+        // 🎓 EDUCATIONAL CESS TYPES
+        tax.setPtMunicipalEduTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.MUNICIPAL_EDU, 0.0)));
+        tax.setPtSpecialEduTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.SPECIAL_EDU, 0.0)));
+
+        // ⚙️ SERVICE & USER CHARGES
+        tax.setPtServiceChargesFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.SERVICE_CHG, 0.0)));
+        tax.setPtMiscellaneousChargesFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.MISC_CHG, 0.0)));
+        tax.setPtUserChargesFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.USER_CHG, 0.0)));
+
+        // 🔢 FLEXIBLE / RESERVED TAXES
+        tax.setPtTax1Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX1, 0.0)));
+        tax.setPtTax2Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX2, 0.0)));
+        tax.setPtTax3Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX3, 0.0)));
+        tax.setPtTax4Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX4, 0.0)));
+        tax.setPtTax5Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX5, 0.0)));
+        tax.setPtTax6Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX6, 0.0)));
+        tax.setPtTax7Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX7, 0.0)));
+        tax.setPtTax8Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX8, 0.0)));
+        tax.setPtTax9Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX9, 0.0)));
+        tax.setPtTax10Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX10, 0.0)));
+        tax.setPtTax11Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX11, 0.0)));
+        tax.setPtTax12Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX12, 0.0)));
+        tax.setPtTax13Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX13, 0.0)));
+        tax.setPtTax14Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX14, 0.0)));
+        tax.setPtTax15Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX15, 0.0)));
+        tax.setPtTax16Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX16, 0.0)));
+        tax.setPtTax17Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX17, 0.0)));
+        tax.setPtTax18Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX18, 0.0)));
+        tax.setPtTax19Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX19, 0.0)));
+        tax.setPtTax20Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX20, 0.0)));
+        tax.setPtTax21Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX21, 0.0)));
+        tax.setPtTax22Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX22, 0.0)));
+        tax.setPtTax23Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX23, 0.0)));
+        tax.setPtTax24Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX24, 0.0)));
+        tax.setPtTax25Fl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.TAX25, 0.0)));
+
+        // 🧮 Total Tax
+        double totalTax = taxMap.containsKey(ReportTaxKeys.TOTAL_TAX)
+                ? taxMap.get(ReportTaxKeys.TOTAL_TAX)
+                : taxMap.values().stream().mapToDouble(Double::doubleValue).sum();
+        tax.setPtFinalTaxFl(nullToZero(totalTax));
+
+        tax.setCreatedAt(LocalDateTime.now());
+        tax.setUpdatedAt(LocalDateTime.now());
+        return tax;
+    }
+
+    private AfterHearing_ProposedRValuesEntity convertAssessmentResultsOfProposedRvaluesToEntity(
+            ProposedRatableValueDetailsDto dto
+    ) {
+        AfterHearing_ProposedRValuesEntity prv = new AfterHearing_ProposedRValuesEntity();
+
+        prv.setPrNewPropertyNoVc(dto.getPdNewPropertynovc());
+        prv.setPrFinalPropNoVc(dto.getFinalPropertyNoVc());
+
+        // 🧮 Ratable Value Fields
+        prv.setPrResidentialFl(nullToZero(dto.getResidentialFl()));
+        prv.setPrCommercialFl(nullToZero(dto.getCommercialFl()));
+        prv.setPrIndustrialFl(nullToZero(dto.getIndustrialFl()));
+        prv.setPrReligiousFl(nullToZero(dto.getReligiousFl()));
+        prv.setPrEducationalFl(nullToZero(dto.getEducationalInstituteFl()));
+        prv.setPrGovernmentFl(nullToZero(dto.getGovernmentFl()));
+        prv.setPrMobileTowerFl(nullToZero(dto.getMobileTowerFl()));
+        prv.setPrElectricSubstationFl(nullToZero(dto.getElectricSubstationFl()));
+
+        // 🏗️ Open Plot Categories
+        prv.setPrResidentialOpenPlotFl(nullToZero(dto.getResidentialOpenPlotFl()));
+        prv.setPrCommercialOpenPlotFl(nullToZero(dto.getCommercialOpenPlotFl()));
+        prv.setPrIndustrialOpenPlotFl(nullToZero(dto.getIndustrialOpenPlotFl()));
+        prv.setPrReligiousOpenPlotFl(nullToZero(dto.getReligiousOpenPlotFl()));
+        prv.setPrEducationAndLegalInstituteOpenPlotFl(nullToZero(dto.getEducationAndLegalInstituteOpenPlotFl()));
+        prv.setPrGovernmentOpenPlotFl(nullToZero(dto.getGovernmentOpenPlotFl()));
+
+        // 🧾 Total Ratable Value
+        prv.setPrTotalRatableValueFl(nullToZero(dto.getAggregateFl()));
+
+        // 🕒 Metadata
+        prv.setCreatedAt(LocalDateTime.now());
+        prv.setUpdatedAt(LocalDateTime.now());
+
+        return prv;
+    }
+
+    private List<AfterHearing_PropertyRValuesEntity> convertAssessmentResultsOfPropertyRvaluesToEntity(
+            List<PropertyUnitDetailsDto> unitDtos,
+            String newPropertyNo,
+            String finalPropertyNo
+    ) {
+        if (unitDtos == null || unitDtos.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return unitDtos.stream().map(u -> {
+            AfterHearing_PropertyRValuesEntity ar = new AfterHearing_PropertyRValuesEntity();
+
+            ar.setPrvPropertyNoVc(newPropertyNo);
+            ar.setPrvFinalPropNoVc(finalPropertyNo);
+            ar.setPrvUnitNoVc(u.getUnitNoVc());
+
+            // 🏠 Core Values
+            ar.setPrvRatePerSqMFl(nullToZero(u.getRatePerSqMFl()));
+            ar.setPrvRentalValAsPerRateFl(nullToZero(u.getRentalValAsPerRateFl()));
+            ar.setPrvDepreciationRateFl(u.getDepreciationRateFl() != null ? u.getDepreciationRateFl().intValue() : 0);
+            ar.setPrvDepreciationAmountFl(nullToZero(u.getDepreciationAmountFl()));
+            ar.setPrvAmountAfterDepreciationFl(nullToZero(u.getValueAfterDepreciationFl()));
+            ar.setPrvMaintenanceRepairsFl(nullToZero(u.getMaintenanceRepairsFl()));
+            ar.setPrvTaxableValueByRateFl(nullToZero(u.getTaxableValueByRateFl()));
+
+            // 🧾 Rent-Based Fields
+            ar.setPrvTenantNameVc(u.getTenantNameVc());
+            ar.setPrvActualMonthlyRentFl(nullToZero(u.getActualMonthlyRentFl()));
+            ar.setPrvActualAnnualRentFl(nullToZero(u.getActualAnnualRentFl()));
+            ar.setPrvMaintenanceRepairsRentFl(nullToZero(u.getMaintenanceRepairsRentFl()));
+            ar.setPrvTaxableValueByRentFl(nullToZero(u.getTaxableValueByRentFl()));
+            ar.setPrvTaxableValueConsideredFl(nullToZero(u.getTaxableValueConsideredFl()));
+
+            // 🧮 Additional Fields
+            ar.setPrvAgeFactorVc(u.getAgeFactorVc());
+
+            // 🕒 Metadata
+            ar.setCreatedAt(LocalDateTime.now());
+            ar.setUpdatedAt(LocalDateTime.now());
+
+            return ar;
+        }).collect(Collectors.toList());
+    }
+
+    private ProposedRatableValueDetailsDto mapToProposedRatableValueDetailsDto(AfterHearing_ProposedRValuesDto rvDto) {
+        ProposedRatableValueDetailsDto dto = new ProposedRatableValueDetailsDto();
+
+        dto.setPdNewPropertynovc(rvDto.getPrNewPropertyNoVc());
+        dto.setFinalPropertyNoVc(rvDto.getPrFinalPropNoVc());
+
+        dto.setResidentialFl(rvDto.getPrResidentialFl());
+        dto.setCommercialFl(rvDto.getPrCommercialFl());
+        dto.setIndustrialFl(rvDto.getPrIndustrialFl());
+        dto.setReligiousFl(rvDto.getPrReligiousFl());
+        dto.setEducationalInstituteFl(rvDto.getPrEducationalFl());
+        dto.setGovernmentFl(rvDto.getPrGovernmentFl());
+        dto.setMobileTowerFl(rvDto.getPrMobileTowerFl());
+        dto.setElectricSubstationFl(rvDto.getPrElectricSubstationFl());
+
+        dto.setResidentialOpenPlotFl(rvDto.getPrResidentialOpenPlotFl());
+        dto.setCommercialOpenPlotFl(rvDto.getPrCommercialOpenPlotFl());
+        dto.setIndustrialOpenPlotFl(rvDto.getPrIndustrialOpenPlotFl());
+        dto.setReligiousOpenPlotFl(rvDto.getPrReligiousOpenPlotFl());
+        dto.setEducationAndLegalInstituteOpenPlotFl(rvDto.getPrEducationAndLegalInstituteOpenPlotFl());
+        dto.setGovernmentOpenPlotFl(rvDto.getPrGovernmentOpenPlotFl());
+
+        dto.setAggregateFl(rvDto.getPrTotalRatableValueFl());
+
+        return dto;
+    }
+
+    private AfterHearing_ProposedRValuesDto mapToAfterHearingProposedRvDto(ProposedRatableValueDetailsDto src) {
+        AfterHearing_ProposedRValuesDto dto = new AfterHearing_ProposedRValuesDto();
+
+        dto.setPrNewPropertyNoVc(src.getFinalPropertyNoVc());
+        dto.setPrFinalPropNoVc(src.getFinalPropertyNoVc());
+
+        // 🏠 Ratable Value Components
+        dto.setPrResidentialFl(nullToZero(src.getResidentialFl()));
+        dto.setPrCommercialFl(nullToZero(src.getCommercialFl()));
+        dto.setPrIndustrialFl(nullToZero(src.getIndustrialFl()));
+        dto.setPrReligiousFl(nullToZero(src.getReligiousFl()));
+        dto.setPrEducationalFl(nullToZero(src.getEducationalInstituteFl()));
+        dto.setPrGovernmentFl(nullToZero(src.getGovernmentFl()));
+        dto.setPrMobileTowerFl(nullToZero(src.getMobileTowerFl()));
+        dto.setPrElectricSubstationFl(nullToZero(src.getElectricSubstationFl()));
+
+        // 🏗️ Open Plot Components
+        dto.setPrResidentialOpenPlotFl(nullToZero(src.getResidentialOpenPlotFl()));
+        dto.setPrCommercialOpenPlotFl(nullToZero(src.getCommercialOpenPlotFl()));
+        dto.setPrIndustrialOpenPlotFl(nullToZero(src.getIndustrialOpenPlotFl()));
+        dto.setPrReligiousOpenPlotFl(nullToZero(src.getReligiousOpenPlotFl()));
+        dto.setPrEducationAndLegalInstituteOpenPlotFl(nullToZero(src.getEducationAndLegalInstituteOpenPlotFl()));
+        dto.setPrGovernmentOpenPlotFl(nullToZero(src.getGovernmentOpenPlotFl()));
+
+        // 🧾 Total Ratable Value
+        dto.setPrTotalRatableValueFl(nullToZero(src.getAggregateFl()));
+
+        // 🕒 Metadata
+        dto.setCreatedAt(LocalDateTime.now());
+        dto.setUpdatedAt(LocalDateTime.now());
+
+        return dto;
+    }
+
+    private Double nullToZero(Double val) {
+        return val == null ? 0.0 : val;
+    }
 }

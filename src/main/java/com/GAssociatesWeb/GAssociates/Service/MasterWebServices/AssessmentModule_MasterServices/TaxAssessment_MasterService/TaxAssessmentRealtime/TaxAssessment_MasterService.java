@@ -5,6 +5,6 @@ import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDt
 import java.util.Map;
 
 public interface TaxAssessment_MasterService {
-    public AssessmentResultsDto  performAssessment(String newPropertyNumber);
+    public AssessmentResultsDto  performAssessment(String newPropertyNumber, boolean fromAfterHearing);
     //public AssessmentResultsDto dtoConversion(Map<String, Object> assessmentData);
 }

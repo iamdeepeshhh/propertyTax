@@ -4,6 +4,6 @@ import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.Af
 
 public interface AfterHearingPropertyManagement_MasterService {
 
-    public AfterHearingCompleteProperty_Dto createCompleteProperty(AfterHearingCompleteProperty_Dto dto);
+    public AfterHearingCompleteProperty_Dto createCompleteProperty(String pdNewPropertyNovc,AfterHearingCompleteProperty_Dto dto, boolean  byRv,boolean byAssessment);
     public AfterHearingCompleteProperty_Dto getCompletePropertyByNewPropertyNo(String newPropertyNo);
 }

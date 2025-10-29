@@ -3,6 +3,8 @@ import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDt
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.ConsolidatedTaxDetailsDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.PropertyUnitDetailsDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.ProposedRatableValueDetailsDto;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.AfterHearing_MasterEntity.AfterHearing_PropertyDetailsEntity;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.AfterHearing_MasterEntity.AfterHearing_UnitDetailsEntity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.ConsolidatedTaxes_MasterEntity.ConsolidatedTaxes_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.EduCessAndEmpCess_MasterEntity.EduCessAndEmpCess_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.PropertyRates_MasterEntity.PropertyRates_MasterEntity;
@@ -14,6 +16,8 @@ import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.UnitUsageTypes_Mast
 import com.GAssociatesWeb.GAssociates.Entity.PropertySurveyEntity.CompletePropertySurvey_Entity.PropertyDetails_Entity.PropertyDetails_Entity;
 import com.GAssociatesWeb.GAssociates.Entity.PropertySurveyEntity.CompletePropertySurvey_Entity.PropertyOldDetails_Entity.PropertyOldDetails_Entity;
 import com.GAssociatesWeb.GAssociates.Entity.PropertySurveyEntity.CompletePropertySurvey_Entity.UnitDetails_Entity.UnitDetails_Entity;
+import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AfterAssessmentModule_MasterRepository.AfterHearing_MasterRepository.AfterHearingPropertyDetails_MasterRepository;
+import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AfterAssessmentModule_MasterRepository.AfterHearing_MasterRepository.AfterHearingUnitDetails_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.ConsolidatedTaxes_MasterRepository.ConsolidatedTaxes_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.EduCessAndEmpCess_MasterRepository.EduCessAndEmpCess_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.PropertyRates_MasterRepository.PropertyRates_MasterRepository;
@@ -26,6 +30,7 @@ import com.GAssociatesWeb.GAssociates.Repository.PropertySurveyRepository.Proper
 import com.GAssociatesWeb.GAssociates.Repository.PropertySurveyRepository.PropertyOldDetails_Repository;
 import com.GAssociatesWeb.GAssociates.Repository.PropertySurveyRepository.UnitDetails_Repository;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.ReportConfigs_MasterServices.ReportTaxKeys;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,6 +67,10 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
     private PropertyOldDetails_Repository propertyOldDetails_repository;
     @Autowired
     private RvTypesAppliedTaxes_MasterRepository rvTypesAppliedTaxesMasterRepository;
+    @Autowired
+    private AfterHearingPropertyDetails_MasterRepository afterHearingPropertyDetailsMasterRepository;
+    @Autowired
+    private AfterHearingUnitDetails_MasterRepository afterHearingUnitDetailsMasterRepository;
     List<String> warnings = new ArrayList<>();
     Map<Long, Double> taxValueMap = new HashMap<>();
 
@@ -69,21 +78,44 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
 
     //this process is basically used for realtime tax assessment process
     @Override
-    public AssessmentResultsDto performAssessment(String newPropertyNumber) {
+    public AssessmentResultsDto performAssessment(String newPropertyNumber, boolean fromAfterHearing) {
         warnings.clear();
 
-        Optional<PropertyDetails_Entity> propertyOpt = propertyDetailsRepository.findBypdNewpropertynoVc(newPropertyNumber);
+        PropertyDetails_Entity property;
+        List<UnitDetails_Entity> unitDetails;
 
-        if (!propertyOpt.isPresent()) {
-            String errorMessage = "Property not found for the given newPropertyNumber: " + newPropertyNumber;
-            logger.severe(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
+        if (fromAfterHearing) {
+            // 🔹 Fetch After-Hearing versions
+            AfterHearing_PropertyDetailsEntity ahProp =
+                    afterHearingPropertyDetailsMasterRepository.findByPdNewpropertynoVc(newPropertyNumber)
+                            .orElseThrow(() -> new IllegalArgumentException(
+                                    "After-Hearing property not found: " + newPropertyNumber));
+
+            List<AfterHearing_UnitDetailsEntity> ahUnits =
+                    afterHearingUnitDetailsMasterRepository.findAllByPdNewpropertynoVc(newPropertyNumber);
+
+            // 🔹 Convert to normal entities for reuse of existing logic
+            property = mapAfterHearingToProperty(ahProp);
+            unitDetails = ahUnits.stream()
+                    .map(this::mapAfterHearingToUnit)
+                    .collect(Collectors.toList());
+
+            logger.info("🟩 Using After-Hearing repositories for reassessment of " + newPropertyNumber);
+        } else {
+            property = propertyDetailsRepository.findBypdNewpropertynoVc(newPropertyNumber)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Property not found: " + newPropertyNumber));
+
+            unitDetails = unitDetailsRepository.findAllByPdNewpropertynoVc(newPropertyNumber);
+            logger.info("🟢 Using standard repositories for assessment of " + newPropertyNumber);
         }
 
-        PropertyDetails_Entity property = propertyOpt.get();
         Integer zone = property.getPdZoneI();
-        List<UnitDetails_Entity> unitDetails = unitDetailsRepository.findAllByPdNewpropertynoVc(newPropertyNumber);
 
+
+        // ==========================================================
+        // 🔹 Step 2 — Initialize Variables
+        // ==========================================================
         List<Map<String, Object>> unitRecords = new ArrayList<>();
         double totalRatableValue = 0.0;
         double totalUserCharges = 0.0;
@@ -93,92 +125,85 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         double taxableValueRented = 0.0;
         double maintenanceRepairAmountRented = 0.0;
         double maintenanceRepairAmountUnrented = 0.0;
-        Map<Long, Double> maxUserChargesByCategory = new HashMap<>(); // to track the commercial usercharge as we have to consider bigger one
-
+        Map<Long, Double> maxUserChargesByCategory = new HashMap<>();
         Map<Long, Double> rateTypeTotals = new HashMap<>();
-        Set<Integer> processedUnitSubUsagesId = new HashSet<>();//for checking which unitusage subtype is processed so that usercharges get applied once
+        Set<Integer> processedUnitSubUsagesId = new HashSet<>();
+
+        // ==========================================================
+        // 🔹 Step 3 — Loop Through Unit Details and Calculate RV
+        // ==========================================================
         for (UnitDetails_Entity unit : unitDetails) {
             logger.info("Starting ratable value calculation for unit: " + unit.getUdUnitnoVc());
             Map<String, Object> unitRecord = calculateRatableValueForUnit(unit, zone);
             unitRecords.add(unitRecord);
+
             Double ratableValue = (Double) unitRecord.get("ratableValue");
             totalRatableValue += (ratableValue != null) ? ratableValue : 0.0;
 
-            Long categoryId = (Long) unitRecord.get("categoryId"); //using category id to set the values to their respective proposed ratable values
+            Long categoryId = (Long) unitRecord.get("categoryId");
             if (categoryId != null) {
                 rateTypeTotals.merge(categoryId, ratableValue, Double::sum);
             }
 
-
-            Object amountAfterDepreciationObj = unitRecord.get("amountAfterDepreciation");
             double amountAfterDepreciation = 0.0;
+            Object amountAfterDepreciationObj = unitRecord.get("amountAfterDepreciation");
             if (amountAfterDepreciationObj != null) {
                 amountAfterDepreciation = (Double) amountAfterDepreciationObj;
             }
 
             if (unit.getUdTenantnoI() != null && !unit.getUdTenantnoI().isEmpty()) {
-                // Rented units
+                // 🟢 Rented units
                 double annualRent = Double.parseDouble(unit.getUdRentalnoVc()) * 12;
                 annualRentalValue += annualRent;
 
-                // Retrieve and handle 'maintenanceRepairAmountForRent'
-                Object maintenanceRepairAmountForRentObj = unitRecord.get("maintenanceRepairAmountForRent");
-                double maintenanceRepairAmountForRent = 0.0;
-                if (maintenanceRepairAmountForRentObj != null) {
-                    maintenanceRepairAmountForRent = (Double) maintenanceRepairAmountForRentObj;
-                }
+                double maintenanceRepairAmountForRent =
+                        (Double) unitRecord.getOrDefault("maintenanceRepairAmountForRent", 0.0);
                 maintenanceRepairAmountRented += maintenanceRepairAmountForRent;
 
-                // Retrieve and handle 'taxableValueByActualRent'
-                Object taxableValueByActualRentObj = unitRecord.get("taxableValueByActualRent");
-                double taxableValueByActualRent = 0.0;
-                if (taxableValueByActualRentObj != null) {
-                    taxableValueByActualRent = (Double) taxableValueByActualRentObj;
-                }
+                double taxableValueByActualRent =
+                        (Double) unitRecord.getOrDefault("taxableValueByActualRent", 0.0);
                 taxableValueRented += taxableValueByActualRent;
             } else {
-                // Unrented units
+                // 🟠 Unrented units
                 annualUnRentalValue += amountAfterDepreciation;
 
                 double maintenanceRepairAmount = amountAfterDepreciation * 0.10;
                 maintenanceRepairAmountUnrented += maintenanceRepairAmount;
-
-                double taxableValueAfterMaintenance = amountAfterDepreciation - maintenanceRepairAmount;
-                taxableValueUnrented += taxableValueAfterMaintenance;
+                taxableValueUnrented += (amountAfterDepreciation - maintenanceRepairAmount);
             }
+
+            // 🧮 User Charges
             if (Double.parseDouble(unit.getUdAssessmentareaF()) != 0) {
-                if (categoryId == 4 || categoryId == 9) {  // Specifically handling commercial and commercial open plot category
+                if (categoryId == 4 || categoryId == 9) { // Commercial or Commercial Open Plot
                     double currentCharge = getUserChargesForUnit(unit);
                     maxUserChargesByCategory.merge(categoryId, currentCharge, Math::max);
-                } else if (!processedUnitSubUsagesId.contains(unit.getUdUsagesubtypeI())) {  // For non-commercial units
+                } else if (!processedUnitSubUsagesId.contains(unit.getUdUsagesubtypeI())) {
                     double userCharges = getUserChargesForUnit(unit);
                     totalUserCharges += userCharges;
-                    processedUnitSubUsagesId.add(unit.getUdUsagesubtypeI());  // Mark this unit ID as processed
+                    processedUnitSubUsagesId.add(unit.getUdUsagesubtypeI());
                 }
             }
-
-            logger.info("details:" + totalRatableValue);
-            logger.info("Completed ratable value calculation for unit: " + unit.getUdUnitnoVc() + ", Ratable Value: " + totalRatableValue);
+            logger.info("Completed ratable value calculation for unit: " + unit.getUdUnitnoVc());
         }
 
-        // this is added to get the usercharges correctly for commercial properties
+        // 🧩 Handle max user charges for commercial
         if (maxUserChargesByCategory.containsKey(4L) || maxUserChargesByCategory.containsKey(9L)) {
-            double maxCharge4 = maxUserChargesByCategory.getOrDefault(4L, 0.0);//this is getting used for commercial property
-            double maxCharge9 = maxUserChargesByCategory.getOrDefault(9L, 0.0);//this is getting used for commercial open plot
+            double maxCharge4 = maxUserChargesByCategory.getOrDefault(4L, 0.0);
+            double maxCharge9 = maxUserChargesByCategory.getOrDefault(9L, 0.0);
             totalUserCharges += Math.max(maxCharge4, maxCharge9);
         }
 
-        annualRentalValue = Math.round(annualRentalValue);
-        taxableValueUnrented = Math.round(taxableValueUnrented);
-
+        // ==========================================================
+        // 🔹 Step 4 — Calculate All Taxes
+        // ==========================================================
         totalRatableValue = Math.round(totalRatableValue);
-
-        Map<Long, Double> educationTaxMap = calculateEducationTax(totalRatableValue, unitRecords);//updated as per the new requirement
-        Map<Long, Double> propertyTaxMap = calculatePropertyTax(unitRecords); //updated as per the new requirement
-        double propertyTax = propertyTaxMap.getOrDefault(ReportTaxKeys.PT_PARENT, 0.0);//updated as per the new requirement
-        Map<Long, Double> consolidatedTaxes = calculateConsolidatedTaxes(totalRatableValue, propertyTax); //updated as per the new requirement
         totalUserCharges = Math.round(totalUserCharges);
-        Map<Long, Double> egcMap = calculateEgc(totalRatableValue, unitRecords);//updated as per the new requirement
+
+        Map<Long, Double> educationTaxMap = calculateEducationTax(totalRatableValue, unitRecords);
+        Map<Long, Double> propertyTaxMap = calculatePropertyTax(unitRecords);
+        double propertyTax = propertyTaxMap.getOrDefault(ReportTaxKeys.PT_PARENT, 0.0);
+        Map<Long, Double> consolidatedTaxes = calculateConsolidatedTaxes(totalRatableValue, propertyTax);
+        Map<Long, Double> egcMap = calculateEgc(totalRatableValue, unitRecords);
 
         double grandTotal =
                 propertyTaxMap.values().stream().mapToDouble(Double::doubleValue).sum()
@@ -187,16 +212,9 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
                         + egcMap.values().stream().mapToDouble(Double::doubleValue).sum()
                         + totalUserCharges;
 
-        // Align rounding with batch processing: store grand total as integer (rounded)
         grandTotal = Math.round(grandTotal);
 
-        logger.info("Units: "+ unitRecords);
-//        logger.info("education tax: "+educationTax);
-//        logger.info("consolidatedTaxes: "+consolidatedTaxes);
-//        logger.info("EGC: "+egc);
-//        logger.info("UserCharges: "+totalUserCharges);
-//        logger.info("propertyTax: "+propertyTax );
-        // Convert the assessment data into AssessmentResultsDto
+
         AssessmentResultsDto assessmentResultsDto = new AssessmentResultsDto();
 
         // Set basic property information
@@ -911,8 +929,25 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         return taxValueMap;
     }
 
+    private PropertyDetails_Entity mapAfterHearingToProperty(AfterHearing_PropertyDetailsEntity src) {
+        PropertyDetails_Entity dest = new PropertyDetails_Entity();
+        try {
+            BeanUtils.copyProperties(src, dest);
+        } catch (Exception e) {
+            logger.warning("⚠️ Property mapping failed: " + e.getMessage());
+        }
+        return dest;
+    }
 
-
+    private UnitDetails_Entity mapAfterHearingToUnit(AfterHearing_UnitDetailsEntity src) {
+        UnitDetails_Entity dest = new UnitDetails_Entity();
+        try {
+            BeanUtils.copyProperties(src, dest);
+        } catch (Exception e) {
+            logger.warning("⚠️ Unit mapping failed: " + e.getMessage());
+        }
+        return dest;
+    }
     private Double nullToZero(Double value) {
         return value != null ? value : 0.0;
     }

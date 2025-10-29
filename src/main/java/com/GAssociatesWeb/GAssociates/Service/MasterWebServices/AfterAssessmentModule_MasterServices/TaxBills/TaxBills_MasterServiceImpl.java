@@ -179,7 +179,7 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
 
         for (TaxBills_MasterDto dto : bills) {
             // 🔹 Fetch arrears safely
-            Map<String, Map<Long, Double>> arrearsMap = fetchYearWiseArrears(dto.getPdFinalpropnoVc());
+            Map<String, Map<Long, Double>> arrearsMap = fetchYearWiseArrears(dto.getPdNewpropertynoVc());
             if (arrearsMap == null) arrearsMap = new java.util.LinkedHashMap<>();
             dto.setArrearsYearWiseMap(arrearsMap);
 
@@ -293,8 +293,7 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
                 Map<Long, Double> taxMap = new HashMap<>();
 
                 // Map columns dynamically to tax keys (every field included)
-                Map<String, Long> columnKeyMap = Map.ofEntries(
-                        Map.entry("ptPropertyTaxFl", ReportTaxKeys.PT_PARENT),
+                Map<String, Long> columnKeyMap = new HashMap<>(Map.ofEntries(                        Map.entry("ptPropertyTaxFl", ReportTaxKeys.PT_PARENT),
                         Map.entry("ptEgcTaxFl", ReportTaxKeys.EGC),
                         Map.entry("ptTreeTaxFl", ReportTaxKeys.TREE_TAX),
                         Map.entry("ptEnvironmentTaxFl", ReportTaxKeys.ENV_TAX),
@@ -314,7 +313,7 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
                         Map.entry("ptStreetTaxFl", ReportTaxKeys.STREET_TAX),
                         Map.entry("ptSpecialConservancyTaxFl", ReportTaxKeys.SPEC_CONS),
                         Map.entry("ptFinalTaxFl", ReportTaxKeys.TOTAL_TAX)
-                );
+                ));
 
                 // Include reserved pt_tax1_fl … pt_tax25_fl
                 for (Map.Entry<String, Long> entry : TAX_COLUMN_MAP.entrySet()) {
@@ -345,6 +344,7 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
             dto.setPdWardI(rs.getString("pdWardI"));
             dto.setPdZoneI(rs.getString("pdZoneI"));
             dto.setPdFinalpropnoVc(rs.getString("pdFinalpropnoVc"));
+            dto.setPdNewpropertynoVc(rs.getString("pdNewpropertynoVc"));
             dto.setPdOwnernameVc(rs.getString("pdOwnernameVc"));
             dto.setPdOccupinameF(rs.getString("pdOccupinameF"));
             dto.setPdSurypropnoVc(rs.getString("pdSurypropnoVc"));

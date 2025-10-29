@@ -21,4 +21,6 @@ public class ProposedRatableValueDetailsDto {
     private Double electricSubstationFl;
     private Double aggregateFl;
     private String finalPropertyNoVc;
+
+    private String pdNewPropertynovc;
 }

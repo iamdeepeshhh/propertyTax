@@ -1,10 +1,9 @@
-// =============== 🏛️ Council Details & Year Range =====================\
+// =============================== 🏛️ Council Details & Year Range ===============================
 $(document).on('click', '#printBtn', function () {
   window.print();
 });
-$(document).ready(function () {
-  buildTaxBillTable(".taxBillTable", "TAX_BILL");
 
+$(document).ready(function () {
   // 🏛 Council Details
   $.ajax({
     url: '/3g/getCouncilDetails',
@@ -12,8 +11,7 @@ $(document).ready(function () {
     success: function (data) {
       if (data && data.length > 0) {
         const c = data[0];
-        $('.councilLocalName').text(c.localName);
-        $('.councilLocalNameHeader').text(c.localName);
+        $('.councilLocalName, .councilLocalNameHeader').text(c.localName);
         if (c.imageBase64) {
           $('.councilLogo').attr('src', 'data:image/png;base64,' + c.imageBase64);
           $('.standardSiteNameVC').text(c.standardSiteNameVC);
@@ -26,7 +24,7 @@ $(document).ready(function () {
     error: function () { console.error("❌ Failed to fetch council details."); }
   });
 
-  // 🗓 Assessment Year
+  // 🗓 Assessment Year Range
   fetch('/3g/getAllAssessmentDates')
     .then(res => res.json())
     .then(data => {
@@ -39,7 +37,7 @@ $(document).ready(function () {
     })
     .catch(err => console.error('Error fetching assessment dates:', err));
 
-  // 🧾 Load Batch Data (Ward)
+  // 🧾 Ward number from URL
   const path = window.location.pathname; // e.g. /taxBill/7
   const wardMatch = path.match(/\/taxBill\/(\d+)/);
   const wardNo = wardMatch ? wardMatch[1] : null;
@@ -51,40 +49,22 @@ $(document).ready(function () {
   }
 });
 
+// =============================== 🔢 Convert Digits ===============================
 function convertToDevanagari(num) {
-  const digits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+  const digits = ['०','१','२','३','४','५','६','७','८','९'];
   return num.toString().replace(/\d/g, d => digits[d]);
 }
-
-// =============== 🧾 Dynamic Tax Table Builder =====================
-function buildTaxBillTable(selector, template = "TAX_BILL") {
-  $.get('/3g/reportTaxConfigs?template=' + template, function (configs) {
-    if (!configs || configs.length === 0) return;
-    const $table = $(selector);
-    const $tbody = $table.find('tbody');
-    $tbody.empty();
-    configs.sort((a, b) => a.sequenceI - b.sequenceI);
-    configs.forEach(cfg => {
-      const row = `
-        <tr>
-          <td>${cfg.localNameVc}</td>
-          <td id="taxArrear-${cfg.taxKeyL}" class="t-c">0</td>
-          <td id="taxCurrent-${cfg.taxKeyL}" class="t-c">0</td>
-          <td id="taxTotal-${cfg.taxKeyL}" class="t-c">0</td>
-        </tr>`;
-      $tbody.append(row);
-    });
-    $tbody.append(`
-      <tr class="pinklight">
-        <td><b>एकूण कर</b></td>
-        <td id="totalArrear" class="t-c"><b>0</b></td>
-        <td id="totalCurrent" class="t-c"><b>0</b></td>
-        <td id="totalTax" class="t-c"><b>0</b></td>
-      </tr>`);
-  });
+function convertToDevanagariYear(yearStr) {
+  if (!yearStr) return '';
+  const parts = yearStr.split('-');
+  if (parts.length === 2) {
+    return `वर्ष ${parts[0]} ते ${parts[1]}`;
+  }
+  return `वर्ष ${yearStr}`;
 }
 
-// =============== 🏘️ Ward-wise Batch Data Fetch =====================
+
+// =============================== 🏘️ Fetch Ward Tax Bills ===============================
 function fetchWardTaxBills(wardNo) {
   $.ajax({
     url: `/3g/taxBills?wardNo=${wardNo}`,
@@ -102,12 +82,11 @@ function fetchWardTaxBills(wardNo) {
   });
 }
 
-// =============== 🧾 Render Batch Tax Bill Preview =====================
-function renderBatchPreview(dataList) {
+async function renderBatchPreview(dataList) {
   const $container = $('#main-report-section');
   $container.empty();
 
-  dataList.forEach(dto => {
+  for (const dto of dataList) {
     const $page = $('.page-container.template').clone().removeClass('template').show();
 
     // 🏠 Property info
@@ -122,38 +101,102 @@ function renderBatchPreview(dataList) {
     $page.find('.pdAssesareaF').text(dto.pdAssesareaF || '');
 
     // 💰 Proposed Ratable Values
-    const rv = dto.proposedRatableValues || {};
-    $page.find('.residentialFl').text(rv.residentialFl || '');
-    $page.find('.commercialFl').text(rv.commercialFl || '');
-    $page.find('.religiousFl').text(rv.religiousFl || '');
-    $page.find('.industrialFl').text(rv.industrialFl || '');
-    $page.find('.governmentFl').text(rv.governmentFl || '');
-    $page.find('.mobileTowerFl').text(rv.mobileTowerFl || '');
-    $page.find('.electricSubstationFl').text(rv.electricSubstationFl || '');
-    $page.find('.residentialOpenPlotFl').text(rv.residentialOpenPlotFl || '');
-    $page.find('.commercialOpenPlotFl').text(rv.commercialOpenPlotFl || '');
-    $page.find('.religiousOpenPlotFl').text(rv.religiousOpenPlotFl || '');
-    $page.find('.educationalInstituteOpenPlotFl').text(rv.educationalInstituteOpenPlotFl || '');
-    $page.find('.governmentOpenPlotFl').text(rv.governmentOpenPlotFl || '');
-    $page.find('.industrialOpenPlotFl').text(rv.industrialOpenPlotFl || '');
-    $page.find('.educationAndLegalInstituteOpenPlotFl').text(rv.educationAndLegalInstituteOpenPlotFl || '');
-    $page.find('.aggregateFl').text(rv.aggregateFl || '');
+    const rv = dto.proposedRatableValueDetailsDto || {};
+    Object.entries(rv).forEach(([key, val]) => {
+      $page.find(`.${key}`).text(val || '');
+    });
 
-
-    // 🧾 Tax Key Values
-    if (dto.taxKeyValueMap) {
-      for (let key in dto.taxKeyValueMap) {
-        $page.find(`#taxCurrent-${key}`).text(dto.taxKeyValueMap[key] != null ? dto.taxKeyValueMap[key] : 0);
-        $page.find(`#taxTotal-${key}`).text(dto.taxKeyValueMap[key] != null ? dto.taxKeyValueMap[key] : 0);
-      }
-    }
-    if (dto.consolidatedTaxes) {
-      $page.find('#totalCurrent').text(dto.consolidatedTaxes.totalTaxFl || '0');
-      $page.find('#totalTax').text(dto.consolidatedTaxes.totalTaxFl || '0');
-    }
+    // 🧾 Build arrears + current tax table
+    buildYearWiseTaxTable($page, dto);
 
     $container.append($page);
-  });
+  }
 
-  console.log(`✅ Loaded ${dataList.length} tax bills for preview`);
+  console.log(`✅ Rendered ${dataList.length} tax bills`);
 }
+
+// =============================== 🧾 Build Year-wise Tax Table ===============================
+function buildYearWiseTaxTable($page, dto) {
+  const arrearsMap = dto.arrearsYearWiseMap || {};
+  const currentTaxMap = dto.currentTaxMap || {};
+  const totalTaxMap = dto.totalTaxMap || {};
+  const arrearsYears = Object.keys(arrearsMap);
+
+  // If there are no arrears → show only current & total columns
+  const showArrears = arrearsYears.length > 0;
+
+  $.get('/3g/reportTaxConfigs?template=TAX_BILL', function (configs) {
+    if (!configs || configs.length === 0) return;
+
+    configs.sort((a, b) => a.sequenceI - b.sequenceI);
+
+    let html = `
+      <table class="table table-bordered" style="width:100%;font-size:12px;margin-top:10px;border-collapse:collapse;">
+        <thead style="font-weight:600;">
+          <tr>
+            <th style="background:#f4cccc;">कराचे तपशील</th>`;
+
+    if (showArrears) {
+      arrearsYears.forEach(y => {
+        html += `
+          <th style="padding:0;">
+            <div style="background:#f4cccc; font-weight:600; padding:2px 4px;">थकबाकी रक्कम</div>
+            <div style="background:#c9daf8; padding:2px 4px;">${convertToDevanagariYear(y)}</div>
+          </th>`;
+      });
+    }
+
+    html += `
+        <th style="background:#f4cccc;">चालू मागणी</th>
+        <th style="background:#f4cccc;">एकूण रक्कम</th>
+      </tr>
+    </thead>
+    <tbody>`;
+    // Totals
+    const totalByYear = {};
+    let totalCurrent = 0;
+    let totalOverall = 0;
+
+    // === Rows for each tax ===
+    configs.forEach(cfg => {
+      const key = cfg.taxKeyL;
+      const name = cfg.localNameVc;
+      html += `<tr><td>${name}</td>`;
+
+      let arrearTotal = 0;
+
+      if (showArrears) {
+        arrearsYears.forEach(y => {
+          const val = parseFloat(arrearsMap[y]?.[key] || 0);
+          html += `<td class="t-c">${val.toFixed(2)}</td>`;
+          arrearTotal += val;
+          totalByYear[y] = (totalByYear[y] || 0) + val;
+        });
+      }
+
+      const current = parseFloat(currentTaxMap[key] || 0);
+      const overall = parseFloat(totalTaxMap[key] || arrearTotal + current);
+
+      html += `<td class="t-c">${current.toFixed(2)}</td>`;
+      html += `<td class="t-c"><b>${overall.toFixed(2)}</b></td></tr>`;
+
+      totalCurrent += current;
+      totalOverall += overall;
+    });
+
+    // === Total Row ===
+    html += `<tr style="background:#fcd2d2;font-weight:700;"><td>एकूण कर</td>`;
+    if (showArrears) {
+      arrearsYears.forEach(y => {
+        html += `<td class="t-c">${(totalByYear[y] || 0).toFixed(2)}</td>`;
+      });
+    }
+    html += `<td class="t-c">${totalCurrent.toFixed(2)}</td>`;
+    html += `<td class="t-c">${totalOverall.toFixed(2)}</td></tr></tbody></table>`;
+
+    // Inject below the main tax section
+    $page.find('.taxBillTable').after(html);
+  });
+}
+
+
