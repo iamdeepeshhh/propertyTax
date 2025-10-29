@@ -217,7 +217,7 @@ public class SpecialNotice_MasterServiceImpl implements SpecialNotice_MasterServ
             dto.setPdAssesareaF(rs.getString("pdAssesareaF"));
             //dto.setAnnualRentalValueFl(rs.getString("annualRentalValueFl"));
            // dto.setAnnualUnRentalValueFl(rs.getString("annualUnRentalValueFl"));
-            dto.setPdBuildingvalueI(rs.getString("pdBuildingvalueI"));
+//            dto.setPdBuildingvalueI(rs.getString("pdBuildingvalueI"));
            // dto.setPdPlotvalueF(rs.getString("pdPlotvalueF"));
 
             ConsolidatedTaxDetailsDto taxDto = new ConsolidatedTaxDetailsDto();

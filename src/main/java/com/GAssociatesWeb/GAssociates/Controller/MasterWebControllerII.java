@@ -136,6 +136,7 @@ public class MasterWebControllerII {
         String changedValue = payload.get("changeType"); // RV / ASSESSMENT (optional)
 
         System.out.println("payload+"+payload);
+
         boolean updated = registerObjection_masterService.updateHearingStatus(newPropertyNo, status, changedValue);
 
         if (updated) {
