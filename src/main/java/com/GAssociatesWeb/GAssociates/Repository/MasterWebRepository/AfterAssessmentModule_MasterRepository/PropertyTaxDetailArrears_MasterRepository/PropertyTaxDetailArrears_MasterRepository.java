@@ -5,5 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PropertyTaxDetailArrears_MasterRepository extends JpaRepository<PropertyTaxDetailArrears_MasterEntity, Integer> {
     PropertyTaxDetailArrears_MasterEntity findByNewPropertyNo(String newPropertyNo);
+    PropertyTaxDetailArrears_MasterEntity findByNewPropertyNoAndFinancialYear(String newPropertyNo, String financialYear);
 
 }

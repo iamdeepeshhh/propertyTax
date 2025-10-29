@@ -144,12 +144,22 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
 
         dto.setUnitDetails(createdUnits);
 
+        // Copy existing unit-wise RValues into after-hearing (RV-only change retains RValues)
+        List<Property_RValues> oldRValues = property_rValuesRepository.findAllByPrvPropertyNoVc(newPropertyNo);
+        if (oldRValues != null && !oldRValues.isEmpty()) {
+            afterHearingPropertyRvalues_masterRepository.saveAll(
+                    oldRValues.stream().map(this::mapRValueToAfterHearing).collect(Collectors.toList())
+            );
+        }
+
         // 🔹 Step 3: Run assessment
         AssessmentResultsDto result = taxAssessment_masterService.performAssessment(newPropertyNo, true);
 
+        System.out.println("Perform assessment result \n"+result);
+
         // 🔹 Step 4: Save RValues, Proposed RVs, Tax Details
         if (result.getProposedRatableValues() != null){
-         AfterHearing_ProposedRValuesEntity proposedRValuesEntity = convertAssessmentResultsOfProposedRvaluesToEntity(result.getProposedRatableValues());
+            AfterHearing_ProposedRValuesEntity proposedRValuesEntity = convertAssessmentResultsOfProposedRvaluesToEntity(result.getProposedRatableValues(),newPropertyNo);
             afterHearingProposedRvalues_masterRepository.save(proposedRValuesEntity);
         }
         if (result.getTaxKeyValueMap() != null){
@@ -166,10 +176,12 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
         dto.setHearingStatus("CHANGED");
         dto.setChangeType("ASSESSMENT");
 
+        System.out.println("method ended successfully"+dto);
+
         log.info("[AFTER_HEARING][FULL_ASSESSMENT] ✅ Completed reassessment for " + newPropertyNo);
     }
 
-    private void handleRvChange(
+    private void  handleRvChange(
             String newPropertyNo,
             AfterHearingCompleteProperty_Dto dto,
             PropertyDetails_Dto propertyDetailsDto) {
@@ -233,10 +245,12 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
         double totalTax = allTaxes.values().stream().mapToDouble(Double::doubleValue).sum();
 
         // 🔹 Step 3: Save new Proposed RV
-        AfterHearing_ProposedRValuesDto rvDto = mapToAfterHearingProposedRvDto(proposed);
+        AfterHearing_ProposedRValuesDto rvDto = mapToAfterHearingProposedRvDto(proposed,newPropertyNo);
         afterHearingProposedRvalues_masterRepository.saveAll(
                 convertProposedRValues(Collections.singletonList(rvDto))
         );
+
+
 
         // 🔹 Step 4: Save all Tax Details
         AfterHearing_PropertyTaxDetailsEntity taxEntity =
@@ -915,11 +929,11 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
     }
 
     private AfterHearing_ProposedRValuesEntity convertAssessmentResultsOfProposedRvaluesToEntity(
-            ProposedRatableValueDetailsDto dto
+            ProposedRatableValueDetailsDto dto,String newPropertyNoVc
     ) {
         AfterHearing_ProposedRValuesEntity prv = new AfterHearing_ProposedRValuesEntity();
 
-        prv.setPrNewPropertyNoVc(dto.getPdNewPropertynovc());
+        prv.setPrNewPropertyNoVc(newPropertyNoVc);
         prv.setPrFinalPropNoVc(dto.getFinalPropertyNoVc());
 
         // 🧮 Ratable Value Fields
@@ -952,7 +966,7 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
 
     private List<AfterHearing_PropertyRValuesEntity> convertAssessmentResultsOfPropertyRvaluesToEntity(
             List<PropertyUnitDetailsDto> unitDtos,
-            String newPropertyNo,
+            String newPropertyNoVc,
             String finalPropertyNo
     ) {
         if (unitDtos == null || unitDtos.isEmpty()) {
@@ -962,7 +976,7 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
         return unitDtos.stream().map(u -> {
             AfterHearing_PropertyRValuesEntity ar = new AfterHearing_PropertyRValuesEntity();
 
-            ar.setPrvPropertyNoVc(newPropertyNo);
+            ar.setPrvPropertyNoVc(newPropertyNoVc);
             ar.setPrvFinalPropNoVc(finalPropertyNo);
             ar.setPrvUnitNoVc(u.getUnitNoVc());
 
@@ -1021,10 +1035,10 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
         return dto;
     }
 
-    private AfterHearing_ProposedRValuesDto mapToAfterHearingProposedRvDto(ProposedRatableValueDetailsDto src) {
+    private AfterHearing_ProposedRValuesDto mapToAfterHearingProposedRvDto(ProposedRatableValueDetailsDto src, String newPropertyNoVc) {
         AfterHearing_ProposedRValuesDto dto = new AfterHearing_ProposedRValuesDto();
 
-        dto.setPrNewPropertyNoVc(src.getFinalPropertyNoVc());
+        dto.setPrNewPropertyNoVc(newPropertyNoVc);
         dto.setPrFinalPropNoVc(src.getFinalPropertyNoVc());
 
         // 🏠 Ratable Value Components

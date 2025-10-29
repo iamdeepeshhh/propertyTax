@@ -8,5 +8,6 @@ public interface PropertyTaxDetailArrears_MasterService {
     PropertyTaxDetailArrears_MasterDto saveArrears(PropertyTaxDetailArrears_MasterDto dto);
     List<PropertyTaxDetailArrears_MasterDto> getAll();
     PropertyTaxDetailArrears_MasterDto getSingleArrearsTaxDetails(String newPropertyNo);
+    PropertyTaxDetailArrears_MasterDto getArrearsByPropertyAndYear(String newPropertyNo, String financialYear);
 
 }

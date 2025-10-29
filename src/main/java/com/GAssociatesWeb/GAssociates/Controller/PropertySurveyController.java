@@ -224,6 +224,13 @@ public class PropertySurveyController {
         return "3GAfterLogin";
     }
 
+    @GetMapping("/logout")
+    public String logoutSurvey(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) session.invalidate();
+        return "redirect:/3gSurvey/surveyLogin";
+    }
+
     //if someone is going for new registeration below method will be initialized
     @GetMapping(value = "/form")
     public String showSurveyForm(HttpServletRequest request) {
@@ -1060,7 +1067,10 @@ public class PropertySurveyController {
                            HttpServletRequest request, Model model) {
 
         HttpSession session = request.getSession();
-        if (session.getAttribute("username") == null) {
+        Object username = session.getAttribute("username");
+        Object role = session.getAttribute("role");
+        // Allow access if either survey login (username) exists OR master role exists (navigated from MasterWeb)
+        if (username == null && role == null) {
             return "redirect:/3gSurvey/surveyLogin";
         }
 

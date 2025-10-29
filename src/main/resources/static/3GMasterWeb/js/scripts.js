@@ -58,6 +58,16 @@ function showTab(tabId) {
     }
 }
 
+// Show a specific master child section by id (used by new Master menu)
+function showMaster(childId) {
+    // Reuse showTab behavior: hide all and show only requested child
+    document.querySelectorAll('section').forEach(section => {
+        section.style.display = 'none';
+    });
+    const target = document.getElementById(childId);
+    if (target) target.style.display = 'block';
+}
+
 function populateDropdown(selectId, endpointUrl, displayProperty, idProperty = null) {
     // selectID is the name of the dropdown element
     // endpointUrl is the URL to fetch data from backend(controller)
@@ -1441,14 +1451,18 @@ async function fetchAndPopulateWardsForBatch(endpointUrl, tableBodyId) {
             // Add actions
             const actionsCell = document.createElement('td');
             actionsCell.className = "text-center";
-            // "Process Ward" button
-            const processButton = document.createElement('button');
-            processButton.textContent = 'Process Ward';
-            processButton.classList.add('btn', 'btn-success', 'mr-2');
-            processButton.onclick = function() {
-                processBatchForWard(ward.wardNo, row);
-            };
-            actionsCell.appendChild(processButton);
+            // "Process Ward" button (shown only if permitted by server)
+            const allowProcEl = document.getElementById('perm-controls');
+            const allowProcess = allowProcEl && allowProcEl.dataset && allowProcEl.dataset.allowProcess === 'true';
+            if (allowProcess) {
+                const processButton = document.createElement('button');
+                processButton.textContent = 'Process Ward';
+                processButton.classList.add('btn', 'btn-success', 'mr-2');
+                processButton.onclick = function() {
+                    processBatchForWard(ward.wardNo, row);
+                };
+                actionsCell.appendChild(processButton);
+            }
 
             // "View Batch Report" button
             const viewBatchReportButton = document.createElement('button');
@@ -1992,8 +2006,6 @@ async function saveArrearsTax() {
     alert("⚠️ Failed to save arrears tax. Please check console for details.");
   }
 }
-
-
 
 
 

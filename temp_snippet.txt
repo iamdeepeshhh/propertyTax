@@ -1,0 +1,5 @@
+const p2HearingData = taxConfigs.map(c =>
+            `<td class=\"p2\">${after[c.taxKeyL] || 0}</td>`
+          ).join('');
+
+          // Appeal taxes are empty in the origina

@@ -22,7 +22,7 @@
 
         th {
           font-weight: 600;
-          background: #f9f9f9;
+          background: #fff; /* no header color */
         }
 
         /* vertical headers */
@@ -88,21 +88,44 @@
         .report-header {
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          margin-left: -10px;
-          padding: 10px 0;
+          justify-content: center;
+          gap: 20px;                 /* spacing between logo & text */
+          margin: 15px auto;
+          width: 100%;
         }
+
+        .property-no .prop-line {
+          border-bottom: 1px solid #000;
+          padding: 1px 0; /* tighter to reduce row height */
+        }
+
+        .property-no .prop-line:last-child {
+          border-bottom: none; /* remove divider after last one */
+        }
+
         .report-header img {
           height: 90px;
           width: auto;
-          margin-left: 120px;
-          border-radius: 20px;
-          transform: scale(1.1);
+          margin-left: 0;
+          border-radius: 12px;
+          flex-shrink: 0;
         }
+
         .report-header div {
-          flex-grow: 1;
+          flex: 1;
           text-align: center;
-          padding-left: 50px;
+        }
+
+        .report-header h1 {
+          color: red;
+          font-size: 22px;
+          margin: 0 0 4px 0;
+        }
+
+        .report-header p {
+          margin: 2px 0;
+          font-size: 14px;
+          line-height: 1.3;
         }
         .report-header h1, .report-header p {
           margin: 0;
@@ -123,12 +146,15 @@
         }
 
         .column-numbers th {
-          background: rgb(136, 214, 250);
+          background: rgb(136, 214, 250); /* remove blue band */
           font-size: 11px;
           font-weight: bold;
           border: 1px solid #000;
           text-align: center;
         }
+
+        /* No special color for group headers */
+        th.group { background: #fff; }
 
         /* 🔹 CSS Counters for Column Numbers */
         tr.column-numbers {
@@ -152,27 +178,31 @@
         tr.column-numbers th.p2::before {
           content: counter(counterP2);
         }
+        
+        /* Do not number the P2 serial column */
+        tr.column-numbers th.p2.p2-serial { counter-increment: none; }
+        tr.column-numbers th.p2.p2-serial::before { content: ""; }
         /* Note: .seam columns won't be incremented or display content, which is correct. */
 
 
         td.property-no {
-          line-height: 1.4;
+          line-height: 1.15;
           text-align: center;
           vertical-align: middle;
           white-space: pre-line; /* allows line breaks (\n) */
           font-weight: 600;
-          font-size: 12px;
-          padding: 4px;
+          font-size: 11px;
+          padding: 2px 3px;
         }
 
         td.multi-line {
           text-align: center;
           vertical-align: middle;
-          line-height: 1.3;
+          line-height: 1.15;
           white-space: pre-line; /* allows \n or <br> line breaks */
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 500;
-          padding: 3px;
+          padding: 2px 3px;
         }
 
         /* 🔹 Optional: light background header strip like your screenshot */
@@ -210,23 +240,137 @@
         font-weight: bold;
       }
 
-        /* printing */
-        @media print {
-          .controls { display: none !important; }
-          header.report-header, thead {
-            display: table-header-group;
-          }
-            body.print1 .p2, body.print1 .seam { display: none !important; }
-            body.print2 .p1, body.print2 .seam { display: none !important; }
-            tfoot { display: table-footer-group; }
-            tr.page-break { page-break-after: always; }
+      /* ✅ Ensure Part 1 and Part 2 columns match perfectly */
+table.reportTable {
+  table-layout: fixed;
+  width: 100%;
+}
 
-          /* 4. Printing Logic for Counters */
-          /* These rules are no longer needed, as the parent <th>
-             (e.g., body.print1 .p2) is already set to display: none. */
+/* Give both parts equal cell sizing */
+.p1, .p2 {
+  width: auto;
+  min-width: 30px;
+  max-width: 100px;
+  word-wrap: break-word;
+}
+
+        /* Optional: make text wrap identically (tighter) */
+        .p1, .p2, .v {
+  line-height: 1.15;
+  padding: 2px 3px;
+  vertical-align: middle;
+}
+        /* Tighter Part 1 cells so height follows content */
+        th.p1, td.p1 {
+          padding: 2px 3px;
+          line-height: 1.12;
+        }
+        /* Tighter Part 2 cells to match height tightening */
+        th.p2, td.p2 {
+          padding: 2px 3px;
+          line-height: 1.12;
         }
 
-        @page { size: A3 landscape; margin: 1cm; }
+/* Force vertical alignment across both sides */
+tr td, tr th {
+  vertical-align: middle;
+}
+
+th, td {
+  font-size: 11px;
+  padding: 2px 3px;
+}
+
+/* Broader important columns */
+th.property-no, td.property-no { min-width: 90px; }
+th.owner-name, td.owner-name   { min-width: 120px; }
+th.usage-type, td.usage-type   { min-width: 90px; }
+th.zone-no, td.zone-no         { min-width: 60px; }
+th.tax-col, td.tax-col         { min-width: 55px; }
+
+/* Keep numeric tax columns compact */
+th[class*="p1"], th[class*="p2"], td[class*="p1"], td[class*="p2"] {
+  text-align: center;
+  min-width: 45px;
+}
+
+/* Vertical header width so Marathi fits properly */
+th.v {
+  width: 36px;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Allow wide layout with smooth scroll on-screen */
+#reportContainer {
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* Optional: visually balance all columns horizontally */
+table.reportTable {
+  border-spacing: 0;
+  table-layout: fixed;
+}
+        @media print {
+  .controls { display: none !important; }
+.report-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 20px !important;
+    width: 100% !important;
+    margin: 10px auto !important;
+  }
+
+  .report-header img {
+    height: 90px !important;
+    margin: 0 !important;
+  }
+
+  .report-header div {
+    flex: 1 !important;
+    text-align: center !important;
+  }
+  header.report-header, thead {
+    display: table-header-group;
+  }
+
+  tfoot { display: table-footer-group; }
+
+  /* Hide unnecessary parts */
+  body.print1 .p2,
+  body.print1 .seam {
+    display: none !important;
+  }
+
+  body.print2 .p1,
+  body.print2 .seam {
+    display: none !important;
+  }
+
+  /* ✅ Ensure container and tables are visible in PDF */
+  #reportContainer {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  table.reportTable {
+    display: table !important;
+    width: 100% !important;
+  }
+
+  /* ✅ Continuous flow (no extra blank pages) */
+  div[style*="page-break-after"] {
+    page-break-after: avoid !important;
+  }
+
+  @page {
+    size: A3 landscape;
+    margin: 10mm;
+  }
+}
     </style>
 </head>
 <body>
@@ -297,6 +441,11 @@
         }
 
         // 3. Render report only after configs and data are ready
+
+        console.log(data[0].propertyDetails );
+        console.log(data[0].propertySummary );
+        console.log(data[0].propertyUnitDetails );
+        console.log(data[0].unitDetails );
         renderAssessmentChunks(data);
 
       } catch (err) {
@@ -325,7 +474,7 @@
 
 
     /* --------------------------------------
-         🔹 Render chunks (3 reports per page)
+    🔹 Render chunks (3 reports per page)
        -------------------------------------- */
     function renderAssessmentChunks(data) {
       const grouped = data.reduce((acc, prop) => {
@@ -335,6 +484,8 @@
         return acc;
       }, {});
 
+
+
       const reportContainer = document.querySelector("#reportContainer");
       reportContainer.innerHTML = "";
       const groups = Object.values(grouped);
@@ -342,7 +493,7 @@
       // --- DYNAMIC HEADER GENERATION ---
       const taxConfigs = window.dynamicTaxConfigs || [];
       // +1 for 'एकूण' (Total) column
-      const taxColSpan = taxConfigs.length + 1;
+      const taxColSpan = taxConfigs.length + 2;
 
       // Helper to generate dynamic tax headers
       const createTaxHeaders = (className) => {
@@ -364,12 +515,12 @@
         <thead>
           <tr>
             <th class="p1" rowspan="3" >क्र.</th>
-            <th class="p1 v" rowspan="3">रस्ता,<br>विभाग,<br>मंडळाचे नाव व वाड क्र.</th>
-            <th class="p1 v" rowspan="3">झोन क्र.<br>(नवीन / जुना)</th>
-            <th class="p1 v" rowspan="3">मालमत्ता क्रमांक<br>(नवीन / जुना / सह. मा. नं.)</th>
+            <th class="p1 " rowspan="3">रस्ता,<br>विभाग,<br>मंडळाचे नाव व वाड क्र.</th>
+            <th class="p1 " rowspan="3">झोन क्र.<br>(नवीन / जुना)</th>
+            <th class="p1 " rowspan="3">मालमत्ता क्रमांक<br>(नवीन / जुना / सह. मा. नं.)</th>
+            <th class="p1 group" colspan="3">मालमत्तेचे वर्णन</th>
             <th class="p1 " rowspan="3">मालकाचे नाव</th>
             <th class="p1" rowspan="3">भोगवटादाराचे नाव</th>
-            <th class="p1 group" colspan="3">मालमत्तेचे वर्णन</th>
             <th class="p1 v" rowspan="3">मालमत्तेचे अंदाजित वार्षिक भाडे मूल्य</th>
             <th class="p1 v" rowspan="3">भाड्याने दिलेल्या भागाचे वार्षिक भाडे</th>
             <th class="p1 v" rowspan="3">भाड्याने न दिलेल्या भागाचे अंदाजित वार्षिक भाडे</th>
@@ -378,6 +529,7 @@
             <th class="p1 v" rowspan="3">इमारतीचे वा जमिनीचे करयोग्य मूल्य</th>
             <th class="p1 group" colspan="${taxColSpan}">आकारण्यात आलेल्या करांची रक्कम (सुनावणी आधीचे)</th>
             <th class="seam" rowspan="3"></th>
+            <th class="p2" rowspan="3">Sr. No.</th>
             <th class="p2 group" colspan="${taxColSpan}">आकारण्यात येणाऱ्या करांची रक्कम (आक्षेप / सुनावणी नंतरचे)</th>
             <th class="p2 group" colspan="${taxColSpan}">आकारण्यात आलेल्या करांच्या रकम (अपील नंतर)</th>
             <th class="p2" rowspan="3">आक्षेपाबाबत</th>
@@ -393,14 +545,17 @@
             <th class="p1 v">एकूण करयोग्य क्षेत्रफळ</th>
 
             <!-- P1: Dynamic Tax Headers -->
+            <th class="p1 ">करयोग्य मूल्य</th>
             ${p1TaxHeaders}
             <th class="p1">एकूण</th>
 
             <!-- P2 Hearing: Dynamic Tax Headers -->
+            <th class="p2 ">करयोग्य मूल्य</th>
             ${p2HearingHeaders}
             <th class="p2">एकूण</th>
 
             <!-- P2 Appeal: Dynamic Tax Headers -->
+            <th class="p2 ">करयोग्य मूल्य</th>
             ${p2AppealHeaders}
             <th class="p2">एकूण</th>
           </tr>
@@ -413,13 +568,14 @@
       const staticCols1 = Array(15).fill(0).map(() => `<th class="p1"></th>`).join('');
       const p1TaxCols = Array(taxColSpan).fill(0).map(() => `<th class="p1"></th>`).join('');
       const seamCol = '<th class="seam"></th>'; // MODIFIED: Added seam class
-      const p2HearingCols = Array(taxColSpan).fill(0).map(() => `<th class="p2"></th>`).join('');
-      const p2AppealCols = Array(taxColSpan).fill(0).map(() => `<th class="p2"></th>`).join('');
-      const staticCols2 = Array(6).fill(0).map(() => `<th class="p2"></th>`).join('');
+      const p2HearingCols = Array(taxColSpan).fill(0).map(() => `<th class=\"p2\"></th>`).join('');
+      const p2AppealCols = Array(taxColSpan).fill(0).map(() => `<th class=\"p2\"></th>`).join('');
+      const p2SerialCol = '<th class=\"p2 p2-serial\"></th>';
+      const staticCols2 = Array(6).fill(0).map(() => `<th class=\"p2\"></th>`).join('');
 
       // 🔹 MODIFIED: Calculate P1 column count and set P2 counter to start from there.
       const p1ColCount = 15 + taxColSpan;
-      const columnNumbersHTML = `<tr class="column-numbers" style="counter-reset: counterP1 0 counterP2 ${p1ColCount};">${staticCols1}${p1TaxCols}${seamCol}${p2HearingCols}${p2AppealCols}${staticCols2}</tr>`;
+      const columnNumbersHTML = `<tr class=\"column-numbers\" style=\"counter-reset: counterP1 0 counterP2 ${p1ColCount};\">${staticCols1}${p1TaxCols}${seamCol}${p2SerialCol}${p2HearingCols}${p2AppealCols}${staticCols2}</tr>`;
       // --- END DYNAMIC HEADERS ---
 
 
@@ -439,7 +595,27 @@
         chunk.forEach((group, idx) => {
           const property = group[0];
           const pd = property.propertyDetails || {};
+          const psd =property.propertySummary || {};
           const usages = (group.flatMap(p => p.propertyUnitDetails || [])).map(u => u.usageTypeVc || "").join("<br>");
+          // Derived values for mixed columns (unit-wise only)
+          const units = group.flatMap(p => p.propertyUnitDetails || []);
+          const unitLines = (units && units.length > 0)
+            ? units.map(u => {
+                const usage = (u.usageTypeVc || '—');
+                const floor = (u.floorNoVc || '—');
+                const person = (u.tenantNameVc && u.tenantNameVc.trim() !== '') ? `भाडेकरू: ${u.tenantNameVc}` : 'मालक';
+                return `${usage} / ${floor} / ${person}`;
+              })
+            : ['— / — / —'];
+          const multiLineInfo = unitLines.join('<br>');
+          const constructionBlocks = units.map(u => {
+            const ctype = (u.constructionTypeVc || '—');
+            const tArea = (u.taxableAreaFl != null && u.taxableAreaFl !== '') ? u.taxableAreaFl : '—';
+            return `<div class=\"description-block\">${ctype}<br>${tArea}</div>`;
+          }).join('');
+          const totalTaxableArea = (psd.totalAssessmentAreaFl != null)
+            ? psd.totalAssessmentAreaFl
+            : units.reduce((s, u) => s + (parseFloat(u.taxableAreaFl) || 0), 0);
           const beforeAll = group.map(p => p.taxKeyValueMapAfterAssess || {});
           const afterAll = group.map(p => p.taxKeyValueMapAfterHearing || {});
 
@@ -457,16 +633,18 @@
           const after = mergeTaxMaps(afterAll);
 
           // Calculate totals dynamically
-          const totalBefore = taxConfigs.reduce((sum, tax) => sum + (before[tax.taxMasterIdI] || 0), 0);
-          const totalAfter = taxConfigs.reduce((sum, tax) => sum + (after[tax.taxMasterIdI] || 0), 0);
+          const totalBefore = taxConfigs.reduce((sum, tax) => sum + (before[tax.taxKeyL] || 0), 0);
+          const totalAfter = taxConfigs.reduce((sum, tax) => sum + (after[tax.taxKeyL] || 0), 0);
+          const afterTaxable = (after["taxablevalue"] || after["ratablevalue"] || psd?.consideredRvFl || psd?.totalRatableValueFl || 0);
 
           // --- DYNAMIC DATA ROW GENERATION ---
-          const p1TaxData = taxConfigs.map(c =>
-            `<td class="p1">${before[c.taxMasterIdI] || 0}</td>`
-          ).join('');
+          const p1TaxData = `
+            <td class="p1">${before["taxablevalue"] || before["ratablevalue"] || psd?.consideredRvFl || psd?.totalRatableValueFl || 0}</td>
+            ${taxConfigs.map(c => `<td class=\"p1\">${before[c.taxKeyL] || 0}</td>`).join('')}
+          `;
 
           const p2HearingData = taxConfigs.map(c =>
-            `<td class="p2">${after[c.taxMasterIdI] || 0}</td>`
+            `<td class=\"p2\">${after[c.taxKeyL] || 0}</td>`
           ).join('');
 
           // Appeal taxes are empty in the original logic, so we just generate empty cells
@@ -480,40 +658,48 @@
             <td class="p1">${pd.pdWardI || ""}</td>
             <td class="p1">${pd.pdZoneI || ""}</td>
             <td class="p1 property-no">
-                  ${[pd.pdNewpropertynoVc || '', pd.pdFinalpropnoVc || '', pd.pdSurypropnoVc || '']
-                    .filter(v => v && v.trim() !== '')
-                    .join('<br>')}
+              ${
+                [pd.pdFinalpropnoVc, pd.pdOldpropnoVc, pd.pdSurypropnoVc]
+                  .filter(v => v && v.trim() !== '')
+                  .map(v => `<div class="prop-line">${v}</div>`)
+                  .join('')
+              }
             </td>
-            <td class="p1">${pd.pdOwnernameVc || "—"}</td>
-            <td class="p1">${pd.pdOccupinameF || "—"}</td>
+
             <td class="p1 multi-line">
                   ${[
-                    property.propertyTypeVc || "—",
-                    property.usageTypeVc || "—",
-                    property.floorNoVc || "—",
+                    property.propertyTypeVc || "—", "<br>" ,
+                    property.usageTypeVc || "—","<br>",
+                    property.floorNoVc || "—","<br>",
                     property.ownerTypeVc || "—"
                   ].filter(v => v && v.trim() !== "").join("<br>")}
             </td>
             <td class="p1"></td>
             <td class="p1"></td>
-            <td class="p1">${before["ratepersqm"] || ""}</td>
-            <td class="p1">${before["actualrent"] || ""}</td>
-            <td class="p1">${before["ratablevalue"] || ""}</td>
-            <td class="p1">${before["amountafterdep"] || ""}</td>
-            <td class="p1">${before["depamount"] || ""}</td>
-            <td class="p1">${before["totalratablevalue"] || ""}</td>
+            <td class="p1">${pd.pdOwnernameVc || "—"}</td>
+            <td class="p1">${pd.pdOccupinameF || "—"}</td>
+
+            <td class="p1">${psd.totalAlvFl || ""}</td>
+            <td class="p1">${psd.totalYearlyRentFl || ""}</td>
+            <td class="p1">${psd.consideredRvFl || ""}</td>
+            <td class="p1">${psd.totalCombinedAlvRentFl || ""}</td>
+            <td class="p1">${psd.totalDepreciationAmountFl || ""}</td>
+            <td class="p1">${psd.totalRatableValueFl || ""}</td>
 
             <!-- P1: Dynamic Tax Data -->
             ${p1TaxData}
             <td class="p1"><b>${totalBefore.toFixed(0)}</b></td>
 
             <td class="seam"></td>
+            <td class="p2">${i + idx + 1}</td>
 
             <!-- P2 Hearing: Dynamic Tax Data -->
+            <td class="p2">${afterTaxable}</td>
             ${p2HearingData}
             <td class="p2"><b>${totalAfter.toFixed(0)}</b></td>
 
             <!-- P2 Appeal: Dynamic (empty) Tax Data -->
+            <td class="p2"></td>
             ${p2AppealData}
             <td class="p2"></td> <!-- Appeal Total (empty) -->
 
@@ -523,34 +709,55 @@
             <td class="p2"></td> <!-- अधिकृत मूल्य निर्धारण अधिकारीची सही -->
             <td class="p2"></td> <!-- अपील समिती सभापतीची सही -->
             <td class="p2"></td> <!-- फेरफार बँलचा शेरा व मुख्याधिकारी यांची सही -->
-            <td class="p2">${usages}</td> <!-- वापर प्रकार -->
+            <td class="p2">${multiLineInfo}</td> <!-- वापर प्रकार -->
           `;
+          // Fill mixed info cells for Part 1: [4]=Usage/Floor/Owner/Tenant, [5]=Construction/Taxable, [6]=Total Taxable
+          try {
+            const p1Cells = tr.querySelectorAll('td.p1');
+            if (p1Cells.length > 7) {
+              p1Cells[4].innerHTML = multiLineInfo;
+              p1Cells[5].classList.add('description-cell');
+              p1Cells[5].innerHTML = constructionBlocks;
+              p1Cells[6].textContent = (totalTaxableArea ?? '').toString();
+            }
+          } catch (e) { console.warn('Row mixin fill failed', e); }
           tbody.appendChild(tr);
 
         // Add placeholder rows (assuming 3 rows per property)
           const tr1 = document.createElement("tr");
-          tr1.innerHTML = `<td class="p1" colspan="${15 + taxColSpan}"></td> <td class="seam"></td> <td class="p2" colspan="${taxColSpan + taxColSpan + 6}"></td>`;
+          tr1.innerHTML = `<td class=\"p1\" colspan=\"${15 + taxColSpan}\"></td> <td class=\"seam\"></td> <td class=\"p2\" colspan=\"${taxColSpan + taxColSpan + 7}\"></td>`;
           tbody.appendChild(tr1);
 
-            const tr2 = document.createElement("tr");
-          tr2.innerHTML = `<td class="p1" colspan="${15 + taxColSpan}"></td> <td class="seam"></td> <td class="p2" colspan="${taxColSpan + taxColSpan + 6}"></td>`;
+          const tr2 = document.createElement("tr");
+          tr2.innerHTML = `<td class=\"p1\" colspan=\"${15 + taxColSpan}\"></td> <td class=\"seam\"></td> <td class=\"p2\" colspan=\"${taxColSpan + taxColSpan + 7}\"></td>`;
           tbody.appendChild(tr2);
         });
 
-        // Page break style after each chunk
-        wrapper.style.pageBreakAfter = "always";
-        reportContainer.appendChild(wrapper);
-      }
+        if (chunkIndex < groups.length) {
+              wrapper.style.pageBreakAfter = "always";
+          }
+           reportContainer.appendChild(wrapper);
+        }
     }
 
     /* print logic */
     function printPart(part) {
-      document.body.classList.remove('print1','print2');
-      document.body.classList.add(part === 1 ? 'print1' : 'print2');
-      window.print();
-      setTimeout(() => document.body.classList.remove('print1','print2'), 400);
-    }
+  document.body.classList.remove('print1', 'print2');
+  document.body.classList.add(part === 1 ? 'print1' : 'print2');
+
+  // 🕒 Wait for layout to complete before printing
+  setTimeout(() => {
+    console.log("🖨️ Printing report...");
+    window.print();
+
+    // Remove print class after printing
+    setTimeout(() => document.body.classList.remove('print1', 'print2'), 500);
+  }, 800); // ⏳ small delay to let DOM paint fully
+}
+
+
 </script>
 </body>
 </html>
+
 

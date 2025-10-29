@@ -1866,15 +1866,246 @@
     
     //this is used for getting the content from dropdown like in roomtypes whatever roomtype is selected it will get the name from the dropdown
     function getSelectedOptionText(selectId) {
-    if (!selectId) {
-    console.error('getSelectedOptionText: selectElement is null');
-    return '';
-    }
+    if (!selectId) return '';
+
     const selectElement = document.getElementById(selectId);
-    const selectedOption = selectElement.options[selectElement.selectedIndex];
-    return selectedOption.getAttribute('data-name') || selectedOption.text;
+    if (!selectElement) {
+        console.warn(`⚠️ Dropdown not found: ${selectId}`);
+        return '';
     }
-    
+
+    // if dropdown exists but has no selected option
+    const selectedOption = selectElement.options?.[selectElement.selectedIndex];
+    if (!selectedOption) return '';
+
+    return selectedOption.getAttribute('data-name') || selectedOption.text || '';
+}
+
+
+
+   function collectFormDataForAssessment() {
+    // ✅ Always prefer localStorage for property number (After-Hearing reassessment)
+    const propNo = localStorage.getItem("afterHearingProperty") || document.getElementById('podRef')?.value || '';
+
+    const updatedFields = {
+        propertyDetails: {},
+        unitDetails: [],
+        proposedRValues: [],
+        propertyTaxDetails: [],
+        byRv: false,
+        byAssessment: false,
+        hearingStatus: "",
+        changeType: ""
+    };
+
+    const imageFields = new FormData();
+
+    // 🏠 PROPERTY DETAILS
+    updatedFields.propertyDetails = {
+        pdNewpropertynoVc: propNo,
+        propRefno: propNo,
+        pdZoneI: document.getElementById('zone')?.value || '',
+        pdWardI: document.getElementById('ward')?.value || '',
+        pdCitysurveynoF: document.getElementById('citySurveyNo')?.value || '',
+        pdOldpropnoVc: document.getElementById('oldPropertyNo')?.value || '',
+        pdSurypropnoVc: document.getElementById('surveyPropNo')?.value || '',
+        pdLayoutnameVc: document.getElementById('layoutName')?.value || '',
+        pdLayoutnoVc: document.getElementById('layoutNo')?.value || '',
+        pdKhasranoVc: document.getElementById('khasraNo')?.value || '',
+        pdPlotnoVc: document.getElementById('plotNo')?.value || '',
+        pdOwnernameVc: document.getElementById('ownerName')?.value || '',
+        pdAddnewownernameVc: document.getElementById('newOwnerName')?.value || '',
+        pdOccupinameF: document.getElementById('occupierName')?.value || '',
+        pdPropertyaddressVc: document.getElementById('address')?.value || '',
+        pdOwnertypeVc: document.getElementById('ownerType')?.value || '',
+        pdStatusbuildingVc: document.getElementById('buildingStatus')?.value || '',
+        pdPannoVc: document.getElementById('panNo')?.value || '',
+        pdAadharnoVc: document.getElementById('aadharNo')?.value || '',
+        pdContactnoVc: document.getElementById('ownermobileNo')?.value || '',
+        pdCategoryI: document.getElementById('category')?.value || '',
+        pdPropertynameVc: document.getElementById('propertyName')?.value || '',
+        pdBuildingvalueI: document.getElementById('buildingValue')?.value || '',
+        pdPlotvalueF: document.getElementById('plotValue')?.value || '',
+        pdPropertytypeI: document.getElementById('propertyType')?.value || '',
+        pdPropertysubtypeI: document.getElementById('propertySubType')?.value || '',
+        pdUsagetypeI: document.getElementById('propertyusageType')?.value || '',
+        pdUsagesubtypeI: document.getElementById('propertyusageSubType')?.value || '',
+        pdBuildingtypeI: document.getElementById('buildingType')?.value || '',
+        pdBuildingsubtypeI: document.getElementById('buildingSubType')?.value || '',
+        pdConstYearVc: document.getElementById('currentDateProperty')?.value || '',
+        pdConstAgeI: document.getElementById('constAgeProperty')?.value || '',
+        pdPermissionstatusVc: document.getElementById('permissionSelection')?.value || '',
+        pdPermissionnoVc: document.getElementById('permissionNumber')?.value || '',
+        pdPermissiondateDt: document.getElementById('permissionDate')?.value || '',
+        pdStairVc: document.getElementById('stair')?.value || '',
+        pdLiftVc: document.getElementById('lift')?.value || '',
+        pdRoadwidthF: document.getElementById('roadWidth')?.value || '',
+        pdToiletstatusVc: document.getElementById('toiletSelection')?.value || '',
+        pdToiletsI: document.getElementById('numberOfToilets')?.value || '',
+        pdSeweragesVc: document.getElementById('sewerage')?.value || '',
+        pdSeweragesType: document.getElementById('sewerageType')?.value || '',
+        pdWaterconnstatusVc: document.getElementById('waterSelection')?.value || '',
+        pdWaterconntypeVc: document.getElementById('waterOptions')?.value || '',
+        pdMcconnectionVc: document.getElementById('mcConnection')?.value || '',
+        pdMeternoVc: document.getElementById('meterNumber')?.value || '',
+        pdConsumernoVc: document.getElementById('consumerNumber')?.value || '',
+        pdConnectiondateDt: document.getElementById('connectionDate')?.value || '',
+        pdPipesizeF: document.getElementById('pipeSize')?.value || '',
+        pdSolarunitVc: document.getElementById('solar')?.value || '',
+        pdElectricityconnectionVc: document.getElementById('electricitySelection')?.value || '',
+        pdElemeternoVc: document.getElementById('emeterNumber')?.value || '',
+        pdEleconsumernoVc: document.getElementById('econsumerNumber')?.value || '',
+        pdRainwaterhaverstVc: document.getElementById('rainWaterHarvesting')?.value || '',
+        pdPlotareaF: document.getElementById('plotArea')?.value || '',
+        pdTotbuiltupareaF: document.getElementById('builtUpArea')?.value || '',
+        pdTotcarpetareaF: document.getElementById('carpetArea')?.value || '',
+        pdTotalexempareaF: document.getElementById('exemptedArea')?.value || '',
+        pdAssesareaF: document.getElementById('assessableArea')?.value || '',
+        pdArealetoutF: document.getElementById('areaLetout')?.value || '',
+        pdAreanotletoutF: document.getElementById('areaNotLetout')?.value || '',
+        pdNooffloorsI: document.getElementById('nooffloors')?.value || '',
+        pdNoofroomsI: document.getElementById('noofrooms')?.value || '',
+        pdCurrassesdateDt: document.getElementById('currentAssmtDate')?.value || '',
+        pdLastassesdateDt: document.getElementById('lastAssmtDate')?.value || '',
+        pdFirstassesdateDt: document.getElementById('firstAssmtDate')?.value || '',
+        pdNadetailsVc: document.getElementById('naSelection')?.value || '',
+        pdNanumberI: document.getElementById('naOrder')?.value || '',
+        pdNadateDt: document.getElementById('naDate')?.value || '',
+        pdTddetailsVc: document.getElementById('tdSelection')?.value || '',
+        pdTdordernumF: document.getElementById('tdOrder')?.value || '',
+        pdTddateDt: document.getElementById('tdDate')?.value || '',
+        pdTpdetailsVc: document.getElementById('tpSelection')?.value || '',
+        pdTpordernumF: document.getElementById('tpOrder')?.value || '',
+        pdTpdateDt: document.getElementById('tpDate')?.value || '',
+        pdSaledeedI: document.getElementById('saledeedSelection')?.value || '',
+        pdSaledateDt: document.getElementById('saledeedDate')?.value || '',
+        pdOldrvFl: document.getElementById('oldRV')?.value || ''
+    };
+
+    // 🏢 UNIT DETAILS
+    document.querySelectorAll('.formContainer').forEach((unitContainer, index) => {
+        const i = index + 1;
+        const unit = {
+            pdNewpropertynoVc: propNo,
+            udUnitNoVc: parseInt(unitContainer.querySelector(`#unitNo${i}`)?.value || 0),
+            udFloorNoVc: unitContainer.querySelector(`#floorNo${i}`)?.value || '',
+            udOccupantStatusI: unitContainer.querySelector(`#occupancy${i}`)?.value || '',
+            udRentalNoVc: unitContainer.querySelector(`#monthlyrent${i}`)?.value || '',
+            udTenantNoI: unitContainer.querySelector(`#tenantno${i}`)?.value || '',
+            udOccupierNameVc: unitContainer.querySelector(`#occupiername${i}`)?.value || '',
+            udEstablishmentNameVc: unitContainer.querySelector(`#establishmentName${i}`)?.value || '',
+            udMobileNoVc: unitContainer.querySelector(`#umobileNo${i}`)?.value || '',
+            udEmailIdVc: unitContainer.querySelector(`#email${i}`)?.value || '',
+            udUsageTypeI: unitContainer.querySelector(`#unitusageType${i}`)?.value || '',
+            udUsageSubtypeI: unitContainer.querySelector(`#unitusageSubType${i}`)?.value || '',
+            udConstructionClassI: getSelectedOptionText(`classOfProperty${i}`),
+            udConstYearDt: unitContainer.querySelector(`#currentDateUnit${i}`)?.value || '',
+            udConstAgeI: parseInt(unitContainer.querySelector(`#constructionAge${i}`)?.value || 0),
+            udAgeFactorI: unitContainer.querySelector(`#agefactorunithid${i}`)?.value || '',
+            udPlotAreaFl: parseFloat(unitContainer.querySelector(`#totalplotarea${i}`)?.value || 0),
+            udCarpetAreaF: parseFloat(unitContainer.querySelector(`#totalcarpetarea${i}`)?.value || 0),
+            udExemptedAreaF: parseFloat(unitContainer.querySelector(`#totalexemptedarea${i}`)?.value || 0),
+            udAssessmentAreaF: parseFloat(unitContainer.querySelector(`#assessablearea${i}`)?.value || 0),
+            udTotLegAreaF: parseFloat(unitContainer.querySelector(`#totallegalarea${i}`)?.value || 0),
+            udTotIllegAreaF: parseFloat(unitContainer.querySelector(`#totaillegalarea${i}`)?.value || 0),
+            udAreaBefDedF: parseFloat(unitContainer.querySelector(`#totalareabeforeded${i}`)?.value || 0),
+            udUnitRemarkVc: unitContainer.querySelector(`#remark${i}`)?.value || '',
+            unitBuiltupUps: []
+        };
+
+        const popup = document.getElementById(`popup-${i}`);
+        if (popup) {
+            const rows = popup.querySelectorAll('table tbody tr');
+            rows.forEach((row, rowIndex) => {
+                const rowId = `row-${i}-${rowIndex + 1}`;
+                const builtup = {
+                    ubRoomTypeVc: getSelectedOptionText(`use-${rowId}`),
+                    ubDedpercentI: row.querySelector(`#deduction-${rowId}`)?.value || '',
+                    ubareabefdedFl: row.querySelector(`#areabefdeduction-${rowId}`)?.value || '',
+                    ubCarpetAreaFl: row.querySelector(`#carpetArea-${rowId}`)?.value || '',
+                    ubAssesAreaFl: row.querySelector(`#assumptionArea-${rowId}`)?.value || '',
+                    ubLegalAreaFl: row.querySelector(`#legalAssmtArea-${rowId}`)?.value || '',
+                    ubIllegalAreaFl: row.querySelector(`#illegalAssmtArea-${rowId}`)?.value || '',
+                    pdNewpropertynoVc: propNo,
+                    udUnitNoVc: unit.udUnitNoVc,
+                    udFloorNoVc: unit.udFloorNoVc
+                };
+
+                const hasAnyValue =
+                    builtup.ubRoomTypeVc.trim() !== '' &&
+                    (parseFloat(builtup.ubCarpetAreaFl) > 0 ||
+                     parseFloat(builtup.ubAssesAreaFl) > 0 ||
+                     parseFloat(builtup.ubLegalAreaFl) > 0 ||
+                     parseFloat(builtup.ubIllegalAreaFl) > 0);
+
+                if (hasAnyValue) {
+                    unit.unitBuiltupUps.push(builtup);
+                }
+            });
+        }
+
+        updatedFields.unitDetails.push(unit);
+    });
+
+    // 💰 PROPOSED RATABLE VALUES
+    const ratableIds = [
+        "prResidentialFl", "prResidentialOpenPlotFl", "prCommercialFl", "prCommercialOpenPlotFl",
+        "prEducationalFl", "prEducationAndLegalInstituteOpenPlotFl", "prIndustrialFl", "prIndustrialOpenPlotFl",
+        "prGovernmentFl", "prGovernmentOpenPlotFl", "prReligiousFl", "prReligiousOpenPlotFl",
+        "prElectricSubstationFl", "prMobileTowerFl", "prTotalRatableValueFl"
+    ];
+    const proposedRValues = {};
+    ratableIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) proposedRValues[id] = parseFloat(el.value) || 0;
+    });
+    updatedFields.proposedRValues.push(proposedRValues);
+
+    // 🧾 PROPERTY TAX DETAILS
+    const taxIds = [
+        "ptPropertyTaxFl", "ptEduTaxFl", "ptEduResTaxFl", "ptEduNonResTaxFl",
+        "ptEnvironmentTaxFl", "ptTreeTaxFl", "ptCleanTaxFl", "ptLightTaxFl",
+        "ptFireTaxFl", "ptWaterBenefitTaxFl", "ptWaterTaxFl", "ptSewerageBenefitTaxFl",
+        "ptSewerageTaxFl", "ptStreetTaxFl", "ptEgcTaxFl", "ptSpecialConservancyTaxFl",
+        "ptMunicipalEduTaxFl", "ptSpecialEduTaxFl", "ptUserChargesFl",
+        "ptServiceChargesFl", "ptMiscellaneousChargesFl",
+        ...Array.from({ length: 25 }, (_, i) => `ptTax${i + 1}Fl`),
+        "ptFinalRvFl", "ptFinalTaxFl", "ptFinalYearVc"
+    ];
+    const propertyTax = {};
+    taxIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) propertyTax[id] = el.type === 'number' ? parseFloat(el.value) || 0 : el.value;
+    });
+    updatedFields.propertyTaxDetails.push(propertyTax);
+
+    // 🖼️ IMAGES
+    const imageInputs = [
+        { inputId: "propertyImage", conditionId: "includePropertyImage" },
+        { inputId: "propertyImage2", conditionId: "includePropertyImage2" },
+        { inputId: "housePlan1", conditionId: "includeHousePlan1" },
+        { inputId: "housePlan2", conditionId: "includeHousePlan2" },
+    ];
+    imageInputs.forEach(field => {
+        const condition = document.getElementById(field.conditionId)?.value;
+        const fileInput = document.getElementById(field.inputId);
+        if (condition === "1" && fileInput?.files[0]) {
+            imageFields.append(field.inputId, fileInput.files[0]);
+        }
+    });
+
+    // 🧩 Logs for clarity
+    console.group("📦 Assessment Data Collected");
+    console.log("🏠 Property Details:", updatedFields.propertyDetails);
+    console.log("🏢 Unit Details:", updatedFields.unitDetails);
+    console.log("💰 Proposed Ratable Values:", updatedFields.proposedRValues);
+    console.log("🧾 Property Tax Details:", updatedFields.propertyTaxDetails);
+    console.log("🖼️ Image Fields:", [...imageFields.entries()]);
+    console.groupEnd();
+
+    return { updatedFields, imageFields };
+}
+
 
     function collectFormData(cachedData) {
         const updatedFields = {
@@ -1883,7 +2114,7 @@
             proposedRValues: [],
             propertyTaxDetails: []
         };
-    
+
         const imageFields = new FormData();
 
         let formData = {
@@ -1984,7 +2215,7 @@
                 updatedFields.propertyDetails[key] = formData.propertyDetails[key];
             }
         }
-    
+
         // Collect and compare unitDetails
         document.querySelectorAll('.formContainer').forEach((unitContainer, index) => {
             let unitIndex = index + 1;
@@ -2017,14 +2248,14 @@
                 // Add more fields as required
                 unitBuiltupUps: []
             };
-    
+
             const cachedUnit = cachedData.unitDetails?.[index] || {};
             const unitUpdates = {
                 pdNewpropertynoVc: currentUnit.pdNewpropertynoVc,
                 udUnitNoVc: currentUnit.udUnitNoVc,
                 udFloorNoVc: currentUnit.udFloorNoVc
             };
-    
+
             // Compare unit-level fields
             for (const key in currentUnit) {
                 if (key !== 'unitBuiltupUps' && currentUnit[key] !== cachedUnit[key]) {
@@ -2034,7 +2265,7 @@
             const builtUpUpdates = [];
             let popupId = `popup-${unitIndex}`;
             let popup = document.getElementById(popupId);
-    
+
             if (popup) {
                 const rows = popup.querySelectorAll('table tbody tr');
                 rows.forEach((row, rowIndex) => {
@@ -2068,37 +2299,37 @@
                     const isRowEmpty = Object.values(currentBuiltUp).every(
                         (value) => value === null || value === '' || value === undefined
                     );
-            
+
                     if (!isRowEmpty) {
                         const cachedBuiltUp = cachedData.unitBuiltupUps?.[rowIndex] || {};
                         const builtUpDiff = {};
-            
+
                         for (const key in currentBuiltUp) {
                             if (currentBuiltUp[key] !== cachedBuiltUp[key]) {
                                 builtUpDiff[key] = currentBuiltUp[key];
                             }
                         }
-            
+
                         if (Object.keys(builtUpDiff).length > 0) {
                             builtUpUpdates.push(builtUpDiff);
                         }
                     }
                 });
             }
-    
+
             if (Object.keys(unitUpdates).length > 0 || builtUpUpdates.length > 0) {
                 unitUpdates.unitBuiltupUps = builtUpUpdates;
                 updatedFields.unitDetails.push(unitUpdates);
             }
-    
+
             formData.propertyDetails.unitDetails.push(currentUnit);
         });
-    
+
         let jsonData = JSON.stringify(formData);
-    
+
         let formDataToSend = new FormData();
         formDataToSend.append('jsonData', jsonData); // Append JSON string directly
-    
+
         const imageInputs = [
             { inputId: "propertyImage", conditionId: "includePropertyImage" },
             { inputId: "propertyImage2", conditionId: "includePropertyImage2" },
@@ -2114,7 +2345,7 @@
                 imageFields.append(field.inputId, fileInput.files[0]);
             }
         });
-    
+
     updatedFields.proposedRValues = [];
 
     const ratableIds = [
@@ -2168,66 +2399,66 @@
     }
 
     var memberCount = 1;
-    
+
     function addMember() {
     memberCount++;
-    
+
     var formContainer = document.getElementById("formContainer");
-    
+
     const newForm = `
     <div id="memberForm${memberCount}">
     <h3>Member ${memberCount} Details:</h3>
     <label for="name${memberCount}">Name:</label>
     <input type="text" id="name${memberCount}" name="name${memberCount}"><br>
-    
+
     <label for="qualification${memberCount}">Qualification:</label>
     <select id="qualification${memberCount}" name="qualification${memberCount}">
         <option value="undergraduate">Undergraduate</option>
         <option value="postgraduate">Postgraduate</option>
         <option value="doctorate">Doctorate</option>
     </select><br>
-    
+
     <label for="occupation${memberCount}">Occupation:</label>
     <input type="text" id="occupation${memberCount}" name="occupation${memberCount}"><br>
-    
+
     <label for="noOfAdults${memberCount}">No. Of Adults:</label>
     <input type="text" id="noOfAdults${memberCount}" name="noOfAdults${memberCount}"><br>
-    
+
     <label for="noOfChildren${memberCount}">No. of Children:</label>
     <input type="text" id="noOfChildren${memberCount}" name="noOfChildren${memberCount}"><br>
-    
+
     <label for="currentTaxDetails${memberCount}">Current Tax Details:</label>
     <select id="currentTaxDetails${memberCount}" name="currentTaxDetails${memberCount}">
         <option value="taxed">Taxed</option>
         <option value="nontaxed">Non-taxed</option>
     </select><br>
-    
+
     <label for="taxAmount${memberCount}">Tax Amount:</label>
     <input type="text" id="taxAmount${memberCount}" name="taxAmount${memberCount}"><br>
-    
+
     <label for="roadType${memberCount}">Road Type:</label>
     <select id="roadType${memberCount}" name="roadType${memberCount}">
         <option value="residential">Residential</option>
         <option value="commercial">Commercial</option>
     </select><br>
-    
+
     <label for="roadName${memberCount}">Road Name:</label>
     <input type="text" id="roadName${memberCount}" name="roadName${memberCount}"><br>
-    
+
     <button type="button" onclick="addMember()">Add Another Member</button>
     <button type="button" onclick="removeMember(${memberCount})">Remove Member</button>
     <hr>
     </div>
     `;
     document.getElementById("memberForm1").insertAdjacentHTML('beforeend', newForm);
-    
+
     }
-    
+
     function removeMember(formId) {
     var formToRemove = document.getElementById(`memberForm${formId}`);
     formToRemove.remove();
     }
-    
+
     async function validateForm() {
     let isValid = true;
     let missingFields = [];
@@ -2238,85 +2469,97 @@
         missingFields.push(field.textContent);
     }
     });
-    
+
     if (!isValid) {
     alert("Please fill in the following mandatory fields: " + missingFields.join(', '));
     return false;
     }
-    
+
     // Check the survey property number validity
     await checkSurveyPropNo();
-    
+
     if (!isSurveyPropNoValid) {
     alert("The Survey Property Number already exists or is invalid.");
     return false;
     }
-    
+
     return true;
     }
-    
+
     async function submitFormData() {
-        const { updatedFields, imageFields } = collectFormData(cachedPropertyData);
-        console.log(mode);
         document.getElementById('loadingSpinner').style.display = 'flex';
 
         try {
-           const hearingStatus = localStorage.getItem("afterHearingDecision");
-           const changeType = localStorage.getItem("afterHearingChangeType");
-           const byRv = localStorage.getItem("afterHearingByRv") === "true";
-           const byAssessment = localStorage.getItem("afterHearingByAssessment") === "true";
-           const propertyNo = localStorage.getItem("afterHearingProperty");
+            // 🔹 Fetch mode-specific flags
+            const hearingStatus = localStorage.getItem("afterHearingDecision");
+            const changeType = localStorage.getItem("afterHearingChangeType");
+            const byRv = localStorage.getItem("afterHearingByRv") === "true";
+            const byAssessment = localStorage.getItem("afterHearingByAssessment") === "true";
+            const propertyNo = localStorage.getItem("afterHearingProperty");
 
+            let updatedFields, imageFields;
 
-
-           // Add them to DTO payload
+            // ✅ Mode-based data collection
            if (mode === "assessment") {
-             updatedFields.hearingStatus = hearingStatus || "CHANGED";
-             updatedFields.changeType = changeType || "";
-             updatedFields.byRv = byRv;
-             updatedFields.byAssessment = byAssessment;
-           }
-            const formData = new FormData();
+                // 🧾 Collect complete data for assessment
+                const { updatedFields: allFields, imageFields: allImages } = collectFormDataForAssessment();
+                console.log("✅ Assessment All Fields:", allFields);
+                console.log("🖼️ Assessment Image Fields:", [...allImages.entries()]);
+                console.log("✅ Assessment Flags:", changeType, byRv, byAssessment, propertyNo);
 
-            // append DTO data
+                updatedFields = allFields;   // ✅ Assign correctly
+                imageFields = allImages;
+
+                // 🔸 Add after-hearing decision flags
+                updatedFields.hearingStatus = hearingStatus || "CHANGED";
+                updatedFields.changeType = changeType || "";
+                updatedFields.byRv = byRv;
+                updatedFields.byAssessment = byAssessment;
+
+            }else {
+                // ✏️ Collect only updated data for survey edit
+                const { updatedFields: diffFields, imageFields: diffImages } = collectFormData(cachedPropertyData);
+                updatedFields = diffFields;
+                imageFields = diffImages;
+            }
+
+            // 🧳 Prepare FormData payload
+            const formData = new FormData();
             formData.append('updatedFields', JSON.stringify(updatedFields));
 
-            // append images if any
+            // 📸 Append images if available
             for (const [key, blob] of imageFields.entries()) {
                 if (blob) formData.append(key, blob, `${key}.jpg`);
             }
 
-            // ✅ choose endpoint based on mode
+            // 🔗 Endpoint & method selection
             const endpoint =
                 mode === 'assessment'
-                    ? '/3g/createCompletePropertyAfterHearing' // new endpoint in MasterWebControllerII
+                    ? '/3g/createCompletePropertyAfterHearing'   // new endpoint for after-hearing
                     : '/3gSurvey/submitUpdatedPropertyDetails';
 
-            // ✅ method changes for assessment
             const method = mode === 'assessment' ? 'POST' : 'PATCH';
 
-            const response = await fetch(endpoint, {
-                method,
-                body: formData
-            });
+            // 🚀 Send request
+            const response = await fetch(endpoint, { method, body: formData });
 
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
             const result = await response.json();
+
+            // ✅ Show success message
             alert(result.message || (mode === 'assessment'
                 ? "Assessment saved successfully!"
                 : "Survey form updated successfully!"));
 
-            // ✅ redirect after submission
+            // 🧹 Cleanup and redirect
             window.removeEventListener('beforeunload', handleBeforeUnload);
 
             if (mode === 'assessment') {
-                // After-hearing properties list page
                 window.location.href = "/3g/secondaryBatchAssessmentReportPage";
             } else {
-                // Back to main survey page
                 window.location.href = "/3gSurvey/newRegistration";
             }
 
@@ -2327,10 +2570,11 @@
             document.getElementById('loadingSpinner').style.display = 'none';
         }
     }
-    
+
+
     function handleBeforeUnload(event) {
     event.preventDefault();
     event.returnValue = 'Are you sure you want to leave? Your changes may not be saved.';
     }
-    
+
     window.addEventListener('beforeunload', handleBeforeUnload);

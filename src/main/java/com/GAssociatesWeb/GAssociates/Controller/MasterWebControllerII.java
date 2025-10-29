@@ -58,7 +58,7 @@ public class MasterWebControllerII {
 
         try {
             // 🟢 Pass booleans explicitly
-            AfterHearingCompleteProperty_Dto saved = afterHearingService.createCompleteProperty(null,dto, byRv, byAssessment);
+            AfterHearingCompleteProperty_Dto saved = afterHearingService.createCompleteProperty(newPropertyNo,dto, byRv, byAssessment);
 
             if (saved == null || saved.getPropertyDetails() == null)
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -194,5 +194,22 @@ public class MasterWebControllerII {
         }
 
         return ResponseEntity.ok(arrearsDetails);
+    }
+
+    // Fetch arrears by unique key: newPropertyNo + financialYear
+    @GetMapping("/getPropertyArrearsByYear")
+    public ResponseEntity<PropertyTaxDetailArrears_MasterDto> getPropertyArrearsByYear(
+            @RequestParam("newPropertyNo") String newPropertyNo,
+            @RequestParam("financialYear") String financialYear) {
+
+        if (newPropertyNo == null || newPropertyNo.isBlank() || financialYear == null || financialYear.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        PropertyTaxDetailArrears_MasterDto dto =
+                propertyTaxDetailArrears_masterService.getArrearsByPropertyAndYear(newPropertyNo, financialYear);
+
+        if (dto == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(dto);
     }
 }

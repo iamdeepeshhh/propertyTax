@@ -347,12 +347,34 @@ public class MasterWebController {
 
 
     @GetMapping(value = "/masterSheet")
-    public String getMasterSheet(HttpServletRequest request) {
+    public String getMasterSheet(HttpServletRequest request, org.springframework.ui.Model model) {
         HttpSession session = request.getSession();
         if (session.getAttribute("username") == null) {
             return "redirect:/3g/MasterWebLogin"; // Redirect to login page if not authenticated
         }
+        Object roleObj = session.getAttribute("role");
+        boolean isITA = roleObj != null && "ITA".equals(String.valueOf(roleObj));
+        model.addAttribute("isITA", isITA);
         return "3GMasterWeb";
+    }
+
+    // Expose session role for client-side gating
+    @GetMapping("/sessionRole")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> getSessionRole(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        String role = session != null && session.getAttribute("role") != null
+                ? String.valueOf(session.getAttribute("role"))
+                : null;
+        if (role == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of());
+        return ResponseEntity.ok(Map.of("role", role));
+    }
+
+    @GetMapping("/logout")
+    public String logoutMaster(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) session.invalidate();
+        return "redirect:/3g/MasterWebLogin";
     }
 
 

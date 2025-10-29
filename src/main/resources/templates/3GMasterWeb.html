@@ -24,6 +24,28 @@
 .table-extended {
    min-width: 1800px; /* or however wide you need */
  }
+
+ /* --- Multi-level dropdown on hover --- */
+ .navbar .dropdown:hover > .dropdown-menu {
+   display: block;
+ }
+ .dropdown-submenu {
+   position: relative;
+ }
+ .dropdown-submenu > .dropdown-menu {
+   top: 0;
+   left: 100%;
+   margin-top: -1px;
+ }
+ .dropdown-submenu:hover > .dropdown-menu {
+   display: block;
+ }
+ .dropdown-item.dropdown-toggle::after {
+   content: "\25B6"; /* right-pointing triangle */
+   float: right;
+   margin-left: .5rem;
+   font-size: .75rem;
+ }
   </style>
 </head>
 <body>
@@ -40,12 +62,14 @@
         <!-- If there are other nav items, they would go here -->
       </div>
       <!-- Position Logout Link to the right -->
-      <a class="nav-link logout-link" href="/3g/MasterWebLogin" style="color: inherit;">Logout</a>
+      <a class="nav-link logout-link" href="/3g/logout" style="color: inherit;">Logout</a>
     </div>
   </nav>
 </header>
 
 <main>
+<!-- Permission flags (no role exposure) -->
+<div id="perm-controls" th:attr="data-allow-process=${isITA}" style="display:none"></div>
 <nav class="navbar navbar-expand-lg navbar-light w-10">
   <div class="container-fluid justify-content-start">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,10 +81,95 @@
         <li class="nav-item">
           <a class="nav-link" href="#" onclick="showTab('home')">Home</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" id="nav-users">
           <a class="nav-link" href="/3g/userManagement">Users</a>
         </li>
-        <li class="nav-item dropdown">
+        <li class="nav-item dropdown" id="nav-master" th:if="${isITA}">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMaster" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Master
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMaster">
+            <div class="dropdown-submenu">
+              <a class="dropdown-item dropdown-toggle" href="#">Property Details</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" onclick="showMaster('zone')">Zone</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('building-status')">Building Status</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('owner-type')">Owner Type</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('owner-category')">Owner Category</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('water-connection')">Water Connection</a>
+              </div>
+            </div>
+
+            <div class="dropdown-submenu">
+              <a class="dropdown-item dropdown-toggle" href="#">Ward Types</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" onclick="showMaster('ward-no')">Ward No</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('old-wards')">Old Ward No</a>
+              </div>
+            </div>
+
+            <div class="dropdown-submenu">
+              <a class="dropdown-item dropdown-toggle" href="#">Property Types</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" onclick="showMaster('property-type')">Property Type</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('property-sub-type')">Property Sub Type</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('property-usage-type')">Usage Type</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('property-usage-sub-type')">Usage Sub Type</a>
+              </div>
+            </div>
+
+            <div class="dropdown-submenu">
+              <a class="dropdown-item dropdown-toggle" href="#">Building Types</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" onclick="showMaster('building-types')">Building Types</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('building-sub-type')">Building Sub Types</a>
+              </div>
+            </div>
+
+            <div class="dropdown-submenu">
+              <a class="dropdown-item dropdown-toggle" href="#">Unit / Room / Occupancy</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" onclick="showMaster('unit-number')">Unit No</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('unit-floor-no')">Unit Floor No</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('RoomTypes')">Room Types</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('Occupancies')">Occupancy</a>
+              </div>
+            </div>
+
+            <a class="dropdown-item" href="#" onclick="showMaster('sewerage')">Sewerage Types</a>
+
+            <div class="dropdown-submenu">
+              <a class="dropdown-item dropdown-toggle" href="#">Construction</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" onclick="showMaster('construction-class')">Construction Class</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('construction-age-factor')">Age Factor</a>
+              </div>
+            </div>
+
+            <div class="dropdown-submenu">
+              <a class="dropdown-item dropdown-toggle" href="#">Assessment Settings</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" onclick="showMaster('AssessmentDates')">Assessment Dates</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('rvTypeMasterSection')">RV Types</a>
+              </div>
+            </div>
+
+            <div class="dropdown-submenu">
+              <a class="dropdown-item dropdown-toggle" href="#">Tax Master</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" onclick="showMaster('consolidatedTaxesSection')">Consolidated Taxes</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('propertyRatesSection')">Property Rates</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('educationAndEmployment')">Cess Rates</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('depreciationRatesSection')">Depreciation Rates</a>
+              </div>
+            </div>
+
+            <a class="dropdown-item" href="#" onclick="showMaster('ReportTaxConfig')">Report Tax Config</a>
+            <a class="dropdown-item" href="#" onclick="showMaster('councilDetails')">Council Details</a>
+          </div>
+        </li>
+        <!-- Deprecated individual master: Property Details (replaced by Master) -->
+        <!-- <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownPropertyDetails" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Property Details
           </a>
@@ -71,8 +180,9 @@
             <a class="dropdown-item" href="#" onclick="showTab('owner-category')">Owner Category</a>
             <a class="dropdown-item" href="#" onclick="showTab('water-connection')">Water Connection</a>
           </div>
-        </li>
-        <li class="nav-item dropdown">
+        </li> -->
+        <!-- Deprecated individual master: Ward Types (replaced by Master) -->
+        <!-- <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownWardTypes" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Ward Types
           </a>
@@ -80,8 +190,9 @@
             <a class="dropdown-item" href="#" onclick="showTab('ward-no')">Ward no</a>
             <a class="dropdown-item" href="#" onclick="showTab('old-wards')">Old Ward no</a>
           </div>
-        </li>
-        <li class="nav-item dropdown">
+        </li> -->
+        <!-- Deprecated individual master: Property Types (replaced by Master) -->
+        <!-- <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownPropertyTypes" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Property Types
           </a>
@@ -93,8 +204,9 @@
 
 
           </div>
-        </li>
-        <li class="nav-item dropdown">
+        </li> -->
+        <!-- Deprecated individual master: Building Types (replaced by Master) -->
+        <!-- <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownBuildingTypes" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Building Types
           </a>
@@ -103,15 +215,17 @@
             <a class="dropdown-item" href="#" onclick="showTab('building-sub-type')">Building Sub Type</a>
           </div>
         </li>
-        <li class="nav-item dropdown">
+        <!-- Deprecated individual master: Sewerage Types (replaced by Master) -->
+        <!-- <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownSewerageTypes" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Sewerage Types
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownSewerageTypes">
             <a class="dropdown-item" href="#" onclick="showTab('sewerage')">Sewerage</a>
           </div>
-        </li>
-        <li class="nav-item dropdown">
+        </li> -->
+        <!-- Deprecated individual master: Unit Types (replaced by Master) -->
+        <!-- <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUnitTypes" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Unit Types
           </a>
@@ -160,7 +274,7 @@
           </div>
         </li>
 
-        <li class="nav-item dropdown">
+        <li class="nav-item dropdown" th:if="${isITA}">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownTaxMaster" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Tax Master
           </a>
@@ -174,7 +288,7 @@
 <!--            <a class="dropdown-item" href="#" onclick="showTab('userChargesSection')">User Charges</a>-->
           </div>
         </li>
-        <li class="nav-item dropdown ">
+        <li class="nav-item dropdown " th:if="${isITA}">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownOthers" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Others
             </a>
@@ -541,7 +655,7 @@
 
         <!-- Buttons -->
         <div class="form-group">
-          <button type="button" class="btn btn-primary" disabled>Save (API wiring pending)</button>
+          <button type="button" id="rtc-save-btn" class="btn btn-primary">Save</button>
         </div>
       </form>
 
@@ -2668,5 +2782,6 @@
 <script src="/3GMasterWeb/js/scripts.js"></script>
 
 
-</body>
+  <script src="/3GMasterWeb/js/scripts-part2.js"></script>\n</body>
 </html>
+

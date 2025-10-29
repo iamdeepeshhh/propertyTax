@@ -15,9 +15,22 @@ public class PropertyTaxDetailArrears_MasterServiceImpl implements PropertyTaxDe
 
     @Override
     public PropertyTaxDetailArrears_MasterDto saveArrears(PropertyTaxDetailArrears_MasterDto dto) {
+        // Upsert by unique key: newPropertyNo + financialYear
+        PropertyTaxDetailArrears_MasterEntity existing = null;
+        try {
+            if (dto != null && dto.getNewPropertyNo() != null && dto.getFinancialYear() != null) {
+                existing = repository.findByNewPropertyNoAndFinancialYear(dto.getNewPropertyNo(), dto.getFinancialYear());
+            }
+        } catch (Exception ignored) {}
+
         PropertyTaxDetailArrears_MasterEntity entity = toEntity(dto);
+        if (existing != null) {
+            // preserve DB id and timestamps for update
+            entity.setArrearsId(existing.getArrearsId());
+            if (entity.getCreatedAt() == null) entity.setCreatedAt(existing.getCreatedAt());
+        }
         repository.save(entity);
-        return dto;
+        return toDto(entity);
     }
 
     @Override
@@ -29,6 +42,11 @@ public class PropertyTaxDetailArrears_MasterServiceImpl implements PropertyTaxDe
     @Override
     public PropertyTaxDetailArrears_MasterDto getSingleArrearsTaxDetails(String newPropertyNo) {
         return toDto(repository.findByNewPropertyNo(newPropertyNo));
+    }
+
+    @Override
+    public PropertyTaxDetailArrears_MasterDto getArrearsByPropertyAndYear(String newPropertyNo, String financialYear) {
+        return toDto(repository.findByNewPropertyNoAndFinancialYear(newPropertyNo, financialYear));
     }
 
     // 🔹 ENTITY ➜ DTO

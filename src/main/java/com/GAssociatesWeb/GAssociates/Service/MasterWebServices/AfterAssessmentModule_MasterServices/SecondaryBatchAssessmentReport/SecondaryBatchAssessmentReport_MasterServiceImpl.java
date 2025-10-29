@@ -297,8 +297,27 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
             summary.setTotalRatableValueFl(sum(allUnits, PropertyUnitDetailsDto::getRatableValueFl));
             summary.setConsideredRvFl(Math.max(summary.getTotalRatableValueFl(), summary.getTotalCombinedAlvRentFl()));
 
+            // Merge tax maps (before and after) across all grouped rows so caller doesn't need to sum
+            Map<Long, Double> mergedBefore = new HashMap<>();
+            Map<Long, Double> mergedAfter = new HashMap<>();
+            for (AfterHearingCompleteProperty_Dto d : entry.getValue()) {
+                Map<Long, Double> b = Optional.ofNullable(d.getTaxKeyValueMapAfterAssess()).orElse(Map.of());
+                for (Map.Entry<Long, Double> e : b.entrySet()) {
+                    mergedBefore.merge(e.getKey(), Optional.ofNullable(e.getValue()).orElse(0.0), Double::sum);
+                }
+                Map<Long, Double> a = Optional.ofNullable(d.getTaxKeyValueMapAfterHearing()).orElse(Map.of());
+                for (Map.Entry<Long, Double> e : a.entrySet()) {
+                    mergedAfter.merge(e.getKey(), Optional.ofNullable(e.getValue()).orElse(0.0), Double::sum);
+                }
+            }
+            // Set totals in summary if helpful to consumers
+            summary.setTotalBeforeTaxFl(mergedBefore.values().stream().mapToDouble(Double::doubleValue).sum());
+            summary.setTotalAfterTaxFl(mergedAfter.values().stream().mapToDouble(Double::doubleValue).sum());
+
             main.setPropertyUnitDetails(allUnits);
             main.setPropertySummary(summary);
+            main.setTaxKeyValueMapAfterAssess(mergedBefore);
+            main.setTaxKeyValueMapAfterHearing(mergedAfter);
             finalList.add(main);
         }
         return finalList;
