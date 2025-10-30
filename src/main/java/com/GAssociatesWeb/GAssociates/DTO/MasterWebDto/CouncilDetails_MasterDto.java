@@ -17,4 +17,8 @@ public class CouncilDetails_MasterDto {
     private  String localSiteNameVC;
     private  String standardDistrictNameVC;
     private  String localDistrictNameVC;
+
+    // Additional images
+    private String chiefOfficerSignBase64;
+    private String companySignBase64;
 }

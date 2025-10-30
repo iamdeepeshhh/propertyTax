@@ -31,4 +31,10 @@ public class CouncilDetails_MasterEntity {
     @Column(name = "localdistrictnameVC")
     private  String localDistrictNameVC;
 
+    @Column(name = "chief_officer_sign_base64", columnDefinition = "TEXT")
+    private String chiefOfficerSignBase64;
+
+    @Column(name = "company_sign_base64", columnDefinition = "TEXT")
+    private String companySignBase64;
+
 }

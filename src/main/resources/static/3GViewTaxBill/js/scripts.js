@@ -1,4 +1,4 @@
-// =============================== 🏛️ Council Details & Year Range ===============================
+﻿// =============================== 🏛️ Council Details & Year Range ===============================
 $(document).on('click', '#printBtn', function () {
   window.print();
 });
@@ -18,6 +18,17 @@ $(document).ready(function () {
           $('.localSiteNameVC').text(c.localSiteNameVC);
           $('.standardDistrictNameVC').text(c.standardDistrictNameVC);
           $('.localDistrictNameVC').text(c.localDistrictNameVC);
+          // Chief officer signature (Base64 -> data URL)
+          try {
+            const b64 = String(c.chiefOfficerSignBase64 || '').trim();
+            if (b64) {
+              const isData = /^data:image\/(png|jpeg);base64,/i.test(b64);
+              const isPng = b64.startsWith('iVBORw0K');
+              const isJpeg = b64.startsWith('/9j/');
+              window.chiefOfficerSignUrl = isData ? b64 : `data:${isPng ? 'image/png' : (isJpeg ? 'image/jpeg' : 'image/png')};base64,${b64}`;
+              $('.officerSignature').attr('src', window.chiefOfficerSignUrl);
+            }
+          } catch (e) { console.warn('chiefOfficerSign parsing failed', e); }
         }
       }
     },
@@ -88,6 +99,9 @@ async function renderBatchPreview(dataList) {
 
   for (const dto of dataList) {
     const $page = $('.page-container.template').clone().removeClass('template').show();
+    if (window.chiefOfficerSignUrl) {
+      $page.find('.officerSignature').attr('src', window.chiefOfficerSignUrl);
+    }
 
     // 🏠 Property info
     $page.find('.pdOwnernameVc').text(dto.pdOwnernameVc || '');
@@ -198,5 +212,6 @@ function buildYearWiseTaxTable($page, dto) {
     $page.find('.taxBillTable').after(html);
   });
 }
+
 
 

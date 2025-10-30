@@ -1,4 +1,4 @@
-
+﻿
 // For the Council
 $(document).ready(function () {
   $.ajax({
@@ -54,10 +54,10 @@ $(document).ready(function () {
      const startYearDev = convertToDevanagari(startYear.toString());
      const endYearDev = convertToDevanagari(endYear.toString());
 
-     return `${startYearDev}-${convertToDevanagari(startYearL.toString())} ते ${endYearDev}-${convertToDevanagari(endYearL.toString())}`;
+     return `${startYearDev}-${convertToDevanagari(startYearL.toString())} à¤¤à¥‡ ${endYearDev}-${convertToDevanagari(endYearL.toString())}`;
  }
 
  function convertToDevanagari(numberString) {
-     const devanagariDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+     const devanagariDigits = ['à¥¦', 'à¥§', 'à¥¨', 'à¥©', 'à¥ª', 'à¥«', 'à¥¬', 'à¥­', 'à¥®', 'à¥¯'];
      return numberString.replace(/[0-9]/g, (digit) => devanagariDigits[digit]);
  }

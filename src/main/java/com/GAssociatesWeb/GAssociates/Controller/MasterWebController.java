@@ -1502,6 +1502,46 @@ public class MasterWebController {
         }
     }
 
+
+    // Partial upsert: creates or updates the single council record (ID=1). Only provided fields are changed.
+    @PostMapping(value = "/updateCouncilDetails", consumes = {"multipart/form-data"})
+    public ResponseEntity<String> updateCouncilDetails(
+            @RequestParam(name = "standardName", required = false) String standardName,
+            @RequestParam(name = "localName", required = false) String localName,
+            @RequestParam(name = "standardSiteNameVc", required = false) String standardSiteNameVc,
+            @RequestParam(name = "localSiteNameVc", required = false) String localSiteNameVc,
+            @RequestParam(name = "standardDistrictNameVc", required = false) String standardDistrictNameVc,
+            @RequestParam(name = "localDistrictNameVc", required = false) String localDistrictNameVc,
+            @RequestParam(name = "councilImage", required = false) MultipartFile councilImage,
+            @RequestParam(name = "chiefOfficerSign", required = false) MultipartFile chiefOfficerSign,
+            @RequestParam(name = "companySign", required = false) MultipartFile companySign
+    ) {
+        try {
+            CouncilDetails_MasterDto dto = new CouncilDetails_MasterDto();
+            dto.setStandardName(standardName);
+            dto.setLocalName(localName);
+            dto.setStandardSiteNameVC(standardSiteNameVc);
+            dto.setLocalSiteNameVC(localSiteNameVc);
+            dto.setStandardDistrictNameVC(standardDistrictNameVc);
+            dto.setLocalDistrictNameVC(localDistrictNameVc);
+
+            if (councilImage != null && !councilImage.isEmpty()) {
+                dto.setImageBase64(ImageUtils.convertToBase64(councilImage));
+            }
+            if (chiefOfficerSign != null && !chiefOfficerSign.isEmpty()) {
+                dto.setChiefOfficerSignBase64(ImageUtils.convertToBase64(chiefOfficerSign));
+            }
+            if (companySign != null && !companySign.isEmpty()) {
+                dto.setCompanySignBase64(ImageUtils.convertToBase64(companySign));
+            }
+
+            councilDetails_masterService.updateCouncilDetailsPartial(dto);
+            return ResponseEntity.ok("Updated");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update council details");
+        }
+    }
     @GetMapping("/getCouncilDetails")
     public ResponseEntity<List<Map<String, Object>>> getCouncilDetails() {
         try {
@@ -1517,6 +1557,8 @@ public class MasterWebController {
                 item.put("localSiteNameVC", councilDetailsDto.getLocalSiteNameVC());
                 item.put("standardDistrictNameVC", councilDetailsDto.getStandardDistrictNameVC());
                 item.put("localDistrictNameVC", councilDetailsDto.getLocalDistrictNameVC());
+                item.put("chiefOfficerSignBase64", councilDetailsDto.getChiefOfficerSignBase64());
+                item.put("companySignBase64", councilDetailsDto.getCompanySignBase64());
                 // Return the map as a list containing the single object
                 List<Map<String, Object>> councilDetailsList = Collections.singletonList(item);
                 return ResponseEntity.ok(councilDetailsList);
@@ -1770,4 +1812,3 @@ public class MasterWebController {
         return list.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(list);
     }
 }
-

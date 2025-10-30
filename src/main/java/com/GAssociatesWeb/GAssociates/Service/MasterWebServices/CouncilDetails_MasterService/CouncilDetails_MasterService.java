@@ -6,4 +6,5 @@ public interface CouncilDetails_MasterService {
     public void saveCouncilDetails(CouncilDetails_MasterDto dto);
     public CouncilDetails_MasterDto getSingleCouncilDetails();
     public boolean deleteCouncilDetailById(Long id);
+    public void updateCouncilDetailsPartial(CouncilDetails_MasterDto dto);
 }

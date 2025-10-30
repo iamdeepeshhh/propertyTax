@@ -1,4 +1,4 @@
-// JavaScript function to show the content of the selected tab
+﻿// JavaScript function to show the content of the selected tab
 document.addEventListener("DOMContentLoaded", function() {
     showTab('home');
 });
@@ -138,7 +138,7 @@ function getRateTypeDescription(params) {
         descriptionField.textContent = selectedRateType ? selectedRateType.descriptionVc : '';
     }
 
-    // ✅ Also preselect taxes
+    // âœ… Also preselect taxes
     if (selectedRateType) { if (selectedRateType.taxKeysL && selectedRateType.taxKeysL.length) { preSelectTaxes(selectedRateType.taxKeysL); } else if (selectedRateType.appliedTaxesVc) { const names = selectedRateType.appliedTaxesVc.split(",").map(n => n.trim()).filter(Boolean); } }
 }
 
@@ -180,7 +180,7 @@ var isValid = true;
 var formData = {};
 
 if (!input) {
-    console.warn(`⚠️ Input with ID '${inputId}' not found in the form '${formId}'.`);
+    console.warn(`âš ï¸ Input with ID '${inputId}' not found in the form '${formId}'.`);
     return;
 }
 
@@ -1663,7 +1663,9 @@ function submitCouncilDetailsForm() {
     // Get form inputs
     const standardNameInput = document.getElementById('standardName');
     const localNameInput = document.getElementById('localName');
-    const imageInput = document.getElementById('councilImage');// File input for image
+    const imageInput = document.getElementById('councilImage'); // File input for logo
+    const chiefSignInput = document.getElementById('chiefOfficerSign'); // File input for chief officer sign
+    const companySignInput = document.getElementById('companySign'); // File input for company sign
 
     // Field created by Himanshu for standardization and localization of site and district
     const standardSiteNameInput = document.getElementById('standardSiteName');
@@ -1671,9 +1673,8 @@ function submitCouncilDetailsForm() {
     const standardDistrictName = document.getElementById('standardDistrictName');
     const localDistrictName = document.getElementById('localDistrictName');
 
-    // Compress the image and then submit
-    const file = imageInput.files[0];
-    compressImage(file,525,700, null, (compressedBlob) => {
+    // Helper to build and submit regardless of logo presence
+    const buildAndSubmit = (logoBlob) => {
         const formData = new FormData();
         formData.append('standardName', standardNameInput.value);
         formData.append('localName', localNameInput.value);
@@ -1681,16 +1682,20 @@ function submitCouncilDetailsForm() {
         formData.append('localSiteNameVc', localSiteNameInput.value);
         formData.append('standardDistrictNameVc' , standardDistrictName.value);
         formData.append('localDistrictNameVc' , localDistrictName.value);
-        formData.append('councilImage', compressedBlob, file.name); // Use the original filename
-        // Submit the form data via fetch
-        fetch('/3g/saveCouncilDetails', {
-            method: 'POST',
-            body: formData,
-        })
+        if (logoBlob) {
+            const fileRef = imageInput.files && imageInput.files[0];
+            formData.append('councilImage', logoBlob, (fileRef && fileRef.name) ? fileRef.name : 'council.png');
+        }
+        // Append signatures if provided (no compression for simplicity)
+        const chiefFile = chiefSignInput && chiefSignInput.files ? chiefSignInput.files[0] : null;
+        if (chiefFile) formData.append('chiefOfficerSign', chiefFile, chiefFile.name);
+        const companyFile = companySignInput && companySignInput.files ? companySignInput.files[0] : null;
+        if (companyFile) formData.append('companySign', companyFile, companyFile.name);
+        fetch('/3g/updateCouncilDetails', { method: 'POST', body: formData })
             .then((response) => {
                 if (response.ok) {
                     alert('Council details submitted successfully!');
-                    document.getElementById('councilDetailsForm').reset(); // Reset the form
+                    document.getElementById('councilDetailsForm').reset();
                 } else {
                     alert('Failed to submit council details. Please try again.');
                 }
@@ -1699,7 +1704,17 @@ function submitCouncilDetailsForm() {
                 console.error('Error occurred while submitting council details:', error);
                 alert('An unexpected error occurred. Please try again later.');
             });
-    });
+    };
+    const file = imageInput.files && imageInput.files[0];
+    if (file) {
+        // Compress the image and then submit
+        compressImage(file, 525, 700, null, (compressedBlob) => {
+            buildAndSubmit(compressedBlob);
+        });
+    } else {
+        // No logo selected; still submit other fields and signatures
+        buildAndSubmit(null);
+    }
 }
 function compressImage(file,maxWidth,maxHeight, previewId, callback) {
     if (!file) return;  // Exit if no file is selected
@@ -1848,14 +1863,14 @@ function openAfterHearingProperty(newPropertyNo) {
       // Immediate backend update (no data changes)
       markObjectionStatus(newPropertyNo, decision.toUpperCase());
     } else if (decision === "changed") {
-      // If changed — open 2nd modal
+      // If changed â€” open 2nd modal
       openChangeTypeModal(newPropertyNo);
     }
   };
 }
 
 // =======================
-// 🔹 Step 2: Select Change Type (RV / Assessment)
+// ðŸ”¹ Step 2: Select Change Type (RV / Assessment)
 // =======================
 function openChangeTypeModal(newPropertyNo) {
   document.getElementById("changeTypeSelect").value = "";
@@ -1872,7 +1887,7 @@ function openChangeTypeModal(newPropertyNo) {
 
     changeModal.hide();
 
-    // ✅ Simple boolean logic — no need toUpperCase()
+    // âœ… Simple boolean logic â€” no need toUpperCase()
     const byRv = (changeType === "RV");
     const byAssessment = (changeType === "ASSESSMENT");
 
@@ -1883,14 +1898,14 @@ function openChangeTypeModal(newPropertyNo) {
     localStorage.setItem("afterHearingByAssessment", byAssessment);
     localStorage.setItem("afterHearingProperty", newPropertyNo);
 
-    // 🟢 Open edit form
+    // ðŸŸ¢ Open edit form
     editAssessment(newPropertyNo);
   };
 }
 
 
 // =======================
-// 🔹 Mark Retained / Absent (immediate update)
+// ðŸ”¹ Mark Retained / Absent (immediate update)
 // =======================
 function markObjectionStatus(newPropertyNo, status) {
   fetch(`/3g/afterHearing/markStatus`, {
@@ -1913,7 +1928,7 @@ function markObjectionStatus(newPropertyNo, status) {
 }
 
 // =======================
-// 🔹 Open Edit Form
+// ðŸ”¹ Open Edit Form
 // =======================
 function editAssessment(newPropertyNo) {
   const url = `/3gSurvey/editSurveyForm?newpropertyno=${newPropertyNo}&mode=assessment`;
@@ -1921,12 +1936,12 @@ function editAssessment(newPropertyNo) {
 }
 
 // =======================
-// 🔹 Called AFTER officer saves modified data
+// ðŸ”¹ Called AFTER officer saves modified data
 // =======================
 async function finalizeAfterHearingStatus(newPropertyNo) {
   try {
     if (!window.afterHearingDecision || !window.afterHearingChangeType) {
-      console.warn("⚠️ No hearing decision stored for property " + newPropertyNo);
+      console.warn("âš ï¸ No hearing decision stored for property " + newPropertyNo);
       return;
     }
 
@@ -1945,12 +1960,12 @@ async function finalizeAfterHearingStatus(newPropertyNo) {
     if (!res.ok) throw new Error("Server error updating status");
 
     const data = await res.json();
-    console.log("✅ Hearing status finalized:", data);
+    console.log("âœ… Hearing status finalized:", data);
 
     alert("After Hearing status marked as CHANGED successfully!");
 
   } catch (error) {
-    console.error("❌ Failed to finalize hearing status:", error);
+    console.error("âŒ Failed to finalize hearing status:", error);
     alert("Error marking After Hearing status. Please check console.");
   }
 }
@@ -1959,7 +1974,7 @@ async function saveArrearsTax() {
   try {
     const form = document.getElementById("arrearsTaxForm");
     if (!form) {
-      alert("⚠️ Form not found!");
+      alert("âš ï¸ Form not found!");
       return;
     }
 
@@ -1967,7 +1982,7 @@ async function saveArrearsTax() {
     const jsonData = {};
 
     formData.forEach((value, key) => {
-      // 🔒 Do not convert IDs or codes to numbers
+      // ðŸ”’ Do not convert IDs or codes to numbers
       const keepAsString = [
         "newPropertyNo",
         "finalPropertyNo",
@@ -1984,7 +1999,7 @@ async function saveArrearsTax() {
       }
     });
 
-    console.log("📤 Submitting arrears tax data:", jsonData);
+    console.log("ðŸ“¤ Submitting arrears tax data:", jsonData);
 
     const response = await fetch("/3g/addPropertyArrearsTax", {
       method: "POST",
@@ -1995,17 +2010,16 @@ async function saveArrearsTax() {
     if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
     const result = await response.json();
-    alert("✅ Arrears Tax Saved Successfully!");
+    alert("âœ… Arrears Tax Saved Successfully!");
 
     form.reset();
     document.getElementById("arrears-tax").style.display = "none";
     document.getElementById("arrears").style.display = "block";
 
   } catch (error) {
-    console.error("❌ Error while saving arrears tax:", error);
-    alert("⚠️ Failed to save arrears tax. Please check console for details.");
+    console.error("âŒ Error while saving arrears tax:", error);
+    alert("âš ï¸ Failed to save arrears tax. Please check console for details.");
   }
 }
-
 
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="mr">
 <head>
     <meta charset="UTF-8">
@@ -178,7 +178,7 @@
         tr.column-numbers th.p2::before {
           content: counter(counterP2);
         }
-        
+
         /* Do not number the P2 serial column */
         tr.column-numbers th.p2.p2-serial { counter-increment: none; }
         tr.column-numbers th.p2.p2-serial::before { content: ""; }
@@ -189,7 +189,8 @@
           line-height: 1.15;
           text-align: center;
           vertical-align: middle;
-          white-space: pre-line; /* allows line breaks (\n) */
+          white-space: pre-line; /* allows line breaks (
+) */
           font-weight: 600;
           font-size: 11px;
           padding: 2px 3px;
@@ -199,7 +200,8 @@
           text-align: center;
           vertical-align: middle;
           line-height: 1.15;
-          white-space: pre-line; /* allows \n or <br> line breaks */
+          white-space: pre-line; /* allows 
+ or <br> line breaks */
           font-size: 11px;
           font-weight: 500;
           padding: 2px 3px;
@@ -279,6 +281,11 @@ tr td, tr th {
 th, td {
   font-size: 11px;
   padding: 2px 3px;
+}
+
+/* Widen the Usage/Floor/Owner, Tenant columns to avoid wrapping */
+.usage-cell {
+  min-width: 170px;
 }
 
 /* Broader important columns */
@@ -396,6 +403,18 @@ table.reportTable {
     // 🔹 Global store for dynamic tax configurations
     window.dynamicTaxConfigs = [];
 
+    // Unit usage id -> local name map
+    window.unitUsageLocal = new Map();
+
+    async function fetchUnitUsageMap() {
+      try {
+        const res = await fetch('/3g/getAllUnitUsageTypes');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const rows = await res.json();
+        rows.forEach(r => { if (r && r.id != null) window.unitUsageLocal.set(Number(r.id), r.localName || ''); });
+      } catch (e) { console.warn('Failed to load unit usage types', e); }
+    }
+
     // 🔹 Fetch only dynamic tax column names
     async function fetchDynamicTaxColumns() {
       try {
@@ -419,7 +438,8 @@ table.reportTable {
       // Run council details fetch in parallel
       fetchCouncilDetails();
 
-      // 1. Wait for tax configurations to load first
+      // 1. Load usage map and tax configurations first
+      await fetchUnitUsageMap();
       await fetchDynamicTaxColumns();
 
       // 2. Now fetch the main report data
@@ -596,12 +616,12 @@ table.reportTable {
           const property = group[0];
           const pd = property.propertyDetails || {};
           const psd =property.propertySummary || {};
-          const usages = (group.flatMap(p => p.propertyUnitDetails || [])).map(u => u.usageTypeVc || "").join("<br>");
+          const usages = (group.flatMap(p => p.propertyUnitDetails || [])).map(u => (window.unitUsageLocal.get(Number(u.usageTypeVc)) || u.usageTypeVc || "")).join("<br>");
           // Derived values for mixed columns (unit-wise only)
           const units = group.flatMap(p => p.propertyUnitDetails || []);
           const unitLines = (units && units.length > 0)
             ? units.map(u => {
-                const usage = (u.usageTypeVc || '—');
+                const usage = (window.unitUsageLocal.get(Number(u.usageTypeVc)) || u.usageTypeVc || '-');
                 const floor = (u.floorNoVc || '—');
                 const person = (u.tenantNameVc && u.tenantNameVc.trim() !== '') ? `भाडेकरू: ${u.tenantNameVc}` : 'मालक';
                 return `${usage} / ${floor} / ${person}`;
@@ -712,15 +732,32 @@ table.reportTable {
             <td class="p2">${multiLineInfo}</td> <!-- वापर प्रकार -->
           `;
           // Fill mixed info cells for Part 1: [4]=Usage/Floor/Owner/Tenant, [5]=Construction/Taxable, [6]=Total Taxable
-          try {
-            const p1Cells = tr.querySelectorAll('td.p1');
-            if (p1Cells.length > 7) {
-              p1Cells[4].innerHTML = multiLineInfo;
-              p1Cells[5].classList.add('description-cell');
-              p1Cells[5].innerHTML = constructionBlocks;
-              p1Cells[6].textContent = (totalTaxableArea ?? '').toString();
-            }
-          } catch (e) { console.warn('Row mixin fill failed', e); }
+            try {
+              const p1Cells = tr.querySelectorAll('td.p1');
+              if (p1Cells.length > 7) {
+                p1Cells[4].classList.add('description-cell');
+                p1Cells[4].classList.add('usage-cell');
+                p1Cells[4].innerHTML = multiLineInfo
+                  .split('<br>')
+                  .map(s => `<div class="description-block">${s}</div>`)
+                  .join('');
+                p1Cells[5].classList.add('description-cell');
+                p1Cells[5].innerHTML = constructionBlocks;
+                p1Cells[6].textContent = (totalTaxableArea ?? '').toString();
+              }
+
+              // Mirror partitioning for the last P2 column (वापर प्रकार / मजला / मालक, भाडेकरू)
+              const p2Cells = tr.querySelectorAll('td.p2');
+              if (p2Cells.length > 0) {
+                const lastP2 = p2Cells[p2Cells.length - 1];
+                lastP2.classList.add('description-cell');
+                lastP2.classList.add('usage-cell');
+                lastP2.innerHTML = multiLineInfo
+                  .split('<br>')
+                  .map(s => `<div class="description-block">${s}</div>`)
+                  .join('');
+              }
+            } catch (e) { console.warn('Row mixin fill failed', e); }
           tbody.appendChild(tr);
 
         // Add placeholder rows (assuming 3 rows per property)
@@ -759,5 +796,6 @@ table.reportTable {
 </script>
 </body>
 </html>
+
 
 
