@@ -81,7 +81,7 @@
         <li class="nav-item">
           <a class="nav-link" href="#" onclick="showTab('home')">Home</a>
         </li>
-        <li class="nav-item" id="nav-users">
+        <li class="nav-item" id="nav-users" th:if="${isITA}">
           <a class="nav-link" href="/3g/userManagement">Users</a>
         </li>
         <li class="nav-item dropdown" id="nav-master" th:if="${isITA}">
@@ -146,26 +146,26 @@
               </div>
             </div>
 
-            <div class="dropdown-submenu">
-              <a class="dropdown-item dropdown-toggle" href="#">Assessment Settings</a>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="#" onclick="showMaster('AssessmentDates')">Assessment Dates</a>
-                <a class="dropdown-item" href="#" onclick="showMaster('rvTypeMasterSection')">RV Types</a>
-              </div>
-            </div>
+<!--            <div class="dropdown-submenu">-->
+<!--              <a class="dropdown-item dropdown-toggle" href="#">Assessment Settings</a>-->
+<!--              <div class="dropdown-menu">-->
+<!--                <a class="dropdown-item" href="#" onclick="showMaster('AssessmentDates')">Assessment Dates</a>-->
+<!--                <a class="dropdown-item" href="#" onclick="showMaster('rvTypeMasterSection')">RV Types</a>-->
+<!--              </div>-->
+<!--            </div>-->
 
-            <div class="dropdown-submenu">
-              <a class="dropdown-item dropdown-toggle" href="#">Tax Master</a>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="#" onclick="showMaster('consolidatedTaxesSection')">Consolidated Taxes</a>
-                <a class="dropdown-item" href="#" onclick="showMaster('propertyRatesSection')">Property Rates</a>
-                <a class="dropdown-item" href="#" onclick="showMaster('educationAndEmployment')">Cess Rates</a>
-                <a class="dropdown-item" href="#" onclick="showMaster('depreciationRatesSection')">Depreciation Rates</a>
-              </div>
-            </div>
+<!--            <div class="dropdown-submenu">-->
+<!--              <a class="dropdown-item dropdown-toggle" href="#">Tax Master</a>-->
+<!--              <div class="dropdown-menu">-->
+<!--                <a class="dropdown-item" href="#" onclick="showMaster('consolidatedTaxesSection')">Consolidated Taxes</a>-->
+<!--                <a class="dropdown-item" href="#" onclick="showMaster('propertyRatesSection')">Property Rates</a>-->
+<!--                <a class="dropdown-item" href="#" onclick="showMaster('educationAndEmployment')">Cess Rates</a>-->
+<!--                <a class="dropdown-item" href="#" onclick="showMaster('depreciationRatesSection')">Depreciation Rates</a>-->
+<!--              </div>-->
+<!--            </div>-->
 
-            <a class="dropdown-item" href="#" onclick="showMaster('ReportTaxConfig')">Report Tax Config</a>
-            <a class="dropdown-item" href="#" onclick="showMaster('councilDetails')">Council Details</a>
+<!--            <a class="dropdown-item" href="#" onclick="showMaster('ReportTaxConfig')">Report Tax Config</a>-->
+<!--            <a class="dropdown-item" href="#" onclick="showMaster('councilDetails')">Council Details</a>-->
           </div>
         </li>
         <!-- Deprecated individual master: Property Details (replaced by Master) -->
