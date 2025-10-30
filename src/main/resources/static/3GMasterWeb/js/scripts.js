@@ -1999,7 +1999,7 @@ async function saveArrearsTax() {
       }
     });
 
-    console.log("ðŸ“¤ Submitting arrears tax data:", jsonData);
+    console.log("Submitting arrears tax data:", jsonData);
 
     const response = await fetch("/3g/addPropertyArrearsTax", {
       method: "POST",

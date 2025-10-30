@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -45,9 +46,11 @@ public class MasterWebControllerII {
             @RequestPart(value = "housePlan1", required = false) MultipartFile housePlan1,
             @RequestPart(value = "housePlan2", required = false) MultipartFile housePlan2) throws JsonProcessingException {
 
-        ObjectMapper mapper = new ObjectMapper();
-        AfterHearingCompleteProperty_Dto dto = mapper.readValue(updatedFieldsJson, AfterHearingCompleteProperty_Dto.class);
 
+        ObjectMapper mapper = new ObjectMapper();
+        String utf8Json = ensureUtf8(updatedFieldsJson);
+        AfterHearingCompleteProperty_Dto dto = mapper.readValue(utf8Json, AfterHearingCompleteProperty_Dto.class);
+        System.out.println(dto);
         String newPropertyNo = dto.getPropertyDetails().getPdNewpropertynoVc();
         boolean byRv = dto.isByRv();
         boolean byAssessment = dto.isByAssessment();
@@ -80,6 +83,10 @@ public class MasterWebControllerII {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", e.getMessage()));
         }
+    }
+
+    private String ensureUtf8(String input) {
+        return new String(input.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
 

@@ -378,7 +378,6 @@ public class PropertySurveyController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             CompleteProperty_Dto updatedPropertyDto = objectMapper.readValue(updatedFieldsJson, CompleteProperty_Dto.class);
-            System.out.println("this is updated survey"+updatedPropertyDto);
             if (propertyImage != null) {
                 updatedPropertyDto.getPropertyDetails().setPdPropimageT(
                         ImageUtils.convertToBase64(propertyImage)

@@ -224,6 +224,7 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
         ProposedRatableValueDetailsDto proposed =
                 mapToProposedRatableValueDetailsDto(dto.getProposedRValues().get(0));
 
+        System.out.println("proposedrvalues::"+dto.getProposedRValues());
         if (proposed == null)
             throw new IllegalArgumentException("Missing ProposedRatableValueDetailsDto for RV change");
 
@@ -244,13 +245,18 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
 
         double totalTax = allTaxes.values().stream().mapToDouble(Double::doubleValue).sum();
 
+        List<Property_RValues> oldRValues = property_rValuesRepository.findAllByPrvPropertyNoVc(newPropertyNo);
+        if (!oldRValues.isEmpty()) {
+            afterHearingPropertyRvalues_masterRepository.saveAll(
+                    oldRValues.stream().map(this::mapRValueToAfterHearing).collect(Collectors.toList())
+            );
+        }
+
         // 🔹 Step 3: Save new Proposed RV
         AfterHearing_ProposedRValuesDto rvDto = mapToAfterHearingProposedRvDto(proposed,newPropertyNo);
         afterHearingProposedRvalues_masterRepository.saveAll(
                 convertProposedRValues(Collections.singletonList(rvDto))
         );
-
-
 
         // 🔹 Step 4: Save all Tax Details
         AfterHearing_PropertyTaxDetailsEntity taxEntity =
