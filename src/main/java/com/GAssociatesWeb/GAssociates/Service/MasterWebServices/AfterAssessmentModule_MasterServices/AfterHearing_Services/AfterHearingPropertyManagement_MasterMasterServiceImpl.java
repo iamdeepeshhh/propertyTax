@@ -106,6 +106,7 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
             AfterHearingCompleteProperty_Dto dto,
             PropertyDetails_Dto propertyDetailsDto) {
 
+        String finalPropertyNo = dto.getPropertyDetails().getPdFinalpropnoVc();
         // 🔹 Step 1: Save Property into after-hearing
         PropertyDetails_Dto savedProperty = afterPropertyDetailsService.createAfterHearingProperty(propertyDetailsDto);
 
@@ -159,7 +160,7 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
 
         // 🔹 Step 4: Save RValues, Proposed RVs, Tax Details
         if (result.getProposedRatableValues() != null){
-            AfterHearing_ProposedRValuesEntity proposedRValuesEntity = convertAssessmentResultsOfProposedRvaluesToEntity(result.getProposedRatableValues(),newPropertyNo);
+            AfterHearing_ProposedRValuesEntity proposedRValuesEntity = convertAssessmentResultsOfProposedRvaluesToEntity(result.getProposedRatableValues(),newPropertyNo, finalPropertyNo);
             afterHearingProposedRvalues_masterRepository.save(proposedRValuesEntity);
         }
         if (result.getTaxKeyValueMap() != null){
@@ -865,7 +866,9 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
 
         // 🏛️ PROPERTY TAX COMPOSITION
 
+        tax.setPtPropertyTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.PT_PARENT, 0.0)));
         // 📚 EDUCATION + EGC
+        tax.setPtEduTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.EDUC_PARENT, 0.0)));
         tax.setPtEduResTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.EDUC_RES, 0.0)));
         tax.setPtEduNonResTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.EDUC_COMM, 0.0)));
         tax.setPtEgcTaxFl(nullToZero(taxMap.getOrDefault(ReportTaxKeys.EGC, 0.0)));
@@ -935,12 +938,12 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
     }
 
     private AfterHearing_ProposedRValuesEntity convertAssessmentResultsOfProposedRvaluesToEntity(
-            ProposedRatableValueDetailsDto dto,String newPropertyNoVc
+            ProposedRatableValueDetailsDto dto,String newPropertyNoVc, String finalPropertyNo
     ) {
         AfterHearing_ProposedRValuesEntity prv = new AfterHearing_ProposedRValuesEntity();
 
         prv.setPrNewPropertyNoVc(newPropertyNoVc);
-        prv.setPrFinalPropNoVc(dto.getFinalPropertyNoVc());
+        prv.setPrFinalPropNoVc(finalPropertyNo);
 
         // 🧮 Ratable Value Fields
         prv.setPrResidentialFl(nullToZero(dto.getResidentialFl()));

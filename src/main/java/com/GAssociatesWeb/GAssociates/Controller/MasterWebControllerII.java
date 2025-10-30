@@ -89,8 +89,6 @@ public class MasterWebControllerII {
         return new String(input.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-
-
     @GetMapping("/secondaryBatchAssessmentReport")
     public ResponseEntity<?> getSecondaryBatchAssessmentReport(@RequestParam("wardNo") Integer wardNo) {
         try {

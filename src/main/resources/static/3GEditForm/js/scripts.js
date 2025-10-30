@@ -101,7 +101,9 @@
                 if (data && data.propertyDetails) {
                     console.log('unit details:', data.unitDetails);
                     console.log('Property details:', data);
-                    cachedPropertyData = JSON.parse(JSON.stringify(data)); // Deep copy to cachedPropertyData
+                    cachedPropertyData = JSON.parse(JSON.stringify(data));
+                     // Deep copy to cachedPropertyData
+                    $('#finalPropertyNo').val(data.propertyDetails.pdFinalpropnoVc || '');
                     $('#podRef').val(data.propertyDetails.propRefno || ''); // Reference Number
                     $('#zone').val(data.propertyDetails.pdZoneI || ''); // Zone
                     $('#oldWard').val(data.propertyDetails.pdOldwardNoVc || ''); // Old Ward
@@ -1979,7 +1981,8 @@
         pdTpdateDt: document.getElementById('tpDate')?.value || '',
         pdSaledeedI: document.getElementById('saledeedSelection')?.value || '',
         pdSaledateDt: document.getElementById('saledeedDate')?.value || '',
-        pdOldrvFl: document.getElementById('oldRV')?.value || ''
+        pdOldrvFl: document.getElementById('oldRV')?.value || '',
+        pdFinalpropnoVc: document.getElementById('finalPropertyNo')?.value || ''
     };
 
     // 🏢 UNIT DETAILS
