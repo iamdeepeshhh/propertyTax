@@ -45,6 +45,20 @@
 
             // Auto open the RV tab on load
             openTab('RV');
+
+            // In assessment mode, Next from Unit should go to RV (not Additional)
+            try {
+                var unitContainer = document.getElementById('UnitTabContent');
+                if (unitContainer) {
+                    var nextButtons = unitContainer.querySelectorAll('button[onclick^="Next("]');
+                    nextButtons.forEach(function(btn){
+                        var val = btn.getAttribute('onclick') || '';
+                        if (val.includes("'Additional'")) {
+                            btn.setAttribute('onclick', "Next('RV')");
+                        }
+                    });
+                }
+            } catch (e) { console.warn('Could not rewire Unit Next button for assessment mode', e); }
         } else if (mode === 'survey') {
             // Hide "RV" and "Taxes"
             if (rvTab) rvTab.style.display = 'none';

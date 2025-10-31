@@ -592,15 +592,24 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
     🔹 Render chunks (3 reports per page)
        -------------------------------------- */
     function renderAssessmentChunks(data) {
+
+      // 1️⃣ Sort the complete dataset by FINAL property number (e.g. 010001, 010002, etc.)
+      data.sort((a, b) => {
+        const valA = a.propertyDetails?.pdFinalpropnoVc || '';
+        const valB = b.propertyDetails?.pdFinalpropnoVc || '';
+        return valA.localeCompare(valB, undefined, { numeric: true });
+      });
+
+      // 2️⃣ Group the sorted data by NEW property number (unit-level grouping)
       const grouped = data.reduce((acc, prop) => {
-        const key = prop.propertyDetails?.pdNewpropertynoVc;
+        const key = prop.propertyDetails?.pdNewpropertynoVc; // group units of same property together
+        if (!key) return acc; // skip invalid records
         if (!acc[key]) acc[key] = [];
         acc[key].push(prop);
         return acc;
       }, {});
 
-
-
+      // (the rest of your existing rendering logic stays the same below)
       const reportContainer = document.querySelector("#reportContainer");
       reportContainer.innerHTML = "";
       const groups = Object.values(grouped);

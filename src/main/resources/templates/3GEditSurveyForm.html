@@ -15,7 +15,8 @@
         <button onclick="openTab('Property')">Property</button>
         <button onclick="openTab('Unit')">Unit</button>
         <button onclick="openTab('RV')">Ratable Values</button>
-        <button onclick="openTab('Taxes')">Taxes</button>
+        <!-- Temporarily hide Taxes tab in Edit Survey Form -->
+        <!-- <button onclick="openTab('Taxes')">Taxes</button> -->
         <button onclick="openTab('Additional')">Additional</button>
     </div>
     <form id="propertyForm" action="/survey/submit" method="post">
@@ -525,7 +526,8 @@
 
 
 
-        <div id="TaxesTabContent" class="tab-content" style="display:none;">
+        <!-- Taxes tab hidden for now -->
+        <div id="TaxesTabContent" class="tab-content" style="display:none; visibility:hidden; height:0; overflow:hidden;">
             <form id="taxForm">
                 <fieldset>
                     <legend>Property Taxes</legend>

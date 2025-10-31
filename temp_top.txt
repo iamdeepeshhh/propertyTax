@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Property Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" crossorigin="anonymous">
+    <link href="/3GSurveyForm/css/styles.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/3GEditForm/js/rv-bulk-adjust.js"></script></head>
+<body>
+    <div class="tabs">
+        <button onclick="openTab('Main')">Main</button>
+        <button onclick="openTab('Property')">Property</button>
+        <button onclick="openTab('Unit')">Unit</button>
+        <button onclick="openTab('RV')">Ratable Values</button>
+        <button onclick="openTab('Taxes')">Taxes</button>
+        <button onclick="openTab('Additional')">Additional</button>
+    </div>
+    <form id="propertyForm" action="/survey/submit" method="post">
+    
+       <div id="MainTabContent" class="tab-content">
+        <form>
+            <input type="hidden" id="finalPropertyNo" name="finalPropertyNo">
+
+            <label for="podRef">Reference no:</label>
+            <input type="text" id="podRef" name="podRef" style="width: 97%;" disabled><br>
+    
+            <label for="zone" class="mandatory">Zone:</label>
+            <select id="zone" name="zone" style="width: 97%;"></select><br>
+    
+            <label for="oldWard">Old Ward:</label>
+            <select id="oldWard" name="oldWard" style="width: 97%;"></select><br>
+    
+            <label for="ward" class="mandatory">Ward:</label>
+            <select id="ward" name="ward" style="width: 97%;" onchange="checkSurveyPropNo()"></select><br>
+    
+            <label for="citySurveyNo">City Survey No.:</label>
+            <input type="text" id="citySurveyNo" name="citySurveyNo" style="width: 95%;"><br>
+    
+            <label for="oldPropertyNo">Old Property No.:</label>
+            <input type="text" id="oldPropertyNo" name="oldPropertyNo" style="width: 95%;"><br>
+    
+            <label for="surveyPropNo" class="mandatory">Survey Prop No.:</label>
+            <input type="text" id="surveyPropNo" name="surveyPropNo" style="width: 95%;" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits" oninput="removeSpacesAndCheck(this)"><br>
+            <span id="surveyPropNoMessage" style="color: red; display: none;">Survey Prop No. already exists in this ward.</span>
+    
+            <label for="sequenceNo">Sequence No.:</label>
+            <input type="text" id="sequenceNo" name="sequenceNo" style="width: 95%;"><br>
+    
+            <label for="layoutName">Layout Name:</label>
+            <input type="text" id="layoutName" name="layoutName" style="width: 95%;"><br>
+    
+            <label for="layoutNo">Layout No.:</label>
+            <input type="text" id="layoutNo" name="layoutNo" style="width: 95%;"><br>
+    
+            <label for="khasraNo">Khasra No.:</label>
+            <input type="text" id="khasraNo" name="khasraNo" style="width: 95%;"><br>
+    
+            <label for="plotNo">Plot No.:</label>
+            <input type="text" id="plotNo" name="plotNo" style="width: 95%;"><br>
+    
+            <label for="ownerName" class="mandatory">Owner Name:</label>
+            <input type="text" id="ownerName" name="ownerName" style="width: 95%;"><br>
+    
+            <label for="newOwnerName">New Owner Name:</label>
+            <input type="text" id="newOwnerName" name="newOwnerName" style="width: 95%;" disabled><br>
+    
+            <label for="occupierName">Occupier Name:</label>
+            <input type="text" id="occupierName" name="occupierName" style="width: 95%;"><br>
+    
+            <label for="address" class="mandatory">Address:</label>
+            <input type="text" id="address" name="address" style="width: 95%;"><br>
+    
+            <label for="ownerType" class="mandatory">Owner Type:</label>
+            <select id="ownerType" name="ownerType" style="width: 97%;"></select><br>
+    
+            <label for="buildingStatus">Building Status:</label>
+            <select id="buildingStatus" name="buildingStatus" style="width: 100%;"></select><br><br>
+    
+            <button type="button" onclick="Next('Property')">Next</button>
+        </form>
+    </div>
+    
+        <div id="PropertyTabContent" class="tab-content">
+    
+            <form>
+                <fieldset>
+                    <legend>Owner details</legend>
+                    <label for="panNo" >Pan No.:</label>
+                    <input style="width: 97%;" type="text" id="panNo" name="panNo"><br>
+    
+                    <label for="aadharNo" >Aadhar No.:</label>
+                    <input style="width: 97%;" type="text" id="aadharNo" name="aadharNo"><br>
+    
+                    <label for="ownermobileNo" >Mobile No.:</label>
+                    <input style="width: 97%;" type="text" id="ownermobileNo" name="mobileNo"><br>
+    
+                    <label for="category" class="mandatory">Category:</label>
+                    <select style="width: 99%;" id="category" name="category">
+                    </select><br>
+    
+                    <label for="propertyName">Property Name:</label>
+                    <input style="width: 97%;" type="text" id="propertyName" name="propertyName"><br>
+    
+                    <label for="buildingValue">Building Value:</label>
+                    <input style="width: 97%;" type="text" id="buildingValue" name="buildingValue"><br>
+    
+                    <label for="plotValue">Plot Value:</label>
+                    <input style="width: 97%;" type="text" id="plotValue" name="plotValue"><br>
+                </fieldset>
+                <fieldset>
+                    <legend>Property information</legend>
+    
+                    <label for="propertyType" class="mandatory">Property Type:</label>
+                    <select style="width: 97%;" id="propertyType" name="propertyType">
+                        <option value="select">Select</option>
+                    </select><br>
+    
+                    <label for="propertySubType" class="mandatory">Property Sub Type:</label>
+                    <select style="width: 97%;" id="propertySubType" name="propertySubType">
+                        <option value="select">Select</option>
+                    </select><br>
+    
+                    <label for="propertyusageType" class="mandatory">Usage Type:</label>
+                    <select style="width: 97%;" id="propertyusageType" name="propertyusageType">
+                        <option value="select">Select</option>
+                    </select><br>
+    
+                    <label for="propertyusageSubType" class="mandatory">Usage Sub Type:</label>
+                    <select style="width: 97%;" id="propertyusageSubType" name="propertyusageSubType">
+                        <option value="select">Select</option>
+                    </select><br>
+    
+                    <label for="buildingType">Building Type:</label>
+                    <select style="width: 97%;" id="buildingType" name="buildingType">
+                        <option value="select">Select</option>
+                    </select><br>
+    
+                    <label for="buildingSubType">Building Sub Type:</label>
+                    <select style="width: 97%;" id="buildingSubType" name="buildingSubType">
+                        <option value="select">Select</option>
+                    </select><br>
+    
+                    <label for="constYear" class="mandatory">Construction Year:</label>
+                    <select style="width: 97%;" id="constYear" name="constYear" onchange="updatePropertyAgeFactor(this.value)">
+                        <!-- Year options will be populated by JavaScript -->
+                    </select><br>
+    
+                    <label for="constAgeProperty">Construction Age:</label>
+                    <input style="width: 97%;" type="text" id="constAgeProperty" name="constAgeProperty" readonly><br>
+    
+                    <label for="ageFactorProperty">Age Factor:</label>
+                    <input style="width: 97%;" type="text" id="ageFactorProperty" name="ageFactorProperty" readonly><br>
+    
+                    <input type="hidden" id="agefactorpropertyhid">
+                    <input type="text" id="currentDateProperty" name="currentDateProperty">
+    
+                    <label for="permissionSelection">Permission:</label>
+                    <select style="width: 97%;" id="permissionSelection" name="permissionSelection"
+                            onchange="togglePopup('permissionSelection', 'permissionPopup')">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                    <div id="permissionPopup" class="popup">
+                        <label for="permissionNumber">Permission Number:</label>
+                        <input style="width: 97%;" type="text" id="permissionNumber" name="permissionNumber">
+                        <label for="permissionDate">Permission Date:</label>
+                        <input style="width: 97%;
+                                padding: 8px;
+                                box-sizing: border-box;
+                                border: 1px solid #ccc;
+                            border-radius: 3px;" type="date" id="permissionDate" name="permissionDate">
+                        </div>
+    
+    
+                    <label for="stair">Stair:</label>
+                    <select style="width: 97%;" id="stair" name="stair">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select><br>
+    
+                    <label for="lift">Lift:</label>
+                    <select style="width: 97%;" id="lift" name="lift">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select><br>
+    
+                    <label for="roadWidth">Road Width (in meter):</label>
+                    <input style="width: 95%;" type="text" id="roadWidth" name="roadWidth"><br>
+                </fieldset>
+    
+                <!-- Suraj's code starts here -->
+                <fieldset>
+                    <legend>Other information</legend>
+                    <label for="toiletSelection">Toilet:</label>
+                    <select style="width: 97%;" id="toiletSelection" name="toiletSelection"
+                            onchange="togglePopup('toiletSelection', 'toiletPopup')">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
