@@ -318,15 +318,19 @@ public class MasterWebControllerII {
 
         if (updated) {
             try {
-                // For RETAINED/ABSENT, persist a snapshot into After Hearing tables as-is
+                // For RETAINED/ABSENT, persist a snapshot from BEFORE-HEARING (live) tables
                 if ("RETAINED".equalsIgnoreCase(status) || "ABSENT".equalsIgnoreCase(status)) {
                     boolean alreadySnapshotted = false;
                     try { alreadySnapshotted = afterHearingPropertyDetailsService.getPropertyByNewPropertyNo(newPropertyNo) != null; } catch (Exception ignore) {}
 
                     if (!alreadySnapshotted) {
-                        // Fetch complete live property snapshot (property, units, RV, taxes)
-                        AfterHearingCompleteProperty_Dto snapshot = afterHearingService.getCompletePropertyByNewPropertyNo(newPropertyNo);
-                        if (snapshot != null && snapshot.getPropertyDetails() != null) {
+                        // Fetch live complete property (survey/property tables)
+                        com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.CompleteProperty_Dto live =
+                                propertyManagementService.getCompletePropertyByNewPropertyNo(newPropertyNo);
+                        if (live != null && live.getPropertyDetails() != null) {
+                            AfterHearingCompleteProperty_Dto snapshot = new AfterHearingCompleteProperty_Dto();
+                            snapshot.setPropertyDetails(live.getPropertyDetails());
+                            snapshot.setUnitDetails(live.getUnitDetails());
                             snapshot.setHearingStatus(status);
                             snapshot.setChangeType("NONE");
                             // Persist to after-hearing without re-assessment or RV change
