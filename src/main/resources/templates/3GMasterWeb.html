@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <link href="/3GMasterWeb/css/styles.css" rel="stylesheet">
@@ -287,6 +287,7 @@
             <a class="dropdown-item" href="#" onclick="showTab('educationAndEmployment')">EDU Cess and EGC Cess</a>
             <a class="dropdown-item" href="#" onclick="showTab('rvTypeMasterSection')">Rate Master</a>
             <a class="dropdown-item" href="#" onclick="showTab('ReportTaxConfig')">Report Tax Config</a>
+<!--            <a class="dropdown-item" href="#" onclick="showTab('compareBeforeAfter')">Before/After Compare</a>-->
 <!--            <a class="dropdown-item" href="#" onclick="showTab('userChargesSection')">User Charges</a>-->
           </div>
         </li>
@@ -623,7 +624,7 @@
           </div>
           <div class="form-group col-md-6">
             <label for="rtc-local">Local Name</label>
-            <input type="text" id="rtc-local" name="localNameVc" class="form-control" placeholder="e.g., मालमत्ता कर	">
+            <input type="text" id="rtc-local" name="localNameVc" class="form-control" placeholder="e.g., ???????? ??	">
           </div>
         </div>
 
@@ -679,6 +680,46 @@
     <div style="height: 40px;"></div>
     <div style="height: 40px;"></div>
     <div style="height: 40px;"></div>
+  </section>
+
+  <section id="compareBeforeAfter" class="container mt-5" style="display:none;">
+    <h2>Before/After Compare</h2>
+    <div class="card p-3 mb-3">
+      <div class="form-row align-items-end">
+        <div class="form-group col-md-4">
+          <label for="cba-newprop">Property No (Final / New)</label>
+          <input type="text" id="cba-newprop" class="form-control" placeholder="Enter New Property No">
+        </div>
+        <div class="form-group col-md-3">
+          <button id="cba-load" type="button" class="btn btn-primary">Load Compare</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="cba-results" class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">Before (Live)</div>
+          <div class="card-body">
+            <div id="cba-before-summary" class="mb-2"></div>
+            <div style="max-height: 320px; overflow:auto">
+              <pre id="cba-before-json" class="mb-0" style="white-space: pre-wrap"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">After Hearing</div>
+          <div class="card-body">
+            <div id="cba-after-summary" class="mb-2"></div>
+            <div style="max-height: 320px; overflow:auto">
+              <pre id="cba-after-json" class="mb-0" style="white-space: pre-wrap"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
 
@@ -2425,17 +2466,17 @@
 
 <section id="arrears-tax">
     <div class="container mt-5">
-      <h2>Arrears Property Tax Details / थकबाकी मालमत्ता कर तपशील</h2>
+      <h2>Arrears Property Tax Details / ?????? ???????? ?? ?????</h2>
 
       <form id="arrearsTaxForm" class="needs-validation" novalidate>
 
         <input type="hidden" id="newPropertyNo" name="newPropertyNo" value="">
-        <!-- 📅 YEAR & STATUS -->
-        <h4 class="mt-4">Financial Year & Status / आर्थिक वर्ष व स्थिती</h4>
+        <!-- ?? YEAR & STATUS -->
+        <h4 class="mt-4">Financial Year & Status / ?????? ???? ? ??????</h4>
         <div class="form-row">
-          <!-- 🗓️ Financial Year -->
+          <!-- ??? Financial Year -->
           <div class="form-group col-md-3">
-            <label for="financialYear">Financial Year / आर्थिक वर्ष</label>
+            <label for="financialYear">Financial Year / ?????? ????</label>
             <select id="financialYear" name="financialYear" class="form-control">
               <option value="">Select Year</option>
               <option value="2022-2023">2022-2023</option>
@@ -2444,15 +2485,15 @@
             </select>
           </div>
 
-          <!-- 👤 Owner Name -->
+          <!-- ?? Owner Name -->
           <div class="form-group col-md-4">
-            <label for="ownerName">Owner Name / मालकाचे नाव</label>
+            <label for="ownerName">Owner Name / ??????? ???</label>
             <input type="text" id="ownerName" name="ownerName" class="form-control" placeholder="Enter Owner Name">
           </div>
 
-          <!-- 🏠 Final Property Number -->
+          <!-- ?? Final Property Number -->
           <div class="form-group col-md-4">
-            <label for="finalPropertyNo">Final Property Number / अंतिम मालमत्ता क्र.</label>
+            <label for="finalPropertyNo">Final Property Number / ????? ???????? ???.</label>
             <input type="text" id="finalPropertyNo" name="finalPropertyNo" class="form-control" placeholder="Enter Final Property No.">
           </div>
           <div class="form-group col-md-4">
@@ -2460,8 +2501,8 @@
           </div>
         </div>
 
-        <!-- 💰 ARREARS TAX COMPONENTS -->
-        <h4 class="mt-4">Arrears Tax Components / थकबाकी कर घटक</h4>
+        <!-- ?? ARREARS TAX COMPONENTS -->
+        <h4 class="mt-4">Arrears Tax Components / ?????? ?? ???</h4>
         <div class="form-row">
           <div class="form-group col-md-3"><label>Property Tax</label><input type="number" id="propertyTax" name="propertyTax" class="form-control" value="0"></div>
           <div class="form-group col-md-3"><label>Education Tax</label><input type="number" id="educationTax" name="educationTax" class="form-control" value="0"></div>
@@ -2509,15 +2550,15 @@
 
         </div>
 
-        <!-- 📊 SUMMARY -->
-        <h4 class="mt-4">Summary / सारांश</h4>
+        <!-- ?? SUMMARY -->
+        <h4 class="mt-4">Summary / ??????</h4>
         <div class="form-row">
           <div class="form-group col-md-3"><label>Penalty</label><input type="number" id="penalty" name="penalty" class="form-control" value="0"></div>
           <div class="form-group col-md-3"><label>Total Tax</label><input type="number" id="totalTax" name="totalTax" class="form-control" value="0"></div>
         </div>
 
-        <!-- 🔢 Dynamic Tax Fields (ptTax1–ptTax25) -->
-        <h4 class="mt-4">Dynamic Taxes (1–25)</h4>
+        <!-- ?? Dynamic Tax Fields (ptTax1�ptTax25) -->
+        <h4 class="mt-4">Dynamic Taxes (1�25)</h4>
         <div class="form-row">
           <!-- Loop Example: You can replicate for all 25 -->
           <div class="form-group col-md-2" style="margin-bottom:8px;" id="dynamicTaxContainer">
@@ -2550,10 +2591,10 @@
           <!-- Continue up to ptTax25 -->
         </div>
 
-        <!-- 🔘 BUTTONS -->
+        <!-- ?? BUTTONS -->
         <div class="text-center mt-4">
           <button type="button" class="btn btn-primary" onclick="calculateArrearsTotal()">Calculate Total</button>
-          <button type="button" class="btn btn-success" onclick="saveArrearsTax()">💾 Save Arrears Tax</button>
+          <button type="button" class="btn btn-success" onclick="saveArrearsTax()">?? Save Arrears Tax</button>
 
         </div>
       </form>
@@ -2710,7 +2751,7 @@
       </div>
   </div>
 </div>
-<!-- ðŸ”¹ Decision Modal -->
+<!-- 🔹 Decision Modal -->
 <div class="modal fade" id="hearingDecisionModal" tabindex="-1" aria-labelledby="hearingDecisionModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -2737,7 +2778,7 @@
   </div>
 </div>
 
-<!-- ðŸ”¹ Change Type Modal -->
+<!-- 🔹 Change Type Modal -->
 <div class="modal fade" id="changeTypeModal" tabindex="-1" aria-labelledby="changeTypeModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -2766,7 +2807,7 @@
 
 </main>
 <!--<footer>-->
-<!--  <p>Â© 2024 3G Associates. All rights reserved.</p>-->
+<!--  <p>© 2024 3G Associates. All rights reserved.</p>-->
 <!--</footer>-->
 
 

@@ -115,6 +115,7 @@
     // expose total calc for inline onclick and also recalc on edits
     window.calculateArrearsTotal = calculateArrearsTotal;
     autoWireArrearsTotal();
+    setupCompareObjectionList();
   });
 })();
 
@@ -186,4 +187,147 @@ function autoWireArrearsTotal() {
     inp.addEventListener('input', handler);
     inp.addEventListener('change', handler);
   });
+}
+
+// ---------------- Before/After Compare (MasterWeb Part 2) -----------------
+document.addEventListener('DOMContentLoaded', function() {
+  const btn = document.getElementById('cba-load');
+  if (!btn) return;
+  btn.addEventListener('click', async function() {
+    const input = document.getElementById('cba-newprop');
+    const propNo = (input && input.value || '').trim();
+    if (!propNo) { alert('Enter Final or New Property No'); return; }
+    try {
+      const res = await fetch(`/3g/afterHearing/compareProperty?finalPropertyNo=${encodeURIComponent(propNo)}`);
+      if (!res.ok) throw new Error('Failed to load compare data');
+      const data = await res.json();
+      renderCompare(data);
+    } catch (e) {
+      console.error(e);
+      alert('Unable to load compare data');
+    }
+  });
+});
+
+function setupCompareObjectionList() {
+  const section = document.getElementById('compareBeforeAfter');
+  if (!section) return;
+  if (!document.getElementById('cba-obj-tbody')) {
+    const card = document.createElement('div');
+    card.className = 'card p-3 mb-3';
+    card.innerHTML = `
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Objections Taken</h5>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="cba-refresh-obj">Refresh</button>
+      </div>
+      <div class="table-responsive mt-2">
+        <table class="table table-sm table-bordered mb-0">
+          <thead class="thead-light">
+            <tr>
+              <th>Ward</th>
+              <th>Final No</th>
+              <th>New No</th>
+              <th>Owner</th>
+              <th>Status</th>
+              <th>Change</th>
+              <th>Objection Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="cba-obj-tbody"></tbody>
+        </table>
+      </div>`;
+    // insert card at the top of section
+    const firstChild = section.firstElementChild;
+    section.insertBefore(card, firstChild);
+  }
+
+  const refreshBtn = document.getElementById('cba-refresh-obj');
+  if (refreshBtn) refreshBtn.addEventListener('click', loadObjectionTakenList);
+  // initial load
+  loadObjectionTakenList();
+
+  // delegate click for view changes
+  section.addEventListener('click', function (ev) {
+    const btn = ev.target.closest('.cba-view-change');
+    if (!btn) return;
+    const finalNo = btn.getAttribute('data-final');
+    const input = document.getElementById('cba-newprop');
+    if (input) input.value = finalNo || '';
+    const trigger = document.getElementById('cba-load');
+    if (trigger) trigger.click();
+  });
+}
+
+async function loadObjectionTakenList() {
+  const body = document.getElementById('cba-obj-tbody');
+  if (!body) return;
+  body.innerHTML = '<tr><td colspan="8">Loading...</td></tr>';
+  try {
+    const res = await fetch('/3g/getObjectionTakenProperties');
+    if (res.status === 204) { body.innerHTML = '<tr><td colspan="8">No records</td></tr>'; return; }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const list = await res.json();
+    if (!Array.isArray(list) || list.length === 0) {
+      body.innerHTML = '<tr><td colspan="8">No records</td></tr>';
+      return;
+    }
+    body.innerHTML = list.map((r, idx) => {
+      const ward = r.wardNo != null ? r.wardNo : '';
+      const fno = r.finalPropertyNo || '';
+      const nno = r.newPropertyNo || '';
+      const owner = r.ownerName || '';
+      const status = r.hearingStatus || '';
+      const change = r.changedValue || '';
+      const date = r.objectionDate || '';
+      return `<tr>
+        <td>${ward}</td>
+        <td>${fno}</td>
+        <td>${nno}</td>
+        <td>${owner}</td>
+        <td>${status}</td>
+        <td>${change}</td>
+        <td>${date}</td>
+        <td><button type="button" class="btn btn-sm btn-primary cba-view-change" data-final="${fno}">View Changes</button></td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    console.error('Failed to load objections list:', e);
+    body.innerHTML = '<tr><td colspan="8">Failed to load</td></tr>';
+  }
+}
+
+function renderCompare(data){
+  const before = data && data.before || {};
+  const after = data && data.after || {};
+
+  const bpd = before.propertyDetails || {};
+  const apd = after.propertyDetails || {};
+  const bUnits = before.unitDetails || [];
+  const aUnits = after.unitDetails || [];
+
+  const bSummary = [
+    `Owner: ${bpd.pdOwnernameVc || ''}`,
+    `Address: ${bpd.pdPropertyaddressVc || ''}`,
+    `Ward: ${bpd.pdWardI || ''}`,
+    `Final No: ${bpd.pdFinalpropnoVc || ''}`,
+    `Units: ${bUnits.length}`
+  ].join(' | ');
+
+  const aSummary = [
+    `Owner: ${apd.pdOwnernameVc || ''}`,
+    `Address: ${apd.pdPropertyaddressVc || ''}`,
+    `Ward: ${apd.pdWardI || ''}`,
+    `Final No: ${apd.pdFinalpropnoVc || ''}`,
+    `Units: ${aUnits.length}`
+  ].join(' | ');
+
+  const bSumEl = document.getElementById('cba-before-summary');
+  const aSumEl = document.getElementById('cba-after-summary');
+  const bJsonEl = document.getElementById('cba-before-json');
+  const aJsonEl = document.getElementById('cba-after-json');
+  if (bSumEl) bSumEl.textContent = bSummary;
+  if (aSumEl) aSumEl.textContent = aSummary;
+  if (bJsonEl) bJsonEl.textContent = JSON.stringify(before, null, 2);
+  if (aJsonEl) aJsonEl.textContent = JSON.stringify(after, null, 2);
 }

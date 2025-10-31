@@ -6,6 +6,18 @@ import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.Pr
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.TaxBills_MasterDto.TaxBills_MasterDto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.AssessmentResultsDto;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearingPropertyManagement_MasterService;
+import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.PropertyManagement_Service;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearingUnitDetails_Service.AfterHearingUnitDetails_Service;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearingUnitBuiltupDetails_Service.AfterHearingUnitBuiltupDetails_Service;
+import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AfterAssessmentModule_MasterRepository.AfterHearing_MasterRepository.AfterHearingPropertyTaxDetails_MasterRepository;
+import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AfterAssessmentModule_MasterRepository.AfterHearing_MasterRepository.AfterHearingProposedRvalues_MasterRepository;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.AfterHearing_MasterEntity.AfterHearing_PropertyTaxDetailsEntity;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.AfterHearing_MasterEntity.AfterHearing_ProposedRValuesEntity;
+import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.CompleteProperty_Dto;
+import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.PropertyDetails_Dto;
+import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.UnitDetails_Dto;
+import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.UnitBuiltUp_Dto;
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto.AfterHearing_PropertyTaxDetailsDto;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.PropertyTaxDetailArrears_MasterService.PropertyTaxDetailArrears_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.RegisterObjection_MasterService.RegisterObjection_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.SecondaryBatchAssessmentReport.SecondaryBatchAssessmentReport_MasterService;
@@ -22,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping(value = "/3g")
@@ -29,16 +42,172 @@ import java.util.Map;
 public class MasterWebControllerII {
 
     private final AfterHearingPropertyManagement_MasterService afterHearingService;
+    private final PropertyManagement_Service propertyManagementService;
     private final TaxBills_MasterService taxBills_masterService;
     private final PropertyTaxDetailArrears_MasterService propertyTaxDetailArrears_masterService;
     private final RegisterObjection_MasterService registerObjection_masterService;
     private SecondaryBatchAssessmentReport_MasterService secondaryBatchAssessmentReportService;
     private final AfterHearingPropertyDetails_Service afterHearingPropertyDetailsService;
+    private final AfterHearingUnitDetails_Service afterHearingUnitDetailsService;
+    private final AfterHearingUnitBuiltupDetails_Service afterHearingUnitBuiltupDetailsService;
+    private final AfterHearingPropertyTaxDetails_MasterRepository afterHearingPropertyTaxRepo;
+    private final AfterHearingProposedRvalues_MasterRepository afterHearingProposedRvRepo;
     
 
     @GetMapping("/getCompletePropertyAfterHearing")
     public ResponseEntity<?> getCompletePropertyByNewPropertyNo(@RequestParam String newPropertyNo) {
         return ResponseEntity.ok(afterHearingService.getCompletePropertyByNewPropertyNo(newPropertyNo));
+    }
+
+    @GetMapping("/afterHearing/compareProperty")
+    public ResponseEntity<?> compareBeforeAfter(
+            @RequestParam(value = "newPropertyNo", required = false) String newPropertyNo,
+            @RequestParam(value = "finalPropertyNo", required = false) String finalPropertyNo) {
+        try {
+            String np = (newPropertyNo != null && !newPropertyNo.trim().isEmpty()) ? newPropertyNo.trim() : null;
+            if ((np == null || np.isEmpty()) && finalPropertyNo != null && !finalPropertyNo.trim().isEmpty()) {
+                // Resolve new property no from final property number
+                List<PropertyDetails_Dto> matches = propertyManagementService.searchNewProperties(null, null, null, finalPropertyNo.trim());
+                if (matches != null && !matches.isEmpty()) {
+                    np = matches.get(0).getPdNewpropertynoVc();
+                }
+            }
+
+            if (np == null || np.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(java.util.Collections.singletonMap("error", "Provide newPropertyNo or finalPropertyNo"));
+            }
+
+            // BEFORE: live property snapshot
+            CompleteProperty_Dto before = propertyManagementService.getCompletePropertyByNewPropertyNo(np);
+
+            // AFTER: assemble from after-hearing tables
+            AfterHearingCompleteProperty_Dto after = new AfterHearingCompleteProperty_Dto();
+            try {
+                PropertyDetails_Dto afterProp = afterHearingPropertyDetailsService.getPropertyByNewPropertyNo(np);
+                after.setPropertyDetails(afterProp);
+            } catch (Exception nf) {
+                // if no after-hearing record exists, keep 'after' minimal instead of failing
+                after.setPropertyDetails(null);
+            }
+
+            // units + builtups
+            List<UnitDetails_Dto> ahUnits = afterHearingUnitDetailsService.getAllUnitsByProperty(newPropertyNo);
+            if (ahUnits != null) {
+                for (UnitDetails_Dto u : ahUnits) {
+                    List<UnitBuiltUp_Dto> builtUps = afterHearingUnitBuiltupDetailsService.findAllBuiltUpsByUnit(
+                            u.getPdNewpropertynoVc(), u.getUdFloorNoVc(), u.getUdUnitNoVc());
+                    u.setUnitBuiltupUps(builtUps);
+                }
+            }
+            after.setUnitDetails(ahUnits);
+
+            // taxes (after-hearing)
+            List<AfterHearing_PropertyTaxDetailsEntity> taxEntities = afterHearingPropertyTaxRepo.findByPtNewPropertyNoVc(np);
+            if (taxEntities != null && !taxEntities.isEmpty()) {
+                List<AfterHearing_PropertyTaxDetailsDto> taxDtos = taxEntities.stream()
+                        .map(this::convertAfterTaxEntityToDto)
+                        .collect(java.util.stream.Collectors.toList());
+                after.setPropertyTaxDetails(taxDtos);
+            }
+
+            // proposed RVs (after-hearing)
+            List<AfterHearing_ProposedRValuesEntity> prvs = afterHearingProposedRvRepo.findByPrNewPropertyNoVc(np);
+            if (prvs != null && !prvs.isEmpty()) {
+                java.util.List<com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto.AfterHearing_ProposedRValuesDto> prvDtos = prvs.stream().map(e -> {
+                    com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto.AfterHearing_ProposedRValuesDto d = new com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto.AfterHearing_ProposedRValuesDto();
+                    d.setPrNewPropertyNoVc(e.getPrNewPropertyNoVc());
+                    d.setPrFinalPropNoVc(e.getPrFinalPropNoVc());
+                    d.setPrResidentialFl(e.getPrResidentialFl());
+                    d.setPrCommercialFl(e.getPrCommercialFl());
+                    d.setPrIndustrialFl(e.getPrIndustrialFl());
+                    d.setPrReligiousFl(e.getPrReligiousFl());
+                    d.setPrEducationalFl(e.getPrEducationalFl());
+                    d.setPrMobileTowerFl(e.getPrMobileTowerFl());
+                    d.setPrElectricSubstationFl(e.getPrElectricSubstationFl());
+                    d.setPrGovernmentFl(e.getPrGovernmentFl());
+                    d.setPrResidentialOpenPlotFl(e.getPrResidentialOpenPlotFl());
+                    d.setPrCommercialOpenPlotFl(e.getPrCommercialOpenPlotFl());
+                    d.setPrIndustrialOpenPlotFl(e.getPrIndustrialOpenPlotFl());
+                    d.setPrReligiousOpenPlotFl(e.getPrReligiousOpenPlotFl());
+                    d.setPrEducationAndLegalInstituteOpenPlotFl(e.getPrEducationAndLegalInstituteOpenPlotFl());
+                    d.setPrGovernmentOpenPlotFl(e.getPrGovernmentOpenPlotFl());
+                    d.setPrTotalRatableValueFl(e.getPrTotalRatableValueFl());
+                    d.setCreatedAt(e.getCreatedAt());
+                    d.setUpdatedAt(e.getUpdatedAt());
+                    return d;
+                }).collect(java.util.stream.Collectors.toList());
+                after.setProposedRValues(prvDtos);
+            }
+
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("before", before);
+            payload.put("after", after);
+            return ResponseEntity.ok(payload);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(java.util.Collections.singletonMap("error", e.getMessage()));
+        }
+    }
+
+    private AfterHearing_PropertyTaxDetailsDto convertAfterTaxEntityToDto(AfterHearing_PropertyTaxDetailsEntity entity) {
+        AfterHearing_PropertyTaxDetailsDto dto = new AfterHearing_PropertyTaxDetailsDto();
+        dto.setPtNewPropertyNoVc(entity.getPtNewPropertyNoVc());
+        dto.setPtFinalPropertyNoVc(entity.getPtFinalPropertyNoVc());
+        dto.setPtPropertyTaxFl(entity.getPtPropertyTaxFl());
+        dto.setPtEgcTaxFl(entity.getPtEgcTaxFl());
+        dto.setPtTreeTaxFl(entity.getPtTreeTaxFl());
+        dto.setPtCleanTaxFl(entity.getPtCleanTaxFl());
+        dto.setPtFireTaxFl(entity.getPtFireTaxFl());
+        dto.setPtLightTaxFl(entity.getPtLightTaxFl());
+        dto.setPtUserChargesFl(entity.getPtUserChargesFl());
+        dto.setPtEnvironmentTaxFl(entity.getPtEnvironmentTaxFl());
+        dto.setPtEduResTaxFl(entity.getPtEduResTaxFl());
+        dto.setPtEduNonResTaxFl(entity.getPtEduNonResTaxFl());
+        dto.setPtEduTaxFl(entity.getPtEduTaxFl());
+        dto.setPtWaterTaxFl(entity.getPtWaterTaxFl());
+        dto.setPtSewerageTaxFl(entity.getPtSewerageTaxFl());
+        dto.setPtSewerageBenefitTaxFl(entity.getPtSewerageBenefitTaxFl());
+        dto.setPtWaterBenefitTaxFl(entity.getPtWaterBenefitTaxFl());
+        dto.setPtStreetTaxFl(entity.getPtStreetTaxFl());
+        dto.setPtSpecialConservancyTaxFl(entity.getPtSpecialConservancyTaxFl());
+        dto.setPtMunicipalEduTaxFl(entity.getPtMunicipalEduTaxFl());
+        dto.setPtSpecialEduTaxFl(entity.getPtSpecialEduTaxFl());
+        dto.setPtServiceChargesFl(entity.getPtServiceChargesFl());
+        dto.setPtMiscellaneousChargesFl(entity.getPtMiscellaneousChargesFl());
+        dto.setPtTax1Fl(entity.getPtTax1Fl());
+        dto.setPtTax2Fl(entity.getPtTax2Fl());
+        dto.setPtTax3Fl(entity.getPtTax3Fl());
+        dto.setPtTax4Fl(entity.getPtTax4Fl());
+        dto.setPtTax5Fl(entity.getPtTax5Fl());
+        dto.setPtTax6Fl(entity.getPtTax6Fl());
+        dto.setPtTax7Fl(entity.getPtTax7Fl());
+        dto.setPtTax8Fl(entity.getPtTax8Fl());
+        dto.setPtTax9Fl(entity.getPtTax9Fl());
+        dto.setPtTax10Fl(entity.getPtTax10Fl());
+        dto.setPtTax11Fl(entity.getPtTax11Fl());
+        dto.setPtTax12Fl(entity.getPtTax12Fl());
+        dto.setPtTax13Fl(entity.getPtTax13Fl());
+        dto.setPtTax14Fl(entity.getPtTax14Fl());
+        dto.setPtTax15Fl(entity.getPtTax15Fl());
+        dto.setPtTax16Fl(entity.getPtTax16Fl());
+        dto.setPtTax17Fl(entity.getPtTax17Fl());
+        dto.setPtTax18Fl(entity.getPtTax18Fl());
+        dto.setPtTax19Fl(entity.getPtTax19Fl());
+        dto.setPtTax20Fl(entity.getPtTax20Fl());
+        dto.setPtTax21Fl(entity.getPtTax21Fl());
+        dto.setPtTax22Fl(entity.getPtTax22Fl());
+        dto.setPtTax23Fl(entity.getPtTax23Fl());
+        dto.setPtTax24Fl(entity.getPtTax24Fl());
+        dto.setPtTax25Fl(entity.getPtTax25Fl());
+        dto.setPtFinalTaxFl(entity.getPtFinalTaxFl());
+        dto.setPtFinalYearVc(entity.getPtFinalYearVc());
+        dto.setPtFinalRvFl(entity.getPtFinalRvFl());
+        dto.setPtDummyVc(entity.getPtDummyVc());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setUpdatedAt(entity.getUpdatedAt());
+        return dto;
     }
 
     @PostMapping(value = "/createCompletePropertyAfterHearing", consumes = {"multipart/form-data"})
