@@ -11,6 +11,7 @@ import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentM
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.SecondaryBatchAssessmentReport.SecondaryBatchAssessmentReport_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.TaxBills.TaxBills_MasterService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearingPropertyDetails_Service.AfterHearingPropertyDetails_Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,8 @@ public class MasterWebControllerII {
     private final PropertyTaxDetailArrears_MasterService propertyTaxDetailArrears_masterService;
     private final RegisterObjection_MasterService registerObjection_masterService;
     private SecondaryBatchAssessmentReport_MasterService secondaryBatchAssessmentReportService;
+    private final AfterHearingPropertyDetails_Service afterHearingPropertyDetailsService;
+    
 
     @GetMapping("/getCompletePropertyAfterHearing")
     public ResponseEntity<?> getCompletePropertyByNewPropertyNo(@RequestParam String newPropertyNo) {
@@ -145,6 +148,27 @@ public class MasterWebControllerII {
         boolean updated = registerObjection_masterService.updateHearingStatus(newPropertyNo, status, changedValue);
 
         if (updated) {
+            try {
+                // For RETAINED/ABSENT, persist a snapshot into After Hearing tables as-is
+                if ("RETAINED".equalsIgnoreCase(status) || "ABSENT".equalsIgnoreCase(status)) {
+                    boolean alreadySnapshotted = false;
+                    try { alreadySnapshotted = afterHearingPropertyDetailsService.getPropertyByNewPropertyNo(newPropertyNo) != null; } catch (Exception ignore) {}
+
+                    if (!alreadySnapshotted) {
+                        // Fetch complete live property snapshot (property, units, RV, taxes)
+                        AfterHearingCompleteProperty_Dto snapshot = afterHearingService.getCompletePropertyByNewPropertyNo(newPropertyNo);
+                        if (snapshot != null && snapshot.getPropertyDetails() != null) {
+                            snapshot.setHearingStatus(status);
+                            snapshot.setChangeType("NONE");
+                            // Persist to after-hearing without re-assessment or RV change
+                            afterHearingService.createCompleteProperty(newPropertyNo, snapshot, false, false);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                // proceed to return success for status update even if snapshot fails
+            }
             return ResponseEntity.ok(Map.of(
                     "message", "Hearing status updated successfully",
                     "property", newPropertyNo,

@@ -398,10 +398,15 @@ fetchAndPopulateTable('/3g/getAllUnitUsageSubTypes', 'existingUnitUsageSubtypesT
 fetchAndPopulateTable('/3g/constructionClassMasters', 'existingConstructionClassesTableBody', ['englishname', 'marathiname', 'Deduction'],'deleteConstructionClassMastersById');
 fetchAndPopulateTable('/3g/getAllAssessmentDates', 'existingAssessmentDatesTableBody', ['firstassessmentdate', 'currentassessmentdate', 'lastassessmentdate'], '/3g/deleteAssessmentById');
 fetchAndPopulateTable('/3g/occupancyMasters', 'existingOccupanciesTableBody', ['standardName', 'localName', 'id']);
+
+// Initialize Report Tax Config editor
+initReportTaxConfig();
 fetchAndPopulateTable('/3g/roomTypes', 'existingRoomTypesTableBody', ['englishname', 'room']);
 fetchAndPopulateTable('/3g/getAllZones', 'existingZonesTableBody', ['name']);
 fetchAndPopulateTable('/3g/getAllRemarks', 'existingRemarksTableBody', ['remark']);
 fetchAndPopulateTable('/3g/constructionAgeFactor', 'existingConstructionAgeFactorsTableBody', ['afm_agefactorid_i','afm_agefactornameeng_vc', 'afm_agefactornamell_vc', 'afm_ageminage_vc', 'afm_agemaxage_vc', 'afm_remarks_vc']);
+  // Initialize Report Tax Config editor
+  initReportTaxConfig();
 initializePropertyTypesAndCaptureSelection('uusc-property-type-select', 'propertytypes');
 initializePropertyTypesAndCaptureSelection('uuc-property-type-select', 'propertytypes');
 initializePropertyTypesAndCaptureSelection('property-type-select', '/3g/propertytypes');
@@ -413,6 +418,172 @@ initializePropertySubtypesBasedOnType('uusc-property-type-select', 'uusc-propert
 initializePropertyUsageTypesBasedOnSubtype('pusc-property-subtype-select','pusc-property-usage-type-select','usageTypes');
 initializePropertyUsageTypesBasedOnSubtype('uusc-property-subtype-select','uusc-property-usage-type-select','usageTypes');
 initializeUnitUsageTypesBasedOnPropertyUsage('uuc-property-subtype-select','uuc-property-usage-type-select','usageTypes');
+
+// ---------------- Report Tax Config Editor -----------------
+function initReportTaxConfig() {
+  const tplSel = document.getElementById('rtc-template');
+  const taxSel = document.getElementById('rtc-taxselect');
+  const stdInp = document.getElementById('rtc-standard');
+  const locInp = document.getElementById('rtc-local');
+  const seqInp = document.getElementById('rtc-sequence');
+  function buildSeqOptions(rows) {
+    const sel = seqInp;
+    if (!sel) return;
+    const max = Math.max(1, (rows || []).length);
+    let html = '';
+    for (let i = 1; i <= max; i++) {
+      html += `<option value="${i}">${i}</option>`;
+    }
+    sel.innerHTML = html;
+  }
+  const visChk = document.getElementById('rtc-visible');
+  const parentKeyHidden = document.getElementById('rtc-parentkey');
+  const showTotalHidden = document.getElementById('rtc-showtotal');
+  const tableBody = document.getElementById('rtc-table-body');
+  const saveBtn = document.getElementById('rtc-save-btn');
+
+  if (!tplSel || !taxSel) return; // section not on page
+
+  const state = { all: [], byTemplate: new Map(), current: null };
+
+  function loadAll() {
+    fetch('/3g/reportTaxConfigs/all')
+      .then(r => r.json())
+      .then(rows => {
+        state.all = Array.isArray(rows) ? rows : [];
+        state.byTemplate.clear();
+        for (const row of state.all) {
+          const t = row.template;
+          if (!state.byTemplate.has(t)) state.byTemplate.set(t, []);
+          state.byTemplate.get(t).push(row);
+        }
+        refreshUI();
+      })
+      .catch(err => console.error('Failed to load report tax configs', err));
+  }
+
+  function refreshUI() {
+    const tpl = tplSel.value;
+    const rows = (state.byTemplate.get(tpl) || []).sort((a,b)=> (a.sequence||0) - (b.sequence||0));
+
+    // populate tax dropdown
+    taxSel.innerHTML = '<option value="">Select Tax</option>' +
+      rows.map(r => `<option value="${r.taxKey}">${r.englishname || r.marathiname || r.taxKey}</option>`).join('');
+
+    // populate table
+    if (tableBody) {
+      tableBody.innerHTML = rows.map((r, idx) => `
+        <tr data-taxkey="${r.taxKey}">
+          <td>${idx+1}</td>
+          <td>${r.template}</td>
+          <td>${r.sequence ?? ''}</td>
+          <td>${r.englishname ?? ''}</td>
+          <td>${r.marathiname ?? ''}</td>
+          <td>${r.visible ? 'Yes' : 'No'}</td>
+          <td>${r.showTotal ? 'Yes' : 'No'}</td>
+          <td><button type="button" class="btn btn-sm btn-link rtc-edit" data-taxkey="${r.taxKey}">Edit</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // auto-select first tax
+    if (rows.length > 0) {
+      // build sequence options for this template
+      buildSeqOptions(rows);
+      taxSel.value = rows[0].taxKey;
+      fillFormFromSelection();
+    } else {
+      buildSeqOptions([]);
+      clearForm();
+    }
+  }
+
+  function clearForm() {
+    state.current = null;
+    stdInp.value = '';
+    locInp.value = '';
+    seqInp.value = '';
+    visChk.checked = true;
+    parentKeyHidden.value = '';
+    showTotalHidden.value = '';
+  }
+
+  function fillFormFromSelection() {
+    const tpl = tplSel.value;
+    const key = taxSel.value ? Number(taxSel.value) : null;
+    if (!key) { clearForm(); return; }
+    const row = (state.byTemplate.get(tpl) || []).find(r => Number(r.taxKey) === key);
+    if (!row) { clearForm(); return; }
+    state.current = row;
+    stdInp.value = row.englishname || '';
+    locInp.value = row.marathiname || '';
+    // ensure sequence dropdown has options for current template
+    buildSeqOptions((state.byTemplate.get(tpl) || []));
+    seqInp.value = row.sequence != null ? row.sequence : 1;
+    visChk.checked = !!row.visible;
+    parentKeyHidden.value = row.parentKey != null ? row.parentKey : '';
+    showTotalHidden.value = row.showTotal ? 'true' : 'false';
+  }
+
+  function onSave() {
+    if (!state.current) { alert('Select a tax'); return; }
+
+    // Auto-indexing: rebuild full order for the selected template
+    const tpl = tplSel.value;
+    const rows = (state.byTemplate.get(tpl) || []).slice();
+    const targetKey = Number(state.current.taxKey);
+    const desiredSeq = Math.max(1, Number(seqInp.value || 1));
+
+    // Keep names if inputs empty (do not null/blank them)
+    const stdName = (stdInp.value || '').trim() || (state.current.englishname || '');
+    const locName = (locInp.value || '').trim() || (state.current.marathiname || '');
+
+    rows.sort((a,b)=> (a.sequence||0) - (b.sequence||0));
+    const others = rows.filter(r => Number(r.taxKey) !== targetKey);
+    const insertIdx = Math.min(Math.max(desiredSeq-1, 0), others.length);
+    const newOrder = others.slice(0, insertIdx)
+      .concat([state.current])
+      .concat(others.slice(insertIdx));
+
+    const payload = newOrder.map((r, i) => ({
+      id: r.id,
+      templateVc: tpl,
+      taxKeyL: r.taxKey,
+      parentTaxKeyL: r.parentKey || null,
+      isParentBl: null,
+      showTotalBl: r.showTotal || false,
+      standardNameVc: Number(r.taxKey) === targetKey ? stdName : (r.englishname || ''),
+      localNameVc: Number(r.taxKey) === targetKey ? locName  : (r.marathiname || ''),
+      sequenceI: i + 1,
+      visibleB: Number(r.taxKey) === targetKey ? visChk.checked : !!r.visible
+    }));
+
+    fetch('/3g/reportTaxConfigs/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(res => {
+      if (!res.ok) throw new Error('Save failed');
+      loadAll();
+    }).catch(err => {
+      console.error(err);
+      alert('Failed to save.');
+    });
+  }
+
+  tplSel.addEventListener('change', refreshUI);
+  taxSel.addEventListener('change', fillFormFromSelection);
+  document.addEventListener('click', function(ev){
+    if (ev.target && ev.target.classList.contains('rtc-edit')) {
+      const key = ev.target.getAttribute('data-taxkey');
+      taxSel.value = key;
+      fillFormFromSelection();
+    }
+  });
+  if (saveBtn) saveBtn.addEventListener('click', onSave);
+
+  loadAll();
+}
 initializeUnitUsageTypesBasedOnPropertyUsage('uusc-property-usage-type-select', 'uusc-unit-usage-type-select', 'getUnitUsageByPropUsageId');
 initializeBuildingTypesAndCaptureSelection('building-type-select', 'getBuildingTypes');
 initializePropertyTypesAndCaptureSelection('bt-property-type-select', 'propertytypes');
@@ -2021,5 +2192,4 @@ async function saveArrearsTax() {
     alert("âš ï¸ Failed to save arrears tax. Please check console for details.");
   }
 }
-
 

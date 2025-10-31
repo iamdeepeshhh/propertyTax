@@ -57,9 +57,11 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
                 COALESCE(apd.pd_surypropno_vc, p.pd_surypropno_vc) AS surveypropno,
                 COALESCE(apd.pd_zone_i, p.pd_zone_i) AS zone,
                 COALESCE(apd.pd_ward_i, p.pd_ward_i) AS ward,
+                ro.rg_hearingstatus_vc AS hearing_status,
 
                 COALESCE(aud.ud_floorno_vc, u.ud_floorno_vc) AS floorno,
                 COALESCE(aud.ud_usagetype_i, u.ud_usagetype_i) AS usagetype,
+                COALESCE(aud.ud_occupantstatus_i, u.ud_occupantstatus_i) AS occupantstatus,
                 COALESCE(aud.ud_constructionclass_i, u.ud_constructionclass_i) AS constclass,
                 COALESCE(aud.ud_carpetarea_f, u.ud_carpetarea_f) AS carpetarea,
                 COALESCE(aud.ud_assessmentarea_f, u.ud_assessmentarea_f) AS assessmentarea,
@@ -87,6 +89,8 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
                     COALESCE(ar.prv_ratablevalue_f, r.prv_ratablevalue_f, 0),
                     COALESCE(ar.prv_taxvalue_f, r.prv_taxvalue_f, 0)
                 ) AS considered_rv,
+                pr.pr_totalrv_fl AS before_finalrv,
+                apr.pr_totalrv_fl AS after_finalrv,
 
                 -- ========== BEFORE taxes ==========
                 pt.pt_propertytax_fl AS before_propertytax,
@@ -110,7 +114,7 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
                 pt.pt_edunrestax_fl AS before_educ_comm,
                 pt.pt_servicecharges_fl AS before_service_chg,
                 pt.pt_final_tax_fl AS before_finaltax,
-                pt.pt_finalrv_fl AS before_finalrv,
+                
             """ + flexBefore + """
                 -- ========== AFTER taxes ==========
                 COALESCE(a.pt_propertytax_fl, pt.pt_propertytax_fl, 0) AS after_propertytax,
@@ -134,7 +138,7 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
                 COALESCE(a.pt_edunrestax_fl, pt.pt_edunrestax_fl, 0) AS after_educ_comm,
                 COALESCE(a.pt_servicecharges_fl, pt.pt_servicecharges_fl, 0) AS after_service_chg,
                 COALESCE(a.pt_final_tax_fl, pt.pt_final_tax_fl, 0) AS after_finaltax,
-                COALESCE(a.pt_finalrv_fl, pt.pt_finalrv_fl, 0) AS after_finalrv,
+               
             """ + flexAfter + """
                 old.pod_totalratablevalue_i AS oldrv,
                 old.pod_totaltax_fl AS oldtax,
@@ -149,6 +153,8 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
               ON u.pd_newpropertyno_vc = aud.pd_newpropertyno_vc
              AND u.ud_unitno_vc = aud.ud_unitno_vc
              AND u.ud_floorno_vc = aud.ud_floorno_vc
+            LEFT JOIN register_objection ro
+              ON ro.rg_newpropertyno_vc = p.pd_newpropertyno_vc
             LEFT JOIN property_rvalues r
               ON p.pd_newpropertyno_vc = r.prv_propertyno_vc
              AND CAST(r.prv_unitno_vc AS INTEGER) = u.ud_unitno_vc
@@ -159,6 +165,10 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
               ON p.pd_newpropertyno_vc = pt.pt_newpropertyno_vc
             LEFT JOIN afterhearing_property_taxdetails a
               ON p.pd_newpropertyno_vc = a.pt_newpropertyno_vc
+            LEFT JOIN afterhearing_proposed_rvalues apr
+              ON p.pd_newpropertyno_vc = apr.pr_newpropertyno_vc
+            Left JOIN proposed_rvalues pr
+              ON p.pd_newpropertyno_vc = pr.pr_newpropertyno_vc
             LEFT JOIN property_olddetails old
               ON CAST(NULLIF(p.prop_refno, '') AS INTEGER) = old.pod_refno_vc
             WHERE CAST(COALESCE(apd.pd_ward_i, p.pd_ward_i) AS INTEGER) = :wardNo
@@ -190,12 +200,15 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
             pd.setPdOccupinameF(getString(t, "occupiername"));
             pd.setPdSurypropnoVc(getString(t, "surveypropno"));
             dto.setPropertyDetails(pd);
+            // Map hearing status from register_objection if present
+            dto.setHearingStatus(getString(t, "hearing_status"));
 
             PropertyUnitDetailsDto unit = new PropertyUnitDetailsDto();
             unit.setNewPropertyNo(getString(t, "newpropertyno"));
             unit.setFinalPropertyNo(getString(t, "finalpropertyno"));
             unit.setFloorNoVc(getString(t, "floorno"));
             unit.setUsageTypeVc(String.valueOf(getString(t, "usagetype")));
+            unit.setOccupantStatusI(getString(t, "occupantstatus"));
             unit.setConstructionTypeVc(String.valueOf(getString(t, "constclass")));
             unit.setCarpetAreaFl(String.valueOf(getDouble(t, "carpetarea")));
             unit.setTaxableAreaFl(String.valueOf(getDouble(t, "assessmentarea")));
@@ -262,6 +275,11 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
             dto.setTaxKeyValueMapAfterHearing(afterMap);
 
             dto.setPropertyUnitDetails(List.of(unit));
+            // Capture before/after final RV from SQL aliases into a lightweight summary snapshot
+            AfterHearingPropertySummary_Dto snap = new AfterHearingPropertySummary_Dto();
+            snap.setBeforeFinalRvFl(getDouble(t, "before_finalrv"));
+            snap.setAfterFinalRvFl(getDouble(t, "after_finalrv"));
+            dto.setPropertySummary(snap);
             result.add(dto);
         }
         return result;
@@ -313,6 +331,13 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
             // Set totals in summary if helpful to consumers
             summary.setTotalBeforeTaxFl(mergedBefore.values().stream().mapToDouble(Double::doubleValue).sum());
             summary.setTotalAfterTaxFl(mergedAfter.values().stream().mapToDouble(Double::doubleValue).sum());
+
+            // Carry forward before/after final RV values captured per-row
+            if (main.getPropertySummary() != null) {
+                var snap = main.getPropertySummary();
+                summary.setBeforeFinalRvFl(snap.getBeforeFinalRvFl());
+                summary.setAfterFinalRvFl(snap.getAfterFinalRvFl());
+            }
 
             main.setPropertyUnitDetails(allUnits);
             main.setPropertySummary(summary);

@@ -232,6 +232,7 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
         double propertyTax = afterHearingTaxCalculationService.calculatePropertyTax(proposed);
         double eduCess = afterHearingTaxCalculationService.calculateEducationCess(proposed);
         double egc = afterHearingTaxCalculationService.calculateEgc(proposed);
+        double userCharges = afterHearingTaxCalculationService.calculateUserCharges(newPropertyNo, propertyDetailsDto.getPdCategoryI());
 
         // 🧾 Consolidated taxes (Tree, Fire, Light, etc.)
         Map<Long, Double> consolidatedTaxes =
@@ -239,12 +240,15 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
 
         // 🧮 Merge all taxes into one map (to be persisted)
         Map<Long, Double> allTaxes = new LinkedHashMap<>();
-        allTaxes.put(ReportTaxKeys.PT1, propertyTax);
-        allTaxes.put(ReportTaxKeys.EDUC_RES, eduCess); // Education (res+comm) combined
+        allTaxes.put(ReportTaxKeys.PT_PARENT, propertyTax);
+        allTaxes.put(ReportTaxKeys.EDUC_PARENT, eduCess);
         allTaxes.put(ReportTaxKeys.EGC, egc);
         allTaxes.putAll(consolidatedTaxes);
+        allTaxes.put(ReportTaxKeys.USER_CHG, userCharges);
 
         double totalTax = allTaxes.values().stream().mapToDouble(Double::doubleValue).sum();
+        // Provide explicit total for downstream consumers
+        allTaxes.put(ReportTaxKeys.TOTAL_TAX, totalTax);
 
         List<Property_RValues> oldRValues = property_rValuesRepository.findAllByPrvPropertyNoVc(newPropertyNo);
         if (!oldRValues.isEmpty()) {

@@ -926,6 +926,20 @@ public class TaxAssessment_MasterServiceImpl implements TaxAssessment_MasterServ
         // ----------------- USER CHARGES -----------------
         taxValueMap.put(ReportTaxKeys.USER_CHG, userCharges);
 
+        // ----------------- GRAND TOTAL -----------------
+        // Exclude child keys to avoid double-counting when parent totals are present
+        java.util.Set<Long> exclude = java.util.Set.of(
+                ReportTaxKeys.PT1,
+                ReportTaxKeys.PT2,
+                ReportTaxKeys.EDUC_RES,
+                ReportTaxKeys.EDUC_COMM
+        );
+        double grandTotal = taxValueMap.entrySet().stream()
+                .filter(e -> !exclude.contains(e.getKey()))
+                .mapToDouble(java.util.Map.Entry::getValue)
+                .sum();
+        taxValueMap.put(ReportTaxKeys.TOTAL_TAX, grandTotal);
+
         return taxValueMap;
     }
 

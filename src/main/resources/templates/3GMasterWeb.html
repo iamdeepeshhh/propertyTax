@@ -133,6 +133,8 @@
                 <a class="dropdown-item" href="#" onclick="showMaster('unit-floor-no')">Unit Floor No</a>
                 <a class="dropdown-item" href="#" onclick="showMaster('RoomTypes')">Room Types</a>
                 <a class="dropdown-item" href="#" onclick="showMaster('Occupancies')">Occupancy</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('unit-usage-type')">Unit Usages</a>
+                <a class="dropdown-item" href="#" onclick="showMaster('unit-usage-sub-type')">Unit SubUsages</a>
               </div>
             </div>
 
@@ -608,11 +610,8 @@
             <div class="invalid-feedback">Please select a tax.</div>
           </div>
 
-          <!-- Parent Tax Key -->
-          <div class="form-group col-md-4">
-            <label for="rtc-parentkey">Parent Tax Key (optional)</label>
-            <input type="number" id="rtc-parentkey" name="parentTaxKeyL" class="form-control" placeholder="e.g., 1001">
-          </div>
+          <!-- Parent Tax Key (hidden: not editable) -->
+          <input type="hidden" id="rtc-parentkey" name="parentTaxKeyL">
         </div>
 
         <div class="form-row">
@@ -624,15 +623,17 @@
           </div>
           <div class="form-group col-md-6">
             <label for="rtc-local">Local Name</label>
-            <input type="text" id="rtc-local" name="localNameVc" class="form-control" placeholder="à¤¸à¥à¤¥à¤¾à¤¨à¤¿à¤• à¤¨à¤¾à¤µ">
+            <input type="text" id="rtc-local" name="localNameVc" class="form-control" placeholder="e.g., मालमत्ता कर	">
           </div>
         </div>
 
         <div class="form-row">
-          <!-- Sequence -->
+          <!-- Sequence (dropdown) -->
           <div class="form-group col-md-3">
             <label for="rtc-sequence">Sequence</label>
-            <input type="number" id="rtc-sequence" name="sequenceI" class="form-control" placeholder="1" required>
+            <select id="rtc-sequence" name="sequenceI" class="form-control" required>
+              <!-- options populated by JS (1..N) -->
+            </select>
             <div class="invalid-feedback">Sequence is required.</div>
           </div>
 
@@ -644,13 +645,8 @@
             </div>
           </div>
 
-          <!-- Show Total -->
-          <div class="form-group col-md-3">
-            <div class="form-check" style="margin-top: 32px;">
-              <input class="form-check-input" type="checkbox" id="rtc-showtotal" name="showTotalBl">
-              <label class="form-check-label" for="rtc-showtotal">Show Parent Total</label>
-            </div>
-          </div>
+          <!-- Show Total (hidden: not editable) -->
+          <input type="hidden" id="rtc-showtotal" name="showTotalBl">
         </div>
 
         <!-- Buttons -->

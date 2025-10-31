@@ -1,0 +1,39 @@
+*** Begin Patch
+*** Update File: src/main/resources/static/3GMasterWeb/js/scripts.js
+@@
+-  const seqInp = document.getElementById('rtc-sequence');function buildSeqOptions(rows){ const sel=seqInp; if(!sel) return; const max=Math.max(1,(rows||[]).length); let html=""; for(let i=1;i<=max;i++){ html+=<option value=""></option>;} sel.innerHTML=html; }
++  const seqInp = document.getElementById('rtc-sequence');
++  function buildSeqOptions(rows) {
++    const sel = seqInp;
++    if (!sel) return;
++    const max = Math.max(1, (rows || []).length);
++    let html = '';
++    for (let i = 1; i <= max; i++) {
++      html += <option value=""></option>;
++    }
++    sel.innerHTML = html;
++  }
+@@
+-    // populate table
++    // populate table
+     if (tableBody) {
+@@
+     }
+ 
+     // auto-select first tax
+     if (rows.length > 0) {
++      // build sequence options for this template
++      buildSeqOptions(rows);
+       taxSel.value = rows[0].taxKey;
+       fillFormFromSelection();
+     } else {
++      buildSeqOptions([]);
+       clearForm();
+     }
+   }
+@@
+-    seqInp.value = row.sequence != null ? row.sequence : '';
++    // ensure sequence dropdown has options for current template
++    buildSeqOptions((state.byTemplate.get(tpl) || []));
++    seqInp.value = row.sequence != null ? row.sequence : 1;
+*** End Patch

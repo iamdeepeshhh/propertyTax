@@ -25,4 +25,10 @@ public class AfterHearingPropertySummary_Dto {
     // 🔹 Aggregated taxes (if available)
     private Double totalBeforeTaxFl;
     private Double totalAfterTaxFl;
+
+    // Final RV/Tax snapshots (before/after hearing)
+    private Double beforeFinalRvFl;
+    private Double beforeFinalTaxFl;
+    private Double afterFinalRvFl;
+    private Double afterFinalTaxFl;
 }

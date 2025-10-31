@@ -5,6 +5,10 @@ import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_Ma
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.EduCessAndEmpCess_MasterEntity.EduCessAndEmpCess_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.ConsolidatedTaxes_MasterRepository.ConsolidatedTaxes_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.EduCessAndEmpCess_MasterRepository.EduCessAndEmpCess_MasterRepository;
+import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.UnitUsageTypes_MasterRepository.UnitUsageSubType_MasterRepository;
+import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.UnitDetails_Service.UnitDetails_Service;
+import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.UnitDetails_Dto;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.UnitUsageTypes_MasterEntity.UnitUsageSubType_MasterEntity;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.ReportConfigs_MasterServices.ReportTaxKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,9 +22,14 @@ public class AfterHearing_TaxCalculationServiceImpl implements AfterHearing_TaxC
     @Autowired
     private ConsolidatedTaxes_MasterRepository consolidatedTaxesRepo;
 
-
     @Autowired
     private EduCessAndEmpCess_MasterRepository eduCessRepo;
+
+    @Autowired
+    private UnitDetails_Service unitDetailsService;
+
+    @Autowired
+    private UnitUsageSubType_MasterRepository unitUsageSubTypeRepo;
 
     private static final Logger log = Logger.getLogger(AfterHearing_TaxCalculationServiceImpl.class.getName());
 
@@ -178,7 +187,58 @@ public class AfterHearing_TaxCalculationServiceImpl implements AfterHearing_TaxC
     // ============================================================
     // 5️⃣ GRAND TOTAL
     // ============================================================
-    public double calculateTotalTax(ProposedRatableValueDetailsDto prv) {
+        // ============================================================
+    // 5) USER CHARGES (per unit usage subtype)
+    // ============================================================
+    public double calculateUserCharges(String newPropertyNo, String categoryI) {
+        double totalUserCharges = 0.0;
+        Set<Integer> processedSubtypes = new HashSet<>();
+        Map<Long, Double> maxByCategory = new HashMap<>();
+
+        int catId = 0;
+        try { if (categoryI != null && !categoryI.isBlank()) catId = Integer.parseInt(categoryI.trim()); } catch (Exception ignored) {}
+
+        List<UnitDetails_Dto> units = unitDetailsService.getAllUnitsByProperty(newPropertyNo);
+        if (units == null) return 0.0;
+
+        for (UnitDetails_Dto u : units) {
+            double assessArea = 0.0;
+            try { assessArea = Double.parseDouble(Optional.ofNullable(u.getUdAssessmentAreaF()).orElse("0")); } catch (Exception ignored) {}
+            if (assessArea == 0.0) continue;
+
+            Integer subTypeId = u.getUdUsageSubtypeI();
+            if (subTypeId == null) continue;
+
+            double charge = 0.0;
+            try {
+                UnitUsageSubType_MasterEntity sub = unitUsageSubTypeRepo.findById(subTypeId).orElse(null);
+                if (sub != null && sub.getUsm_usercharges_i() != null) {
+                    charge = sub.getUsm_usercharges_i().doubleValue();
+                }
+            } catch (Exception ignored) {}
+
+            if (charge <= 0) continue;
+
+            if (catId == 4 || catId == 9) {
+                long key = (long) catId;
+                maxByCategory.merge(key, charge, Math::max);
+            } else {
+                if (!processedSubtypes.contains(subTypeId)) {
+                    totalUserCharges += charge;
+                    processedSubtypes.add(subTypeId);
+                }
+            }
+        }
+
+        if (catId == 4 || catId == 9) {
+            double m4 = maxByCategory.getOrDefault(4L, 0.0);
+            double m9 = maxByCategory.getOrDefault(9L, 0.0);
+            totalUserCharges += Math.max(m4, m9);
+        }
+
+        return Math.round(totalUserCharges);
+    }
+public double calculateTotalTax(ProposedRatableValueDetailsDto prv) {
         double propertyTax = calculatePropertyTax(prv);
         double educationCess = calculateEducationCess(prv);
         double egc = calculateEgc(prv);
@@ -214,3 +274,9 @@ public class AfterHearing_TaxCalculationServiceImpl implements AfterHearing_TaxC
         return val != null ? val : 0.0;
     }
 }
+
+
+
+
+
+

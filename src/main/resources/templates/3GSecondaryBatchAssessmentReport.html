@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="mr">
 <head>
     <meta charset="UTF-8">
@@ -199,12 +199,11 @@
         td.multi-line {
           text-align: center;
           vertical-align: middle;
-          line-height: 1.15;
-          white-space: pre-line; /* allows 
- or <br> line breaks */
-          font-size: 11px;
+          line-height: 1.0;
+          white-space: pre-line; /* allows or <br> line breaks */
+          font-size: 10px;
           font-weight: 500;
-          padding: 2px 3px;
+          padding: 1px 2px;
         }
 
         /* 🔹 Optional: light background header strip like your screenshot */
@@ -215,14 +214,14 @@
           border-bottom: 2px solid #000;
         }
 
-        td.description-cell {
-       vertical-align: top;
-       text-align: center;
-       padding: 0;
-       font-size: 12px;
-       border-left: 1px solid #000;
-       border-right: 1px solid #000;
-      }
+       td.description-cell {
+          vertical-align: middle;
+          text-align: center;
+          padding: 2px 0;
+          font-size: 12px;
+          border-left: 1px solid #000;
+          border-right: 1px solid #000;
+        }
 
       /* 🔹 Each usage/floor block inside that cell */
       .description-block {
@@ -279,8 +278,10 @@ tr td, tr th {
 }
 
 th, td {
-  font-size: 11px;
-  padding: 2px 3px;
+  font-size: 10px;          /* slightly smaller text */
+  padding: 1px 2px;         /* tighter spacing */
+  line-height: 1.0;         /* reduce vertical space */
+  vertical-align: middle;
 }
 
 /* Widen the Usage/Floor/Owner, Tenant columns to avoid wrapping */
@@ -318,6 +319,23 @@ th.v {
 table.reportTable {
   border-spacing: 0;
   table-layout: fixed;
+}
+.reportTable td.p1,
+.reportTable td.p2 {
+  padding: 4px 5px;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.description-block {
+  padding: 0.5px 0;
+  line-height: 1.05;
+}
+
+
+.partition-row td {
+  height: 10px;
+  background: #fafafa;
 }
         @media print {
   .controls { display: none !important; }
@@ -357,6 +375,31 @@ table.reportTable {
     display: none !important;
   }
 
+.reportTable td.p1,
+  .reportTable td.p2 {
+     padding: 0.5px 1px !important;
+  line-height: 1.0 !important;
+  font-size: 9.5px !important;
+  }
+
+  .description-block {
+    padding: 1px 0 !important;
+    line-height: 1.1 !important;
+  }
+
+  .reportTable th.v {
+    line-height: 1.05 !important;
+    font-size: 10px !important;
+    height: 90px !important;
+  }
+
+  .partition-row td {
+    height: 14px !important;
+    background: #f9f9f9 !important;
+    border-top: 2px double #000 !important;
+    border-bottom: 2px double #000 !important;
+  }
+
   /* ✅ Ensure container and tables are visible in PDF */
   #reportContainer {
     display: block !important;
@@ -378,6 +421,46 @@ table.reportTable {
     margin: 10mm;
   }
 }
+        /* ✅ Enable horizontal + vertical scrolling for large tables */
+.reportWrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-width: 100%;
+  max-height: 85vh;     /* show large part of table before scrolling */
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+}
+
+/* Ensure tables inside scroll area don’t shrink */
+.reportWrapper table {
+  width: max-content;    /* table grows as wide as its content */
+  min-width: 100%;       /* but not smaller than full width */
+}
+
+/* ✅ Ultra-compact layout for वापर प्रकार / मजला / मालक / भाडेकरू */
+td.description-cell.usage-cell {
+  padding: 0 !important;           /* no extra space top/bottom */
+  line-height: 0.95 !important;    /* tighten lines further */
+}
+
+td.description-cell.usage-cell .description-block {
+  padding: 0 !important;           /* remove padding inside each block */
+  margin: 0 !important;            /* remove gap between lines */
+  line-height: 0.95 !important;    /* compact text spacing */
+}
+
+td.description-cell.usage-cell .description-block:last-child {
+  margin-bottom: -1px !important;
+}
+
+
+/* Lighten and shrink divider line between items */
+td.description-cell.usage-cell .description-block div[style*="border-top"] {
+  border-top: 1px solid rgba(0,0,0,0.15) !important; /* thinner and lighter line */
+  width: 45% !important;                             /* shorter divider */
+  margin: 0 auto !important;                         /* almost no gap around */
+}
+
     </style>
 </head>
 <body>
@@ -405,6 +488,8 @@ table.reportTable {
 
     // Unit usage id -> local name map
     window.unitUsageLocal = new Map();
+    // Occupancy id -> local name map
+    window.occupancyLocal = new Map();
 
     async function fetchUnitUsageMap() {
       try {
@@ -413,6 +498,15 @@ table.reportTable {
         const rows = await res.json();
         rows.forEach(r => { if (r && r.id != null) window.unitUsageLocal.set(Number(r.id), r.localName || ''); });
       } catch (e) { console.warn('Failed to load unit usage types', e); }
+    }
+
+    async function fetchOccupancyMap() {
+      try {
+        const res = await fetch('/3g/occupancyMasters');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const rows = await res.json();
+        rows.forEach(r => { if (r && r.id != null) window.occupancyLocal.set(Number(r.id), r.localName || r.standardName || ''); });
+      } catch (e) { console.warn('Failed to load occupancy types', e); }
     }
 
     // 🔹 Fetch only dynamic tax column names
@@ -438,8 +532,9 @@ table.reportTable {
       // Run council details fetch in parallel
       fetchCouncilDetails();
 
-      // 1. Load usage map and tax configurations first
+      // 1. Load usage/occupancy maps and tax configurations first
       await fetchUnitUsageMap();
+      await fetchOccupancyMap();
       await fetchDynamicTaxColumns();
 
       // 2. Now fetch the main report data
@@ -608,8 +703,11 @@ table.reportTable {
         // only add council header from 2nd chunk onwards
         wrapper.innerHTML = `
           ${chunkIndex === 1 ? "" : councilHeaderHTML}
-          <table class="reportTable">${tableHeadHTML}${columnNumbersHTML}<tbody></tbody></table>
+          <div class="reportWrapper">
+            <table class="reportTable">${tableHeadHTML}${columnNumbersHTML}<tbody></tbody></table>
+          </div>
         `;
+
         const tbody = wrapper.querySelector("tbody");
 
         chunk.forEach((group, idx) => {
@@ -623,15 +721,27 @@ table.reportTable {
             ? units.map(u => {
                 const usage = (window.unitUsageLocal.get(Number(u.usageTypeVc)) || u.usageTypeVc || '-');
                 const floor = (u.floorNoVc || '—');
-                const person = (u.tenantNameVc && u.tenantNameVc.trim() !== '') ? `भाडेकरू: ${u.tenantNameVc}` : 'मालक';
-                return `${usage} / ${floor} / ${person}`;
-              })
+                const occName = window.occupancyLocal.get(Number(u.occupantStatusI)) || '';
+                let occDisplay = occName || '-';
+                if (/tenant/i.test(occName) || /भाडेकरू/.test(occName)) {
+                  if (u.tenantNameVc && u.tenantNameVc.trim() !== '') {
+                    occDisplay = `${occName}: ${u.tenantNameVc}`;
+                  }
+                }
+                return `
+                      ${usage}
+                      <div style="border-top: 1px solid rgba(0,0,0,0.2); width: 50%; margin: 1px auto;"></div>
+                      ${floor}
+                      <div style="border-top: 1px solid rgba(0,0,0,0.2); width: 50%; margin: 1px auto;"></div>
+                      ${occDisplay}
+                    `;
+                })
             : ['— / — / —'];
           const multiLineInfo = unitLines.join('<br>');
           const constructionBlocks = units.map(u => {
             const ctype = (u.constructionTypeVc || '—');
             const tArea = (u.taxableAreaFl != null && u.taxableAreaFl !== '') ? u.taxableAreaFl : '—';
-            return `<div class=\"description-block\">${ctype}<br>${tArea}</div>`;
+            return `<div class=\"description-block\">${ctype} <div style="border-top: 1px solid rgba(0,0,0,0.3); width: 60%; margin: 3px auto;"></div> ${tArea}</div>`;
           }).join('');
           const totalTaxableArea = (psd.totalAssessmentAreaFl != null)
             ? psd.totalAssessmentAreaFl
@@ -655,11 +765,11 @@ table.reportTable {
           // Calculate totals dynamically
           const totalBefore = taxConfigs.reduce((sum, tax) => sum + (before[tax.taxKeyL] || 0), 0);
           const totalAfter = taxConfigs.reduce((sum, tax) => sum + (after[tax.taxKeyL] || 0), 0);
-          const afterTaxable = (after["taxablevalue"] || after["ratablevalue"] || psd?.consideredRvFl || psd?.totalRatableValueFl || 0);
+          const afterTaxable = (after["taxablevalue"] || after["ratablevalue"] || psd?.afterFinalRvFl || psd?.afterFinalRvFl || 0);
 
           // --- DYNAMIC DATA ROW GENERATION ---
           const p1TaxData = `
-            <td class="p1">${before["taxablevalue"] || before["ratablevalue"] || psd?.consideredRvFl || psd?.totalRatableValueFl || 0}</td>
+            <td class="p1">${psd?.beforeFinalRvFl || 0}</td>
             ${taxConfigs.map(c => `<td class=\"p1\">${before[c.taxKeyL] || 0}</td>`).join('')}
           `;
 
@@ -724,7 +834,7 @@ table.reportTable {
             <td class="p2"></td> <!-- Appeal Total (empty) -->
 
             <!-- Static P2 Columns (Fixed Bug) -->
-            <td class="p2"></td> <!-- आक्षेपाबाबत -->
+            <td class="p2">${property.hearingStatus || '-'}</td> <!-- आक्षेपाबाबत -->
             <td class="p2"></td> <!-- सुनावणी निकाल -->
             <td class="p2"></td> <!-- अधिकृत मूल्य निर्धारण अधिकारीची सही -->
             <td class="p2"></td> <!-- अपील समिती सभापतीची सही -->
@@ -761,13 +871,31 @@ table.reportTable {
           tbody.appendChild(tr);
 
         // Add placeholder rows (assuming 3 rows per property)
-          const tr1 = document.createElement("tr");
-          tr1.innerHTML = `<td class=\"p1\" colspan=\"${15 + taxColSpan}\"></td> <td class=\"seam\"></td> <td class=\"p2\" colspan=\"${taxColSpan + taxColSpan + 7}\"></td>`;
-          tbody.appendChild(tr1);
+          // ✅ Partition row (visually separates properties)
+            const partitionRow = document.createElement("tr");
+            partitionRow.classList.add("partition-row");
 
-          const tr2 = document.createElement("tr");
-          tr2.innerHTML = `<td class=\"p1\" colspan=\"${15 + taxColSpan}\"></td> <td class=\"seam\"></td> <td class=\"p2\" colspan=\"${taxColSpan + taxColSpan + 7}\"></td>`;
-          tbody.appendChild(tr2);
+            // Create same structure as a normal data row (so alignment is perfect)
+            let partitionCells = "";
+
+            // Part 1 cells
+            for (let x = 0; x < 15 + taxColSpan; x++) {
+              partitionCells += `<td class="p1"></td>`;
+            }
+
+            // Seam divider
+            partitionCells += `<td class="seam"></td>`;
+
+            // Part 2 cells
+            for (let y = 0; y < taxColSpan + taxColSpan + 7; y++) {
+              partitionCells += `<td class="p2"></td>`;
+            }
+
+            // Fill row
+            partitionRow.innerHTML = partitionCells;
+           tbody.appendChild(partitionRow.cloneNode(true));
+           tbody.appendChild(partitionRow);
+
         });
 
         if (chunkIndex < groups.length) {
@@ -796,6 +924,5 @@ table.reportTable {
 </script>
 </body>
 </html>
-
 
 

@@ -12,5 +12,6 @@ public interface AfterHearing_TaxCalculationService {
     double calculateEgc(ProposedRatableValueDetailsDto proposed);
 
     double calculateTotalTax(ProposedRatableValueDetailsDto proposed);
+    public double calculateUserCharges(String newPropertyNo, String categoryI);
     public Map<Long, Double> calculateConsolidatedTaxes(double finalRV, double propertyTax);
 }
