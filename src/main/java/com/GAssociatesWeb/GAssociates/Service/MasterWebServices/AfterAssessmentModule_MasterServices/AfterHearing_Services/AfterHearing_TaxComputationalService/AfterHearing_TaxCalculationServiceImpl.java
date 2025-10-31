@@ -95,6 +95,26 @@ public class AfterHearing_TaxCalculationServiceImpl implements AfterHearing_TaxC
         return totalEduCess;
     }
 
+    // Breakdown for persisting Residential vs Commercial education taxes
+    public Map<Long, Double> calculateEducationCessBreakdown(ProposedRatableValueDetailsDto prv) {
+        double res = 0.0;
+        double comm = 0.0;
+
+        // Residential portion
+        res += calculateEduCessForCategory(prv.getResidentialFl(), true, "Residential");
+
+        // Commercial portion (non-resi buckets)
+        comm += calculateEduCessForCategory(prv.getCommercialFl(), false, "Commercial");
+        comm += calculateEduCessForCategory(prv.getIndustrialFl(), false, "Industrial");
+        comm += calculateEduCessForCategory(prv.getMobileTowerFl(), false, "Mobile Tower");
+        comm += calculateEduCessForCategory(prv.getElectricSubstationFl(), false, "Electric Substation");
+
+        Map<Long, Double> map = new HashMap<>();
+        map.put(ReportTaxKeys.EDUC_RES, (double) Math.round(res));
+        map.put(ReportTaxKeys.EDUC_COMM, (double) Math.round(comm));
+        return map;
+    }
+
     private double calculateEduCessForCategory(Double categoryValue, boolean isResidential, String categoryName) {
         double value = nullToZero(categoryValue);
         if (value <= 0) return 0.0;

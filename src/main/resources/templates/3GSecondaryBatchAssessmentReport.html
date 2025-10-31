@@ -646,9 +646,9 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
             <th class="seam" rowspan="3"></th>
             <th class="p2" rowspan="3">Sr. No.</th>
             <th class="p2 group" colspan="${taxColSpan}">आकारण्यात येणाऱ्या करांची रक्कम (आक्षेप / सुनावणी नंतरचे)</th>
-            <th class="p2 group" colspan="${taxColSpan}">आकारण्यात आलेल्या करांच्या रकम (अपील नंतर)</th>
             <th class="p2" rowspan="3">आक्षेपाबाबत</th>
             <th class="p2" rowspan="3">सुनावणी निकाल</th>
+            <th class="p2 group" colspan="${taxColSpan}">आकारण्यात आलेल्या करांच्या रकम (अपील नंतर)</th>
             <th class="p2" rowspan="3">अधिकृत मूल्य निर्धारण अधिकारीची सही</th>
             <th class="p2" rowspan="3">अपील समिती सभापतीची सही</th>
             <th class="p2" rowspan="3">फेरफार बँलचा शेरा व मुख्याधिकारी यांची सही</th>
@@ -827,6 +827,9 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
             <td class="p2">${afterTaxable}</td>
             ${p2HearingData}
             <td class="p2"><b>${totalAfter.toFixed(0)}</b></td>
+            <td class="p2">${getHearingColumn1(property.hearingStatus)}</td>
+            <td class="p2">${getHearingColumn2(property.hearingStatus)}</td>
+
 
             <!-- P2 Appeal: Dynamic (empty) Tax Data -->
             <td class="p2"></td>
@@ -834,8 +837,7 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
             <td class="p2"></td> <!-- Appeal Total (empty) -->
 
             <!-- Static P2 Columns (Fixed Bug) -->
-            <td class="p2">${property.hearingStatus || '-'}</td> <!-- आक्षेपाबाबत -->
-            <td class="p2"></td> <!-- सुनावणी निकाल -->
+
             <td class="p2"></td> <!-- अधिकृत मूल्य निर्धारण अधिकारीची सही -->
             <td class="p2"></td> <!-- अपील समिती सभापतीची सही -->
             <td class="p2"></td> <!-- फेरफार बँलचा शेरा व मुख्याधिकारी यांची सही -->
@@ -920,7 +922,23 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
   }, 800); // ⏳ small delay to let DOM paint fully
 }
 
+function getHearingColumn1(status) {
+  switch ((status || '').toLowerCase()) {
+    case 'absent': return 'आक्षेप / गैरहजर';
+    case 'retained': return 'आक्षेप / हजर';
+    case 'changed': return 'आक्षेप / हजर';
+    default: return '-';
+  }
+}
 
+function getHearingColumn2(status) {
+  switch ((status || '').toLowerCase()) {
+    case 'absent': return 'आकारणी कायम';
+    case 'retained': return 'आकारणी कायम';
+    case 'changed': return 'बदल';
+    default: return '-';
+  }
+}
 </script>
 </body>
 </html>

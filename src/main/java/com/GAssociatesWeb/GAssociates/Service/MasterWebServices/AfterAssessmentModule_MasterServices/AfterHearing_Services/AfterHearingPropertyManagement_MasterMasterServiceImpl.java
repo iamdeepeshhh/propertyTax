@@ -231,6 +231,7 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
 
         double propertyTax = afterHearingTaxCalculationService.calculatePropertyTax(proposed);
         double eduCess = afterHearingTaxCalculationService.calculateEducationCess(proposed);
+        Map<Long, Double> eduBreakdown = afterHearingTaxCalculationService.calculateEducationCessBreakdown(proposed);
         double egc = afterHearingTaxCalculationService.calculateEgc(proposed);
         double userCharges = afterHearingTaxCalculationService.calculateUserCharges(newPropertyNo, propertyDetailsDto.getPdCategoryI());
 
@@ -242,6 +243,10 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
         Map<Long, Double> allTaxes = new LinkedHashMap<>();
         allTaxes.put(ReportTaxKeys.PT_PARENT, propertyTax);
         allTaxes.put(ReportTaxKeys.EDUC_PARENT, eduCess);
+        if (eduBreakdown != null) {
+            allTaxes.put(ReportTaxKeys.EDUC_RES, eduBreakdown.getOrDefault(ReportTaxKeys.EDUC_RES, 0.0));
+            allTaxes.put(ReportTaxKeys.EDUC_COMM, eduBreakdown.getOrDefault(ReportTaxKeys.EDUC_COMM, 0.0));
+        }
         allTaxes.put(ReportTaxKeys.EGC, egc);
         allTaxes.putAll(consolidatedTaxes);
         allTaxes.put(ReportTaxKeys.USER_CHG, userCharges);

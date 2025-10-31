@@ -8,6 +8,8 @@ public interface AfterHearing_TaxCalculationService {
     double calculatePropertyTax(ProposedRatableValueDetailsDto proposed);
 
     double calculateEducationCess(ProposedRatableValueDetailsDto proposed);
+    // Returns a map with ReportTaxKeys.EDUC_RES and ReportTaxKeys.EDUC_COMM
+    Map<Long, Double> calculateEducationCessBreakdown(ProposedRatableValueDetailsDto proposed);
 
     double calculateEgc(ProposedRatableValueDetailsDto proposed);
 
