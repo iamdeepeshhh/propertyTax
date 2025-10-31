@@ -1,4 +1,4 @@
-﻿// JavaScript function to show the content of the selected tab
+// JavaScript function to show the content of the selected tab
 document.addEventListener("DOMContentLoaded", function() {
     showTab('home');
 });
@@ -138,7 +138,7 @@ function getRateTypeDescription(params) {
         descriptionField.textContent = selectedRateType ? selectedRateType.descriptionVc : '';
     }
 
-    // âœ… Also preselect taxes
+    // ✅ Also preselect taxes
     if (selectedRateType) { if (selectedRateType.taxKeysL && selectedRateType.taxKeysL.length) { preSelectTaxes(selectedRateType.taxKeysL); } else if (selectedRateType.appliedTaxesVc) { const names = selectedRateType.appliedTaxesVc.split(",").map(n => n.trim()).filter(Boolean); } }
 }
 
@@ -180,7 +180,7 @@ var isValid = true;
 var formData = {};
 
 if (!input) {
-    console.warn(`âš ï¸ Input with ID '${inputId}' not found in the form '${formId}'.`);
+    console.warn(`⚠️ Input with ID '${inputId}' not found in the form '${formId}'.`);
     return;
 }
 
@@ -481,7 +481,6 @@ function initReportTaxConfig() {
           <td>${r.marathiname ?? ''}</td>
           <td>${r.visible ? 'Yes' : 'No'}</td>
           <td>${r.showTotal ? 'Yes' : 'No'}</td>
-          <td><button type="button" class="btn btn-sm btn-link rtc-edit" data-taxkey="${r.taxKey}">Edit</button></td>
         </tr>
       `).join('');
     }
@@ -600,7 +599,7 @@ fetchAndPopulateTable('/3g/getAllPropertyRates', 'existingPropertyRatesTableBody
 fetchAndPopulateTable('/3g/getAllCessRates', 'existingCessRatesTableBody', ['minTaxableValueFl','maxTaxableValueFl','residentialRateFl','commercialRateFl','egcRateFl'],'/3g/deleteCessRate');
 fetchAndPopulateTable('/3g/getDepreciationRates', 'existingDepreciationRatesTableBody', ['constructionClassVc','minAgeI','maxAgeI','depreciationPercentageI'],'/3g/deleteDepreciationRate');
 fetchAndPopulateTable('/3g/getCouncilDetails','councilDetailsTableBody', ['standardName', 'localName'], '/3g/deleteCouncilDetails');
-fetchAndPopulateTable('/3g/reportTaxConfigs/all','rtc-table-body', ['template', 'sequence', 'englishname', 'marathiname', 'visible', 'showTotal']);
+// (rendered by initReportTaxConfig)
 
 fetchAllRateTypes();
 });
@@ -888,39 +887,37 @@ async function fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEn
                 row.appendChild(cell);
             });
 
-            // Add action buttons
-            const actionsCell = document.createElement('td');
+    // Add action buttons only if endpoints provided
+    if (deleteEndpointUrl || updateEndpointUrl) {
+        const actionsCell = document.createElement('td');
 
-            // Add delete button if deleteEndpointUrl is provided
-            if (deleteEndpointUrl) {
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.classList.add('btn', 'btn-danger', 'mr-2');
-                deleteButton.onclick = function() {
-                    deleteRecord(item.id, deleteEndpointUrl, () => {// here we would require id to be changed to value and all should be uniform like value in usm psm n all
-                        // Refresh the table after successful deletion
-                        fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEndpointUrl, updateEndpointUrl);
-                    });
-                };
-                actionsCell.appendChild(deleteButton);
-            }
+        if (deleteEndpointUrl) {
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('btn', 'btn-danger', 'mr-2');
+            deleteButton.onclick = function() {
+                deleteRecord(item.id, deleteEndpointUrl, () => {
+                    fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEndpointUrl, updateEndpointUrl);
+                });
+            };
+            actionsCell.appendChild(deleteButton);
+        }
 
-            // Add edit button if updateEndpointUrl is provided
-            if (updateEndpointUrl) {
-                const editButton = document.createElement('button');
-                editButton.textContent = 'Edit';
-                editButton.classList.add('btn', 'btn-warning');
-                editButton.onclick = function() {
-                    editRecord(row, item, columns, updateEndpointUrl, () => {
-                        // Refresh the table after successful update
-                        fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEndpointUrl, updateEndpointUrl);
-                    });
-                };
-                actionsCell.appendChild(editButton);
-            }
+        if (updateEndpointUrl) {
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.classList.add('btn', 'btn-warning');
+            editButton.onclick = function() {
+                editRecord(row, item, columns, updateEndpointUrl, () => {
+                    fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEndpointUrl, updateEndpointUrl);
+                });
+            };
+            actionsCell.appendChild(editButton);
+        }
 
-            actionsCell.style.textAlign = 'center'; // Center align
-            row.appendChild(actionsCell);
+        actionsCell.style.textAlign = 'center';
+        row.appendChild(actionsCell);
+    }
 
             tableBody.appendChild(row);
         });
@@ -2040,14 +2037,14 @@ function openAfterHearingProperty(newPropertyNo) {
       // Immediate backend update (no data changes)
       markObjectionStatus(newPropertyNo, decision.toUpperCase());
     } else if (decision === "changed") {
-      // If changed â€” open 2nd modal
+      // If changed — open 2nd modal
       openChangeTypeModal(newPropertyNo);
     }
   };
 }
 
 // =======================
-// ðŸ”¹ Step 2: Select Change Type (RV / Assessment)
+// 🔹 Step 2: Select Change Type (RV / Assessment)
 // =======================
 function openChangeTypeModal(newPropertyNo) {
   document.getElementById("changeTypeSelect").value = "";
@@ -2064,7 +2061,7 @@ function openChangeTypeModal(newPropertyNo) {
 
     changeModal.hide();
 
-    // âœ… Simple boolean logic â€” no need toUpperCase()
+    // ✅ Simple boolean logic — no need toUpperCase()
     const byRv = (changeType === "RV");
     const byAssessment = (changeType === "ASSESSMENT");
 
@@ -2075,14 +2072,14 @@ function openChangeTypeModal(newPropertyNo) {
     localStorage.setItem("afterHearingByAssessment", byAssessment);
     localStorage.setItem("afterHearingProperty", newPropertyNo);
 
-    // ðŸŸ¢ Open edit form
+    // 🟢 Open edit form
     editAssessment(newPropertyNo);
   };
 }
 
 
 // =======================
-// ðŸ”¹ Mark Retained / Absent (immediate update)
+// 🔹 Mark Retained / Absent (immediate update)
 // =======================
 function markObjectionStatus(newPropertyNo, status) {
   fetch(`/3g/afterHearing/markStatus`, {
@@ -2105,7 +2102,7 @@ function markObjectionStatus(newPropertyNo, status) {
 }
 
 // =======================
-// ðŸ”¹ Open Edit Form
+// 🔹 Open Edit Form
 // =======================
 function editAssessment(newPropertyNo) {
   const url = `/3gSurvey/editSurveyForm?newpropertyno=${newPropertyNo}&mode=assessment`;
@@ -2113,12 +2110,12 @@ function editAssessment(newPropertyNo) {
 }
 
 // =======================
-// ðŸ”¹ Called AFTER officer saves modified data
+// 🔹 Called AFTER officer saves modified data
 // =======================
 async function finalizeAfterHearingStatus(newPropertyNo) {
   try {
     if (!window.afterHearingDecision || !window.afterHearingChangeType) {
-      console.warn("âš ï¸ No hearing decision stored for property " + newPropertyNo);
+      console.warn("⚠️ No hearing decision stored for property " + newPropertyNo);
       return;
     }
 
@@ -2137,12 +2134,12 @@ async function finalizeAfterHearingStatus(newPropertyNo) {
     if (!res.ok) throw new Error("Server error updating status");
 
     const data = await res.json();
-    console.log("âœ… Hearing status finalized:", data);
+    console.log("✅ Hearing status finalized:", data);
 
     alert("After Hearing status marked as CHANGED successfully!");
 
   } catch (error) {
-    console.error("âŒ Failed to finalize hearing status:", error);
+    console.error("❌ Failed to finalize hearing status:", error);
     alert("Error marking After Hearing status. Please check console.");
   }
 }
@@ -2151,7 +2148,7 @@ async function saveArrearsTax() {
   try {
     const form = document.getElementById("arrearsTaxForm");
     if (!form) {
-      alert("âš ï¸ Form not found!");
+      alert("⚠️ Form not found!");
       return;
     }
 
@@ -2159,7 +2156,7 @@ async function saveArrearsTax() {
     const jsonData = {};
 
     formData.forEach((value, key) => {
-      // ðŸ”’ Do not convert IDs or codes to numbers
+      // 🔒 Do not convert IDs or codes to numbers
       const keepAsString = [
         "newPropertyNo",
         "finalPropertyNo",
@@ -2187,15 +2184,16 @@ async function saveArrearsTax() {
     if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
     const result = await response.json();
-    alert("âœ… Arrears Tax Saved Successfully!");
+    alert("✅ Arrears Tax Saved Successfully!");
 
     form.reset();
     document.getElementById("arrears-tax").style.display = "none";
     document.getElementById("arrears").style.display = "block";
 
   } catch (error) {
-    console.error("âŒ Error while saving arrears tax:", error);
-    alert("âš ï¸ Failed to save arrears tax. Please check console for details.");
+    console.error("❌ Error while saving arrears tax:", error);
+    alert("⚠️ Failed to save arrears tax. Please check console for details.");
   }
 }
+
 
