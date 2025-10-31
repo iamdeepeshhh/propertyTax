@@ -2464,19 +2464,18 @@
     </div>
   </section>
 
-<section id="arrears-tax">
+  <section id="arrears-tax">
     <div class="container mt-5">
-      <h2>Arrears Property Tax Details / ?????? ???????? ?? ?????</h2>
+      <h2>Arrears Property Tax Details / थकबाकी मालमत्ता कर तपशील</h2>
 
       <form id="arrearsTaxForm" class="needs-validation" novalidate>
-
         <input type="hidden" id="newPropertyNo" name="newPropertyNo" value="">
-        <!-- ?? YEAR & STATUS -->
-        <h4 class="mt-4">Financial Year & Status / ?????? ???? ? ??????</h4>
+
+        <!-- वित्तीय वर्ष आणि स्थिती -->
+        <h4 class="mt-4">Financial Year & Status / आर्थिक वर्ष व स्थिती</h4>
         <div class="form-row">
-          <!-- ??? Financial Year -->
           <div class="form-group col-md-3">
-            <label for="financialYear">Financial Year / ?????? ????</label>
+            <label for="financialYear">Financial Year / आर्थिक वर्ष</label>
             <select id="financialYear" name="financialYear" class="form-control">
               <option value="">Select Year</option>
               <option value="2022-2023">2022-2023</option>
@@ -2485,121 +2484,109 @@
             </select>
           </div>
 
-          <!-- ?? Owner Name -->
           <div class="form-group col-md-4">
-            <label for="ownerName">Owner Name / ??????? ???</label>
+            <label for="ownerName">Owner Name / मालकाचे नाव</label>
             <input type="text" id="ownerName" name="ownerName" class="form-control" placeholder="Enter Owner Name">
           </div>
 
-          <!-- ?? Final Property Number -->
           <div class="form-group col-md-4">
-            <label for="finalPropertyNo">Final Property Number / ????? ???????? ???.</label>
+            <label for="finalPropertyNo">Final Property Number / अंतिम मालमत्ता क्र.</label>
             <input type="text" id="finalPropertyNo" name="finalPropertyNo" class="form-control" placeholder="Enter Final Property No.">
           </div>
+
           <div class="form-group col-md-4">
             <button type="button" class="btn btn-success" onclick="showTab('arrears')">Cancel</button>
           </div>
         </div>
 
-        <!-- ?? ARREARS TAX COMPONENTS -->
-        <h4 class="mt-4">Arrears Tax Components / ?????? ?? ???</h4>
+        <!-- थकबाकी कर घटक -->
+        <h4 class="mt-4">Arrears Tax Components / थकबाकी कर घटक</h4>
         <div class="form-row">
-          <div class="form-group col-md-3"><label>Property Tax</label><input type="number" id="propertyTax" name="propertyTax" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Education Tax</label><input type="number" id="educationTax" name="educationTax" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Tree Tax</label><input type="number" id="treeTax" name="treeTax" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Environment Tax</label><input type="number" id="environmentTax" name="environmentTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Property Tax (मालमत्ता कर)</label><input type="number" id="propertyTax" name="propertyTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Education Tax (शैक्षणिक कर)</label><input type="number" id="educationTax" name="educationTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Tree Tax (झाड कर)</label><input type="number" id="treeTax" name="treeTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Environment Tax (पर्यावरण कर)</label><input type="number" id="environmentTax" name="environmentTax" class="form-control" value="0"></div>
         </div>
 
         <div class="form-row">
-          <div class="form-group col-md-3"><label>Fire Tax</label><input type="number" id="fireTax" name="fireTax" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Electricity Tax</label><input type="number" id="electricityTax" name="electricityTax" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>User Charges</label><input type="number" id="userCharges" name="userCharges" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Light Tax</label><input type="number" id="lightTax" name="lightTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Fire Tax (अग्निशमन कर)</label><input type="number" id="fireTax" name="fireTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Electricity Tax (विद्युत कर)</label><input type="number" id="electricityTax" name="electricityTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>User Charges (वापर शुल्क)</label><input type="number" id="userCharges" name="userCharges" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Light Tax (प्रकाश कर)</label><input type="number" id="lightTax" name="lightTax" class="form-control" value="0"></div>
         </div>
 
         <div class="form-row">
-          <div class="form-group col-md-3"><label>Clean Tax</label><input type="number" id="cleanTax" name="cleanTax" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Water Tax</label><input type="number" id="waterTax" name="waterTax" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>EGC Tax</label><input type="number" id="egcTax" name="egcTax" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Special Education Tax</label><input type="number" id="ptSpecialEduTax" name="ptSpecialEduTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Clean Tax (स्वच्छता कर)</label><input type="number" id="cleanTax" name="cleanTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Water Tax (पाणी कर)</label><input type="number" id="waterTax" name="waterTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>EGC Tax (रोजगार हमी कर)</label><input type="number" id="egcTax" name="egcTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Special Education Tax (विशेष शिक्षण कर)</label><input type="number" id="ptSpecialEduTax" name="ptSpecialEduTax" class="form-control" value="0"></div>
         </div>
 
         <div class="form-row">
-          <div class="form-group col-md-3"><label>Miscellaneous Tax</label><input type="number" id="miscellaneousTax" name="miscellaneousTax" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Other Tax</label><input type="number" id="otherTax" name="otherTax" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Sewerage Tax</label><input type="number" id="ptSewerageTax" name="ptSewerageTax" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Street Tax</label><input type="number" id="ptStreetTax" name="ptStreetTax" class="form-control" value="0"></div>
-
+          <div class="form-group col-md-3"><label>Miscellaneous Tax (विविध कर)</label><input type="number" id="miscellaneousTax" name="miscellaneousTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Other Tax (इतर कर)</label><input type="number" id="otherTax" name="otherTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Sewerage Tax (जलनिस्सारण कर)</label><input type="number" id="ptSewerageTax" name="ptSewerageTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Street Tax (रस्ता कर)</label><input type="number" id="ptStreetTax" name="ptStreetTax" class="form-control" value="0"></div>
         </div>
 
         <div class="form-row">
-          <div class="form-group col-md-3"><label>Misc. Charges</label><input type="number" id="ptMiscellaneousCharges" name="ptMiscellaneousCharges" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Service Charges</label><input type="number" id="ptServiceCharges" name="ptServiceCharges" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Sewerage Benefit Tax</label><input type="number" id="ptSewerageBenefitTax" name="ptSewerageBenefitTax" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Water Benefit Tax</label><input type="number" id="ptWaterBenefitTax" name="ptWaterBenefitTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Misc. Charges (इतर शुल्क)</label><input type="number" id="ptMiscellaneousCharges" name="ptMiscellaneousCharges" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Service Charges (सेवा शुल्क)</label><input type="number" id="ptServiceCharges" name="ptServiceCharges" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Sewerage Benefit Tax (जलनिस्सारण लाभ कर)</label><input type="number" id="ptSewerageBenefitTax" name="ptSewerageBenefitTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Water Benefit Tax (पाणी लाभ कर)</label><input type="number" id="ptWaterBenefitTax" name="ptWaterBenefitTax" class="form-control" value="0"></div>
         </div>
 
         <div class="form-row">
-          <div class="form-group col-md-3"><label>Municipal Education Tax</label><input type="number" id="ptMunicipalEduTax" name="ptMunicipalEduTax" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Special Conservancy Tax</label><input type="number" id="ptSpecialConservancyTax" name="ptSpecialConservancyTax" class="form-control" value="0"></div>
-
+          <div class="form-group col-md-3"><label>Municipal Education Tax (महापालिका शिक्षण कर)</label><input type="number" id="ptMunicipalEduTax" name="ptMunicipalEduTax" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Special Conservancy Tax (विशेष स्वच्छता कर)</label><input type="number" id="ptSpecialConservancyTax" name="ptSpecialConservancyTax" class="form-control" value="0"></div>
         </div>
 
+        <!-- सारांश -->
+        <h4 class="mt-4">Summary / सारांश</h4>
         <div class="form-row">
-
-
+          <div class="form-group col-md-3"><label>Penalty (शास्ती)</label><input type="number" id="penalty" name="penalty" class="form-control" value="0"></div>
+          <div class="form-group col-md-3"><label>Total Tax (एकूण कर)</label><input type="number" id="totalTax" name="totalTax" class="form-control" value="0"></div>
         </div>
 
-        <!-- ?? SUMMARY -->
-        <h4 class="mt-4">Summary / ??????</h4>
-        <div class="form-row">
-          <div class="form-group col-md-3"><label>Penalty</label><input type="number" id="penalty" name="penalty" class="form-control" value="0"></div>
-          <div class="form-group col-md-3"><label>Total Tax</label><input type="number" id="totalTax" name="totalTax" class="form-control" value="0"></div>
+        <!-- Dynamic Taxes -->
+        <h4 class="mt-4">Dynamic Taxes (गतिशील कर)</h4>
+        <div class="form-row" id="dynamicTaxContainer">
+          <div class="form-group col-md-2"><label>Tax 1 (कर १)</label><input type="number" id="ptTax1" name="ptTax1" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 2 (कर २)</label><input type="number" id="ptTax2" name="ptTax2" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 3 (कर ३)</label><input type="number" id="ptTax3" name="ptTax3" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 4 (कर ४)</label><input type="number" id="ptTax4" name="ptTax4" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 5 (कर ५)</label><input type="number" id="ptTax5" name="ptTax5" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 6 (कर ६)</label><input type="number" id="ptTax6" name="ptTax6" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 7 (कर ७)</label><input type="number" id="ptTax7" name="ptTax7" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 8 (कर ८)</label><input type="number" id="ptTax8" name="ptTax8" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 9 (कर ९)</label><input type="number" id="ptTax9" name="ptTax9" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 10 (कर १०)</label><input type="number" id="ptTax10" name="ptTax10" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 11 (कर ११)</label><input type="number" id="ptTax11" name="ptTax11" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 12 (कर १२)</label><input type="number" id="ptTax12" name="ptTax12" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 13 (कर १३)</label><input type="number" id="ptTax13" name="ptTax13" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 14 (कर १४)</label><input type="number" id="ptTax14" name="ptTax14" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 15 (कर १५)</label><input type="number" id="ptTax15" name="ptTax15" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 16 (कर १६)</label><input type="number" id="ptTax16" name="ptTax16" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 17 (कर १७)</label><input type="number" id="ptTax17" name="ptTax17" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 18 (कर १८)</label><input type="number" id="ptTax18" name="ptTax18" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 19 (कर १९)</label><input type="number" id="ptTax19" name="ptTax19" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 20 (कर २०)</label><input type="number" id="ptTax20" name="ptTax20" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 21 (कर २१)</label><input type="number" id="ptTax21" name="ptTax21" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 22 (कर २२)</label><input type="number" id="ptTax22" name="ptTax22" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 23 (कर २३)</label><input type="number" id="ptTax23" name="ptTax23" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 24 (कर २४)</label><input type="number" id="ptTax24" name="ptTax24" class="form-control" value="0"></div>
+          <div class="form-group col-md-2"><label>Tax 25 (कर २५)</label><input type="number" id="ptTax25" name="ptTax25" class="form-control" value="0"></div>
         </div>
 
-        <!-- ?? Dynamic Tax Fields (ptTax1�ptTax25) -->
-        <h4 class="mt-4">Dynamic Taxes (1�25)</h4>
-        <div class="form-row">
-          <!-- Loop Example: You can replicate for all 25 -->
-          <div class="form-group col-md-2" style="margin-bottom:8px;" id="dynamicTaxContainer">
-            <label>Tax 1</label><input type="number" id="ptTax1" name="ptTax1" class="form-control" value="0">
-          </div>
-          <div class="form-group col-md-2"><label>Tax 2</label><input type="number" id="ptTax2" name="ptTax2" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 3</label><input type="number" id="ptTax3" name="ptTax3" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 4</label><input type="number" id="ptTax4" name="ptTax4" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 5</label><input type="number" id="ptTax5" name="ptTax5" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 6</label><input type="number" id="ptTax6" name="ptTax6" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 7</label><input type="number" id="ptTax7" name="ptTax7" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 8</label><input type="number" id="ptTax8" name="ptTax8" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 9</label><input type="number" id="ptTax9" name="ptTax9" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 10</label><input type="number" id="ptTax10" name="ptTax10" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 11</label><input type="number" id="ptTax11" name="ptTax11" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 12</label><input type="number" id="ptTax12" name="ptTax12" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 13</label><input type="number" id="ptTax13" name="ptTax13" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 14</label><input type="number" id="ptTax14" name="ptTax14" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 15</label><input type="number" id="ptTax15" name="ptTax15" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 16</label><input type="number" id="ptTax16" name="ptTax16" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 17</label><input type="number" id="ptTax17" name="ptTax17" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 18</label><input type="number" id="ptTax18" name="ptTax18" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 19</label><input type="number" id="ptTax19" name="ptTax19" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 20</label><input type="number" id="ptTax20" name="ptTax20" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 21</label><input type="number" id="ptTax21" name="ptTax21" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 22</label><input type="number" id="ptTax22" name="ptTax22" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 23</label><input type="number" id="ptTax23" name="ptTax23" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 24</label><input type="number" id="ptTax24" name="ptTax24" class="form-control" value="0"></div>
-          <div class="form-group col-md-2"><label>Tax 25</label><input type="number" id="ptTax25" name="ptTax25" class="form-control" value="0"></div>
-          <!-- Continue up to ptTax25 -->
-        </div>
 
-        <!-- ?? BUTTONS -->
         <div class="text-center mt-4">
           <button type="button" class="btn btn-primary" onclick="calculateArrearsTotal()">Calculate Total</button>
-          <button type="button" class="btn btn-success" onclick="saveArrearsTax()">?? Save Arrears Tax</button>
-
+          <button type="button" class="btn btn-success" onclick="saveArrearsTax()">💾 Save Arrears Tax / थकबाकी कर जतन करा</button>
         </div>
       </form>
     </div>
   </section>
+
 
 <section id="objections" class="container mt-5">
   <h2>Objection Status</h2>

@@ -15,9 +15,9 @@ public interface RegisterObjection_MasterRepository extends JpaRepository<Regist
     @Query("""
         SELECT r FROM RegisterObjection_Entity r
         WHERE 
-            (:spn IS NULL OR LOWER(r.surveyNo) LIKE LOWER(CONCAT('%', :spn, '%')))
-            AND (:finalPropertyNo IS NULL OR LOWER(r.finalPropertyNo) LIKE LOWER(CONCAT('%', :finalPropertyNo, '%')))
-            AND (:ownerName IS NULL OR LOWER(r.ownerName) LIKE LOWER(CONCAT('%', :ownerName, '%')))
+            (:spn IS NULL OR LOWER(CAST(r.surveyNo AS string)) LIKE CONCAT('%', LOWER(CAST(:spn AS string)), '%'))
+            AND (:finalPropertyNo IS NULL OR LOWER(CAST(r.finalPropertyNo AS string)) LIKE CONCAT('%', LOWER(CAST(:finalPropertyNo AS string)), '%'))
+            AND (:ownerName IS NULL OR LOWER(CAST(r.ownerName AS string)) LIKE CONCAT('%', LOWER(CAST(:ownerName AS string)), '%'))
             AND (:ward IS NULL OR r.wardNo = :ward)
         ORDER BY r.createdAt DESC
     """)

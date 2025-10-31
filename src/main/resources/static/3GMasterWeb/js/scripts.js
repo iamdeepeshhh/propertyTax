@@ -1239,6 +1239,7 @@ function getActionButtons(actionType, item) {
     else if (actionType === 'notices') {
         return `
             <button class="btn btn-warning mr-2" onclick="viewSpecialNotice(null, '${item.pdNewpropertynoVc}')">Special Notice</button>
+            <button class="btn btn-info" onclick="viewTaxBill('${item.pdNewpropertynoVc}')">Tax Bill</button>
         `;
     }
 
@@ -1787,6 +1788,11 @@ function viewSpecialNotice(wardNo, newPropertyNo) {
         url += `?newPropertyNo=${newPropertyNo}`;
     }
     window.open(url, '_blank', 'noopener,noreferrer');
+}
+function viewTaxBill(newPropertyNo) {
+    if (!newPropertyNo) return;
+    // Open mapped route without dummy ward; query param drives single-bill mode
+    window.open(`/taxBill?newPropertyNo=${encodeURIComponent(newPropertyNo)}`, '_blank', 'noopener,noreferrer');
 }
 function viewHearingNotice(wardNo) {
     const url = `/hearingNotice`;

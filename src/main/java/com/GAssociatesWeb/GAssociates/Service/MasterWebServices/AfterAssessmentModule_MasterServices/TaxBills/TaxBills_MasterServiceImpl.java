@@ -47,7 +47,7 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
                     "(SELECT a.last_assessment_date FROM assessmentdate_master a LIMIT 1) AS previousAssessmentDateDt, " +
 
                     // ====================== PROPERTY TAXES ======================
-                    "COALESCE(aht.pt_propertytax_fl, pt.pt_propertytax_fl) AS ptPropertyTaxFl, " +
+                    "COALESCE(aht.pt_propertytax_fl, pt.pt_propertytax_fl) AS ptPropertyTaxFl, \n                    0 AS ptPenaltyFl, " +
                     "COALESCE(aht.pt_egctax_fl, pt.pt_egctax_fl) AS ptEgcTaxFl, " +
                     "COALESCE(aht.pt_treetax_fl, pt.pt_treetax_fl) AS ptTreeTaxFl, " +
                     "COALESCE(aht.pt_cleantax_fl, pt.pt_cleantax_fl) AS ptCleanTaxFl, " +
@@ -124,6 +124,7 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
 
     private static final Map<String, Long> TAX_COLUMN_MAP = Map.ofEntries(
             Map.entry("ptPropertyTaxFl", ReportTaxKeys.PT_PARENT),
+            Map.entry("ptPenaltyFl", ReportTaxKeys.PENALTY),
             Map.entry("ptEduResTaxFl", ReportTaxKeys.EDUC_RES),
             Map.entry("ptEduNonResTaxFl", ReportTaxKeys.EDUC_COMM),
             Map.entry("ptEduTaxFl", ReportTaxKeys.EDUC_PARENT),
@@ -216,6 +217,11 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
         return fetchTaxBills("p.pd_newpropertyno_vc = ?", new Object[]{newPropertyNo});
     }
 
+    public TaxBills_MasterDto getSingleTaxBillByNewPropertyNo(String newPropertyNo) {
+        List<TaxBills_MasterDto> list = getTaxBillsByNewPropertyNo(newPropertyNo);
+        return (list == null || list.isEmpty()) ? null : list.get(0);
+    }
+
     private Map<String, Map<Long, Double>> fetchYearWiseArrears(String newPropertyNo) {
         String sql = """
         SELECT 
@@ -234,6 +240,7 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
             SUM(COALESCE(pt_usercharges_fl, arrears_usercharges_dp)) AS ptUserChargesFl,
             SUM(COALESCE(pt_servicecharges_fl, 0)) AS ptServiceChargesFl,
             SUM(COALESCE(pt_miscellaneouscharges_fl, arrears_miscell_dp)) AS ptMiscellaneousChargesFl,
+            SUM(arrears_penalty_dp) AS ptPenaltyFl,
 
             -- Education and EGC related
             SUM(COALESCE(pt_edutax_fl, arrears_edutax_dp)) AS ptEduTaxFl,
@@ -294,6 +301,7 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
 
                 // Map columns dynamically to tax keys (every field included)
                 Map<String, Long> columnKeyMap = new HashMap<>(Map.ofEntries(                        Map.entry("ptPropertyTaxFl", ReportTaxKeys.PT_PARENT),
+                        Map.entry("ptPenaltyFl", ReportTaxKeys.PENALTY),
                         Map.entry("ptEgcTaxFl", ReportTaxKeys.EGC),
                         Map.entry("ptTreeTaxFl", ReportTaxKeys.TREE_TAX),
                         Map.entry("ptEnvironmentTaxFl", ReportTaxKeys.ENV_TAX),
@@ -389,3 +397,4 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
 
 
 }
+

@@ -8,4 +8,5 @@ import java.util.List;
 public interface TaxBills_MasterService {
     public List<TaxBills_MasterDto> getTaxBillsByWard(int wardNo);
     public List<TaxBills_MasterDto> getTaxBillsByNewPropertyNo(String newPropertyNo);
+    public TaxBills_MasterDto getSingleTaxBillByNewPropertyNo(String newPropertyNo);
 }

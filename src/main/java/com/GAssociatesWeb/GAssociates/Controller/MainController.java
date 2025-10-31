@@ -43,6 +43,12 @@ public class MainController {
         return "3GViewTaxBill";
     }
 
+    @GetMapping("taxBill")
+    public String showSingleTaxBill() {
+        // Renders the same template; JS will detect ?newPropertyNo and fetch single bill
+        return "3GViewTaxBill";
+    }
+
     @GetMapping("rtcc/{pdNewpropertyno}")
     public String showRtcc(@PathVariable("pdNewpropertyno") String newPropertyNumber, Model model) {
         model.addAttribute("newPropertyNumber", newPropertyNumber);

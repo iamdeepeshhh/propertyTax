@@ -23,7 +23,7 @@ public class ConsolidatedTaxes_MasterServiceImpl implements ConsolidatedTaxes_Ma
     public ConsolidatedTaxes_MasterServiceImpl(ConsolidatedTaxes_MasterRepository consolidatedTaxes_masterRepository, SequenceService sequenceService, ReportTaxes_MasterRepository reportTaxes_MasterRepository) {
         this.consolidatedTaxes_masterRepository = consolidatedTaxes_masterRepository;
         this.sequenceService = sequenceService;
-
+        
         reportTaxes_masterRepository = reportTaxes_MasterRepository;
     }
 

@@ -306,6 +306,19 @@ public class MasterWebControllerII {
         }
     }
 
+    @GetMapping("/taxBills/single")
+    public ResponseEntity<TaxBills_MasterDto> getSingleTaxBill(
+            @RequestParam("newPropertyNo") String newPropertyNo) {
+        try {
+            TaxBills_MasterDto dto = taxBills_masterService.getSingleTaxBillByNewPropertyNo(newPropertyNo);
+            if (dto == null) return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
+    }
+
     @PostMapping("/afterHearing/markStatus")
     public ResponseEntity<?> markAfterHearingStatus(@RequestBody Map<String, String> payload) {
         String newPropertyNo = payload.get("newPropertyNo");

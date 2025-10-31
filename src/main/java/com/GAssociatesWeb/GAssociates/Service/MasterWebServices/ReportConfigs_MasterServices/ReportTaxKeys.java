@@ -59,4 +59,5 @@ public final class ReportTaxKeys {
     public static final Long TAX24         = 44L;
     public static final Long TAX25         = 45L;
     public static final long TOTAL_TAX = 9999L;
+    public static final Long PENALTY = 47L;
 }
