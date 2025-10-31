@@ -148,7 +148,14 @@ $(document).ready(function () {
             grouped[key].unitDetails.sort((a, b) => a.unitNoVc - b.unitNoVc);
         });
         
-        return Object.values(grouped);  // Return the grouped data as an array
+        // Convert map to array and sort by final property number (natural order)
+        const arr = Object.values(grouped);
+        arr.sort((a, b) => {
+            const A = (a.pdFinalpropnoVc || '').toString();
+            const B = (b.pdFinalpropnoVc || '').toString();
+            return A.localeCompare(B, undefined, { numeric: true, sensitivity: 'base' });
+        });
+        return arr;
     }
 
     // Function to populate the table with the grouped data

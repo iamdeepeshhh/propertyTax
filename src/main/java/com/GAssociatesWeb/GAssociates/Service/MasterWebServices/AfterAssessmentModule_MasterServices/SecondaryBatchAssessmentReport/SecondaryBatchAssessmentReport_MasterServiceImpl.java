@@ -147,20 +147,30 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
             FROM property_details p
             LEFT JOIN afterhearing_property_details apd
               ON p.pd_newpropertyno_vc = apd.pd_newpropertyno_vc
-            JOIN unit_details u
-              ON p.pd_newpropertyno_vc = u.pd_newpropertyno_vc
+            JOIN (
+                SELECT u.pd_newpropertyno_vc, u.ud_floorno_vc, u.ud_unitno_vc
+                FROM unit_details u
+                UNION
+                SELECT aud.pd_newpropertyno_vc, aud.ud_floorno_vc, aud.ud_unitno_vc
+                FROM afterhearing_unit_details aud
+            ) ux
+              ON ux.pd_newpropertyno_vc = p.pd_newpropertyno_vc
+            LEFT JOIN unit_details u
+              ON u.pd_newpropertyno_vc = ux.pd_newpropertyno_vc
+             AND u.ud_unitno_vc = ux.ud_unitno_vc
+             AND u.ud_floorno_vc = ux.ud_floorno_vc
             LEFT JOIN afterhearing_unit_details aud
-              ON u.pd_newpropertyno_vc = aud.pd_newpropertyno_vc
-             AND u.ud_unitno_vc = aud.ud_unitno_vc
-             AND u.ud_floorno_vc = aud.ud_floorno_vc
+              ON aud.pd_newpropertyno_vc = ux.pd_newpropertyno_vc
+             AND aud.ud_unitno_vc = ux.ud_unitno_vc
+             AND aud.ud_floorno_vc = ux.ud_floorno_vc
             LEFT JOIN register_objection ro
               ON ro.rg_newpropertyno_vc = p.pd_newpropertyno_vc
             LEFT JOIN property_rvalues r
               ON p.pd_newpropertyno_vc = r.prv_propertyno_vc
-             AND CAST(r.prv_unitno_vc AS INTEGER) = u.ud_unitno_vc
+             AND CAST(r.prv_unitno_vc AS INTEGER) = CAST(ux.ud_unitno_vc AS INTEGER)
             LEFT JOIN afterhearing_property_rvalues ar
               ON p.pd_newpropertyno_vc = ar.prv_propertyno_vc
-             AND CAST(ar.prv_unitno_vc AS INTEGER) = u.ud_unitno_vc
+             AND CAST(ar.prv_unitno_vc AS INTEGER) = CAST(ux.ud_unitno_vc AS INTEGER)
             LEFT JOIN property_taxdetails pt
               ON p.pd_newpropertyno_vc = pt.pt_newpropertyno_vc
             LEFT JOIN afterhearing_property_taxdetails a

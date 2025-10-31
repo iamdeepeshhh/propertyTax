@@ -2575,7 +2575,7 @@
             window.removeEventListener('beforeunload', handleBeforeUnload);
 
             if (mode === 'assessment') {
-                window.location.href = "/3g/secondaryBatchAssessmentReportPage";
+                window.location.href = "/3g/masterSheet";
             } else {
                 window.location.href = "/3gSurvey/newRegistration";
             }

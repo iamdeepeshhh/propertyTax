@@ -461,6 +461,10 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
   margin: 0 auto !important;                         /* almost no gap around */
 }
 
+.property-no .prop-line:not(:last-child) {
+  margin-bottom: 4px;
+}
+
     </style>
 </head>
 <body>
@@ -526,6 +530,43 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
         console.error("❌ Failed to fetch tax configs:", err);
         alert("Error: Could not load dynamic tax columns. Report may be incorrect.");
       }
+    }
+
+    // Abbreviate floor names to compact labels (e.g., Ground -> GF, Basement -> B)
+    function abbreviateFloor(value) {
+      if (value == null) return '—';
+      const raw = String(value).trim();
+      if (raw.length === 0) return '—';
+      const s = raw.toLowerCase();
+
+      // Handle composites like "Basement 1", "Basement-2"
+      if (s.startsWith('basement')) {
+        const n = s.replace(/[^0-9]/g, '');
+        return 'B' + (n || '');
+      }
+      if (s.startsWith('ground')) return 'GF';
+      if (s === 'g' || s === 'g.f.' || s === 'g f' || s === 'gf') return 'GF';
+      if (s.startsWith('loft')) return 'L';
+      if (s.startsWith('mezz')) return 'M';
+      if (s.startsWith('stilt')) return 'ST';
+      if (s.startsWith('terrace')) return 'T';
+      if (s.startsWith('roof')) return 'RF';
+      if (s.startsWith('open')) return 'O';
+      if (s.startsWith('other')) return 'OT';
+
+      // Words to numbers mapping
+      const words = {
+        'first': '1', 'second': '2', 'third': '3', 'fourth': '4', 'fifth': '5',
+        'sixth': '6', 'seventh': '7', 'eighth': '8', 'ninth': '9', 'tenth': '10'
+      };
+      if (words[s]) return words[s];
+
+      // Numeric floor like "1", "1st", "2nd", etc.
+      const m = s.match(/^(\d+)(st|nd|rd|th)?(\s*floor)?$/);
+      if (m) return `${parseInt(m[1], 10)}`;
+
+      // Default to first letter uppercased
+      return raw.charAt(0).toUpperCase();
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
@@ -739,9 +780,9 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
                 }
                 return `
                       ${usage}
-                      <div style="border-top: 1px solid rgba(0,0,0,0.2); width: 50%; margin: 1px auto;"></div>
-                      ${floor}
-                      <div style="border-top: 1px solid rgba(0,0,0,0.2); width: 50%; margin: 1px auto;"></div>
+                      <div style="border-top: 1px solid rgba(0,0,0,0.6); width: 50%; margin: 1px auto;"></div>
+                      ${abbreviateFloor(u.floorNoVc)}
+                      <div style="border-top: 1px solid rgba(0,0,0,0.6); width: 50%; margin: 1px auto;"></div>
                       ${occDisplay}
                     `;
                 })
@@ -799,8 +840,7 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
             <td class="p1 property-no">
               ${
                 [pd.pdFinalpropnoVc, pd.pdOldpropnoVc, pd.pdSurypropnoVc]
-                  .filter(v => v && v.trim() !== '')
-                  .map(v => `<div class="prop-line">${v}</div>`)
+                  .map(v => `<div class="prop-line">${v || ''}</div>`)
                   .join('')
               }
             </td>

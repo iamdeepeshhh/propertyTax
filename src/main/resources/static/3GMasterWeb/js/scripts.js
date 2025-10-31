@@ -1799,7 +1799,7 @@ function viewHearingNotice(wardNo) {
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 function viewSecondaryBatchAssessmentReport(wardNo) {
-    const url = `/secondaryBatchAssessmentReport`;
+    const url = `/secondaryBatchAssessmentReport?wardNo=${encodeURIComponent(wardNo)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 function viewOrderSheet(wardNo) {
