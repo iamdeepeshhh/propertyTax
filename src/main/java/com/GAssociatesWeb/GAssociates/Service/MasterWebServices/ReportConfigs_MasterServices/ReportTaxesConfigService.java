@@ -9,4 +9,6 @@ public interface ReportTaxesConfigService {
     List<ReportTaxes_MasterDto> getAllConfigsByTemplate(String templateVc);
     public void saveOrUpdateReportConfigTaxes(List<ReportTaxes_MasterDto> configs);
     public List<ReportTaxes_MasterDto> getAllConfigs();
+    // Inserts only when missing for (taxKey, template); never updates existing rows
+    public void insertMissingOnly(List<ReportTaxes_MasterDto> configs);
 }

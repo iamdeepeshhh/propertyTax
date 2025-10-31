@@ -30,6 +30,7 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
                     "COALESCE(ah.pd_propertyaddress_vc, p.pd_propertyaddress_vc) AS pdPropertyaddressVc, " +
                     "COALESCE(ah.pd_ward_i, p.pd_ward_i) AS pdWardI, " +
                     "COALESCE(ah.pd_zone_i, p.pd_zone_i) AS pdZoneI, " +
+                    "COALESCE(ah.pd_usagetype_i, p.pd_usagetype_i) AS pdUsageType, " +
                     "p.pd_newpropertyno_vc AS pdNewpropertynoVc, " +
                     "p.pd_finalpropno_vc AS pdFinalpropnoVc, " + // ✅ no COALESCE
                     "COALESCE(ah.pd_ownername_vc, p.pd_ownername_vc) AS pdOwnernameVc, " +
@@ -47,7 +48,7 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
                     "(SELECT a.last_assessment_date FROM assessmentdate_master a LIMIT 1) AS previousAssessmentDateDt, " +
 
                     // ====================== PROPERTY TAXES ======================
-                    "COALESCE(aht.pt_propertytax_fl, pt.pt_propertytax_fl) AS ptPropertyTaxFl, \n                    0 AS ptPenaltyFl, " +
+                    "COALESCE(aht.pt_propertytax_fl, pt.pt_propertytax_fl) AS ptPropertyTaxFl," +
                     "COALESCE(aht.pt_egctax_fl, pt.pt_egctax_fl) AS ptEgcTaxFl, " +
                     "COALESCE(aht.pt_treetax_fl, pt.pt_treetax_fl) AS ptTreeTaxFl, " +
                     "COALESCE(aht.pt_cleantax_fl, pt.pt_cleantax_fl) AS ptCleanTaxFl, " +
@@ -68,6 +69,8 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
                     "COALESCE(aht.pt_specialedutax_fl, pt.pt_specialedutax_fl) AS ptSpecialEduTaxFl, " +
                     "COALESCE(aht.pt_servicecharges_fl, pt.pt_servicecharges_fl) AS ptServiceChargesFl, " +
                     "COALESCE(aht.pt_miscellaneouscharges_fl, pt.pt_miscellaneouscharges_fl) AS ptMiscellaneousChargesFl, " +
+                    // Penalty only comes from arrears; include zero column so RowMapper/TAX_COLUMN_MAP can read it
+                    "0 AS ptPenaltyFl, " +
 
                     // === Flexible Reserved Taxes ===
                     "COALESCE(aht.pt_tax1_fl, pt.pt_tax1_fl) AS ptTax1Fl, " +
@@ -349,6 +352,7 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
             TaxBills_MasterDto dto = new TaxBills_MasterDto();
 
             // 🏠 Property info
+
             dto.setPdWardI(rs.getString("pdWardI"));
             dto.setPdZoneI(rs.getString("pdZoneI"));
             dto.setPdFinalpropnoVc(rs.getString("pdFinalpropnoVc"));
@@ -359,6 +363,7 @@ public class TaxBills_MasterServiceImpl implements TaxBills_MasterService{
             dto.setPdOldpropnoVc(rs.getString("pdOldpropnoVc"));
             dto.setPdAssesareaF(Double.valueOf(rs.getString("pdAssesareaF")));
             dto.setPdPropertyaddressVc(rs.getString("pdPropertyaddressVc"));
+            dto.setPdUsageType(rs.getString("pdUsageType"));
 //            dto.setFinalTaxFl(rs.getDouble("finalTax"));
 
             // 📊 Proposed Ratable Values

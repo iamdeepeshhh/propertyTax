@@ -1,9 +1,24 @@
+
 // =============================== ??? Council Details & Year Range ===============================
 $(document).on('click', '#printBtn', function () {
+
   window.print();
 });
 
+let usageTypeMap = {};
+const usageTypePromise = fetch('/3g/propertyusagetypes')
+  .then(res => res.json())
+  .then(arr => {
+    arr.forEach(it => {
+      const id = String(it.id);
+      usageTypeMap[id] = it.localName || ''; // ✅ store only local name
+    });
+    console.log("✅ Loaded Local Usage Types:", usageTypeMap);
+  })
+  .catch(err => console.error("❌ Failed to load usage types:", err));
+
 $(document).ready(function () {
+
   // ?? Council Details
   $.ajax({
     url: '/3g/getCouncilDetails',
@@ -79,9 +94,9 @@ function convertToDevanagariYear(yearStr) {
   if (!yearStr) return '';
   const parts = yearStr.split('-');
   if (parts.length === 2) {
-    return `???? ${parts[0]} ?? ${parts[1]}`;
+     return `वर्ष ${parts[0]} ते ${parts[1]}`;
   }
-  return `???? ${yearStr}`;
+  return `वर्ष ${yearStr}`;
 }
 
 
@@ -140,11 +155,28 @@ async function renderBatchPreview(dataList) {
     $page.find('.pdFinalpropnoVc').text(dto.pdFinalpropnoVc || '');
     $page.find('.pdPropertyaddressVc').text(dto.pdPropertyaddressVc || '');
     $page.find('.pdAssesareaF').text(dto.pdAssesareaF || '');
+    (function setUsage() {
+      const id = dto.pdUsageType != null ? String(dto.pdUsageType) : '';
+      if (!id) return;
+
+      const setLocalName = (map) => {
+        const name = map[id];
+        return name || id; // fallback to id if not found
+      };
+
+      if (usageTypeMap && usageTypeMap[id]) {
+        $page.find('.pdUsageTypeName').text(setLocalName(usageTypeMap));
+      } else {
+        usageTypePromise.then(() => {
+          $page.find('.pdUsageTypeName').text(setLocalName(usageTypeMap));
+        });
+      }
+    })();
 
     // ?? Proposed Ratable Values
     const rv = dto.proposedRatableValueDetailsDto || {};
     Object.entries(rv).forEach(([key, val]) => {
-      $page.find(`.${key}`).text(val || '');
+      $page.find(`.${key}`).text(val || '0');
     });
 
     // ?? Build arrears + current tax table
@@ -226,7 +258,7 @@ function buildYearWiseTaxTable($page, dto) {
     });
 
     // === Total Row ===
-    html += `<tr style="background:#fcd2d2;font-weight:700;"><td>???? ??</td>`;
+    html += `<tr style="background:#fcd2d2;font-weight:700;"><td>एकूण कर</td>`;
     if (showArrears) {
       arrearsYears.forEach(y => {
         html += `<td class="t-c">${(totalByYear[y] || 0).toFixed(2)}</td>`;
@@ -239,6 +271,5 @@ function buildYearWiseTaxTable($page, dto) {
     $page.find('.taxBillTable').after(html);
   });
 }
-
 
 

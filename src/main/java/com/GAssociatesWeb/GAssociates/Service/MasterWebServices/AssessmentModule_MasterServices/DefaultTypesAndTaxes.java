@@ -529,7 +529,7 @@ public class DefaultTypesAndTaxes {
                     new ReportTaxes_MasterDto(null, "Tax23", "कर २३", 43, ReportTaxKeys.TAX23, null, false, true, "TAX_BILL", false),
                     new ReportTaxes_MasterDto(null, "Tax24", "कर २४", 44, ReportTaxKeys.TAX24, null, false, true, "TAX_BILL", false),
                     new ReportTaxes_MasterDto(null, "Tax25", "कर २५", 45, ReportTaxKeys.TAX25, null, false, true, "TAX_BILL", false),
-                    new ReportTaxes_MasterDto(null, "Penalty", "दंड", 49, ReportTaxKeys.PENALTY, null, false, true, "TAX_BILL", true),
+                    new ReportTaxes_MasterDto(null, "Penalty", "शास्ती", 49, ReportTaxKeys.PENALTY, null, false, true, "TAX_BILL", true),
                     // ===================== USER CHARGES =====================
                     new ReportTaxes_MasterDto(null, "User Charges", "उपयोगकर्ता शुल्क व इतर",
                             46, ReportTaxKeys.USER_CHG, null, true, true, "TAX_BILL", true)
@@ -538,7 +538,8 @@ public class DefaultTypesAndTaxes {
                     );
 
             if (!reportsTaxes.isEmpty()) {
-                reportTaxesConfigService.saveOrUpdateReportConfigTaxes(reportsTaxes);
+                // Only insert defaults for missing tax keys; do not update existing user-edited rows
+                reportTaxesConfigService.insertMissingOnly(reportsTaxes);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -89,6 +89,17 @@ public class ReportTaxesConfigServiceImpl implements ReportTaxesConfigService {
         }
     }
 
+    @Override
+    public void insertMissingOnly(List<ReportTaxes_MasterDto> configs) {
+        for (ReportTaxes_MasterDto dto : configs) {
+            boolean exists = repository.findByTaxKeyLAndTemplateVc(dto.getTaxKeyL(), dto.getTemplateVc()).isPresent();
+            if (!exists) {
+                ReportTaxes_MasterEntity entity = convertToEntity(dto);
+                repository.save(entity);
+            }
+        }
+    }
+
     private ReportTaxes_MasterEntity convertToEntity(ReportTaxes_MasterDto dto) {
         return new ReportTaxes_MasterEntity(
                 null, // ID auto-generated

@@ -1,8 +1,22 @@
-﻿<html>
+<html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Tax Bills</title>
     <link rel="stylesheet" href="/3GViewTaxBill/css/styles.css">
+    <style>
+        .table-bordered th,
+        .table-bordered td {
+          text-align: center !important;
+          vertical-align: middle !important;
+
+          line-height: 1.2 !important;
+        }
+        .table-bordered thead th {
+
+          font-weight: 600 !important;
+        }
+    </style>
+
 </head>
 
 <body style="font-size:12px !important; height:900px !important;font-family:  Arial Unicode MS;">
@@ -104,7 +118,7 @@
                                         </thead>
                                         <tbody>
                                         <tr class="h-25 t-a-c">
-                                            <td>क. योग्य मु.</td>
+                                            <td class="pdUsageTypeName"></td>
                                             <td class="residentialFl"></td>
                                             <td class="commercialFl"></td>
                                             <td class="religiousFl"></td>
@@ -233,7 +247,7 @@
                                         </thead>
                                         <tbody>
                                         <tr class="h-25 t-a-c">
-                                            <td>क. योग्य मु.</td>
+                                            <td class="pdUsageTypeName"></td>
                                             <td class="residentialFl"></td>
                                             <td class="commercialFl"></td>
                                             <td class="religiousFl"></td>
@@ -286,5 +300,4 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="/3GViewTaxBill/js/scripts.js"></script>
 </html>
-
 
