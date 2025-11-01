@@ -1,200 +1,683 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Tax Bills</title>
+    <link rel="stylesheet" href="/3GViewTaxBill/css/styles.css">
+    <style>
+        .table-bordered th,
+        .table-bordered td {
+          text-align: center !important;
+          vertical-align: middle !important;
 
-        .part1{
-            border:solid 1px black;
-            padding: 5px;
+          line-height: 1.2 !important;
         }
-        .tabpart1{
-            text-align: center;
-            margin-right: auto;
-            margin-left: auto;
-            padding-top: 0px;
-        }
-        .date{
-            text-align: left;
-            font-size: 12px;
-        }
-        .sign{
-            text-align: right;
-            font-size: 12px;
-            padding-top: 5px;
-        }
-        .headpart{
-            text-align: center;
+        .table-bordered thead th {
+
+          font-weight: 600 !important;
         }
 
-        .councilLogo {
-            display: block;
-            width: 100px;
-            height: 70px;
-            object-fit: contain;
-            float: left;
-            margin-right: 18px;
+    /* ... all your other styles ... */
+
+    /* === FINAL ATTEMPT: REPLACE @media print BLOCK WITH THIS === */
+    @media print {
+        #printBtn {
+            display: none !important;
         }
 
-        .councilLocalNameHeader{
-            border-radius:100px ;
-            width: 280px;
-            height: 40px;
-            font-size: 26px;
-            background-color: #800020;
-            color: white;
-            padding: 5px;
-            margin-top: 15px;
-        }
-        .table1{
-            border:solid black 1px black;
-
-            margin: auto;
-        }
-        .middlehead{
-            font-size: 14px;
-            text-align: center;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .lasthead{
-            font-size: 14px;
-            text-align: center;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .para{
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .tab1{
-            text-align: center;
-            font-size: 16px;
-        }
-        .num{
-            text-align: center;
-        }
-        .formpart1{
-            margin-right: 30px;
-            margin-left: 30px;
-            margin-top: 8px;
-            margin-bottom: 8px;
-            padding-top: 0px;
-        }
-        .row{
-            text-align: center;
-            font-size: 12px;
-            }
-        .col{
-            border-right: 1px solid black;
-            height: 30px;
-            right: 50%;
-        }
-        .tab{
-            table-layout: fixed;
-              width: 80px;
-        }
-        .execl{
-            text-align: center;
-            margin:20px;
-            table-layout: fixed;
-              width: 180px;
-              background-color: #b2ffff;
-            text-align: center;
-        }
-        .table2{
-            border: 1px black;
-            width: 400px;
-            margin-top: 6px;
-            font-size: 12px !important;
-        }
-        .sky{
-            background-color: #7df9ff;
-            width: 60px;
-        }
-        .light{
-            background-color: #b2ffff;
-            text-align: left;
-        }
-        .pinklight{
-            background-color: #fdbcb4;
-        }
-        .dark{
-            width: 44px;
-            background-color: #b2ffff;
-            text-align: center
-        }
-        .tab12{
-            table-layout: auto;
-              width: 100px;
-        }
-        .tab123{
-        table-layout: auto;
-              width: 120px;
-              border:1px solid black;
-              border-color: black;
-        }
-        .tab78{
-            width: 70px;
-        }
-        .para1{
-            font-size: 12px;
-        }
-        .para2{
-            font-size: 12px;
-        }
-        .para3{
-            font-size: 12px;
-        }
-        .para4{
-            font-size: 12px;
-        }
-
-        table.table-bordered{
-            border:1px solid black;
-
-          }
-        table.table-bordered > thead > tr > th{
-            border:1px solid black;
-            font-size: 12px !important;
-        }
-        table.table-bordered > tbody > tr > td{
-            border:1px solid black;
-            font-size: 12px !important;
-        }
-
-        /* Print in one page */
-
-         @page {
+        /* 1. Set minimal page margins */
+        @page {
             size: A4 landscape;
-            margin-top: 10mm;
-            margin-right: 12mm;
-            margin-bottom: 8mm;
-            margin-left: 12mm;
-          }
+            margin: 4mm !important;
+        }
 
-          body {
+        /* 2. Set smallest base font size */
+        body {
+            font-size: 9px !important;
+            height: auto !important;
+            line-height: 1.1;
+        }
+
+        /* 3. --- NEW FIX: Force legal text into 2 columns --- */
+        .para1 {
+            font-size: 8px !important;
+            line-height: 1.0;
+            margin-top: 2px !important;
+            margin-bottom: 2px !important;
+        }
+
+        /* 4. Shrink images */
+        .councilLogo {
+            height: 50px !important;
+            width: 70px !important;
+            margin-right: 10px !important;
+        }
+
+        .officerSignature {
+            height: 25px !important;
+        }
+
+        /* 5. Shrink header text */
+        .councilLocalNameHeader {
+            font-size: 20px !important;
+            height: auto !important;
+            padding: 2px !important;
+            margin-top: 5px !important;
+        }
+
+        .middlehead,
+        .lasthead {
             font-size: 11px !important;
-          }
+        }
 
-          table {
-            page-break-inside: avoid !important;
-          }
+        /* 6. Minimize all margins and paddings */
+        .formpart1 {
+            margin: 1px 20px !important;
+        }
 
-          .container {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-          }
+        .part1 {
+            padding: 2px !important;
+        }
 
-          .container > form > table > thead > tr > td {
+        .tabpart1,
+        .table1,
+        .table2,
+        table[style*="margin-top"] {
+            margin-top: 1px !important;
+        }
+
+        /* 7. Reduce all table cell padding */
+        table.table-bordered > thead > tr > th,
+        table.table-bordered > tbody > tr > td {
+            padding: 1px 2px !important;
+            font-size: 9px !important;
+        }
+
+        /* 8. Fix for the signature table */
+        table[style*="margin-top:-3px"] {
+             margin-top: 0 !important;
+             margin-bottom: 0 !important;
+        }
+
+        /* --- Keep Old Layout Fixes --- */
+        * {
+            box-sizing: border-box;
+        }
+
+        .container,
+        #taxreceipt {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container > form > table {
+            height: auto !important;
+            width: 100%;
+        }
+
+        .container {
+            /* border: none !important; */ /* Overridden by fade border style */
+            position: relative;
+            border: 1px solid darkgrey !important;
+        }
+
+        /* This pseudo-element creates the fade *over* the content FOR PRINT */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            /* This creates an inner shadow (vignette) that fades from the edges */
+            box-shadow: inset 0 0 25px 10px rgba(255, 255, 255, 0.8),
+                        inset 0 0 50px 25px rgba(255, 255, 255, 0.8) !important;
+
+            pointer-events: none;
+            z-index: 10;
+
+            /* Force printer to try and render shadows */
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+
+        /* Ensure form content stays below the fade overlay FOR PRINT */
+        #taxreceipt {
+            position: relative;
+            z-index: 1;
+        }
+
+
+        .container > form > table > thead > tr > td {
             width: 50%;
             vertical-align: top;
-          }
-
-          img {
-            max-width: 100%;
-            height: auto;
-          }
-
-        /* CSS: Always hide in print media */
-        @media print {
-          #printBtn {
-            display: none !important;
-          }
+            padding: 0 4px;
         }
+    }
+
+    /* === ADDED STYLES FROM YOUR SECOND BLOCK === */
+    .part1{
+        border:solid 1px black;
+        padding: 5px;
+    }
+    .tabpart1{
+        text-align: center;
+        margin-right: auto;
+        margin-left: auto;
+        padding-top: 0px;
+    }
+    .date{
+        text-align: left;
+        font-size: 12px;
+    }
+    .sign{
+        text-align: right;
+        font-size: 12px;
+        padding-top: 5px;
+    }
+    .headpart{
+        text-align: center;
+    }
+
+    .councilLogo {
+        display: block;
+        width: 100px;
+        height: 70px;
+        object-fit: contain;
+        float: left;
+        margin-right: 18px;
+    }
+
+    .councilLocalNameHeader{
+        border-radius:100px ;
+        width: 280px;
+        height: 40px;
+        font-size: 26px;
+        background-color: #800020;
+        color: white;
+        padding: 5px;
+        margin-top: 15px;
+    }
+    .table1{
+        border:solid black 1px black;
+
+        margin: auto;
+    }
+    .middlehead{
+        font-size: 14px;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .lasthead{
+        font-size: 14px;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .para{
+        font-size: 16px;
+        font-weight: bold;
+    }
+    .tab1{
+        text-align: center;
+        font-size: 16px;
+    }
+    .num{
+        text-align: center;
+    }
+    .formpart1{
+        margin-right: 30px;
+        margin-left: 30px;
+        margin-top: 8px;
+        margin-bottom: 8px;
+        padding-top: 0px;
+    }
+    .row{
+        text-align: center;
+        font-size: 12px;
+        }
+    .col{
+        border-right: 1px solid black;
+        height: 30px;
+        right: 50%;
+    }
+    .tab{
+        table-layout: fixed;
+         width: 80px;
+    }
+    .execl{
+        text-align: center;
+        margin:20px;
+        table-layout: fixed;
+         width: 180px;
+         background-color: #b2ffff;
+        text-align: center;
+    }
+    .table2{
+        border: 1px black;
+        width: 400px;
+        margin-top: 6px;
+        font-size: 12px !important;
+    }
+    .sky{
+        background-color: #7df9ff;
+        width: 60px;
+    }
+    .light{
+        background-color: #b2ffff;
+        text-align: left;
+    }
+    .pinklight{
+        background-color: #fdbcb4;
+    }
+    .dark{
+        width: 44px;
+        background-color: #b2ffff;
+        text-align: center
+    }
+    .tab12{
+        table-layout: auto;
+         width: 100px;
+    }
+    .tab123{
+    table-layout: auto;
+         width: 120px;
+         border:1px solid black;
+         border-color: black;
+    }
+    .tab78{
+        width: 70px;
+    }
+    .para1{
+        font-size: 12px;
+    }
+    .para2{
+        font-size: 12px;
+    }
+    .para3{
+        font-size: 12px;
+    }
+    .para4{
+        font-size: 12px;
+    }
+
+    table.table-bordered{
+        border:1px solid black;
+
+      }
+    table.table-bordered > thead > tr > th{
+        border:1px solid black;
+        font-size: 10px !important;  /* <-- Reduced from 12px */
+        padding: 4px 2px !important;    /* <-- Added padding (top/bottom 4px, left/right 2px) */
+        line-height: 1.1 !important;  /* <-- Tightened line height for multi-line headers */
+    }
+    table.table-bordered > tbody > tr > td{
+        border:1px solid black;
+        font-size: 12px !important;
+    }
+
+    /* Print in one page */
+
+     @page {
+       size: A4 landscape;
+       margin-top: 10mm;
+       margin-right: 12mm;
+       margin-bottom: 8mm;
+       margin-left: 12mm;
+     }
+
+     body {
+       font-size: 11px !important;
+     }
+
+     table {
+       page-break-inside: avoid !important;
+     }
+
+     .container {
+       display: flex;
+       flex-direction: row;
+       justify-content: space-between;
+     }
+
+     .container > form > table > thead > tr > td {
+       width: 50%;
+       vertical-align: top;
+     }
+
+     img {
+       max-width: 100%;
+       height: auto;
+     }
+
+    /* CSS: Always hide in print media */
+    @media print {
+         #printBtn {
+             display: none !
+         }
+    }
+
+    /* === FADE BORDER EFFECT === */
+    .container {
+        position: relative;
+        /* The border is now applied here instead of inline */
+        border: 1px solid darkgrey;
+    }
+
+    /* This pseudo-element creates the fade *over* the content */
+    .container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        /* This creates an inner shadow (vignette) that fades from the edges */
+        /* We use a white fade to blend with the page background */
+        box-shadow: inset 0 0 25px 10px rgba(255, 255, 255, 0.8),
+                    inset 0 0 50px 25px rgba(255, 255, 255, 0.8);
+
+        /* This ensures the overlay doesn't block mouse events (like clicking/selecting) */
+        pointer-events: none;
+
+        /* This ensures the fade is on top of the content */
+        z-index: 10;
+    }
+
+    /* Ensure form content stays below the fade overlay */
+    #taxreceipt {
+        position: relative;
+        z-index: 1;
+    }
+    /* === END FADE BORDER EFFECT === */
+
+    </style>
+
+</head>
+
+<body style="font-size:12px !important; height:900px !important;font-family:  Arial Unicode MS;">
+<button id="printBtn"
+        style="padding:6px 12px;
+        background:#007bff;
+        color:white;
+        border:none;
+        border-radius:4px;
+        cursor:pointer;">
+    🖨️ Print
+</button>
+<div id="main-report-section" style="margin:20px;"></div>
+<div class="page-container template" style="display:none;">
+    <div id="printIt">
+        <!-- Removed inline style from this container -->
+        <div class="container">
+            <form id="taxreceipt" name="taxreceipt">
+
+                <table style="padding:4px;height:800px !important;">
+                    <thead>
+                    <tr>
+                        <td>
+                            <div class="part1 formpart1">
+                                <table class="tabpart1 headpart" style="margin-top:2px!important;">
+                                    <tbody><tr>
+                                        <td rowspan="4" style="padding-right:20px">
+                                            <img class="councilLogo" src="https://example.com/default-image.png" alt="Council Logo" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="councilLocalNameHeader">नगर परिषद</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <d class="middlehead">महाराष्ट्र लेखा संहिता नमुना क्र. ५२ (नियम ६८,९३ पहा)</d>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <d class="lasthead">31/03/2025 रोजी संपणाऱ्या कालावधीच्या कराचे बिल</d>
+                                        </td>
+                                    </tr>
+                                    </tbody></table>
+
+                                <table style="width:100%; font-size: 12px !important;margin-top:5px!important;">
+                                    <tbody><tr>
+                                        <td style="width:25%;">बिल क्र.:  </td>
+                                        <td style="width:25%;">वार्ड क्र.: <span class="pdWardI"></span></td>
+                                        <td style="width:25%;">झोन क्र.: <span class="pdZoneI"></span></td>
+                                        <td style="width:25%;">बिल दि. : </td>
+                                    </tr>
+                                    </tbody></table>
+                                <table style="width:100%; font-size: 12px !important;margin-top:5px!important;">
+                                    <tbody><tr>
+                                        <td style="width:75%;">नविन मालमत्ता क्र. : <span class="pdFinalpropnoVc"></span></td>
+                                        <td style="width:25%;">जुना मालमत्ता क्र.: <span class="pdOldpropnoVc"></span></td>
+                                    </tr>
+                                    </tbody></table>
+                                <table style="width:100%; font-size: 12px !important;margin-top:2px!important;">
+                                    <tbody><tr>
+                                        <td style="width:75%;">
+                                            <b>नाव:- <span class="pdOwnernameVc"></span></b>
+                                        </td>
+                                        <td style="width:25%;">मालमत्ता क्षेत्रफळ: <span class="pdAssesareaF"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:65%;">पत्ता:- <span class="pdPropertyaddressVc"></span></td>
+                                        <td style="width:35%;"></td>
+                                    </tr></tbody></table>
+
+                                <div class="tab1">
+                                    <table class="table1 table-bordered" style="width:100%;margin-top:5px!important;" cellspacing="0" cellpadding="0">
+                                        <thead>
+                                        <tr>
+                                            <th class="row sky" rowspan="2">वापराचा प्रकार</th>
+                                            <th class="row sky" rowspan="2">निवासी</th>
+                                            <th class="row sky" rowspan="2">वाणिज्य</th>
+                                            <th class="row sky" rowspan="2">धार्मिक</th>
+                                            <th class="row sky" colspan="6">
+                                                <span>खुला भूखंड</span>
+                                            </th>
+                                            <th class="row sky" rowspan="2">शैक्ष.व वैधा संस्थान</th>
+                                            <th class="row sky" rowspan="2">शासकीय</th>
+                                            <th class="row sky" rowspan="2">औद्योगिक</th>
+                                            <th class="row sky" rowspan="2">मोबाईल टॉवर</th>
+                                            <th class="row sky" rowspan="2">इलेक्ट्रिक सब-स्टेशन</th>
+                                            <th class="row sky" rowspan="2">एकूण</th>
+                                        </tr>
+                                        <tr style="background-color:#F8E0F7;" class="t-a-c">
+                                            <th style="border-left:0px!important;" class="bb-n">निवासी</th>
+                                            <th style="border-left:0px!important;border-right:0px!important;" class="bb-n">वाणिज्य</th>
+                                            <th>धार्मिक</th>
+                                            <th>शैक्ष.व वैधा संस्थान</th>
+                                            <th>शासकीय</th>
+                                            <th>औद्योगिक</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr class="h-25 t-a-c">
+                                            <td class="pdUsageTypeName"></td>
+                                            <td class="residentialFl"></td>
+                                            <td class="commercialFl"></td>
+                                            <td class="religiousFl"></td>
+                                            <td class="residentialOpenPlotFl"></td>
+                                            <td class="commercialOpenPlotFl"></td>
+                                            <td class="religiousOpenPlotFl"></td>
+                                            <td class="educationalInstituteOpenPlotFl"></td>
+                                            <td class="governmentOpenPlotFl"></td>
+                                            <td class="industrialOpenPlotFl"></td>
+                                            <td class="educationAndLegalInstituteOpenPlotFl"></td>
+                                            <td class="governmentFl"></td>
+                                            <td class="industrialFl"></td>
+                                            <td class="mobileTowerFl"></td>
+                                            <td class="electricSubstationFl"></td>
+                                            <td class="aggregateFl"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <table class="table2 table-bordered taxBillTable" style="width:100%;margin-top:5px!important;" cellspacing="0" cellpadding="0">
+
+                                    <tbody></tbody>
+                                </table>
+
+                                <p align="justify" class="para1" style="margin-top:0px!important;font-size:10px !important;"></p><p align="justify" class="para1">१) महाराष्ट्र नगर परिषदा, नगर परिषदी व औद्योगिक नागरी अधिनियम १९६५ नुसार न.प चा कर आर्थिक वर्षाच्या सुरुवातीला अर्थात १ एप्रील रोजी देय होतो.
+                                २) कराचे देयक आल्यापासून १५ (दिवस) दिवसाचे आत देयकातील संपूर्ण रक्कम अदा केल्यास, मालमत्ता करावर १% सूट मिळेल.<br>
+                                ३) एकुण मालमत्ता कराची निम्मी रक्कम बिल दिनांकापासून तीन महिन्याच्या आत न भरल्यास तीन महिन्या नंतर प्रथम सहा माही रक्कमेवर कलम १५० अ (१) अन्वये दर माह २% दंड / शास्ती आकारण्यात येईल तसेच उर्वरित रक्कमेसह पूर्ण मालमत्ता कर, ३१ डिसेंबर पर्यंत न भरल्यास त्यावर सुध्दा कलम १५० अ (१) अन्वये दर माह २% दंड / शास्ती आकारण्यात येईल व कराची रक्कम दंडासह भरने बंधनकारक राहील.<br>
+                                ४) जर देयक दिल्यापासून विहित मुदतीच्या आत कराचा भरणा न केल्यास पूर्ण कराचा भरणा, दंडाची रक्कम व्याज फी व इतर बाकी रक्कम विहित मुदतीत भरली नाही किंवा (व) कलम १६९ च्या तरतुदीनुसार अश्या दाव्या विरुद्ध अपील केले नाहि तर अशी रक्कम वसूल करण्याचा सर्व खर्च कलम १५२ अन्वये मुख्याधिकारी यांचे स्वाक्षरीचे वारंट/अधिपत्र काढून आपल्या जंगम किंवा स्थावर मालमत्तेची अटकावणी करून ती जाहीर लिलावाद्वारे विकून वसुलीस पात्र असेल.<br>
+                                ५) जप्त केलेल्या स्थावर मालमत्तेबाबत मा. जिल्हाधिकारी यांची पूर्व मंजुरी घेवून न.प.ला रक्कमेत आपले स्थावर मालमत्ता ताब्यात घेता येईल.<br>
+                                ६)सदर देयक दि. ३१ मार्च पर्यंतचे वसुलीस अधीन राहून लागू करण्यात येत आहे. त्यानुसार त्या कराची रक्कम अदा केली असल्यास, भरलेली रक्कम सदर बिलातून सामायोजीत केली जाईल.<br>
+                                <b>टीप:</b>
+                                सदर देयके सन 2024-25 या आर्थिक वर्षाचे असून यापूर्वीचे जुन्या कर आकारणीनुसार आपणावर बाकी असलेले मागील वर्षाचे थकीत मालमत्ता कर 2 टक्के शास्तीसह कर भरणा करणे बंधनकारक राहील सदर थकीत रक्कम नगर परिषद कार्यालयात पहावयास उपलब्ध आहे.
+                                </p>
+                                <table style="margin-top:-3px;width:100%;margin-bottom: -3px;">
+                                    <tbody><tr><td style="width:15%; text-align: left;">दि: ___//20_</td>
+                                        <td style="width:30%; text-align: right;"></td>
+                                        <td style="width:30%; text-align: right;"><img class="officerSignature" src="" height="40;" width="80;"></td></tr>
+                                    <tr>
+                                        <td style="width:15%; text-align: left; font-size:5px;">SPN:0001</td>
+                                        <td style="width:30%; text-align: center;"><span style="padding-right:8px;">मालमत्ता धारकरची /पावती,</span><br>
+
+                                            घेणाऱ्याची स्वाक्षरी व नाव</td><td style="width:30%; text-align: right;"><span style="padding-right:8px;">मुख्याधिकारी,</span><br>
+                                        <span style="padding-right:8px;" class="councilLocalName"></span></td></tr>
+                                    </tbody></table>
+
+                            </div></td>
+                        <td>
+                            <div class="part1 formpart1">
+                                <table class="tabpart1 headpart" style="margin-top:2px!important;">
+                                    <tbody><tr>
+                                        <td rowspan="4" style="padding-right:20px">
+                                            <img class="councilLogo" src="https://example.com/default-image.png" alt="Council Logo" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="councilLocalNameHeader">नगर परिषद</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <d class="middlehead">महाराष्ट्र लेखा संहिता नमुना क्र. ५२ (नियम ६८,९३ पहा)</d>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <d class="lasthead">31/03/2025 रोजी संपणाऱ्या कालावधीच्या कराचे बिल</d>
+                                        </td>
+                                    </tr>
+                                    </tbody></table>
+                                <table style="width:100%; font-size: 12px !important;margin-top:5px!important;">
+                                    <tbody><tr>
+                                        <td style="width:25%;">बिल क्र.: </td>
+                                        <td style="width:25%;">वार्ड क्र.: <span class="pdWardI"></span></td>
+                                        <td style="width:25%;">झोन क्र.: <span class="pdZoneI"></span></td>
+                                        <td style="width:25%;">बिल दि.: </td>
+                                    </tr>
+                                    </tbody></table>
+                                <table style="width:100%; font-size: 12px !important;margin-top:5px!important;">
+                                    <tbody><tr>
+                                        <td style="width:75%;" >नविन मालमत्ता क्र.: <span class="pdFinalpropnoVc"></span></td>
+                                        <td style="width:25%;">जुना मालमत्ता क्र.: <span class="pdOldpropnoVc"></span></td>
+                                    </tr>
+
+                                    </tbody></table>
+                                <table style="width:100%; font-size: 12px !important;margin-top:2px!important;">
+                                    <tbody><tr>
+                                        <td style="width:75%;">
+                                            <b>नाव:- <span class="pdOwnernameVc"></span></b>
+
+                                        </td>
+
+                                        <td style="width:25%;">मालमत्ता क्षेत्रफळ: <span class="pdAssesareaF"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:65%;">पत्ता:- <span class="pdPropertyaddressVc"></span></td>
+                                        <td style="width:35%;"></td>
+                                    </tr></tbody></table>
+                                <div class="tab1">
+                                    <table class="table1 table-bordered" style="width:100%;margin-top: 5px!important;" cellspacing="0" cellpadding="0">
+                                        <thead>
+                                        <tr>
+                                            <th class="row sky" rowspan="2">वापराचा प्रकार</th>
+                                            <th class="row sky" rowspan="2">निवासी</th>
+                                            <th class="row sky" rowspan="2">वाणिज्य</th>
+                                            <th class="row sky" rowspan="2">धार्मिक</th>
+                                            <th class="row sky" colspan="6">
+                                                <span>खुला भूखंड</span>
+                                            </th>
+                                            <th class="row sky" rowspan="2">शैक्ष.व वैधा संस्थान</th>
+                                            <th class="row sky" rowspan="2">शासकीय</th>
+                                            <th class="row sky" rowspan="2">औद्योगिक</th>
+                                            <th class="row sky" rowspan="2">मोबाईल टॉवर</th>
+                                            <th class="row sky" rowspan="2">इलेक्ट्रिक सब-स्टेशन</th>
+                                            <th class="row sky" rowspan="2">एकूण</th>
+                                        </tr>
+                                        <tr style="background-color:#F8E0F7;" class="t-a-c">
+                                            <th style="border-left:0px!important;" class="bb-n">निवासी</th>
+                                            <th style="border-left:0px!important;border-right:0px!important;" class="bb-n">वाणिज्य</th>
+                                            <th>धार्मिक</th>
+                                            <th>शैक्ष.व वैधा संस्थान</th>
+                                            <th>शासकीय</th>
+                                            <th>औद्योगिक</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr class="h-25 t-a-c">
+                                            <td class="pdUsageTypeName"></td>
+                                            <td class="residentialFl"></td>
+                                            <td class="commercialFl"></td>
+                                            <td class="religiousFl"></td>
+                                            <td class="residentialOpenPlotFl"></td>
+                                            <td class="commercialOpenPlotFl"></td>
+                                            <td class="religiousOpenPlotFl"></td>
+                                            <td class="educationalInstituteOpenPlotFl"></td>
+                                            <td class="governmentOpenPlotFl"></td>
+                                            <td class="industrialOpenPlotFl"></td>
+                                            <td class="educationAndLegalInstituteOpenPlotFl"></td>
+                                            <td class="governmentFl"></td>
+                                            <td class="industrialFl"></td>
+                                            <td class="mobileTowerFl"></td>
+                                            <td class="electricSubstationFl"></td>
+                                            <td class="aggregateFl"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <table class="table2 table-bordered taxBillTable" style="width:100%;margin-top:5px!important;" cellspacing="0" cellpadding="0">
+
+                                    <tbody></tbody>
+                                </table>
+
+                                <p align="justify" class="para1" style="margin-top:0px!important;font-size:10px !important;"></p><p align="justify" class="para1">१) महाराष्ट्र नगर परिषदा, नगर परिषदी व औद्योगिक नागरी अधिनियम १९६५ नुसार न.प चा कर आर्थिक वर्षाच्या सुरुवातीला अर्थात १ एप्रील रोजी देय होतो.
+                                २) कराचे देयक आल्यापासून १५ (दिवस) दिवसाचे आत देयकातील संपूर्ण रक्कम अदा केल्यास, मालमत्ता करावर १% सूट मिळेल.<br>
+                                ३) एकुण मालमत्ता कराची निम्मी रक्कम बिल दिनांकापासून तीन महिन्याच्या आत न भरल्यास तीन महिन्या नंतर प्रथम सहा माही रक्कमेवर कलम १५० अ (१) अन्वये दर माह २% दंड / शास्ती आकारण्यात येईल तसेच उर्वरित रक्कमेसह पूर्ण मालमत्ता कर, ३१ डिसेंबर पर्यंत न भरल्यास त्यावर सुध्दा कलम १५० अ (१) अन्वये दर माह २% दंड / शास्ती आकारण्यात येईल व कराची रक्कम दंडासह भरने बंधनकारक राहील.<br>
+                                ४) जर देयक दिल्यापासून विहित मुदतीच्या आत कराचा भरणा न केल्यास पूर्ण कराचा भरणा, दंडाची रक्कम व्याज फी व इतर बाकी रक्कम विहित मुदतीत भरली नाही किंवा (व) कलम १६९ च्या तरतुदीनुसार अश्या दाव्या विरुद्ध अपील केले नाहि तर अशी रक्कम वसूल करण्याचा सर्व खर्च कलम १५२ अन्वये मुख्याधिकारी यांचे स्वाक्षरीचे वारंट/अधिपत्र काढून आपल्या जंगम किंवा स्थावर मालमत्तेची अटकावणी करून ती जाहीर लिलावाद्वारे विकून वसुलीस पात्र असेल.<br>
+                                ५) जप्त केलेल्या स्थावर मालमत्तेबाबत मा. जिल्हाधिकारी यांची पूर्व मंजुरी घेवून न.प.ला रक्कमेत आपले स्थावर मालमत्ता ताब्यात घेता येईल.<br>
+                                ६)सदर देयक दि. ३१ मार्च पर्यंतचे वसुलीस अधीन राहून लागू करण्यात येत आहे. त्यानुसार त्या कराची रक्कम अदा केली असल्यास, भरलेली रक्कम सदर बिलातून सामायोजीत केली जाईल.<br>
+                                <b>टीप:</b>
+                                सदर देयके सन 2024-25 या आर्थिक वर्षाचे असून यापूर्वीचे जुन्या कर आकारणीनुसार आपणावर बाकी असलेले मागील वर्षाचे थकीत मालमत्ता कर 2 टक्के शास्तीसह कर भरणा करणे बंधनकारक राहील सदर थकीत रक्कम नगर परिषद कार्यालयात पहावयास उपलब्ध आहे.
+                                </p>
+                                <table style="margin-top:-3px;width:100%;margin-bottom: -3px;">
+                                    <tbody><tr><td style="width:15%; text-align: left;">दि: ___//20_</td>
+                                        <td style="width:30%; text-align: right;"></td>
+                                        <td style="width:30%; text-align: right;"><img class="officerSignature" src="" height="40;" width="80;"></td></tr>
+                                    <tr><td style="width:15%; text-align: left; font-size:5px;">SPN:0001</td><td style="width:30%; text-align: center;"><span style="padding-right:8px;">कर निरीक्षक</span><br>
+                                        <span style="padding-right:8px;" class="councilLocalName"></span></td><td style="width:30%; text-align: right;"><span style="padding-right:8px;">मुख्याधिकारी,</span><br>
+                                        <span style="padding-right:8px;" class="councilLocalName"></span></td></tr>
+
+                                    </tbody></table>
+                            </div></td></tr></thead></table>
+            </form></div>
+
+    </div>
+</div>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/3GViewTaxBill/js/scripts.js"></script>
+</html>
+
