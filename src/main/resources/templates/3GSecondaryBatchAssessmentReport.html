@@ -62,7 +62,7 @@
         body {
           font-family: 'Noto Sans Devanagari', Arial, sans-serif;
           margin: 20px;
-          font-size: 13px;
+          font-size: 14px;
         }
 
         .controls {
@@ -278,9 +278,9 @@ tr td, tr th {
 }
 
 th, td {
-  font-size: 10px;          /* slightly smaller text */
-  padding: 1px 2px;         /* tighter spacing */
-  line-height: 1.0;         /* reduce vertical space */
+  font-size: 14px;          /* slightly smaller text */
+  padding: 2px 3px;      /* slightly more breathing room */
+  line-height: 1.15        /* reduce vertical space */
   vertical-align: middle;
 }
 
@@ -377,9 +377,9 @@ table.reportTable {
 
 .reportTable td.p1,
   .reportTable td.p2 {
-     padding: 0.5px 1px !important;
-  line-height: 1.0 !important;
-  font-size: 9.5px !important;
+    padding: 1px 2px !important;
+  line-height: 1.1 !important;
+  font-size: 10.5px !important;
   }
 
   .description-block {
@@ -855,8 +855,9 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
             </td>
             <td class="p1"></td>
             <td class="p1"></td>
-            <td class="p1">${pd.pdOwnernameVc || "—"}</td>
-            <td class="p1">${pd.pdOccupinameF || "—"}</td>
+            <td class="p1">${pd.pdOwnernameVc ? 'श्री/श्रीमती. ' + pd.pdOwnernameVc : '—'}</td>
+            <td class="p1">${pd.pdOccupinameF ? 'श्री/श्रीमती. ' + pd.pdOccupinameF : '—'}</td>
+
 
             <td class="p1">${psd.totalAlvFl || ""}</td>
             <td class="p1">${psd.totalYearlyRentFl || ""}</td>
