@@ -137,7 +137,7 @@ function renderHearingNoticeSingle(dto) {
 function renderAndPrintHearingChunk() {
   const chunk = hnDataList.slice(hnCurrentChunk * hnChunkSize, (hnCurrentChunk + 1) * hnChunkSize);
   if (chunk.length === 0) {
-    alert('✅ All Hearing Notices printed successfully.');
+
     $('#startHearingPrint').show();
     return;
   }
