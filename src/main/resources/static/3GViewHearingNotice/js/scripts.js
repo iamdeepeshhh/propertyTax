@@ -121,7 +121,7 @@ function renderHearingNoticeSingle(dto) {
   $page.find('tbody tr td').eq(0).text(dto.applicationNo || '');
   $page.find('tbody tr td').eq(1).text(dto.zoneNo || '');
   $page.find('tbody tr td').eq(2).text(dto.wardNo || '');
-  $page.find('tbody tr td').eq(3).text(dto.newPropertyNo || '');
+  $page.find('tbody tr td').eq(3).text(dto.finalPropertyNo || '');
   $page.find('tbody tr td').eq(4).text(dto.oldPropertyNo || '');
 
   // Dynamic Content Binding (support both legacy and new selectors)

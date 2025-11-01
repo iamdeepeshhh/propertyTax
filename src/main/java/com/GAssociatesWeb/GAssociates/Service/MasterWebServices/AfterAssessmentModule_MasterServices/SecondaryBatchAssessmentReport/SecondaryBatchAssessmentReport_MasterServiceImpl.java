@@ -34,19 +34,72 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
         return aggregateProperties(flatList);
     }
 
+    /**
+     * Builds the static SQL block for dynamic tax columns (pt_tax1_fl → pt_tax25_fl)
+     * with both BEFORE and AFTER aliases.
+     */
+    private String buildDynamicTaxColumns() {
+        return """
+        -- ========== BEFORE Dynamic Taxes ==========
+        pt.pt_tax1_fl  AS before_tax1,
+        pt.pt_tax2_fl  AS before_tax2,
+        pt.pt_tax3_fl  AS before_tax3,
+        pt.pt_tax4_fl  AS before_tax4,
+        pt.pt_tax5_fl  AS before_tax5,
+        pt.pt_tax6_fl  AS before_tax6,
+        pt.pt_tax7_fl  AS before_tax7,
+        pt.pt_tax8_fl  AS before_tax8,
+        pt.pt_tax9_fl  AS before_tax9,
+        pt.pt_tax10_fl AS before_tax10,
+        pt.pt_tax11_fl AS before_tax11,
+        pt.pt_tax12_fl AS before_tax12,
+        pt.pt_tax13_fl AS before_tax13,
+        pt.pt_tax14_fl AS before_tax14,
+        pt.pt_tax15_fl AS before_tax15,
+        pt.pt_tax16_fl AS before_tax16,
+        pt.pt_tax17_fl AS before_tax17,
+        pt.pt_tax18_fl AS before_tax18,
+        pt.pt_tax19_fl AS before_tax19,
+        pt.pt_tax20_fl AS before_tax20,
+        pt.pt_tax21_fl AS before_tax21,
+        pt.pt_tax22_fl AS before_tax22,
+        pt.pt_tax23_fl AS before_tax23,
+        pt.pt_tax24_fl AS before_tax24,
+        pt.pt_tax25_fl AS before_tax25,
+
+        -- ========== AFTER Dynamic Taxes ==========
+        COALESCE(a.pt_tax1_fl,  pt.pt_tax1_fl,  0) AS after_tax1,
+        COALESCE(a.pt_tax2_fl,  pt.pt_tax2_fl,  0) AS after_tax2,
+        COALESCE(a.pt_tax3_fl,  pt.pt_tax3_fl,  0) AS after_tax3,
+        COALESCE(a.pt_tax4_fl,  pt.pt_tax4_fl,  0) AS after_tax4,
+        COALESCE(a.pt_tax5_fl,  pt.pt_tax5_fl,  0) AS after_tax5,
+        COALESCE(a.pt_tax6_fl,  pt.pt_tax6_fl,  0) AS after_tax6,
+        COALESCE(a.pt_tax7_fl,  pt.pt_tax7_fl,  0) AS after_tax7,
+        COALESCE(a.pt_tax8_fl,  pt.pt_tax8_fl,  0) AS after_tax8,
+        COALESCE(a.pt_tax9_fl,  pt.pt_tax9_fl,  0) AS after_tax9,
+        COALESCE(a.pt_tax10_fl, pt.pt_tax10_fl, 0) AS after_tax10,
+        COALESCE(a.pt_tax11_fl, pt.pt_tax11_fl, 0) AS after_tax11,
+        COALESCE(a.pt_tax12_fl, pt.pt_tax12_fl, 0) AS after_tax12,
+        COALESCE(a.pt_tax13_fl, pt.pt_tax13_fl, 0) AS after_tax13,
+        COALESCE(a.pt_tax14_fl, pt.pt_tax14_fl, 0) AS after_tax14,
+        COALESCE(a.pt_tax15_fl, pt.pt_tax15_fl, 0) AS after_tax15,
+        COALESCE(a.pt_tax16_fl, pt.pt_tax16_fl, 0) AS after_tax16,
+        COALESCE(a.pt_tax17_fl, pt.pt_tax17_fl, 0) AS after_tax17,
+        COALESCE(a.pt_tax18_fl, pt.pt_tax18_fl, 0) AS after_tax18,
+        COALESCE(a.pt_tax19_fl, pt.pt_tax19_fl, 0) AS after_tax19,
+        COALESCE(a.pt_tax20_fl, pt.pt_tax20_fl, 0) AS after_tax20,
+        COALESCE(a.pt_tax21_fl, pt.pt_tax21_fl, 0) AS after_tax21,
+        COALESCE(a.pt_tax22_fl, pt.pt_tax22_fl, 0) AS after_tax22,
+        COALESCE(a.pt_tax23_fl, pt.pt_tax23_fl, 0) AS after_tax23,
+        COALESCE(a.pt_tax24_fl, pt.pt_tax24_fl, 0) AS after_tax24,
+        COALESCE(a.pt_tax25_fl, pt.pt_tax25_fl, 0) AS after_tax25,
+    """;
+    }
+
     // ============================================================
     // SQL BUILDER (includes before + after taxes)
     // ============================================================
     private String buildSql() {
-        StringBuilder flexBefore = new StringBuilder();
-        StringBuilder flexAfter = new StringBuilder();
-
-        for (int i = 1; i <= 25; i++) {
-            flexBefore.append("pt.pt_tax").append(i).append("_fl AS before_tax").append(i).append(", ");
-            flexAfter.append("COALESCE(a.pt_tax").append(i)
-                    .append("_fl, pt.pt_tax").append(i).append("_fl, 0) AS after_tax")
-                    .append(i).append(", ");
-        }
 
         return """
             SELECT DISTINCT
@@ -110,12 +163,12 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
                 pt.pt_specialconservancytax_fl AS before_spec_cons,
                 pt.pt_municipaledutax_fl AS before_municipal_edu,
                 pt.pt_specialedutax_fl AS before_special_edu,
+                pt.pt_edutax_fl AS before_educationtax,
                 pt.pt_edurestax_fl AS before_educ_res,
                 pt.pt_edunrestax_fl AS before_educ_comm,
                 pt.pt_servicecharges_fl AS before_service_chg,
                 pt.pt_final_tax_fl AS before_finaltax,
                 
-            """ + flexBefore + """
                 -- ========== AFTER taxes ==========
                 COALESCE(a.pt_propertytax_fl, pt.pt_propertytax_fl, 0) AS after_propertytax,
                 COALESCE(a.pt_cleantax_fl, pt.pt_cleantax_fl, 0) AS after_cleantax,
@@ -134,12 +187,14 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
                 COALESCE(a.pt_specialconservancytax_fl, pt.pt_specialconservancytax_fl, 0) AS after_spec_cons,
                 COALESCE(a.pt_municipaledutax_fl, pt.pt_municipaledutax_fl, 0) AS after_municipal_edu,
                 COALESCE(a.pt_specialedutax_fl, pt.pt_specialedutax_fl, 0) AS after_special_edu,
+                COALESCE(a.pt_edutax_fl, pt.pt_edutax_fl, 0) AS after_educationtax,
                 COALESCE(a.pt_edurestax_fl, pt.pt_edurestax_fl, 0) AS after_educ_res,
                 COALESCE(a.pt_edunrestax_fl, pt.pt_edunrestax_fl, 0) AS after_educ_comm,
                 COALESCE(a.pt_servicecharges_fl, pt.pt_servicecharges_fl, 0) AS after_service_chg,
                 COALESCE(a.pt_final_tax_fl, pt.pt_final_tax_fl, 0) AS after_finaltax,
                
-            """ + flexAfter + """
+           """
+                           + buildDynamicTaxColumns() + """
                 old.pod_totalratablevalue_i AS oldrv,
                 old.pod_totaltax_fl AS oldtax,
                 old.pod_oldpropno_vc AS oldpropertyno,
@@ -233,8 +288,9 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
             Map<Long, Double> beforeMap = new HashMap<>();
             Map<Long, Double> afterMap = new HashMap<>();
 
-            beforeMap.put(ReportTaxKeys.PT1,           getDouble(t, "before_propertytax"));
-            beforeMap.put(ReportTaxKeys.PT2,           0.0); // add actual column if exists
+            beforeMap.put(ReportTaxKeys.PT_PARENT,           getDouble(t, "before_propertytax"));
+
+            beforeMap.put(ReportTaxKeys.EDUC_PARENT,    getDouble(t, "before_educationtax"));
             beforeMap.put(ReportTaxKeys.EDUC_RES,      getDouble(t, "before_educ_res"));
             beforeMap.put(ReportTaxKeys.EDUC_COMM,     getDouble(t, "before_educ_comm"));
             beforeMap.put(ReportTaxKeys.EGC,           getDouble(t, "before_egctax"));
@@ -255,8 +311,9 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
             beforeMap.put(ReportTaxKeys.MISC_CHG,      getDouble(t, "before_miscellaneouscharges"));
             beforeMap.put(ReportTaxKeys.USER_CHG,      getDouble(t, "before_usercharges"));
 
-            afterMap.put(ReportTaxKeys.PT1,           getDouble(t, "after_propertytax"));
-            afterMap.put(ReportTaxKeys.PT2,           0.0);
+            afterMap.put(ReportTaxKeys.PT_PARENT,           getDouble(t, "after_propertytax"));
+
+            afterMap.put(ReportTaxKeys.EDUC_PARENT,   getDouble(t, "after_educationtax"));
             afterMap.put(ReportTaxKeys.EDUC_RES,      getDouble(t, "after_educ_res"));
             afterMap.put(ReportTaxKeys.EDUC_COMM,     getDouble(t, "after_educ_comm"));
             afterMap.put(ReportTaxKeys.EGC,           getDouble(t, "after_egctax"));
@@ -277,10 +334,58 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
             afterMap.put(ReportTaxKeys.MISC_CHG,      getDouble(t, "after_miscellaneouscharges"));
             afterMap.put(ReportTaxKeys.USER_CHG,      getDouble(t, "after_usercharges"));
 
-            for (int i = 1; i <= 25; i++) {
-                beforeMap.put(1000L + i, getDouble(t, "before_tax" + i)); // use offset or mapping if needed
-                afterMap.put(1000L + i,  getDouble(t, "after_tax" + i));
-            }
+            beforeMap.put(ReportTaxKeys.TAX1,  getDouble(t, "before_tax1"));
+            beforeMap.put(ReportTaxKeys.TAX2,  getDouble(t, "before_tax2"));
+            beforeMap.put(ReportTaxKeys.TAX3,  getDouble(t, "before_tax3"));
+            beforeMap.put(ReportTaxKeys.TAX4,  getDouble(t, "before_tax4"));
+            beforeMap.put(ReportTaxKeys.TAX5,  getDouble(t, "before_tax5"));
+            beforeMap.put(ReportTaxKeys.TAX6,  getDouble(t, "before_tax6"));
+            beforeMap.put(ReportTaxKeys.TAX7,  getDouble(t, "before_tax7"));
+            beforeMap.put(ReportTaxKeys.TAX8,  getDouble(t, "before_tax8"));
+            beforeMap.put(ReportTaxKeys.TAX9,  getDouble(t, "before_tax9"));
+            beforeMap.put(ReportTaxKeys.TAX10, getDouble(t, "before_tax10"));
+            beforeMap.put(ReportTaxKeys.TAX11, getDouble(t, "before_tax11"));
+            beforeMap.put(ReportTaxKeys.TAX12, getDouble(t, "before_tax12"));
+            beforeMap.put(ReportTaxKeys.TAX13, getDouble(t, "before_tax13"));
+            beforeMap.put(ReportTaxKeys.TAX14, getDouble(t, "before_tax14"));
+            beforeMap.put(ReportTaxKeys.TAX15, getDouble(t, "before_tax15"));
+            beforeMap.put(ReportTaxKeys.TAX16, getDouble(t, "before_tax16"));
+            beforeMap.put(ReportTaxKeys.TAX17, getDouble(t, "before_tax17"));
+            beforeMap.put(ReportTaxKeys.TAX18, getDouble(t, "before_tax18"));
+            beforeMap.put(ReportTaxKeys.TAX19, getDouble(t, "before_tax19"));
+            beforeMap.put(ReportTaxKeys.TAX20, getDouble(t, "before_tax20"));
+            beforeMap.put(ReportTaxKeys.TAX21, getDouble(t, "before_tax21"));
+            beforeMap.put(ReportTaxKeys.TAX22, getDouble(t, "before_tax22"));
+            beforeMap.put(ReportTaxKeys.TAX23, getDouble(t, "before_tax23"));
+            beforeMap.put(ReportTaxKeys.TAX24, getDouble(t, "before_tax24"));
+            beforeMap.put(ReportTaxKeys.TAX25, getDouble(t, "before_tax25"));
+
+            afterMap.put(ReportTaxKeys.TAX1,  getDouble(t, "after_tax1"));
+            afterMap.put(ReportTaxKeys.TAX2,  getDouble(t, "after_tax2"));
+            afterMap.put(ReportTaxKeys.TAX3,  getDouble(t, "after_tax3"));
+            afterMap.put(ReportTaxKeys.TAX4,  getDouble(t, "after_tax4"));
+            afterMap.put(ReportTaxKeys.TAX5,  getDouble(t, "after_tax5"));
+            afterMap.put(ReportTaxKeys.TAX6,  getDouble(t, "after_tax6"));
+            afterMap.put(ReportTaxKeys.TAX7,  getDouble(t, "after_tax7"));
+            afterMap.put(ReportTaxKeys.TAX8,  getDouble(t, "after_tax8"));
+            afterMap.put(ReportTaxKeys.TAX9,  getDouble(t, "after_tax9"));
+            afterMap.put(ReportTaxKeys.TAX10, getDouble(t, "after_tax10"));
+            afterMap.put(ReportTaxKeys.TAX11, getDouble(t, "after_tax11"));
+            afterMap.put(ReportTaxKeys.TAX12, getDouble(t, "after_tax12"));
+            afterMap.put(ReportTaxKeys.TAX13, getDouble(t, "after_tax13"));
+            afterMap.put(ReportTaxKeys.TAX14, getDouble(t, "after_tax14"));
+            afterMap.put(ReportTaxKeys.TAX15, getDouble(t, "after_tax15"));
+            afterMap.put(ReportTaxKeys.TAX16, getDouble(t, "after_tax16"));
+            afterMap.put(ReportTaxKeys.TAX17, getDouble(t, "after_tax17"));
+            afterMap.put(ReportTaxKeys.TAX18, getDouble(t, "after_tax18"));
+            afterMap.put(ReportTaxKeys.TAX19, getDouble(t, "after_tax19"));
+            afterMap.put(ReportTaxKeys.TAX20, getDouble(t, "after_tax20"));
+            afterMap.put(ReportTaxKeys.TAX21, getDouble(t, "after_tax21"));
+            afterMap.put(ReportTaxKeys.TAX22, getDouble(t, "after_tax22"));
+            afterMap.put(ReportTaxKeys.TAX23, getDouble(t, "after_tax23"));
+            afterMap.put(ReportTaxKeys.TAX24, getDouble(t, "after_tax24"));
+            afterMap.put(ReportTaxKeys.TAX25, getDouble(t, "after_tax25"));
+
             dto.setTaxKeyValueMapAfterAssess(beforeMap);
             dto.setTaxKeyValueMapAfterHearing(afterMap);
 
