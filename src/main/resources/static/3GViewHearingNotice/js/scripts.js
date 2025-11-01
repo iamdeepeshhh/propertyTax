@@ -138,7 +138,7 @@ function renderAndPrintHearingChunk() {
   const chunk = hnDataList.slice(hnCurrentChunk * hnChunkSize, (hnCurrentChunk + 1) * hnChunkSize);
   if (chunk.length === 0) {
 
-    $('#startHearingPrint').show();
+//    $('#startHearingPrint').show();
     return;
   }
 
