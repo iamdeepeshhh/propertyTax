@@ -118,17 +118,24 @@ function renderHearingNoticeSingle(dto) {
   const $page = $('.container').first();
 
   // Fill Table Data
-  $page.find('tbody tr td').eq(0).text(dto.applicationNo || '');
-  $page.find('tbody tr td').eq(1).text(dto.zoneNo || '');
-  $page.find('tbody tr td').eq(2).text(dto.wardNo || '');
-  $page.find('tbody tr td').eq(3).text(dto.newPropertyNo || '');
-  $page.find('tbody tr td').eq(4).text(dto.oldPropertyNo || '');
+   function renderHearingNoticeSingle(dto) {
+     const $page = $('.container').first();
 
-  // Dynamic Content Binding (support both legacy and new selectors)
-  $page.find('.ownerName, .pdOwnernameVc').text(dto.ownerName || '');
-  $page.find('.hearingDate').text(dto.hearingDate || '');
-  $page.find('.hearingTime').text(dto.hearingTime || '');
-  $page.find('.noticeNo, .pdNoticenoVc').text(dto.noticeNo || '');
+     // Fill table data in both copies
+     $page.find('table').each(function () {
+       $(this).find('tbody tr td').eq(0).text(dto.applicationNo || '');
+       $(this).find('tbody tr td').eq(1).text(dto.zoneNo || '');
+       $(this).find('tbody tr td').eq(2).text(dto.wardNo || '');
+       $(this).find('tbody tr td').eq(3).text(dto.newPropertyNo || '');
+       $(this).find('tbody tr td').eq(4).text(dto.oldPropertyNo || '');
+     });
+
+     // Fill dynamic text (applies to both top and bottom notices)
+     $page.find('.noticeNo, .pdNoticenoVc').text(dto.noticeNo || '');
+     $page.find('.ownerName, .pdOwnernameVc').text(dto.ownerName || '');
+     $page.find('.hearingDate').text(dto.hearingDate || '');
+     $page.find('.hearingTime').text(dto.hearingTime || '');
+   }
 }
 
 // ==========================================
@@ -151,11 +158,13 @@ function renderAndPrintHearingChunk() {
     const $p = $hnOriginalPage.clone(false);
 
     // Fill Table
-    $p.find('tbody tr td').eq(0).text(dto.applicationNo || '');
-    $p.find('tbody tr td').eq(1).text(dto.zoneNo || '');
-    $p.find('tbody tr td').eq(2).text(dto.wardNo || '');
-    $p.find('tbody tr td').eq(3).text(dto.newPropertyNo || '');
-    $p.find('tbody tr td').eq(4).text(dto.oldPropertyNo || '');
+   $p.find('table').each(function () {
+     $(this).find('tbody tr td').eq(0).text(dto.applicationNo || '');
+     $(this).find('tbody tr td').eq(1).text(dto.zoneNo || '');
+     $(this).find('tbody tr td').eq(2).text(dto.wardNo || '');
+     $(this).find('tbody tr td').eq(3).text(dto.newPropertyNo || '');
+     $(this).find('tbody tr td').eq(4).text(dto.oldPropertyNo || '');
+   });
 
     // Dynamic Text Fill (support both legacy and new selectors)
     $p.find('.noticeNo, .pdNoticenoVc').text(dto.noticeNo || '');
