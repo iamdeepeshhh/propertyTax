@@ -9,7 +9,9 @@ public class CouncilDetails_MasterDto {
     private Long id;
     private String standardName;
     private String localName;
-    private String imageBase64; // Store the image as a Base64 string
+    private String imageBase64; // Primary council image Base64
+    private String image2Base64; // Secondary council image Base64
+    private String qrImageBase64; // QR image Base64
 
     // Field created by Himanshu for standardization of site and district and localization of sites and district
 

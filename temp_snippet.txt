@@ -1,5 +1,24 @@
-const p2HearingData = taxConfigs.map(c =>
-            `<td class=\"p2\">${after[c.taxKeyL] || 0}</td>`
-          ).join('');
+function submitForm(formId, inputIds, endpointUrl, dynamicRowInputNames = [], dynamicTableId = '') {
+var form = document.getElementById(formId);
+var isValid = true;
+var formData = {};
 
-          // Appeal taxes are empty in the origina
+if (!input) {
+    console.warn(`⚠️ Input with ID '${inputId}' not found in the form '${formId}'.`);
+    return;
+}
+
+// Collect static form fields
+inputIds.forEach(function(inputId) {
+    var input = document.getElementById(inputId);
+    if (input.type === 'checkbox') {
+        formData[input.name] = input.checked;
+    } else {
+        if (!input.checkValidity()) {
+            input.reportValidity();
+            isValid = false;
+        }
+        formData[input.name] = input.value;
+    }
+});
+

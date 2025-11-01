@@ -19,6 +19,12 @@ public class CouncilDetails_MasterEntity {
     @Column(name = "image_base64", columnDefinition = "TEXT")
     private String imageBase64; // Store the image as a Base64 string
 
+    @Column(name = "image2_base64", columnDefinition = "TEXT")
+    private String image2Base64; // Secondary council image
+
+    @Column(name = "qr_image_base64", columnDefinition = "TEXT")
+    private String qrImageBase64; // QR image
+
     @Column(name = "standardsitenameVC")
     private String standardSiteNameVC;
 

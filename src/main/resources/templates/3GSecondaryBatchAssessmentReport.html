@@ -334,7 +334,7 @@ table.reportTable {
 
 
 .partition-row td {
-  height: 10px;
+  height: 20px;
   background: #fafafa;
 }
         @media print {
@@ -396,8 +396,7 @@ table.reportTable {
   .partition-row td {
     height: 14px !important;
     background: #f9f9f9 !important;
-    border-top: 2px double #000 !important;
-    border-bottom: 2px double #000 !important;
+
   }
 
   /* ✅ Ensure container and tables are visible in PDF */
@@ -861,10 +860,10 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
 
             <td class="p1">${psd.totalAlvFl || ""}</td>
             <td class="p1">${psd.totalYearlyRentFl || ""}</td>
-            <td class="p1">${psd.consideredRvFl || ""}</td>
+            <td class="p1">${psd.totalRatableValueFl|| ""}</td>
             <td class="p1">${psd.totalCombinedAlvRentFl || ""}</td>
             <td class="p1">${psd.totalDepreciationAmountFl || ""}</td>
-            <td class="p1">${psd.totalRatableValueFl || ""}</td>
+            <td class="p1">${psd.consideredRvFl|| ""}</td>
 
             <!-- P1: Dynamic Tax Data -->
             ${p1TaxData}

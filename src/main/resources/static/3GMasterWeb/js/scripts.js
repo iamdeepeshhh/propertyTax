@@ -179,7 +179,7 @@ var form = document.getElementById(formId);
 var isValid = true;
 var formData = {};
 
-if (!input) {
+if (false && !input) {
     console.warn(`⚠️ Input with ID '${inputId}' not found in the form '${formId}'.`);
     return;
 }
@@ -187,6 +187,11 @@ if (!input) {
 // Collect static form fields
 inputIds.forEach(function(inputId) {
     var input = document.getElementById(inputId);
+    if (!input) {
+        console.warn(`Input with ID '${inputId}' not found in the form '${formId}'.`);
+        isValid = false;
+        return;
+    }
     if (input.type === 'checkbox') {
         formData[input.name] = input.checked;
     } else {
@@ -1843,6 +1848,8 @@ function submitCouncilDetailsForm() {
     const standardNameInput = document.getElementById('standardName');
     const localNameInput = document.getElementById('localName');
     const imageInput = document.getElementById('councilImage'); // File input for logo
+    const image2Input = document.getElementById('councilImage2'); // Second council image
+    const qrImageInput = document.getElementById('qrImage'); // QR image
     const chiefSignInput = document.getElementById('chiefOfficerSign'); // File input for chief officer sign
     const companySignInput = document.getElementById('companySign'); // File input for company sign
 
@@ -1865,6 +1872,11 @@ function submitCouncilDetailsForm() {
             const fileRef = imageInput.files && imageInput.files[0];
             formData.append('councilImage', logoBlob, (fileRef && fileRef.name) ? fileRef.name : 'council.png');
         }
+        // Append optional council image 2 and QR image
+        const image2File = image2Input && image2Input.files ? image2Input.files[0] : null;
+        if (image2File) formData.append('councilImage2', image2File, image2File.name);
+        const qrFile = qrImageInput && qrImageInput.files ? qrImageInput.files[0] : null;
+        if (qrFile) formData.append('qrImage', qrFile, qrFile.name);
         // Append signatures if provided (no compression for simplicity)
         const chiefFile = chiefSignInput && chiefSignInput.files ? chiefSignInput.files[0] : null;
         if (chiefFile) formData.append('chiefOfficerSign', chiefFile, chiefFile.name);

@@ -42,6 +42,10 @@ public class CouncilDetails_MasterServiceImpl implements CouncilDetails_MasterSe
         // Images: only overwrite when provided
         if (dto.getImageBase64() != null && !dto.getImageBase64().isBlank())
             entity.setImageBase64(dto.getImageBase64());
+        if (dto.getImage2Base64() != null && !dto.getImage2Base64().isBlank())
+            entity.setImage2Base64(dto.getImage2Base64());
+        if (dto.getQrImageBase64() != null && !dto.getQrImageBase64().isBlank())
+            entity.setQrImageBase64(dto.getQrImageBase64());
         if (dto.getChiefOfficerSignBase64() != null && !dto.getChiefOfficerSignBase64().isBlank())
             entity.setChiefOfficerSignBase64(dto.getChiefOfficerSignBase64());
         if (dto.getCompanySignBase64() != null && !dto.getCompanySignBase64().isBlank())
@@ -63,6 +67,8 @@ public class CouncilDetails_MasterServiceImpl implements CouncilDetails_MasterSe
             dto.setStandardDistrictNameVC(entity.getStandardDistrictNameVC());
             dto.setLocalDistrictNameVC(entity.getLocalDistrictNameVC());
             dto.setImageBase64(entity.getImageBase64()); // Base64 string
+            dto.setImage2Base64(entity.getImage2Base64());
+            dto.setQrImageBase64(entity.getQrImageBase64());
             dto.setId(entity.getId());
             dto.setChiefOfficerSignBase64(entity.getChiefOfficerSignBase64());
             dto.setCompanySignBase64(entity.getCompanySignBase64());
@@ -97,6 +103,10 @@ public class CouncilDetails_MasterServiceImpl implements CouncilDetails_MasterSe
             entity.setLocalDistrictNameVC(dto.getLocalDistrictNameVC());
         if (dto.getImageBase64() != null && !dto.getImageBase64().isBlank())
             entity.setImageBase64(dto.getImageBase64());
+        if (dto.getImage2Base64() != null && !dto.getImage2Base64().isBlank())
+            entity.setImage2Base64(dto.getImage2Base64());
+        if (dto.getQrImageBase64() != null && !dto.getQrImageBase64().isBlank())
+            entity.setQrImageBase64(dto.getQrImageBase64());
         if (dto.getChiefOfficerSignBase64() != null && !dto.getChiefOfficerSignBase64().isBlank())
             entity.setChiefOfficerSignBase64(dto.getChiefOfficerSignBase64());
         if (dto.getCompanySignBase64() != null && !dto.getCompanySignBase64().isBlank())

@@ -1480,7 +1480,9 @@ public class MasterWebController {
                                                      @RequestParam("localSiteNameVc") String localSiteNameVc,
                                                      @RequestParam("standardDistrictNameVc") String standardDistrictNameVc,
                                                      @RequestParam("localDistrictNameVc") String localDistrictNameVc,
-                                                     @RequestParam(name = "councilImage", required = false) MultipartFile councilImage) {
+                                                     @RequestParam(name = "councilImage", required = false) MultipartFile councilImage,
+                                                     @RequestParam(name = "councilImage2", required = false) MultipartFile councilImage2,
+                                                     @RequestParam(name = "qrImage", required = false) MultipartFile qrImage) {
         try {
             CouncilDetails_MasterDto councilDetails_masterDto = new CouncilDetails_MasterDto();
             councilDetails_masterDto.setStandardName(standardName);
@@ -1493,6 +1495,14 @@ public class MasterWebController {
             if (councilImage != null && !councilImage.isEmpty()) {
                 String base64Image = ImageUtils.convertToBase64(councilImage);
                 councilDetails_masterDto.setImageBase64(base64Image);
+            }
+            if (councilImage2 != null && !councilImage2.isEmpty()) {
+                String base64Image2 = ImageUtils.convertToBase64(councilImage2);
+                councilDetails_masterDto.setImage2Base64(base64Image2);
+            }
+            if (qrImage != null && !qrImage.isEmpty()) {
+                String base64Qr = ImageUtils.convertToBase64(qrImage);
+                councilDetails_masterDto.setQrImageBase64(base64Qr);
             }
             councilDetails_masterService.saveCouncilDetails(councilDetails_masterDto);
             return ResponseEntity.ok("Success");
@@ -1513,6 +1523,8 @@ public class MasterWebController {
             @RequestParam(name = "standardDistrictNameVc", required = false) String standardDistrictNameVc,
             @RequestParam(name = "localDistrictNameVc", required = false) String localDistrictNameVc,
             @RequestParam(name = "councilImage", required = false) MultipartFile councilImage,
+            @RequestParam(name = "councilImage2", required = false) MultipartFile councilImage2,
+            @RequestParam(name = "qrImage", required = false) MultipartFile qrImage,
             @RequestParam(name = "chiefOfficerSign", required = false) MultipartFile chiefOfficerSign,
             @RequestParam(name = "companySign", required = false) MultipartFile companySign
     ) {
@@ -1527,6 +1539,12 @@ public class MasterWebController {
 
             if (councilImage != null && !councilImage.isEmpty()) {
                 dto.setImageBase64(ImageUtils.convertToBase64(councilImage));
+            }
+            if (councilImage2 != null && !councilImage2.isEmpty()) {
+                dto.setImage2Base64(ImageUtils.convertToBase64(councilImage2));
+            }
+            if (qrImage != null && !qrImage.isEmpty()) {
+                dto.setQrImageBase64(ImageUtils.convertToBase64(qrImage));
             }
             if (chiefOfficerSign != null && !chiefOfficerSign.isEmpty()) {
                 dto.setChiefOfficerSignBase64(ImageUtils.convertToBase64(chiefOfficerSign));
@@ -1554,6 +1572,8 @@ public class MasterWebController {
                 item.put("standardName", councilDetailsDto.getStandardName());
                 item.put("localName", councilDetailsDto.getLocalName());
                 item.put("imageBase64", councilDetailsDto.getImageBase64()); // Add the Base64 image data
+                item.put("image2Base64", councilDetailsDto.getImage2Base64());
+                item.put("qrImageBase64", councilDetailsDto.getQrImageBase64());
                 item.put("standardSiteNameVC", councilDetailsDto.getStandardSiteNameVC());
                 item.put("localSiteNameVC", councilDetailsDto.getLocalSiteNameVC());
                 item.put("standardDistrictNameVC", councilDetailsDto.getStandardDistrictNameVC());
