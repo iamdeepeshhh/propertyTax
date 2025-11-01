@@ -620,7 +620,7 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
           if (data && data.length > 0) {
             const c = data[0];
             document.querySelector('.councilName').textContent =
-              `${c.localNameVc || 'नगर परिषद'} / ${c.standardName || 'Nagar Parishad'}`;
+              `${c.localName || 'नगर परिषद'} / ${c.standardName || 'Nagar Parishad'}`;
             if (c.imageBase64)
               document.querySelector('.councilLogo').src = 'data:image/png;base64,' + c.imageBase64;
           }

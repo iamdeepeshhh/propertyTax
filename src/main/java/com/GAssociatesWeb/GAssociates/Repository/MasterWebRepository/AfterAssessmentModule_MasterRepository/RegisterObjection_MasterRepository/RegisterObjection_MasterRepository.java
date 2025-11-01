@@ -22,4 +22,13 @@ public interface RegisterObjection_MasterRepository extends JpaRepository<Regist
         ORDER BY r.createdAt DESC
     """)
     List<RegisterObjection_Entity> searchObjectionRecords(String spn, String finalPropertyNo, String ownerName, Integer ward);
+
+    // 🔹 Fetch all objections in a specific ward
+    List<RegisterObjection_Entity> findByWardNo(Integer wardNo);
+
+    // 🔹 Fetch a single record using notice number (for print notice)
+    RegisterObjection_Entity findByNoticeNo(String noticeNo);
+
+    // 🔹 Optional: fetch by final property number (if you need it later)
+    RegisterObjection_Entity findByFinalPropertyNo(String finalPropertyNo);
 }

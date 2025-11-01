@@ -1542,6 +1542,7 @@ public class MasterWebController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update council details");
         }
     }
+
     @GetMapping("/getCouncilDetails")
     public ResponseEntity<List<Map<String, Object>>> getCouncilDetails() {
         try {
@@ -1642,7 +1643,6 @@ public class MasterWebController {
         }
         return ResponseEntity.ok(result);
     }
-
 
 
     //For the Special Notice
@@ -1767,10 +1767,10 @@ public class MasterWebController {
     //for registering the objection of citizen the below methood is getting used
     @PostMapping("/submitObjection")
     public ResponseEntity<String> submitObjection(@RequestBody RegisterObjection_Dto dto) {
-        if (! registerObjection_masterService.existsObjection(dto.getNewPropertyNo())) {
+        if (!registerObjection_masterService.existsObjection(dto.getNewPropertyNo())) {
             registerObjection_masterService.saveObjection(dto);
             return ResponseEntity.ok("Objection submitted successfully");
-        }else{
+        } else {
             return ResponseEntity.badRequest().body("Already Objection is present ");
         }
     }
@@ -1779,7 +1779,7 @@ public class MasterWebController {
     public ResponseEntity<RegisterObjection_Dto> getObjectionDetails(@PathVariable String newPropertyNo) {
 
         RegisterObjection_Dto objection = registerObjection_masterService.getObjection(newPropertyNo);
-        if (objection != null){
+        if (objection != null) {
             return ResponseEntity.ok(objection);
         }
 
@@ -1788,16 +1788,16 @@ public class MasterWebController {
     }
 
     @GetMapping("getObjectionList")
-    public ResponseEntity<List<RegisterObjection_Dto>> getObjectionList(){
+    public ResponseEntity<List<RegisterObjection_Dto>> getObjectionList() {
         List<RegisterObjection_Dto> list = registerObjection_masterService.getList();
-        if (list != null &&!list.isEmpty()){
+        if (list != null && !list.isEmpty()) {
             return ResponseEntity.ok(list);
         }
         return ResponseEntity.notFound().build();
     }
 
     @GetMapping("viewObjectionList")
-    public String viewObjectionList(){
+    public String viewObjectionList() {
         return "3gViewObjectionSheet";
     }
 
@@ -1811,4 +1811,6 @@ public class MasterWebController {
         List<RegisterObjection_Dto> list = registerObjection_masterService.searchObjectionRecords(spn, finalPropertyNo, ownerName, ward);
         return list.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(list);
     }
+
+    // ================= Hearing Notice / Order Sheet (Register Objection) =================
 }

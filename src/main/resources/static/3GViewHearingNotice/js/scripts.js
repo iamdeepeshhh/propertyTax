@@ -1,67 +1,54 @@
-﻿
-// For the Council
+﻿// ==========================================
+// 🏛️ Fetch & Render Council Details
+// ==========================================
 $(document).ready(function () {
   $.ajax({
     url: '/3g/getCouncilDetails',
     type: 'GET',
-    success: function(data) {
+    success: function (data) {
       if (data && data.length > 0) {
-        councilDetails = data[0];
-        $('.councilName').text(councilDetails.localName);
-        if (councilDetails.imageBase64) {
-            $('.councilLogo').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
-            $('.standardSiteNameVC').text(councilDetails.standardSiteNameVC);
-            $('.localSiteNameVC').text(councilDetails.localSiteNameVC);
-            $('.standardDistrictNameVC').text(councilDetails.standardDistrictNameVC);
-            $('.localDistrictNameVC').text(councilDetails.localDistrictNameVC);
+        const council = data[0];
+        $('.councilName').text(council.localName);
+        $('.localDistrictNameVC').text(council.localDistrictNameVC);
+        if (council.imageBase64) {
+          $('.councilLogo').attr('src', 'data:image/png;base64,' + council.imageBase64);
         }
       }
-    }
+    },
   });
 });
 
-// For the year
+// ==========================================
+// 📅 Fetch Assessment Year Range
+// ==========================================
+let globalYearRange = '';
+document.addEventListener('DOMContentLoaded', () => {
+  fetch('/3g/getAllAssessmentDates')
+    .then((r) => r.json())
+    .then((data) => {
+      if (!data || data.length === 0) return;
+      const date = data[0].currentassessmentdate;
+      globalYearRange = formatYearRange(date);
+      $('.yearRange').text(globalYearRange);
+    })
+    .catch(console.error);
+});
 
- let globalYearRange = '';
- document.addEventListener('DOMContentLoaded', () => {
-     fetch('/3g/getAllAssessmentDates', {
-         method: 'GET',
-         headers: {
-             'Content-Type': 'application/json'
-         }
-     })
-     .then(response => {
-         if (!response.ok) {
-             throw new Error('Network response was not ok: ' + response.statusText);
-         }
-         return response.json();
-     })
-     .then(data => {
+function formatYearRange(date) {
+  const year = parseInt(date.split('-')[0]);
+  const start = convertToDevanagari((year).toString());
+  const end = convertToDevanagari((year + 3).toString());
+  return `${start}-${end}`;
+}
 
-         const currentAssessmentDate = data[0].currentassessmentdate;
-         globalYearRange = formatYearRange(currentAssessmentDate);
-         $('.yearRange').text(globalYearRange);
-     })
-     .catch(error => console.error('Error fetching additional data:', error));
- });
+function convertToDevanagari(numStr) {
+  const digits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+  return numStr.replace(/[0-9]/g, (d) => digits[d]);
+}
 
- function formatYearRange(date) {
-     const year = parseInt(date.split('-')[0]);  // Extract the year from the date
-     const startYear = year;
-     const endYear = year + 3;
-     const startYearL = startYear + 1;
-     const endYearL = endYear + 1;
-     const startYearDev = convertToDevanagari(startYear.toString());
-     const endYearDev = convertToDevanagari(endYear.toString());
-
-     return `${startYearDev}-${convertToDevanagari(startYearL.toString())} à¤¤à¥‡ ${endYearDev}-${convertToDevanagari(endYearL.toString())}`;
- }
-
- function convertToDevanagari(numberString) {
-     const devanagariDigits = ['à¥¦', 'à¥§', 'à¥¨', 'à¥©', 'à¥ª', 'à¥«', 'à¥¬', 'à¥­', 'à¥®', 'à¥¯'];
-     return numberString.replace(/[0-9]/g, (digit) => devanagariDigits[digit]);
- }
-// Fetch hearing notices from objection register and render like Special Notice
+// ==========================================
+// 📜 Fetch Hearing Notices and Print
+// ==========================================
 let hnDataList = [];
 let hnCurrentChunk = 0;
 const hnChunkSize = 100;
@@ -73,70 +60,121 @@ document.addEventListener('DOMContentLoaded', () => {
   const newPropertyNo = qp.get('newPropertyNo');
 
   if (newPropertyNo) {
+    // 🧾 Single Notice Mode
     fetch(`/3g/hearingNotices?newPropertyNo=${encodeURIComponent(newPropertyNo)}`)
-      .then(r => r.json())
-      .then(list => {
+      .then((r) => r.json())
+      .then((list) => {
         if (!list || list.length === 0) return;
         $hnOriginalPage = $('.container').first().clone(false);
         renderHearingNoticeSingle(list[0]);
       })
       .catch(console.error);
   } else if (wardNo) {
+    // 📑 Multi Notice (Ward Mode)
     addHearingPrintButton(wardNo);
   }
 });
 
-function addHearingPrintButton(wardNo){
-  $('body').prepend('<button id="startHearingPrint">Print Hearing Notices</button>');
-  $('#startHearingPrint').on('click', function(){
+// ==========================================
+// 🖨️ Add Print Button and Start Printing
+// ==========================================
+function addHearingPrintButton(wardNo) {
+  $('body').prepend(
+    '<button id="startHearingPrint" style="margin:10px;padding:8px 16px;background:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;">Print Hearing Notices</button>'
+  );
+
+  $('#startHearingPrint').on('click', function () {
     $('#startHearingPrint').hide();
     fetch(`/3g/hearingNotices?wardNo=${encodeURIComponent(wardNo)}`)
-      .then(r => r.json())
-      .then(data => {
-        if (!data || data.length === 0) { alert('No data found'); $('#startHearingPrint').show(); return; }
-        hnDataList = data; hnCurrentChunk = 0; $hnOriginalPage = $('.container').first().detach();
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data || data.length === 0) {
+          alert('⚠️ No Hearing Notices found for this ward.');
+          $('#startHearingPrint').show();
+          return;
+        }
+        hnDataList = data;
+        hnCurrentChunk = 0;
+        $hnOriginalPage = $('.container').first().detach();
         renderAndPrintHearingChunk();
       })
-      .catch(e => { console.error(e); $('#startHearingPrint').show(); });
+      .catch((e) => {
+        console.error(e);
+        $('#startHearingPrint').show();
+      });
   });
+
+  // Auto-trigger preview loading without manual click
+  setTimeout(function(){
+    var btn = document.getElementById('startHearingPrint');
+    if (btn) { btn.click(); }
+  }, 0);
 }
 
-function renderHearingNoticeSingle(dto){
+// ==========================================
+// 🧾 Render Single Hearing Notice
+// ==========================================
+function renderHearingNoticeSingle(dto) {
   const $page = $('.container').first();
-  $page.find('.pdFinalpropnoVc').text(dto.finalPropertyNo || dto.pdFinalpropnoVc || '');
-  $page.find('.pdOwnernameVc').text(dto.ownerName || dto.pdOwnernameVc || '');
-  $page.find('.pdOldpropnoVc').text(dto.oldPropertyNo || dto.pdOldpropnoVc || '');
-  $page.find('.pdWardI').text(dto.wardNo || dto.pdWardI || '');
-  $page.find('.pdZoneI').text(dto.zoneNo || dto.pdZoneI || '');
-  $page.find('.pdNoticenoVc').text(dto.noticeNo || dto.pdNoticenoVc || '');
+
+  // Fill Table Data
+  $page.find('tbody tr td').eq(0).text(dto.applicationNo || '');
+  $page.find('tbody tr td').eq(1).text(dto.zoneNo || '');
+  $page.find('tbody tr td').eq(2).text(dto.wardNo || '');
+  $page.find('tbody tr td').eq(3).text(dto.newPropertyNo || '');
+  $page.find('tbody tr td').eq(4).text(dto.oldPropertyNo || '');
+
+  // Dynamic Content Binding (support both legacy and new selectors)
+  $page.find('.ownerName, .pdOwnernameVc').text(dto.ownerName || '');
   $page.find('.hearingDate').text(dto.hearingDate || '');
   $page.find('.hearingTime').text(dto.hearingTime || '');
+  $page.find('.noticeNo, .pdNoticenoVc').text(dto.noticeNo || '');
 }
 
-function renderAndPrintHearingChunk(){
-  const chunk = hnDataList.slice(hnCurrentChunk*hnChunkSize, (hnCurrentChunk+1)*hnChunkSize);
-  if (chunk.length === 0) { alert('All chunks printed'); $('#startHearingPrint').show(); return; }
+// ==========================================
+// 🧾 Render & Print Multiple Hearing Notices
+// ==========================================
+function renderAndPrintHearingChunk() {
+  const chunk = hnDataList.slice(hnCurrentChunk * hnChunkSize, (hnCurrentChunk + 1) * hnChunkSize);
+  if (chunk.length === 0) {
+    alert('✅ All Hearing Notices printed successfully.');
+    $('#startHearingPrint').show();
+    return;
+  }
 
-  const $wrap = $('<div id="hn-report"></div>');
-  chunk.forEach(dto => {
+  let $wrap = $('#hn-report');
+  if (!$wrap.length) {
+    $wrap = $('<div id="hn-report"></div>');
+    $('body').append($wrap);
+  }
+  chunk.forEach((dto) => {
     const $p = $hnOriginalPage.clone(false);
-    $p.find('.pdFinalpropnoVc').text(dto.finalPropertyNo || '');
-    $p.find('.pdOwnernameVc').text(dto.ownerName || '');
-    $p.find('.pdOldpropnoVc').text(dto.oldPropertyNo || '');
-    $p.find('.pdWardI').text(dto.wardNo || '');
-    $p.find('.pdZoneI').text(dto.zoneNo || '');
-    $p.find('.pdNoticenoVc').text(dto.noticeNo || '');
+
+    // Fill Table
+    $p.find('tbody tr td').eq(0).text(dto.applicationNo || '');
+    $p.find('tbody tr td').eq(1).text(dto.zoneNo || '');
+    $p.find('tbody tr td').eq(2).text(dto.wardNo || '');
+    $p.find('tbody tr td').eq(3).text(dto.newPropertyNo || '');
+    $p.find('tbody tr td').eq(4).text(dto.oldPropertyNo || '');
+
+    // Dynamic Text Fill (support both legacy and new selectors)
+    $p.find('.noticeNo, .pdNoticenoVc').text(dto.noticeNo || '');
+    $p.find('.ownerName, .pdOwnernameVc').text(dto.ownerName || '');
     $p.find('.hearingDate').text(dto.hearingDate || '');
     $p.find('.hearingTime').text(dto.hearingTime || '');
+
     $wrap.append($p);
   });
 
-  $('body').append($wrap);
-  setTimeout(() => {
-    window.print();
-    $wrap.remove();
-    hnCurrentChunk++;
-    renderAndPrintHearingChunk();
-  }, 500);
+  // wrapper already ensured above
+  if (!$('#hn-manual-print').length) {
+    $('body').prepend('<button id="hn-manual-print" style="margin:10px;padding:8px 16px;background:#28a745;color:#fff;border:none;border-radius:4px;cursor:pointer;">Print All</button>');
+    $('#hn-manual-print').on('click', function () { window.print(); });
+  }
+
+  // Preview mode: render next chunk without auto-print
+  hnCurrentChunk++;
+  renderAndPrintHearingChunk();
 }
+
 

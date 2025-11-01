@@ -28,7 +28,7 @@ public class MainController {
     @GetMapping("citizenLogin")
     public String showCitizenLogin(){return "3GCitizenPage";}
 
-    @GetMapping("hearingNotice")
+    @GetMapping("hearingNotices")
     public String showHearingNotice(){return "3GViewHearingNotice";}
 
     @GetMapping("secondaryBatchAssessmentReport")

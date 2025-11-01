@@ -17,9 +17,11 @@ import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.CompleteProperty_Dto
 import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.PropertyDetails_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.UnitDetails_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.UnitBuiltUp_Dto;
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.RegisterObjection_Dto.RegisterObjection_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto.AfterHearing_PropertyTaxDetailsDto;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.PropertyTaxDetailArrears_MasterService.PropertyTaxDetailArrears_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.RegisterObjection_MasterService.RegisterObjection_MasterService;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.HearingNotice_MasterService.HearingNotice_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.SecondaryBatchAssessmentReport.SecondaryBatchAssessmentReport_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.TaxBills.TaxBills_MasterService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -47,6 +49,7 @@ public class MasterWebControllerII {
     private final PropertyTaxDetailArrears_MasterService propertyTaxDetailArrears_masterService;
     private final RegisterObjection_MasterService registerObjection_masterService;
     private SecondaryBatchAssessmentReport_MasterService secondaryBatchAssessmentReportService;
+    private final HearingNotice_MasterService hearingNoticeService;
     private final AfterHearingPropertyDetails_Service afterHearingPropertyDetailsService;
     private final AfterHearingUnitDetails_Service afterHearingUnitDetailsService;
     private final AfterHearingUnitBuiltupDetails_Service afterHearingUnitBuiltupDetailsService;
@@ -427,4 +430,21 @@ public class MasterWebControllerII {
         if (dto == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(dto);
     }
-}
+
+    @GetMapping("/hearingNotices")
+    public ResponseEntity<List<RegisterObjection_Dto>> getHearingNoticesII(
+            @RequestParam(required = false) Integer wardNo,
+            @RequestParam(required = false) String newPropertyNo) {
+
+        // Single property mode (preferred when provided)
+        if (newPropertyNo != null && !newPropertyNo.isBlank()) {
+            RegisterObjection_Dto dto = registerObjection_masterService.getObjection(newPropertyNo);
+            return (dto == null) ? ResponseEntity.noContent().build() : ResponseEntity.ok(java.util.List.of(dto));
+        }
+
+        // Ward-wise list mode
+        List<RegisterObjection_Dto> rows = hearingNoticeService.getHearingNoticesByWard(wardNo);
+
+        return (rows == null || rows.isEmpty()) ? ResponseEntity.noContent().build() : ResponseEntity.ok(rows);
+    }}
+

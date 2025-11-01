@@ -1791,8 +1791,13 @@ function viewTaxBill(newPropertyNo) {
     // Open mapped route without dummy ward; query param drives single-bill mode
     window.open(`/taxBill?newPropertyNo=${encodeURIComponent(newPropertyNo)}`, '_blank', 'noopener,noreferrer');
 }
-function viewHearingNotice(wardNo) {
-    const url = `/hearingNotice`;
+function viewHearingNotice(wardNo, newPropertyNo) {
+    let url = `/hearingNotices`;
+    if (newPropertyNo) {
+        url += `?newPropertyNo=${encodeURIComponent(newPropertyNo)}`;
+    } else if (wardNo) {
+        url += `?wardNo=${encodeURIComponent(wardNo)}`;
+    }
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 function viewSecondaryBatchAssessmentReport(wardNo) {
