@@ -436,11 +436,23 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
             for (AfterHearingCompleteProperty_Dto d : entry.getValue()) {
                 Map<Long, Double> b = Optional.ofNullable(d.getTaxKeyValueMapAfterAssess()).orElse(Map.of());
                 for (Map.Entry<Long, Double> e : b.entrySet()) {
-                    mergedBefore.merge(e.getKey(), Optional.ofNullable(e.getValue()).orElse(0.0), Double::sum);
+                    Long key = e.getKey();
+                    Double val = Optional.ofNullable(e.getValue()).orElse(0.0);
+                    if (isFlexibleTaxKey(key)) {
+                        mergedBefore.merge(key, val, Math::max);
+                    } else {
+                        mergedBefore.merge(key, val, Double::sum);
+                    }
                 }
                 Map<Long, Double> a = Optional.ofNullable(d.getTaxKeyValueMapAfterHearing()).orElse(Map.of());
                 for (Map.Entry<Long, Double> e : a.entrySet()) {
-                    mergedAfter.merge(e.getKey(), Optional.ofNullable(e.getValue()).orElse(0.0), Double::sum);
+                    Long key = e.getKey();
+                    Double val = Optional.ofNullable(e.getValue()).orElse(0.0);
+                    if (isFlexibleTaxKey(key)) {
+                        mergedAfter.merge(key, val, Math::max);
+                    } else {
+                        mergedAfter.merge(key, val, Double::sum);
+                    }
                 }
             }
             // Set totals in summary if helpful to consumers
@@ -492,5 +504,34 @@ public class SecondaryBatchAssessmentReport_MasterServiceImpl implements Seconda
         } catch (NumberFormatException e) {
             return 0.0;
         }
+    }
+
+    private boolean isFlexibleTaxKey(Long key) {
+        if (key == null) return false;
+        return key.equals(ReportTaxKeys.TAX1)
+                || key.equals(ReportTaxKeys.TAX2)
+                || key.equals(ReportTaxKeys.TAX3)
+                || key.equals(ReportTaxKeys.TAX4)
+                || key.equals(ReportTaxKeys.TAX5)
+                || key.equals(ReportTaxKeys.TAX6)
+                || key.equals(ReportTaxKeys.TAX7)
+                || key.equals(ReportTaxKeys.TAX8)
+                || key.equals(ReportTaxKeys.TAX9)
+                || key.equals(ReportTaxKeys.TAX10)
+                || key.equals(ReportTaxKeys.TAX11)
+                || key.equals(ReportTaxKeys.TAX12)
+                || key.equals(ReportTaxKeys.TAX13)
+                || key.equals(ReportTaxKeys.TAX14)
+                || key.equals(ReportTaxKeys.TAX15)
+                || key.equals(ReportTaxKeys.TAX16)
+                || key.equals(ReportTaxKeys.TAX17)
+                || key.equals(ReportTaxKeys.TAX18)
+                || key.equals(ReportTaxKeys.TAX19)
+                || key.equals(ReportTaxKeys.TAX20)
+                || key.equals(ReportTaxKeys.TAX21)
+                || key.equals(ReportTaxKeys.TAX22)
+                || key.equals(ReportTaxKeys.TAX23)
+                || key.equals(ReportTaxKeys.TAX24)
+                || key.equals(ReportTaxKeys.TAX25);
     }
 }
