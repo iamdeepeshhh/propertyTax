@@ -1,24 +1,46 @@
 // Show council details
 $(document).ready(function () {
- buildReportTaxTable("#specialNoticeTaxTable", "SPECIAL_NOTICE");
   $.ajax({
     url: '/3g/getCouncilDetails',
     type: 'GET',
     success: function (data) {
       if (data && data.length > 0) {
-        const councilDetails = data[0];
-        $('.councilLocalName').text(councilDetails.localName);
-        if (councilDetails.imageBase64) {
-          $('.councilLogo').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
-          $('.standardSiteNameVC').text(councilDetails.standardSiteNameVC);
-          $('.localSiteNameVC').text(councilDetails.localSiteNameVC);
-          $('.standardDistrictNameVC').text(councilDetails.standardDistrictNameVC);
-          $('.localDistrictNameVC').text(councilDetails.localDistrictNameVC);
+        const council = data[0];
+
+        // Council Texts
+        $('.councilLocalName').text(council.localName || '');
+        $('.standardDistrictNameVC').text(council.standardDistrictNameVC || '');
+        $('.localDistrictNameVC').text(council.localDistrictNameVC || '');
+
+        // 🖼️ Top Left (always shown)
+        if (council.imageBase64 && council.imageBase64.trim() !== '') {
+          $('.councilLogoTopLeft').attr('src', 'data:image/png;base64,' + council.imageBase64).show();
+          $('.councilLogoBottomLeft').attr('src', 'data:image/png;base64,' + council.imageBase64).show();
         }
+
+        // 🖼️ Top Right (optional)
+        if (council.image2Base64 && council.image2Base64.trim() !== '') {
+          $('.councilLogoTopRight').attr('src', 'data:image/png;base64,' + council.image2Base64).show();
+          $('.councilLogoBottomRight').attr('src', 'data:image/png;base64,' + council.image2Base64).show();
+        } else {
+          $('.councilLogoTopRight').hide();
+        }
+
+        // ✅ Center title if both right-side logos are missing
+        $('.logo-title').each(function () {
+          const rightLogoVisible = $(this).find('.councilLogoTopRight:visible, .councilLogoBottomRight:visible').length > 0;
+          if (!rightLogoVisible) $(this).css('justify-content', 'flex-start');
+          else $(this).css('justify-content', 'space-between');
+        });
       }
+    },
+    error: function (err) {
+      console.error('Error fetching council details:', err);
+      $('.councilLogo').hide();
     }
   });
 });
+
 
 // Show year range
 let globalYearRange = '';
@@ -121,7 +143,32 @@ $(document).ready(function () {
 
   if (newPropertyNo) {
     // 👉 Directly render single property special notice
-    renderSingleSpecialNotice(newPropertyNo);
+     $('body').prepend(`
+        <button id="printBtn"
+          style="
+            position: fixed;
+            top: 20px;
+            left: 30px;
+            padding: 8px 14px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            z-index: 1000;
+          ">
+          🖨️ Print
+        </button>
+      `);
+
+      // ✅ Attach event
+      $('#printBtn').on('click', function () {
+        $(this).hide();           // Hide before print
+        window.print();           // Trigger print
+        setTimeout(() => $(this).show(), 1000); // Re-show after print
+      });
+
   } else {
     // 👉 Ward case: Add button for printing
     $('body').prepend(`<button id="startPrint">🖨 Print Special Notice</button>`);

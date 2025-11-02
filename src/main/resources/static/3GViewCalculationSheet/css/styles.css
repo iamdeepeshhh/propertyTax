@@ -155,3 +155,16 @@ body table, th, td {
   font-weight: bold;
   white-space: nowrap;
 }
+.councilLogo {
+  height: 80px;
+  width: 80px;
+  object-fit: contain;
+}
+
+.councilLogoLeft {
+  float: right;
+}
+
+.councilLogoRight {
+  float: left;
+}

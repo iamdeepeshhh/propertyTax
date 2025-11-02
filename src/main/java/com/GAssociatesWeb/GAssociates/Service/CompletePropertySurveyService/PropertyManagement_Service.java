@@ -17,7 +17,7 @@ public interface PropertyManagement_Service {
 
     public CompleteProperty_Dto getCompletePropertyBySurveyNumber(String pdSuryPropNo);
     void deleteCompleteProperty(String pdNewpropertynoVc);
-    public List<PropertyDetails_Dto> searchNewProperties(String surveyPropertyNo, String ownerName, Integer wardNo, String finalPropertyNo);
+    public List<PropertyDetails_Dto> searchNewProperties(String surveyPropertyNo, String ownerName, Integer wardNo, String finalPropertyNo, Integer page, Integer size);
 
     public CompleteProperty_Dto getCompletePropertyByNewPropertyNo(String PdNewPropertyNo);
 

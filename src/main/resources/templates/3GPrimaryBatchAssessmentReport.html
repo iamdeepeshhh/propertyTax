@@ -17,6 +17,23 @@
         print-color-adjust: exact;
     }
 
+    .councilLogo {
+      height: 90px;
+      width: auto;
+      border-radius: 20px;
+      object-fit: contain;
+    }
+
+    .councilLogoLeft {
+      margin-left: 100px;
+    }
+
+    .councilLogoRight {
+      margin-right: 100px;
+      display: none; /* start hidden */
+    }
+
+
     .report-container {
         width: 100%; /* Set to 100% to ensure it fits the page */
         margin-left: auto;
@@ -215,13 +232,15 @@
 <div class="report-container">
 
     <header class="report-header">
-        <img class="councilLogo" src="https://example.com/default-image.png" alt="Council Logo">
+        <img class="councilLogo councilLogoLeft" alt="Council Logo Left" src="https://example.com/default-image.png">
         <div>
-            <h1 class="councilName">नगर पंचायत, sitename / Nagar Panchayat sitename</h1>
+            <h1 class="councilName">नगर परिषद / Municipal Council</h1>
             <p>(नमुना ४३ नियम ७४ पहा)/(Form No. 43 See Rule No. 74)</p>
             <p><span class="yearRange"></span> या वर्षांसाठी इमारती व जमीन यांची आकारणी सूची</p>
         </div>
+        <img class="councilLogo councilLogoRight" alt="Council Logo Right" style="display:none;">
     </header>
+
     <table>
         <thead>
         <tr>

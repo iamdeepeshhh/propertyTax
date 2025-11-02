@@ -118,3 +118,20 @@ body table, th, td {
   font-weight: bold;
   white-space: nowrap;
 }
+
+.councilName {
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+}
+@media print {
+  td:has(.councilName) {
+    text-align: center !important;
+  }
+  .councilLogoLeft:empty,
+  .councilLogoRight:empty,
+  .councilLogoLeft[src=""],
+  .councilLogoRight[src=""] {
+    display: none !important;
+  }
+}

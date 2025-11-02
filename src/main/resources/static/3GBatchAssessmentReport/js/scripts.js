@@ -66,23 +66,49 @@ $(document).ready(function () {
  $.ajax({
    url: '/3g/getCouncilDetails',
    type: 'GET',
-   success: function(data) {
+   success: function (data) {
      if (data && data.length > 0) {
-       councilDetails = data[0]; // ✅ Save council data globally
+       councilDetails = data[0]; // store globally
 
-       // This part below updates the main page (optional)
-       $('.councilName').text(councilDetails.localName + ' / ' + councilDetails.standardName);
-       if (councilDetails.imageBase64) {
-           $('.councilLogo').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
+       // ✅ Update council names and site info
+       $('.councilName').text(
+         (councilDetails.localName + ' / ' + councilDetails.standardName) || 'नगर परिषद'
+       );
+       $('.standardSiteNameVC').text(councilDetails.standardSiteNameVC || '');
+       $('.localSiteNameVC').text(councilDetails.localSiteNameVC || '');
+       $('.standardDistrictNameVC').text(councilDetails.standardDistrictNameVC || '');
+       $('.localDistrictNameVC').text(councilDetails.localDistrictNameVC || '');
+
+       // ✅ Left logo (main council logo)
+       if (councilDetails.imageBase64 && councilDetails.imageBase64.trim() !== '') {
+         $('.councilLogoLeft')
+           .attr('src', 'data:image/png;base64,' + councilDetails.imageBase64)
+           .show();
+       } else {
+         $('.councilLogoLeft').hide();
        }
-       $('.standardSiteNameVC').text(councilDetails.standardSiteNameVC);
-       $('.localSiteNameVC').text(councilDetails.localSiteNameVC);
-       $('.standardDistrictNameVC').text(councilDetails.standardDistrictNameVC);
-       $('.localDistrictNameVC').text(councilDetails.localDistrictNameVC);
 
+       // ✅ Right logo (optional secondary logo)
+       if (councilDetails.image2Base64 && councilDetails.image2Base64.trim() !== '') {
+         $('.councilLogoRight')
+           .attr('src', 'data:image/png;base64,' + councilDetails.image2Base64)
+           .show();
+       } else {
+         $('.councilLogoRight').hide();
+       }
+
+     } else {
+       // No council data found
+       $('.councilLogo').hide();
+       $('.councilName').text('नगर परिषद');
      }
-   }
+   },
+   error: function (xhr, status, error) {
+     console.error('Error fetching council details:', error);
+     $('.councilLogo').hide();
+   },
  });
+
     // Function to get wardNo from URL path (e.g., /batchAssessmentReport/1)
     function getWardNoFromURL() {
         const pathParts = window.location.pathname.split('/');  // Split the path by '/'
@@ -147,7 +173,7 @@ $(document).ready(function () {
         Object.keys(grouped).forEach(key => {
             grouped[key].unitDetails.sort((a, b) => a.unitNoVc - b.unitNoVc);
         });
-        
+
         return Object.values(grouped);  // Return the grouped data as an array
     }
 
@@ -176,10 +202,14 @@ $(document).ready(function () {
                  // ✅ Now update council name/logo inside this chunk
                 $(currentChunk).find('.councilName').text(councilDetails.localName + ' / ' + councilDetails.standardName);
                 if (councilDetails.imageBase64) {
-                    $(currentChunk).find('.councilLogo').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
+                  $(currentChunk).find('.councilLogoLeft').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64).show();
+                }
+                if (councilDetails.image2Base64) {
+                  $(currentChunk).find('.councilLogoRight').attr('src', 'data:image/png;base64,' + councilDetails.image2Base64).show();
+                } else {
+                  $(currentChunk).find('.councilLogoRight').hide();
                 }
                 $(currentChunk).find('.yearRange').text(globalYearRange);
-
                 // Proceed with tbody filling
                 const tbody = $(currentChunk).find('tbody');
 

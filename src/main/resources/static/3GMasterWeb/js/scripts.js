@@ -1178,10 +1178,36 @@ if (confirm('Are you sure you want to delete this record?')) {
 
 
 // fetchPropertyRecords is the method getting used for searching the properties and setting them into the table
-function fetchPropertyRecords(endpointUrl, queryParams, tableBodyId, actionType, columns) {
+// Keep state for paginated property searches
+window.propertySearchState = window.propertySearchState || {};
+
+function fetchPropertyRecords(endpointUrl, queryParams, tableBodyId, actionType, columns, append = false) {
     const url = new URL(endpointUrl, window.location.origin);
+    const isPropertySearch = endpointUrl.includes('/3g/searchNewProperties');
+    // Apply default paging for heavy property searches if not provided
+    if (isPropertySearch) {
+        if (!('page' in queryParams)) queryParams.page = 0;
+        if (!('size' in queryParams)) queryParams.size = 200;
+
+        // Maintain paging state per table
+        try {
+            const pg = Number(queryParams.page || 0);
+            const sz = Number(queryParams.size || 200);
+            const base = JSON.parse(JSON.stringify(queryParams));
+            delete base.page; delete base.size;
+            window.propertySearchState[tableBodyId] = {
+                endpoint: endpointUrl,
+                base,
+                page: pg,
+                size: sz,
+                actionType,
+                columns
+            };
+        } catch (e) { /* ignore state errors */ }
+    }
+
     Object.keys(queryParams).forEach(key => url.searchParams.append(key, queryParams[key]));
-    
+
     fetch(url)
     .then(response => {
         if (!response.ok) {
@@ -1196,7 +1222,7 @@ function fetchPropertyRecords(endpointUrl, queryParams, tableBodyId, actionType,
     })
     .then(data => {
         const tableBody = document.getElementById(tableBodyId);
-        tableBody.innerHTML = '';
+        if (!append) tableBody.innerHTML = '';
 
 
         if (data && data.length > 0) {
@@ -1206,9 +1232,10 @@ function fetchPropertyRecords(endpointUrl, queryParams, tableBodyId, actionType,
                 return valA.localeCompare(valB); // ascending order
             });
 
+            const existingCount = append ? tableBody.querySelectorAll('tr').length : 0;
             data.forEach((item, index) => {
                 const row = document.createElement('tr');
-                row.innerHTML = `<td>${index + 1}</td>` +
+                row.innerHTML = `<td>${existingCount + index + 1}</td>` +
                     columns.map(col => `<td>${item[col] || ''}</td>`).join('') +
                     `<td>` + getActionButtons(actionType, item) + `</td>`;
                 tableBody.appendChild(row);
@@ -1216,8 +1243,41 @@ function fetchPropertyRecords(endpointUrl, queryParams, tableBodyId, actionType,
         } else {
             tableBody.innerHTML = '<tr><td colspan="' + (columns.length + 2) + '">No results found.</td></tr>';
         }
+
+        // Render or hide pager for property search
+        if (isPropertySearch) {
+            const st = window.propertySearchState[tableBodyId];
+            const pagerId = tableBodyId + '-pager';
+            const tableEl = tableBody.closest('table');
+            if (tableEl) {
+                let pager = document.getElementById(pagerId);
+                if (!pager) {
+                    pager = document.createElement('div');
+                    pager.id = pagerId;
+                    pager.style.textAlign = 'center';
+                    pager.style.margin = '8px 0 16px 0';
+                    tableEl.parentNode.insertBefore(pager, tableEl.nextSibling);
+                }
+                const hasMore = Array.isArray(data) && data.length >= (st && st.size ? st.size : Number(queryParams.size || 200));
+                if (hasMore) {
+                    pager.innerHTML = `<button class="btn btn-secondary" onclick="loadMoreProperties('${tableBodyId}')">Load More</button>`;
+                } else {
+                    pager.innerHTML = '';
+                }
+            }
+        }
     })
     .catch(error => console.error('Error fetching property records:', error));
+}
+
+function loadMoreProperties(tableBodyId) {
+    const st = window.propertySearchState && window.propertySearchState[tableBodyId];
+    if (!st) return;
+    const nextPage = (st.page || 0) + 1;
+    const params = Object.assign({}, st.base, { page: nextPage, size: st.size });
+    // Update state before fetch to keep continuity if user clicks fast
+    st.page = nextPage;
+    fetchPropertyRecords(st.endpoint, params, tableBodyId, st.actionType, st.columns, true);
 }
 // getActionButtons is getting used to segregate the buttons for uploading cad images and property images
 // and viewing survey report,calculationsheet also deleting reports
@@ -1301,6 +1361,10 @@ function performSearch(sectionId, columns) {
     if (ownerName) searchParams.ownerName = ownerName;
     if (wardNumber) searchParams.wardNo = wardNumber;
     if (finalPropertyNo) searchParams.finalPropertyNo = finalPropertyNo;
+
+    // Default pagination for heavy queries
+    searchParams.page = 0;
+    searchParams.size = 200; // increase default page size from backend 50 to 200
 
     let tableBodyId, actionType;
     if (sectionId === 'surveyReports') {

@@ -2,6 +2,7 @@ package com.GAssociatesWeb.GAssociates.Repository.PropertySurveyRepository;
 
 import com.GAssociatesWeb.GAssociates.Entity.PropertySurveyEntity.CompletePropertySurvey_Entity.PropertyDetails_Entity.PropertyDetails_Entity;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -22,6 +23,12 @@ public interface PropertyDetails_Repository extends JpaRepository<PropertyDetail
     List<PropertyDetails_Entity> findByPdWardI(Integer wardNo);
 
     List<PropertyDetails_Entity> findAllByPdWardI(int wardNumber, Pageable pageable);
+
+    // Paged search variants for heavy queries
+    Page<PropertyDetails_Entity> findByPdOwnernameVcContainingIgnoreCase(String ownerName, Pageable pageable);
+    Page<PropertyDetails_Entity> findByPdOwnernameVcContainingIgnoreCaseAndPdWardI(String ownerName, Integer wardNo, Pageable pageable);
+    Page<PropertyDetails_Entity> findByPdFinalpropnoVcContainingIgnoreCase(String finalPropertyNo, Pageable pageable);
+    Page<PropertyDetails_Entity> findByPdSurypropnoVcContainingIgnoreCase(String surveyPropertyNo, Pageable pageable);
 
     List<PropertyDetails_Entity> findByPdFinalpropnoVcAndPdWardI(String pdFinalpropnoVc, Integer pdWardI);
     @Query("SELECT p.pdWardI, COUNT(p) FROM PropertyDetails_Entity p GROUP BY p.pdWardI ORDER BY p.pdWardI")

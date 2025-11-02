@@ -88,10 +88,12 @@
         .report-header {
           display: flex;
           align-items: center;
-          justify-content: center;
-          gap: 20px;                 /* spacing between logo & text */
-          margin: 15px auto;
+          justify-content: space-between;
+          text-align: center;
           width: 100%;
+          margin: 0 auto 5px auto;
+          padding: 0;
+          gap: 10px;
         }
 
         .property-no .prop-line {
@@ -103,12 +105,12 @@
           border-bottom: none; /* remove divider after last one */
         }
 
-        .report-header img {
+       .report-header img {
           height: 90px;
-          width: auto;
-          margin-left: 0;
-          border-radius: 12px;
-          flex-shrink: 0;
+          width: 90px;
+          object-fit: contain;
+          margin: 0;
+          padding: 0;
         }
 
         .report-header div {
@@ -337,6 +339,29 @@ table.reportTable {
   height: 20px;
   background: #fafafa;
 }
+
+.center-header {
+  flex: 1;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.center-header h1 {
+  font-size: 22px;
+  color: red;
+  margin: 0;
+}
+
+.center-header p {
+  font-size: 14px;
+  margin: 2px 0;
+}
+
+/* Tighten header to table */
+.report-header + div,
+.report-header + table {
+  margin-top: 2px !important;
+}
         @media print {
   .controls { display: none !important; }
 .report-header {
@@ -347,6 +372,8 @@ table.reportTable {
     gap: 20px !important;
     width: 100% !important;
     margin: 10px auto !important;
+    margin-bottom: 4px !important;
+
   }
 
   .report-header img {
@@ -474,13 +501,15 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
 
 <!-- Main Header (first appearance) -->
 <header class="report-header" id="mainHeader">
-    <img class="councilLogo" src="https://example.com/default-image.png" alt="Council Logo" onerror="this.src='https://placehold.co/100x100/eee/ccc?text=Logo';">
-    <div>
-        <h1 class="councilName">नगर पंचायत, sitename / Nagar Panchayat sitename</h1>
+    <img class="councilLogoLeft" src="https://example.com/default-image.png" alt="Left Council Logo" />
+    <div class="center-header">
+        <h1 class="councilName">नगर परिषद, Sitename / Nagar Parishad Sitename</h1>
         <p>(नमुना ४३ नियम ७४ पहा)/(Form No. 43 See Rule No. 74)</p>
         <p><span class="yearRange"></span> या वर्षांसाठी इमारती व जमीन यांची आकारणी सूची</p>
     </div>
+    <img class="councilLogoRight" alt="Right Council Logo" style="display:none;" />
 </header>
+
 
 <!-- Placeholder container for chunks -->
 <div id="reportContainer"></div>
@@ -613,19 +642,32 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
 
     // 🔹 Fetch council details and fill header
     function fetchCouncilDetails() {
-      fetch('/3g/getCouncilDetails')
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.length > 0) {
-            const c = data[0];
-            document.querySelector('.councilName').textContent =
-              `${c.localName || 'नगर परिषद'} / ${c.standardName || 'Nagar Parishad'}`;
-            if (c.imageBase64)
-              document.querySelector('.councilLogo').src = 'data:image/png;base64,' + c.imageBase64;
-          }
-        })
-        .catch(err => console.error('❌ Failed to fetch council details:', err));
-    }
+  fetch('/3g/getCouncilDetails')
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.length > 0) {
+        const c = data[0];
+
+        document.querySelector('.councilName').textContent =
+          `${c.localName || 'नगर परिषद'} / ${c.standardName || 'Nagar Parishad'}`;
+
+        // Left logo always present
+        if (c.imageBase64 && c.imageBase64.trim() !== '') {
+          document.querySelector('.councilLogoLeft').src = 'data:image/png;base64,' + c.imageBase64;
+        }
+
+        // Right logo optional
+        const rightLogo = document.querySelector('.councilLogoRight');
+        if (c.image2Base64 && c.image2Base64.trim() !== '') {
+          rightLogo.src = 'data:image/png;base64,' + c.image2Base64;
+          rightLogo.style.display = 'block';
+        } else {
+          rightLogo.style.display = 'none';
+        }
+      }
+    })
+    .catch(err => console.error('❌ Failed to fetch council details:', err));
+}
 
 
     /* --------------------------------------
@@ -860,10 +902,10 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
 
             <td class="p1">${psd.totalAlvFl || ""}</td>
             <td class="p1">${psd.totalYearlyRentFl || ""}</td>
-            <td class="p1">${psd.totalRatableValueFl|| ""}</td>
+            <td class="p1">${psd.consideredRvFl|| ""}</td>
             <td class="p1">${psd.totalCombinedAlvRentFl || ""}</td>
             <td class="p1">${psd.totalDepreciationAmountFl || ""}</td>
-            <td class="p1">${psd.consideredRvFl|| ""}</td>
+            <td class="p1">${psd.totalRatableValueFl|| ""}</td>
 
             <!-- P1: Dynamic Tax Data -->
             ${p1TaxData}

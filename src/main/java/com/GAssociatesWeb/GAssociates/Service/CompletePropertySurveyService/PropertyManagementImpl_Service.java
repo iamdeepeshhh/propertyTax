@@ -13,6 +13,9 @@ import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.Unit
 import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.UnitDetails_Service.UnitDetails_Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -95,17 +98,31 @@ public class PropertyManagementImpl_Service implements PropertyManagement_Servic
             String surveyPropertyNo,
             String ownerName,
             Integer wardNo,
-            String finalPropertyNo) {
+            String finalPropertyNo,
+            Integer page,
+            Integer size) {
 
         List<PropertyDetails_Entity> properties;
+        int defaultLimit = 50; // default page size
+        int pageNo = page != null && page >= 0 ? page : 0;
+        int pageSize = size != null && size > 0 ? Math.min(size, 500) : defaultLimit; // safety cap
+        org.springframework.data.domain.Sort sort = org.springframework.data.domain.Sort.by(
+                Sort.Order.asc("pdSurypropnoVc")
+        );
+        Pageable limit = PageRequest.of(pageNo, pageSize, sort);
 
         if (finalPropertyNo != null && !finalPropertyNo.trim().isEmpty() && wardNo != null) {
             // Final Property No + Ward
             properties = propertyDetails_repository.findByPdFinalpropnoVcAndPdWardI(finalPropertyNo, wardNo);
+            // Ensure deterministic order
+            properties.sort(Comparator.comparing(
+                    p -> Optional.ofNullable(p.getPdSurypropnoVc()).orElse("")
+            ));
 
         } else if (finalPropertyNo != null && !finalPropertyNo.trim().isEmpty()) {
             // Final Property No only
-            properties = propertyDetails_repository.findByPdFinalpropnoVcContainingIgnoreCase(finalPropertyNo);
+            properties = propertyDetails_repository.findByPdFinalpropnoVcContainingIgnoreCase(finalPropertyNo, limit)
+                    .getContent();
 
         } else if (surveyPropertyNo != null && !surveyPropertyNo.trim().isEmpty() && wardNo != null) {
             // Survey Property No + Ward
@@ -115,19 +132,22 @@ public class PropertyManagementImpl_Service implements PropertyManagement_Servic
 
         } else if (ownerName != null && !ownerName.trim().isEmpty() && wardNo != null) {
             // Owner Name + Ward
-            properties = propertyDetails_repository.findByPdOwnernameVcContainingIgnoreCaseAndPdWardI(ownerName, wardNo);
+            properties = propertyDetails_repository.findByPdOwnernameVcContainingIgnoreCaseAndPdWardI(ownerName, wardNo, limit)
+                    .getContent();
 
         } else if (ownerName != null && !ownerName.trim().isEmpty()) {
             // Owner Name only
-            properties = propertyDetails_repository.findByPdOwnernameVcContainingIgnoreCase(ownerName);
+            properties = propertyDetails_repository.findByPdOwnernameVcContainingIgnoreCase(ownerName, limit)
+                    .getContent();
 
         } else if (wardNo != null) {
             // Ward only
-            properties = propertyDetails_repository.findByPdWardI(wardNo);
+            properties = propertyDetails_repository.findAllByPdWardI(wardNo, limit);
 
         } else if (surveyPropertyNo != null && !surveyPropertyNo.trim().isEmpty()) {
             // Survey Property No only
-            properties = propertyDetails_repository.findByPdSurypropnoVcContainingIgnoreCase(surveyPropertyNo);
+            properties = propertyDetails_repository.findByPdSurypropnoVcContainingIgnoreCase(surveyPropertyNo, limit)
+                    .getContent();
 
         } else {
             // No criteria

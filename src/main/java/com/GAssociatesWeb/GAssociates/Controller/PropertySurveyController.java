@@ -282,10 +282,12 @@ public class PropertySurveyController {
             @RequestParam(required = false) String surveyPropertyNo,
             @RequestParam(required = false) String ownerName,
             @RequestParam(required = false) Integer wardNo,
-            @RequestParam(required = false) String finalPropertyNo) {
+            @RequestParam(required = false) String finalPropertyNo,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
 
         logger.info(surveyPropertyNo+wardNo+ownerName);
-        List<PropertyDetails_Dto> results = propertyManagement_service.searchNewProperties(surveyPropertyNo, ownerName, wardNo,finalPropertyNo);
+        List<PropertyDetails_Dto> results = propertyManagement_service.searchNewProperties(surveyPropertyNo, ownerName, wardNo, finalPropertyNo, page, size);
         if (results.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

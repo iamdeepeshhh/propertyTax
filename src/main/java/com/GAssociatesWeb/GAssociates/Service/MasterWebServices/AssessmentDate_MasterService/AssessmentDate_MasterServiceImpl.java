@@ -21,10 +21,35 @@ public class AssessmentDate_MasterServiceImpl implements AssessmentDate_MasterSe
 
     @Override
     public AssessmentDate_MasterDto saveAssessmentDate(AssessmentDate_MasterDto assessmentDateDTO) {
-        System.out.println(assessmentDateDTO);
-        AssessmentDate_MasterEntity assessmentDateMasterEntity = mapToEntity(assessmentDateDTO);
-        assessmentDateMasterEntity = assessmentDate_masterRepository.save(assessmentDateMasterEntity);
-        return mapToDTO(assessmentDateMasterEntity);
+        // Enforce a single-record policy: upsert into the first/only record.
+        List<AssessmentDate_MasterEntity> all = assessmentDate_masterRepository.findAll();
+
+        AssessmentDate_MasterEntity entity;
+        if (!all.isEmpty()) {
+            // Update the existing record (use the first one)
+            entity = all.get(0);
+        } else {
+            // Create a new record
+            entity = new AssessmentDate_MasterEntity();
+        }
+
+        // Map incoming values
+        entity.setFirstAssessmentDate(assessmentDateDTO.getFirstAssessmentDate());
+        entity.setLastAssessmentDate(assessmentDateDTO.getLastAssessmentDate());
+        entity.setCurrentAssessmentDate(assessmentDateDTO.getCurrentAssessmentDate());
+
+        // Save the single authoritative record
+        AssessmentDate_MasterEntity saved = assessmentDate_masterRepository.save(entity);
+
+        // If more than one record exists, prune extras
+        if (all.size() > 1) {
+            for (int i = 1; i < all.size(); i++) {
+                AssessmentDate_MasterEntity extra = all.get(i);
+                try { assessmentDate_masterRepository.deleteById(extra.getAssessmentId()); } catch (Exception ignored) {}
+            }
+        }
+
+        return mapToDTO(saved);
     }
 
     @Override

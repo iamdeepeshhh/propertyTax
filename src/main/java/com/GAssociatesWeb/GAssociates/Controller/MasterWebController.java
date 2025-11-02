@@ -1152,8 +1152,10 @@ public class MasterWebController {
             @RequestParam(required = false) String surveyPropertyNo,
             @RequestParam(required = false) String ownerName,
             @RequestParam(required = false) Integer wardNo,
-            @RequestParam(required = false) String finalPropertyNo) {
-        List<PropertyDetails_Dto> results = propertyManagement_service.searchNewProperties(surveyPropertyNo, ownerName, wardNo, finalPropertyNo);
+            @RequestParam(required = false) String finalPropertyNo,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        List<PropertyDetails_Dto> results = propertyManagement_service.searchNewProperties(surveyPropertyNo, ownerName, wardNo, finalPropertyNo, page, size);
 
         if (results.isEmpty()) {
             return ResponseEntity.noContent().build();

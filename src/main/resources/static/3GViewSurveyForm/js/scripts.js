@@ -1,28 +1,46 @@
 $(document).ready(function() {
+    // ✅ Fetch and display Council Details and Logos
     $.ajax({
-        url: '/3g/getCouncilDetails',
-        type: 'GET',
-        success: function(data) {
-            if (data && data.length > 0) {
-                const councilDetails = data[0];
-                $('.councilName').text(councilDetails.localName || 'नगर परिषद');
-//                $('#councilName1').text(councilDetails.localName || 'नगर परिषद');
-                if (councilDetails.imageBase64) {
-                    $('#councilLogo').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
-                    $('#councilLogo1').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
-                } else {
-                    $('#councilLogo').attr('src', 'https://example.com/fallback-image.png');
-                    $('#councilLogo1').attr('src', 'https://example.com/fallback-image.png');
-                }
-            } else {
-                $('#councilLogo').attr('src', 'https://example.com/no-data-image.png');
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('Error fetching council name:', error);
-            $('.councilName').text('-');
+      url: '/3g/getCouncilDetails',
+      type: 'GET',
+      success: function (data) {
+        if (data && data.length > 0) {
+          const council = data[0];
+
+          // 🏛 Council Names and Districts
+          $('.councilLocalName').text(council.localName || '');
+          $('.standardDistrictNameVC').text(council.standardDistrictNameVC || '');
+          $('.localDistrictNameVC').text(council.localDistrictNameVC || '');
+
+          // 🖼️ Left Logo (Always Shown)
+          if (council.imageBase64 && council.imageBase64.trim() !== '') {
+            $('.councilLogoTopLeft').attr('src', 'data:image/png;base64,' + council.imageBase64).show();
+            $('.councilLogoBottomLeft').attr('src', 'data:image/png;base64,' + council.imageBase64).show();
+          } else {
+            $('.councilLogoTopLeft, .councilLogoBottomLeft').hide();
+          }
+
+          // 🖼️ Right Logo (Optional)
+          if (council.image2Base64 && council.image2Base64.trim() !== '') {
+            $('.councilLogoTopRight').attr('src', 'data:image/png;base64,' + council.image2Base64).show();
+            $('.councilLogoBottomRight').attr('src', 'data:image/png;base64,' + council.image2Base64).show();
+          } else {
+            $('.councilLogoTopRight, .councilLogoBottomRight').hide();
+          }
+
+          // 🧭 Align title properly
+          $('.logo-title').each(function () {
+            const rightLogoVisible = $(this).find('.councilLogoTopRight:visible, .councilLogoBottomRight:visible').length > 0;
+            $(this).css('justify-content', rightLogoVisible ? 'space-between' : 'flex-start');
+          });
         }
+      },
+      error: function (err) {
+        console.error('Error fetching council details:', err);
+        $('.councilLogoTopLeft, .councilLogoTopRight').hide();
+      }
     });
+
 // Retrieve the property number from local storage
 var propertyId = window.location.pathname.split('/').pop();
 console.log(propertyId);

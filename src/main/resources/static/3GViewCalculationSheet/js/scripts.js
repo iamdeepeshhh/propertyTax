@@ -23,35 +23,53 @@ $.ajax({
 });
 
 $.ajax({
-        url: '/3g/getCouncilDetails',
-        type: 'GET',
-        success: function(data) {
-            if (data && data.length > 0) {
-                const councilDetails = data[0];
-                console.log(councilDetails);
-                $('#councilName').text(councilDetails.localName + ' / ' + councilDetails.standardName || 'नगर परिषद');
-                $('#councilName1').text(councilDetails.localName + ' / ' + councilDetails.standardName || 'नगर परिषद');
-                $('.siteNameStd').text(councilDetails.standardSiteNameVC);
-                $('.siteNameLocal').text(councilDetails.localSiteNameVC);
-                $('.districtNameLocal').text(councilDetails.localDistrictNameVC);
-                $('.districtNameStd').text(councilDetails.standardDistrictNameVC);
+  url: '/3g/getCouncilDetails',
+  type: 'GET',
+  success: function (data) {
+    if (data && data.length > 0) {
+      const councilDetails = data[0];
+      console.log(councilDetails);
 
-                if (councilDetails.imageBase64) {
-                    $('#councilLogo').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
-                    $('#councilLogo1').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
-                } else {
-                    $('#councilLogo').attr('src', 'https://example.com/fallback-image.png');
-                    $('#councilLogo1').attr('src', 'https://example.com/fallback-image.png');
-                }
-            } else {
-                $('#councilLogo').attr('src', 'https://example.com/no-data-image.png');
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('Error fetching council name:', error);
-            $('#councilName').text('-');
-        }
-    });
+      // Update names
+      $('.councilName').text(
+        (councilDetails.localName + ' / ' + councilDetails.standardName) || 'नगर परिषद'
+      );
+      $('.siteNameStd').text(councilDetails.standardSiteNameVC || '');
+      $('.siteNameLocal').text(councilDetails.localSiteNameVC || '');
+      $('.districtNameLocal').text(councilDetails.localDistrictNameVC || '');
+      $('.districtNameStd').text(councilDetails.standardDistrictNameVC || '');
+
+      // LEFT logo
+      if (councilDetails.imageBase64) {
+        $('.councilLogoLeft')
+          .attr('src', 'data:image/png;base64,' + councilDetails.imageBase64)
+          .show();
+      } else {
+        $('.councilLogoLeft').hide();
+      }
+
+      // RIGHT logo
+      if (councilDetails.image2Base64) {
+        $('.councilLogoRight')
+          .attr('src', 'data:image/png;base64,' + councilDetails.image2Base64)
+          .show();
+        $('.rightLogoCell').show(); // ensure cell visible
+      } else {
+        $('.rightLogoCell').hide(); // completely remove cell if no logo
+      }
+    } else {
+      $('.councilLogo').hide();
+      $('.rightLogoCell').hide();
+    }
+  },
+  error: function (xhr, status, error) {
+    console.error('Error fetching council details:', error);
+    $('.councilLogo').hide();
+    $('.rightLogoCell').hide();
+  },
+});
+
+
     // Retrieve the property number from the URL
     var propertyId = window.location.pathname.split('/').pop();
 

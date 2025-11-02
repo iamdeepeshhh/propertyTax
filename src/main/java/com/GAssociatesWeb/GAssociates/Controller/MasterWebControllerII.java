@@ -70,7 +70,7 @@ public class MasterWebControllerII {
             String np = (newPropertyNo != null && !newPropertyNo.trim().isEmpty()) ? newPropertyNo.trim() : null;
             if ((np == null || np.isEmpty()) && finalPropertyNo != null && !finalPropertyNo.trim().isEmpty()) {
                 // Resolve new property no from final property number
-                List<PropertyDetails_Dto> matches = propertyManagementService.searchNewProperties(null, null, null, finalPropertyNo.trim());
+                List<PropertyDetails_Dto> matches = propertyManagementService.searchNewProperties(null, null, null, finalPropertyNo.trim(), null, null);
                 if (matches != null && !matches.isEmpty()) {
                     np = matches.get(0).getPdNewpropertynoVc();
                 }
@@ -447,4 +447,3 @@ public class MasterWebControllerII {
 
         return (rows == null || rows.isEmpty()) ? ResponseEntity.noContent().build() : ResponseEntity.ok(rows);
     }}
-

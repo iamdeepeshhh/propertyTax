@@ -263,7 +263,7 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
         }
 
         // 🔹 Step 3: Save new Proposed RV
-        AfterHearing_ProposedRValuesDto rvDto = mapToAfterHearingProposedRvDto(proposed,newPropertyNo);
+        AfterHearing_ProposedRValuesDto rvDto = mapToAfterHearingProposedRvDto(proposed,newPropertyNo,propertyDetailsDto.getPdFinalpropnoVc());
         afterHearingProposedRvalues_masterRepository.saveAll(
                 convertProposedRValues(Collections.singletonList(rvDto))
         );
@@ -1053,11 +1053,11 @@ public class AfterHearingPropertyManagement_MasterMasterServiceImpl implements A
         return dto;
     }
 
-    private AfterHearing_ProposedRValuesDto mapToAfterHearingProposedRvDto(ProposedRatableValueDetailsDto src, String newPropertyNoVc) {
+    private AfterHearing_ProposedRValuesDto mapToAfterHearingProposedRvDto(ProposedRatableValueDetailsDto src, String newPropertyNoVc, String finalPropertyNo) {
         AfterHearing_ProposedRValuesDto dto = new AfterHearing_ProposedRValuesDto();
 
         dto.setPrNewPropertyNoVc(newPropertyNoVc);
-        dto.setPrFinalPropNoVc(src.getFinalPropertyNoVc());
+        dto.setPrFinalPropNoVc(finalPropertyNo);
 
         // 🏠 Ratable Value Components
         dto.setPrResidentialFl(nullToZero(src.getResidentialFl()));
