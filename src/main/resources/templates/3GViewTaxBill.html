@@ -4,6 +4,14 @@
     <title>Tax Bills</title>
     <link rel="stylesheet" href="/3GViewTaxBill/css/styles.css">
     <style>
+
+
+        body {
+                    font-family: "Arial Unicode MS", Arial, sans-serif;
+                    height: 930 ;
+                    width: 1300 ;
+
+        }
         .table-bordered th,
         .table-bordered td {
           text-align: center !important;
@@ -33,7 +41,7 @@
 <div id="main-report-section" style="margin:20px;"></div>
 <div class="page-container template" style="display:none;">
     <div id="printIt">
-        <div class="container" style="border: 1px solid darkgrey;">
+        <div class="container" style="border: 1px solid darkgrey; margin-left: 50px;">
             <form id="taxreceipt" name="taxreceipt">
 
                 <table style="padding:4px;height:800px !important;">
@@ -48,7 +56,7 @@
                                             <div class="councilHeaderText">
                                                 <div class="councilLocalNameHeader">नगर परिषद</div>
                                                 <div class="middlehead">महाराष्ट्र लेखा संहिता नमुना क्र. ५२ (नियम ६८,९३ पहा)</div>
-                                                <div class="lasthead">31/03/2025 रोजी संपणाऱ्या कालावधीच्या कराचे बिल</div>
+                                                <div class="lasthead">  <span class ="currentAssessmentDate">31/03/2025</span>  रोजी संपणाऱ्या कालावधीच्या कराचे बिल</div>
                                             </div>
                                             <div class="right-logo-section">
                                                 <div class="right-logo-section">
@@ -152,18 +160,19 @@
                                 ५) जप्त केलेल्या स्थावर मालमत्तेबाबत मा. जिल्हाधिकारी यांची पूर्व मंजुरी घेवून न.प.ला रक्कमेत आपले स्थावर मालमत्ता ताब्यात घेता येईल.<br>
                                 ६)सदर देयक दि. ३१ मार्च पर्यंतचे वसुलीस अधीन राहून लागू करण्यात येत आहे. त्यानुसार त्या कराची रक्कम अदा केली असल्यास, भरलेली रक्कम सदर बिलातून सामायोजीत केली जाईल.<br>
                                 <b>टीप:</b>
-                                सदर देयके सन 2024-25 या आर्थिक वर्षाचे असून यापूर्वीचे जुन्या कर आकारणीनुसार आपणावर बाकी असलेले मागील वर्षाचे थकीत मालमत्ता कर 2 टक्के शास्तीसह कर भरणा करणे बंधनकारक राहील सदर थकीत रक्कम नगर परिषद कार्यालयात पहावयास उपलब्ध आहे.
+                                सदर देयके सन <span class="yearRange"></span> या आर्थिक वर्षाचे असून यापूर्वीचे जुन्या कर आकारणीनुसार आपणावर बाकी असलेले मागील वर्षाचे थकीत मालमत्ता कर 2 टक्के शास्तीसह कर भरणा करणे बंधनकारक राहील सदर थकीत रक्कम नगर परिषद कार्यालयात पहावयास उपलब्ध आहे.
                             </p>
                                 <table style="margin-top:-3px;width:100%;margin-bottom: -3px;">
-                                    <tbody><tr><td style="width:15%; text-align: left;">दि: ___//20_</td>
+                                    <tbody><tr><td style="font-size:10px; width:15%; text-align: left;">दि: ___//20_</td>
                                         <td style="width:30%; text-align: right;"></td>
                                         <td style="width:30%; text-align: right;"><img class="officerSignature" src="" height="40;" width="80;"></td></tr>
                                     <tr>
-                                        <td style="width:15%; text-align: left; font-size:5px;">SPN:0001</td>
-                                        <td style="width:30%; text-align: center;"><span style="padding-right:8px;">मालमत्ता धारकरची /पावती,</span><br>
+                                        <td style="width:15%; text-align: left; font-size:6px;">SPN:<span class="pdSurypropnoVc"></span></td>
+                                        <td style="font-size:10px; width:30%; text-align: center;"><span style="padding-right:8px;">मालमत्ता धारकरची /पावती,</span><br>
 
-                                            घेणाऱ्याची स्वाक्षरी व नाव</td><td style="width:30%; text-align: right;"><span style="padding-right:8px;">मुख्याधिकारी,</span><br>
-                                        <span style="padding-right:8px;" class="councilLocalName"></span></td></tr>
+                                            घेणाऱ्याची स्वाक्षरी व नाव</td>
+                                        <td style="font-size:10px; width:30%; text-align: right;"><span style="padding-right:8px;">मुख्याधिकारी,</span><br>
+                                            <span style="font-size:10px; padding-right:8px;" class="councilLocalName"></span></td></tr>
                                     </tbody></table>
 
                             </div></td>
@@ -176,7 +185,7 @@
                                             <div class="councilHeaderText">
                                                 <div class="councilLocalNameHeader">नगर परिषद</div>
                                                 <div class="middlehead">महाराष्ट्र लेखा संहिता नमुना क्र. ५२ (नियम ६८,९३ पहा)</div>
-                                                <div class="lasthead">31/03/2025 रोजी संपणाऱ्या कालावधीच्या कराचे बिल</div>
+                                                <div class="lasthead"><span class ="currentAssessmentDate">31/03/2025</span> रोजी संपणाऱ्या कालावधीच्या कराचे बिल</div>
                                             </div>
                                             <div class="right-logo-section">
                                                 <div class="right-logo-section">
@@ -280,15 +289,18 @@
                                 ५) जप्त केलेल्या स्थावर मालमत्तेबाबत मा. जिल्हाधिकारी यांची पूर्व मंजुरी घेवून न.प.ला रक्कमेत आपले स्थावर मालमत्ता ताब्यात घेता येईल.<br>
                                 ६)सदर देयक दि. ३१ मार्च पर्यंतचे वसुलीस अधीन राहून लागू करण्यात येत आहे. त्यानुसार त्या कराची रक्कम अदा केली असल्यास, भरलेली रक्कम सदर बिलातून सामायोजीत केली जाईल.<br>
                                 <b>टीप:</b>
-                                सदर देयके सन 2024-25 या आर्थिक वर्षाचे असून यापूर्वीचे जुन्या कर आकारणीनुसार आपणावर बाकी असलेले मागील वर्षाचे थकीत मालमत्ता कर 2 टक्के शास्तीसह कर भरणा करणे बंधनकारक राहील सदर थकीत रक्कम नगर परिषद कार्यालयात पहावयास उपलब्ध आहे.
+                                सदर देयके सन <span class="yearRange"></span> या आर्थिक वर्षाचे असून यापूर्वीचे जुन्या कर आकारणीनुसार आपणावर बाकी असलेले मागील वर्षाचे थकीत मालमत्ता कर 2 टक्के शास्तीसह कर भरणा करणे बंधनकारक राहील सदर थकीत रक्कम नगर परिषद कार्यालयात पहावयास उपलब्ध आहे.
                             </p>
                                 <table style="margin-top:-3px;width:100%;margin-bottom: -3px;">
-                                    <tbody><tr><td style="width:15%; text-align: left;">दि: ___//20_</td>
+                                    <tbody><tr><td style="width:15%; text-align: left ; font-size:10px;">दि: ___//20_</td>
                                         <td style="width:30%; text-align: right;"></td>
                                         <td style="width:30%; text-align: right;"><img class="officerSignature" src="" height="40;" width="80;"></td></tr>
-                                    <tr><td style="width:15%; text-align: left; font-size:5px;">SPN:0001</td><td style="width:30%; text-align: center;"><span style="padding-right:8px;">कर निरीक्षक</span><br>
-                                        <span style="padding-right:8px;" class="councilLocalName"></span></td><td style="width:30%; text-align: right;"><span style="padding-right:8px;">मुख्याधिकारी,</span><br>
-                                        <span style="padding-right:8px;" class="councilLocalName"></span></td></tr>
+                                    <tr><td style="width:15%; text-align: left; font-size:6px;">SPN: <span class="pdSurypropnoVc"></span></td>
+                                        <td style="width:30%; text-align: center;"><span style="padding-right:8px; font-size:10px;">कर निरीक्षक</span><br>
+                                            <span style="font-size:10px; padding-right:8px; " class="councilLocalName"></span ></td>
+                                        <td style="width:30%; text-align: right; font-size:10px;"><span style="padding-right:8px;">मुख्याधिकारी,</span><br>
+                                            <span style="font-size:10px; padding-right:8px;" class="councilLocalName"></span></td>
+                                    </tr>
 
                                     </tbody></table>
                             </div></td></tr></thead></table>
@@ -300,4 +312,3 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="/3GViewTaxBill/js/scripts.js"></script>
 </html>
-

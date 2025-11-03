@@ -1,4 +1,4 @@
-﻿
+
 // For the Council
 $(document).ready(function () {
   $.ajax({
@@ -7,14 +7,19 @@ $(document).ready(function () {
     success: function(data) {
       if (data && data.length > 0) {
         councilDetails = data[0];
-        $('.councilName').text(councilDetails.localName);
+        $('.councilName').text((councilDetails.localName || '') + ' / ' + (councilDetails.standardName || ''));
         if (councilDetails.imageBase64) {
-            $('.councilLogo').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
-            $('.standardSiteNameVC').text(councilDetails.standardSiteNameVC);
-            $('.localSiteNameVC').text(councilDetails.localSiteNameVC);
-            $('.standardDistrictNameVC').text(councilDetails.standardDistrictNameVC);
-            $('.localDistrictNameVC').text(councilDetails.localDistrictNameVC);
+            $('.councilLogoLeft').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
         }
+        if (councilDetails.image2Base64 && councilDetails.image2Base64.trim() !== '') {
+            $('.councilLogoRight').attr('src', 'data:image/png;base64,' + councilDetails.image2Base64).show();
+        } else {
+            $('.councilLogoRight').hide();
+        }
+        $('.standardSiteNameVC').text(councilDetails.standardSiteNameVC || '');
+        $('.localSiteNameVC').text(councilDetails.localSiteNameVC || '');
+        $('.standardDistrictNameVC').text(councilDetails.standardDistrictNameVC || '');
+        $('.localDistrictNameVC').text(councilDetails.localDistrictNameVC || '');
       }
     }
   });
@@ -54,10 +59,10 @@ $(document).ready(function () {
      const startYearDev = convertToDevanagari(startYear.toString());
      const endYearDev = convertToDevanagari(endYear.toString());
 
-     return `${startYearDev}-${convertToDevanagari(startYearL.toString())} à¤¤à¥‡ ${endYearDev}-${convertToDevanagari(endYearL.toString())}`;
+     return `${startYearDev}-${convertToDevanagari(startYearL.toString())} ते ${endYearDev}-${convertToDevanagari(endYearL.toString())}`;
  }
 
  function convertToDevanagari(numberString) {
-     const devanagariDigits = ['à¥¦', 'à¥§', 'à¥¨', 'à¥©', 'à¥ª', 'à¥«', 'à¥¬', 'à¥­', 'à¥®', 'à¥¯'];
+     const devanagariDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
      return numberString.replace(/[0-9]/g, (digit) => devanagariDigits[digit]);
- }
+}

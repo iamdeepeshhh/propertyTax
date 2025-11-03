@@ -5,6 +5,7 @@ $(document).on('click', '#printBtn', function () {
   window.print();
 });
 
+
 let usageTypeMap = {};
 const usageTypePromise = fetch('/3g/propertyusagetypes')
   .then(res => res.json())
@@ -85,11 +86,34 @@ $(document).ready(function () {
     .then(res => res.json())
     .then(data => {
       const currentAssessmentDate = data[0].currentassessmentdate;
+
+
+       const dateObj = new Date(currentAssessmentDate);
+       const day = String(dateObj.getDate()).padStart(2, '0');
+       const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+       const year1 = dateObj.getFullYear();
+       const formattedDate = `${day}/${month}/${year1}`;
+
       const year = parseInt(currentAssessmentDate.split('-')[0]);
       const startYearL = year + 1;
       const endYearL = year + 4;
       const rangeText = `${convertToDevanagari(year)}-${convertToDevanagari(startYearL)} ?? ${convertToDevanagari(year + 3)}-${convertToDevanagari(endYearL)}`;
-      $('.yearRange').text(rangeText);
+
+    let fyStart, fyEnd;
+    if (month < 4) { // Jan, Feb, Mar → belongs to previous FY
+      fyStart = year - 1;
+      fyEnd = year;
+    } else { // Apr to Dec → belongs to current FY
+      fyStart = year;
+      fyEnd = year + 1;
+    }
+
+    // Format like 2024-25
+    const financialYear = `${fyStart}-${String(fyEnd).slice(-2)}`;
+
+
+      $('.yearRange').text(financialYear);
+      $('.currentAssessmentDate').text(formattedDate);
     })
     .catch(err => console.error('Error fetching assessment dates:', err));
 
@@ -319,5 +343,4 @@ function buildYearWiseTaxTable($page, dto) {
     $page.find('.taxBillTable').after(html);
   });
 }
-
 

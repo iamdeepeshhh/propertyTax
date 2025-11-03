@@ -7,9 +7,14 @@ $(document).ready(function () {
         success: function (data) {
             if (data && data.length > 0) {
                 const council = data[0];
-                $('.councilName').text(council.localName + ' / ' + council.standardName);
+                $('.councilName').text((council.localName || '') + ' / ' + (council.standardName || ''));
                 if (council.imageBase64) {
-                    $('img').attr('src', 'data:image/png;base64,' + council.imageBase64);
+                    $('.councilLogoLeft').attr('src', 'data:image/png;base64,' + council.imageBase64);
+                }
+                if (council.image2Base64 && council.image2Base64.trim() !== '') {
+                    $('.councilLogoRight').attr('src', 'data:image/png;base64,' + council.image2Base64).show();
+                } else {
+                    $('.councilLogoRight').hide();
                 }
             }
         }

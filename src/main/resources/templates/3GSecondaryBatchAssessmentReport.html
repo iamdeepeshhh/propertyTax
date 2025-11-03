@@ -148,12 +148,19 @@
         }
 
         .column-numbers th {
-          background: rgb(136, 214, 250); /* remove blue band */
+          background: rgb(136, 214, 250); /* column index band */
           font-size: 11px;
           font-weight: bold;
           border: 1px solid #000;
           text-align: center;
         }
+
+        /* Ensure header gridlines are always visible */
+        .reportTable thead th {
+          border: 1px solid #000 !important;
+          border-color: #000 !important;
+        }
+        .reportTable thead tr { border-bottom: 1px solid #000 !important; }
 
         /* No special color for group headers */
         th.group { background: #fff; }
@@ -336,10 +343,18 @@ table.reportTable {
 
 
 .partition-row td {
-  height: 20px;
+  height: 30px;
   background: #fafafa;
 }
-
+.total-row td {
+  height: auto !important;
+  padding: 2px 3px !important;
+  line-height: 1.12 !important;
+  font-size: 12px !important;
+  vertical-align: middle !important;
+  background: #fff !important;
+  border: 1px solid #000 !important;
+}
 .center-header {
   flex: 1;
   text-align: center;
@@ -362,6 +377,51 @@ table.reportTable {
 .report-header + table {
   margin-top: 2px !important;
 }
+.p2-flex-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+  width: 100%;
+  font-size: 14px;
+}
+
+.p2-bullets {
+  flex: 1.2;
+  text-align: left;
+}
+
+.p2-bullets ul {
+  list-style-type: disc;
+  list-style-position: inside;
+  margin: 4px 0 0 10px;
+  padding: 0;
+  line-height: 1.3;
+}
+
+.p2-sign {
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.4;
+  margin-top: 10px;
+}
+
+.p2-sign .sig-line {
+  text-decoration: none;
+  border-top: 2px solid #000;
+  width: 60%;
+  margin: 0 auto 4px auto;
+}
+
+.p2-sign p {
+  margin: 4px 0;
+}
+
+.p2-sign .tatha {
+  text-align: center;
+  margin: 6px 0;
+}
+
         @media print {
   .controls { display: none !important; }
 .report-header {
@@ -421,7 +481,7 @@ table.reportTable {
   }
 
   .partition-row td {
-    height: 14px !important;
+    height: 16px !important;
     background: #f9f9f9 !important;
 
   }
@@ -446,6 +506,20 @@ table.reportTable {
     size: A3 landscape;
     margin: 10mm;
   }
+  /* Remove scrollbars and borders in print */
+  html, body { overflow: visible !important; }
+  #reportContainer { overflow: visible !important; }
+  .reportWrapper {
+    overflow: visible !important;
+    max-height: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .reportWrapper::-webkit-scrollbar { display: none !important; }
+  .reportWrapper table.reportTable {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
 }
         /* ✅ Enable horizontal + vertical scrolling for large tables */
 .reportWrapper {
@@ -457,11 +531,56 @@ table.reportTable {
   margin-bottom: 20px;
 }
 
+ .p2-flex-row {
+    gap: 25px !important;
+    font-size: 13px !important;
+  }
+  .p2-bullets ul {
+    margin-left: 8px !important;
+    line-height: 1.2 !important;
+  }
+  .p2-sign {
+    text-align: right !important;
+    font-size: 13px !important;
+  }
 /* Ensure tables inside scroll area don’t shrink */
 .reportWrapper table {
   width: max-content;    /* table grows as wide as its content */
   min-width: 100%;       /* but not smaller than full width */
 }
+
+/* No boxes on the post-totals P1/P2 row; keep seam visible */
+.reportTable.no-grid { border: none !important; }
+.reportTable.no-grid td:not(.seam) { border: none !important; }
+.reportWrapper.no-outline { border: none !important; box-shadow: none !important; }
+
+/* Tighten bullet spacing for the P2 note on totals page */
+.reportTable.no-grid td.p2 ul {
+  list-style: none;
+  margin: 2px 0 !important;
+  padding-left: 0 !important;
+}
+.reportTable.no-grid td.p2 ul li {
+  position: relative;
+  padding-left: 12px !important; /* bring text closer to bullet */
+  margin: 2px 0 !important;
+}
+.reportTable.no-grid td.p2 ul li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+/* Center text and reduce padding/margins on last row */
+.reportTable.no-grid td.p2 { padding-left: 6px !important; }
+.reportTable.no-grid td.p1 .sig { text-align: center; }
+.reportTable.no-grid td.p1 .sig p,
+.reportTable.no-grid td.p2 .authority p,
+.reportTable.no-grid td.p2 p { margin: 2px 0 !important; }
+.reportTable.no-grid td.p2 .authority { text-align: center; }
+
+
+
 
 /* ✅ Ultra-compact layout for वापर प्रकार / मजला / मालक / भाडेकरू */
 td.description-cell.usage-cell {
@@ -502,11 +621,21 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
 <!-- Main Header (first appearance) -->
 <header class="report-header" id="mainHeader">
     <img class="councilLogoLeft" src="https://example.com/default-image.png" alt="Left Council Logo" />
+
     <div class="center-header">
-        <h1 class="councilName">नगर परिषद, Sitename / Nagar Parishad Sitename</h1>
-        <p>(नमुना ४३ नियम ७४ पहा)/(Form No. 43 See Rule No. 74)</p>
-        <p><span class="yearRange"></span> या वर्षांसाठी इमारती व जमीन यांची आकारणी सूची</p>
+        <h1 class="councilName">नगर परिषद, Sitename / Municipal Council Sitename</h1>
+        <p>
+            महाराष्ट्र नगरपालिका लेखा संहिता १९७१ (नमुना ४३ नियम ७४ पहा) /
+            The Maharashtra Municipal Account Code 1971 (Form No. 43 See Rule No. 74)
+        </p>
+        <p>
+            <span class="yearRange"></span>
+            या वर्षांकरिता इमारती व जमिनींच्या आकारणीस पात्र असलेल्या मालमत्तांची आकारणी सूची /
+            Assessment List of Buildings and Lands Liable to Taxation for the Year of
+            <span class="yearRangeEnglish"></span>
+        </p>
     </div>
+
     <img class="councilLogoRight" alt="Right Council Logo" style="display:none;" />
 </header>
 
@@ -517,7 +646,7 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
 <script>
     // 🔹 Global store for dynamic tax configurations
     window.dynamicTaxConfigs = [];
-
+let globalYearRange = '';
     // Unit usage id -> local name map
     window.unitUsageLocal = new Map();
     // Occupancy id -> local name map
@@ -601,6 +730,32 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
       // Run council details fetch in parallel
       fetchCouncilDetails();
 
+    try {
+      const resDates = await fetch('/3g/getAllAssessmentDates');
+      if (!resDates.ok) throw new Error('HTTP ' + resDates.status);
+      const data = await resDates.json();
+      if (data && data.length > 0) {
+        const currentAssessmentDate = data[0].currentassessmentdate;
+        const year = parseInt((currentAssessmentDate||'').split('-')[0]);
+        const endYear = year + 3;
+        const toDev = (s)=>{
+          const map=['०','१','२','३','४','५','६','७','८','९'];
+          return String(s).replace(/\d/g, ch => map[Number(ch)]);
+        };
+        const startDev = toDev(String(year));
+        const startNextDev = toDev(String((year+1)%100).padStart(2,'0'));
+        const endDev = toDev(String(endYear));
+        const endNextDev = toDev(String((endYear+1)%100).padStart(2,'0'));
+        const yearRangeMarathi = `वर्ष ${startDev}-${startNextDev} ते ${endDev}-${endNextDev}`;
+        const englishRange = `${year}-${(year + 1).toString().slice(-2)} to ${endYear}-${(endYear + 1).toString().slice(-2)}`;
+        const yrEl = document.querySelector('.yearRange');
+        const yrEnEl = document.querySelector('.yearRangeEnglish');
+        if (yrEl) yrEl.textContent = yearRangeMarathi;
+        if (yrEnEl) yrEnEl.textContent = englishRange;
+      }
+    } catch(err) {
+      console.error('Error fetching assessment dates:', err);
+    }
       // 1. Load usage/occupancy maps and tax configurations first
       await fetchUnitUsageMap();
       await fetchOccupancyMap();
@@ -608,9 +763,12 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
 
       // 2. Now fetch the main report data
       const wardNo = new URLSearchParams(window.location.search).get("wardNo") || 1;
-      const yearRange = document.querySelector(".yearRange");
-      const currentYear = new Date().getFullYear();
-      yearRange.textContent = `${currentYear - 1}-${currentYear}`;
+      // fallback removed to prevent overriding the Marathi year; if needed, set only when empty
+      const yrFallback = document.querySelector('.yearRange');
+      if (yrFallback && !yrFallback.textContent.trim()) {
+        const y = new Date().getFullYear();
+        yrFallback.textContent = `वर्ष ${y-1}-${String((y)%100).padStart(2,'0')} ते ${y+2}-${String((y+3)%100).padStart(2,'0')}`;
+      }
 
       try {
         const res = await fetch(`/3g/secondaryBatchAssessmentReport?wardNo=${wardNo}`);
@@ -640,6 +798,28 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
     });
 
 
+function formatYearRange(date) {
+  const year = parseInt(date.split('-')[0]);
+  const endYear = year + 3;
+
+  const startYearNext = year + 1;
+  const endYearNext = endYear + 1;
+
+  // Convert all four digits for start and end years
+  const startDev = convertToDevanagari(year.toString());
+  const startNextDev = convertToDevanagari(startYearNext.toString().slice(-2)); // keep last 2 digits for look
+  const endDev = convertToDevanagari(endYear.toString());
+  const endNextDev = convertToDevanagari(endYearNext.toString().slice(-2));
+
+  return `सन ${startDev}-${startNextDev} ते ${endDev}-${endNextDev}`;
+}
+
+function convertToDevanagari(numStr) {
+  const digits = ['०','१','२','३','४','५','६','७','८','९'];
+  return numStr.replace(/[0-9]/g, d => digits[d]);
+}
+
+
     // 🔹 Fetch council details and fill header
     function fetchCouncilDetails() {
   fetch('/3g/getCouncilDetails')
@@ -647,6 +827,7 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
     .then(data => {
       if (data && data.length > 0) {
         const c = data[0];
+        window.__councilDetails = c;
 
         document.querySelector('.councilName').textContent =
           `${c.localName || 'नगर परिषद'} / ${c.standardName || 'Nagar Parishad'}`;
@@ -664,6 +845,18 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
         } else {
           rightLogo.style.display = 'none';
         }
+
+         // ✅ FIX: Assign local & standard site/district variables properly
+        const localSite = c.localSiteNameVC || '';
+        const stdSite = c.standardSiteNameVC || '';
+        const localDistrict = c.localDistrictNameVC || '';
+        const stdDistrict = c.standardDistrictNameVC || '';
+
+        // ✅ Update the placeholders on page
+        const siteSpan = document.querySelector('.siteName');
+        const distSpan = document.querySelector('.districtName');
+        if (siteSpan) siteSpan.textContent = localSite || stdSite;
+        if (distSpan) distSpan.textContent = localDistrict || stdDistrict;
       }
     })
     .catch(err => console.error('❌ Failed to fetch council details:', err));
@@ -768,6 +961,8 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
           </tr>
         </thead>
       `;
+      // expose for the final summary page
+      window.__SBAR_tableHeadHTML = tableHeadHTML;
 
       // --- DYNAMIC COLUMN NUMBERS ---
       // MODIFIED: Generate empty <th> tags with correct classes. CSS counters will add numbers.
@@ -783,6 +978,8 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
       // 🔹 MODIFIED: Calculate P1 column count and set P2 counter to start from there.
       const p1ColCount = 15 + taxColSpan;
       const columnNumbersHTML = `<tr class=\"column-numbers\" style=\"counter-reset: counterP1 0 counterP2 ${p1ColCount};\">${staticCols1}${p1TaxCols}${seamCol}${p2SerialCol}${p2HearingCols}${p2AppealCols}${staticCols2}</tr>`;
+      // Expose column index row so totals page can reuse it
+      window.__SBAR_columnNumbersHTML = columnNumbersHTML;
       // --- END DYNAMIC HEADERS ---
 
 
@@ -1023,6 +1220,12 @@ function appendTotalsAndSignaturePage(data) {
   const taxConfigs = window.dynamicTaxConfigs || [];
   // Reuse the same council header markup used on other pages
   const headerHTML = (document.querySelector('#mainHeader')?.outerHTML) || '';
+  // Use the full table head plus the column index row on totals page
+  const dynamicHead = (window.__SBAR_tableHeadHTML || '') + (window.__SBAR_columnNumbersHTML || '');
+  const taxColSpan = (taxConfigs.length + 2);
+  const p1ColCount = 15 + taxColSpan; // matches main table logic (15 fixed + p1 tax block)
+  const p2ColCount = (taxColSpan + taxColSpan + 6) + 1; // Sr.No + hearing block + appeal block + 6 trailing (align header)
+  const totalCols = p1ColCount + 1 + p2ColCount; // P1 + seam + P2
 
   // Totals computation
   const toNum = (v) => {
@@ -1032,15 +1235,47 @@ function appendTotalsAndSignaturePage(data) {
 
   const totals = {};
   taxConfigs.forEach(t => totals[t.taxKeyL] = 0);
+  // Grand totals for BEFORE (assessment) dynamic taxes
+  const beforeTotals = {};
+  taxConfigs.forEach(t => beforeTotals[t.taxKeyL] = 0);
+
+  // Group by property to avoid double counting
+  const grouped = (data || []).reduce((acc, prop) => {
+    const key = prop?.propertyDetails?.pdNewpropertynoVc;
+    if (!key) return acc;
+    (acc[key] ||= []).push(prop);
+    return acc;
+  }, {});
 
   let totalBeforeRV = 0, totalAfterRV = 0;
-  (data || []).forEach(prop => {
-    const psd = prop.propertySummary || {};
-    const after = prop.taxKeyValueMapAfterHearing || {};
+  let totTaxableArea = 0, totAlv = 0, totYearlyRent = 0, totConsideredRv = 0,
+      totCombinedAlv = 0, totDepreciation = 0, totRatableValue = 0;
+
+  Object.values(grouped).forEach(group => {
+    const g0 = group[0] || {};
+    const psd = g0.propertySummary || {};
+    const after = (g0.taxKeyValueMapAfterHearing || {});
+
     totalBeforeRV += toNum(psd.beforeFinalRvFl);
-    totalAfterRV += toNum(psd.afterFinalRvFl);
+    totalAfterRV  += toNum(psd.afterFinalRvFl);
+
+    totTaxableArea   += toNum(psd.totalAssessmentAreaFl);
+    totAlv           += toNum(psd.totalAlvFl);
+    totYearlyRent    += toNum(psd.totalYearlyRentFl);
+    totConsideredRv  += toNum(psd.consideredRvFl);
+    totCombinedAlv   += toNum(psd.totalCombinedAlvRentFl);
+    totDepreciation  += toNum(psd.totalDepreciationAmountFl);
+    totRatableValue  += toNum(psd.totalRatableValueFl);
+
     taxConfigs.forEach(t => {
+      // Sum after-hearing taxes by picking first map (they were merged per property earlier)
       totals[t.taxKeyL] += toNum(after[t.taxKeyL]);
+    });
+
+    // Sum BEFORE (assessment) dynamic taxes using the first group's map
+    const before = (g0.taxKeyValueMapAfterAssess || {});
+    taxConfigs.forEach(t => {
+      beforeTotals[t.taxKeyL] += toNum(before[t.taxKeyL]);
     });
   });
 
@@ -1048,43 +1283,49 @@ function appendTotalsAndSignaturePage(data) {
     <td class="p2"><b>${totals[t.taxKeyL].toFixed(2)}</b></td>
   `).join('');
 
+  const totalBeforeTaxSum = taxConfigs.reduce((sum, t) => sum + toNum(beforeTotals[t.taxKeyL]), 0);
+  const totalAfterTaxSum  = taxConfigs.reduce((sum, t) => sum + toNum(totals[t.taxKeyL]), 0);
   const wrap = document.createElement('div');
   wrap.style.pageBreakBefore = 'always';
   wrap.innerHTML = `
     ${headerHTML}
     <div class="reportWrapper">
-      <table class="reportTable" style="width:100%; border-collapse:collapse;">
-        <thead>
-          <tr>
-            <th colspan="${3 + taxConfigs.length}" style="font-size:18px; text-align:center;">
-              नगर परिषद एकूण करांचा अहवाल (Grand Summary of All Taxes)
-            </th>
-          </tr>
-          <tr>
-            <th class="p2">एकूण करयोग्य मूल्य (Before Hearing)</th>
-            <th class="p2">एकूण करयोग्य मूल्य (After Hearing)</th>
-            ${taxConfigs.map(t => `<th class=\"p2\">${t.localNameVc}</th>`).join('')}
-          </tr>
-        </thead>
+      <table class="reportTable" style="width:100%; border-collapse:collapse; margin-bottom:6px;">
+        ${dynamicHead}
         <tbody>
-          <tr>
-            <td class="p2"><b>${totalBeforeRV.toFixed(2)}</b></td>
+          <tr class="total-row">
+            <!-- P1 fixed cells (15) with totals in their rightful columns -->
+            <td class="p1" colspan="6" style="text-align:center; font-weight:bold;"></td>
+            <td class="p1"><b>${totTaxableArea.toFixed(2)}</b></td>
+            <td class="p1" colspan="2" style="text-align:center; font-weight:bold;">एकूण</td>
+            <td class="p1"><b>${totAlv.toFixed(2)}</b></td>
+            <td class="p1"><b>${totYearlyRent.toFixed(2)}</b></td>
+            <td class="p1"><b>${totConsideredRv.toFixed(2)}</b></td>
+            <td class="p1"><b>${totCombinedAlv.toFixed(2)}</b></td>
+            <td class="p1"><b>${totDepreciation.toFixed(2)}</b></td>
+            <td class="p1"><b>${totRatableValue.toFixed(2)}</b></td>
+            <!-- P1 tax block: BEFORE RV total + dynamic BEFORE tax totals + BEFORE taxes grand total -->
+            <td class="p1"><b>${totalBeforeRV.toFixed(2)}</b></td>
+            ${taxConfigs.map(t => `<td class=\"p1\"><b>${(beforeTotals[t.taxKeyL]||0).toFixed(2)}</b></td>`).join('')}
+            <td class="p1"><b>${totalBeforeTaxSum.toFixed(2)}</b></td>
+            <!-- Seam divider -->
+            <td class="seam"></td>
+            <!-- P2: Sr.No. (empty on totals row) -->
+            <td class="p2"></td>
+            <!-- P2: hearing dynamic taxes (After RV + taxes + After Taxes total) -->
             <td class="p2"><b>${totalAfterRV.toFixed(2)}</b></td>
-            ${totalTaxCells}
+            ${taxConfigs.map(t => `<td class=\"p2\"><b>${(totals[t.taxKeyL]||0).toFixed(2)}</b></td>`).join('')}
+            <td class="p2"><b>${totalAfterTaxSum.toFixed(2)}</b></td>
+            <!-- P2: appeal block (empty) -->
+            ${Array(taxColSpan).fill('<td class="p2"></td>').join('')}
+            <!-- P2: 6 trailing columns (empty) to match header -->
+            ${Array(6).fill('<td class="p2"></td>').join('')}
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div style="margin-top:30px; font-size:15px;">
-      <p>वर्ष २०२३-२४ ते २०२६-२७ या दरम्यान आकारण्यात आलेल्या करांमध्ये वाढ किंवा घट खालीलप्रमाणे आहे:</p>
-      <ul style="margin-top:5px;">
-        <li>Increase or decrease during the year 2023-24 as per Increase and Decrease Register</li>
-        <li>Increase or decrease during the year 2024-25 as per Increase and Decrease Register</li>
-        <li>Increase or decrease during the year 2025-26 as per Increase and Decrease Register</li>
-        <li>Increase or decrease during the year 2026-27 as per Increase and Decrease Register</li>
-      </ul>
-    </div>
+  
 
     <div style="margin-top:40px;">
       <table style="width:100%; border:none; text-align:center; font-size:16px;">
@@ -1098,6 +1339,170 @@ function appendTotalsAndSignaturePage(data) {
   `;
 
   container.appendChild(wrap);
+
+  // Replace legacy summary/signature blocks with P1/P2 split layout
+  try {
+    // Remove the two old blocks (summary note and 3-column signatures)
+    const oldSummary = wrap.querySelector('div[style*="margin-top:30px"][style*="font-size:15px"]');
+    if (oldSummary) oldSummary.remove();
+    const oldSigTableWrap = Array.from(wrap.querySelectorAll('div[style*="margin-top:40px"]'))
+      .find(d => d.querySelector('table'));
+    if (oldSigTableWrap) oldSigTableWrap.remove();
+
+    // Build new P1/P2 table aligned to seam columns
+    const postWrap = document.createElement('div');
+    postWrap.className = 'reportWrapper no-outline';
+    postWrap.innerHTML = `
+      <table class="reportTable no-grid" style="width:100%; border-collapse:collapse; margin-top:8px; border:none;">
+        <tbody>
+          <tr>
+            <td class="p1" colspan="${p1ColCount}">
+              <div style="display:flex; justify-content:space-between; gap:20px;">
+                <div style="text-align:center;">
+                  <br>
+                  <br>
+                  <br>
+                  <p>करअधिक्षक / निरीक्षक</p>
+                </div>
+                <div style="text-align:center;">
+                  <br>
+                  <br>
+                  <br>
+                  <p>मुख्याधिकारी</p>
+                </div>
+              </div>
+            </td>
+            <td class="seam"></td>
+            <td class="p2" colspan="${p2ColCount}">
+  <div class="p2-flex-row">
+    <div class="p2-bullets">
+      <p>वर्ष २०२३-२४ ते २०२६-२७ या दरम्यान आकारण्यात आलेल्या करांमध्ये वाढ किंवा घट खालीलप्रमाणे आहे:</p>
+      <ul>
+  <li>
+    Increase or decrease during the year 2023-2024 as per Increase and Decrease Register /
+    घट-वाढ नोंदवही नुसार २०२३-२०२४ या वर्षात झालेली घट किंवा वाढ रु. ____________
+  </li>
+  <li>
+    Increase or decrease during the year 2024-2025 as per Increase and Decrease Register /
+    घट-वाढ नोंदवही नुसार २०२४-२०२५ या वर्षात झालेली घट किंवा वाढ रु. ____________
+  </li>
+  <li>
+    Increase or decrease during the year 2025-2026 as per Increase and Decrease Register /
+    घट-वाढ नोंदवही नुसार २०२५-२०२६ या वर्षात झालेली घट किंवा वाढ रु. ____________
+  </li>
+  <li>
+    Increase or decrease during the year 2026-2027 as per Increase and Decrease Register /
+    घट-वाढ नोंदवही नुसार २०२६-२०२७ या वर्षात झालेली घट किंवा वाढ रु. ____________
+  </li>
+</ul>
+
+    </div>
+    <div class="p2-sign"><br><br><br><br><br><br><br><br>
+      <p><b>प्राधिकृत मूल्य निर्धारण अधिकारी, न.प. <span class="siteName"></span></b></p>
+      <p class="tatha">तथा</p>
+      <p><b>नगर रचनाकार, नगर रचना कार्यालय, <span class="districtName"></span></b></p>
+    </div>
+
+  </div>
+</td>
+          </tr>
+        </tbody>
+      </table>`;
+    wrap.appendChild(postWrap);
+    // Append council local name under left signature
+    try {
+      const nameText = (document.querySelector('.councilName')?.textContent || '');
+      const local = (nameText.split('/')?.[0] || '').trim();
+      if (local) {
+        const leftSig = postWrap.querySelector('td.p1 > div > div');
+        if (leftSig) {
+          const p = document.createElement('p');
+          p.textContent = local;
+          p.style.margin = '2px 0';
+          p.style.textAlign = 'center';
+          leftSig.appendChild(p);
+        }
+      }
+      // Populate site and district names in P2 block using stored council details
+      const cdet = window.__councilDetails || {};
+      const siteText = (cdet.localSiteNameVC || cdet.standardSiteNameVC || '').toString();
+      const distText = (cdet.localDistrictNameVC || cdet.standardDistrictNameVC || '').toString();
+      const siteSpan2 = postWrap.querySelector('.siteName');
+      const distSpan2 = postWrap.querySelector('.districtName');
+      if (siteSpan2 && siteText) siteSpan2.textContent = siteText;
+      if (distSpan2 && distText) distSpan2.textContent = distText;
+    } catch(e) { /* no-op */ }
+  } catch (e) { console.warn('Post-totals layout patch failed', e); }
+
+  // Ensure the summary table width behaves for screen but not in print
+  try {
+    const first = container.querySelector('.reportWrapper .reportTable');
+    const last = wrap.querySelector('.reportWrapper .reportTable');
+    if (first && last) {
+      // If printing, clamp to 100% to avoid scrollbars
+      if (window.matchMedia && window.matchMedia('print').matches) {
+        last.style.minWidth = '100%';
+        last.style.width = '100%';
+      } else {
+        const w = first.scrollWidth || first.offsetWidth;
+        if (w && w > 0) {
+          last.style.minWidth = w + 'px';
+          last.style.width = 'max-content';
+        }
+      }
+    }
+  } catch(e) { console.warn('Totals table width sync failed', e); }
+
+  // Safety helpers for print layout toggle
+  const __clampForPrint = () => {
+    try {
+      document.querySelectorAll('.reportWrapper .reportTable').forEach(t => {
+        t.style.minWidth = '100%';
+        t.style.width = '100%';
+      });
+      document.querySelectorAll('.reportWrapper').forEach(w => {
+        w.style.overflow = 'visible';
+        w.style.maxHeight = 'none';
+        w.style.border = 'none';
+        w.style.boxShadow = 'none';
+      });
+    } catch(e) { /* no-op */ }
+  };
+  const __restoreAfterPrint = () => {
+    try {
+      // Remove inline styles so screen CSS takes effect again
+      document.querySelectorAll('.reportWrapper .reportTable').forEach(t => {
+        t.style.minWidth = '';
+        t.style.width = '';
+      });
+      document.querySelectorAll('.reportWrapper').forEach(w => {
+        w.style.overflow = '';
+        w.style.maxHeight = '';
+        w.style.border = '';
+        w.style.boxShadow = '';
+      });
+      document.body.classList.remove('print1', 'print2');
+    } catch(e) { /* no-op */ }
+  };
+  // Clamp before printing and restore after
+  window.addEventListener('beforeprint', __clampForPrint);
+  window.addEventListener('afterprint', __restoreAfterPrint);
+  // Also react to media query changes (Chrome/Edge)
+  try {
+    const mq = window.matchMedia && window.matchMedia('print');
+    if (mq && mq.addEventListener) {
+      mq.addEventListener('change', e => { e.matches ? __clampForPrint() : __restoreAfterPrint(); });
+    } else if (mq && mq.addListener) {
+      mq.addListener(e => { e.matches ? __clampForPrint() : __restoreAfterPrint(); });
+    }
+  } catch(e) { /* no-op */ }
+  // Extra fallbacks: when window regains focus or tab becomes visible, restore screen layout
+  try {
+    window.addEventListener('focus', __restoreAfterPrint);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') __restoreAfterPrint();
+    });
+  } catch(e) { /* no-op */ }
 }
 function getHearingColumn1(status) {
   switch ((status || '').toLowerCase()) {
