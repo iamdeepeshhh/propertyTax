@@ -997,7 +997,10 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
           }
            reportContainer.appendChild(wrapper);
         }
-    }
+
+        // After rendering all chunks, append a grand summary + signatures page
+        try { appendTotalsAndSignaturePage(data); } catch(e) { console.warn('Totals page failed', e); }
+      }
 
     /* print logic */
     function printPart(part) {
@@ -1014,6 +1017,88 @@ td.description-cell.usage-cell .description-block div[style*="border-top"] {
   }, 800); // ⏳ small delay to let DOM paint fully
 }
 
+// === Grand totals + signature page ===
+function appendTotalsAndSignaturePage(data) {
+  const container = document.querySelector('#reportContainer');
+  const taxConfigs = window.dynamicTaxConfigs || [];
+  // Reuse the same council header markup used on other pages
+  const headerHTML = (document.querySelector('#mainHeader')?.outerHTML) || '';
+
+  // Totals computation
+  const toNum = (v) => {
+    const n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+  };
+
+  const totals = {};
+  taxConfigs.forEach(t => totals[t.taxKeyL] = 0);
+
+  let totalBeforeRV = 0, totalAfterRV = 0;
+  (data || []).forEach(prop => {
+    const psd = prop.propertySummary || {};
+    const after = prop.taxKeyValueMapAfterHearing || {};
+    totalBeforeRV += toNum(psd.beforeFinalRvFl);
+    totalAfterRV += toNum(psd.afterFinalRvFl);
+    taxConfigs.forEach(t => {
+      totals[t.taxKeyL] += toNum(after[t.taxKeyL]);
+    });
+  });
+
+  const totalTaxCells = taxConfigs.map(t => `
+    <td class="p2"><b>${totals[t.taxKeyL].toFixed(2)}</b></td>
+  `).join('');
+
+  const wrap = document.createElement('div');
+  wrap.style.pageBreakBefore = 'always';
+  wrap.innerHTML = `
+    ${headerHTML}
+    <div class="reportWrapper">
+      <table class="reportTable" style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th colspan="${3 + taxConfigs.length}" style="font-size:18px; text-align:center;">
+              नगर परिषद एकूण करांचा अहवाल (Grand Summary of All Taxes)
+            </th>
+          </tr>
+          <tr>
+            <th class="p2">एकूण करयोग्य मूल्य (Before Hearing)</th>
+            <th class="p2">एकूण करयोग्य मूल्य (After Hearing)</th>
+            ${taxConfigs.map(t => `<th class=\"p2\">${t.localNameVc}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="p2"><b>${totalBeforeRV.toFixed(2)}</b></td>
+            <td class="p2"><b>${totalAfterRV.toFixed(2)}</b></td>
+            ${totalTaxCells}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:30px; font-size:15px;">
+      <p>वर्ष २०२३-२४ ते २०२६-२७ या दरम्यान आकारण्यात आलेल्या करांमध्ये वाढ किंवा घट खालीलप्रमाणे आहे:</p>
+      <ul style="margin-top:5px;">
+        <li>Increase or decrease during the year 2023-24 as per Increase and Decrease Register</li>
+        <li>Increase or decrease during the year 2024-25 as per Increase and Decrease Register</li>
+        <li>Increase or decrease during the year 2025-26 as per Increase and Decrease Register</li>
+        <li>Increase or decrease during the year 2026-27 as per Increase and Decrease Register</li>
+      </ul>
+    </div>
+
+    <div style="margin-top:40px;">
+      <table style="width:100%; border:none; text-align:center; font-size:16px;">
+        <tr>
+          <td style="width:33%;"><br>_________________________<br><b>मुख्य अधिकारी</b><br>(Chief Officer)</td>
+          <td style="width:33%;"><br>_________________________<br><b>कर अधीक्षक</b><br>(Tax Superintendent)</td>
+          <td style="width:33%;"><br>_________________________<br><b>कर निरीक्षक</b><br>(Tax Inspector)</td>
+        </tr>
+      </table>
+    </div>
+  `;
+
+  container.appendChild(wrap);
+}
 function getHearingColumn1(status) {
   switch ((status || '').toLowerCase()) {
     case 'absent': return 'आक्षेप / गैरहजर';
