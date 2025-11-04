@@ -21,6 +21,8 @@ import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.Re
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto.AfterHearing_PropertyTaxDetailsDto;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.PropertyTaxDetailArrears_MasterService.PropertyTaxDetailArrears_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.RegisterObjection_MasterService.RegisterObjection_MasterService;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.OrderSheet_MasterService.OrderSheet_MasterService;
+import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.OrderSheet_Dto.OrderSheet_Dto;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.HearingNotice_MasterService.HearingNotice_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.SecondaryBatchAssessmentReport.SecondaryBatchAssessmentReport_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.TaxBills.TaxBills_MasterService;
@@ -48,6 +50,7 @@ public class MasterWebControllerII {
     private final TaxBills_MasterService taxBills_masterService;
     private final PropertyTaxDetailArrears_MasterService propertyTaxDetailArrears_masterService;
     private final RegisterObjection_MasterService registerObjection_masterService;
+    private final OrderSheet_MasterService orderSheetMasterService;
     private SecondaryBatchAssessmentReport_MasterService secondaryBatchAssessmentReportService;
     private final HearingNotice_MasterService hearingNoticeService;
     private final AfterHearingPropertyDetails_Service afterHearingPropertyDetailsService;
@@ -55,12 +58,39 @@ public class MasterWebControllerII {
     private final AfterHearingUnitBuiltupDetails_Service afterHearingUnitBuiltupDetailsService;
     private final AfterHearingPropertyTaxDetails_MasterRepository afterHearingPropertyTaxRepo;
     private final AfterHearingProposedRvalues_MasterRepository afterHearingProposedRvRepo;
-    
+
+    @GetMapping("/orderSheet")
+    public ResponseEntity<?> getOrderSheet(@RequestParam String newPropertyNo) {
+        try {
+            OrderSheet_Dto dto = orderSheetMasterService.getOrderSheetByNewPropertyNo(newPropertyNo);
+            if (dto == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(java.util.Collections.singletonMap("error", "Order sheet not found for newPropertyNo: " + newPropertyNo));
+            }
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(java.util.Collections.singletonMap("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/orderSheet/byWard")
+    public ResponseEntity<?> getOrderSheetsByWard(@RequestParam Integer wardNo) {
+        try {
+            java.util.List<OrderSheet_Dto> list = orderSheetMasterService.getOrderSheetsByWard(wardNo);
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(java.util.Collections.singletonMap("error", e.getMessage()));
+        }
+    }
 
     @GetMapping("/getCompletePropertyAfterHearing")
     public ResponseEntity<?> getCompletePropertyByNewPropertyNo(@RequestParam String newPropertyNo) {
         return ResponseEntity.ok(afterHearingService.getCompletePropertyByNewPropertyNo(newPropertyNo));
-    }
+}
 
     @GetMapping("/afterHearing/compareProperty")
     public ResponseEntity<?> compareBeforeAfter(
@@ -446,4 +476,41 @@ public class MasterWebControllerII {
         List<RegisterObjection_Dto> rows = hearingNoticeService.getHearingNoticesByWard(wardNo);
 
         return (rows == null || rows.isEmpty()) ? ResponseEntity.noContent().build() : ResponseEntity.ok(rows);
-    }}
+    }
+
+    // =============================
+    // Objection Hearing Scheduler
+    // =============================
+
+    @GetMapping("/objections/scheduler/preview")
+    public ResponseEntity<List<RegisterObjection_Dto>> previewHearingSchedule(
+            @RequestParam Integer wardNo,
+            @RequestParam(required = false) String fromFinal,
+            @RequestParam(required = false) String toFinal) {
+        List<RegisterObjection_Dto> list = registerObjection_masterService.findForScheduling(wardNo, fromFinal, toFinal);
+        if (list == null || list.isEmpty()) return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(list);
+    }
+
+    public static class HearingScheduleRequest {
+        public Integer wardNo;
+        public String fromFinal;
+        public String toFinal;
+        public String hearingDate; // yyyy-MM-dd
+        public String startTime;   // HH:mm
+        public Integer slotMinutes;
+        public Boolean overwriteExisting;
+    }
+
+    @PostMapping("/objections/scheduler/schedule")
+    public ResponseEntity<List<RegisterObjection_Dto>> scheduleHearings(@RequestBody HearingScheduleRequest req) {
+        if (req == null || req.wardNo == null || req.hearingDate == null || req.startTime == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        boolean overwrite = req.overwriteExisting != null && req.overwriteExisting.booleanValue();
+        List<RegisterObjection_Dto> result = registerObjection_masterService.scheduleHearings(
+                req.wardNo, req.fromFinal, req.toFinal, req.hearingDate, req.startTime, req.slotMinutes, overwrite);
+        if (result == null || result.isEmpty()) return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(result);
+    }
+}

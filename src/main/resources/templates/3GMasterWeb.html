@@ -322,6 +322,7 @@
           <div class="dropdown-menu" aria-labelledby="navbarDropdownPropertyDetails">
             <a class="dropdown-item" href="#" onclick="showTab('notices')">Notices</a>
             <a class="dropdown-item" href="#" onclick="showTab('objections')">Objection Status</a>
+            <a class="dropdown-item" href="#" onclick="showTab('scheduler')">Objection Scheduler</a>
           </div>
         </li>
         <li class="nav-item dropdown">
@@ -679,6 +680,69 @@
     <div style="height: 40px;"></div>
     <div style="height: 40px;"></div>
     <div style="height: 40px;"></div>
+  </section>
+
+  <!-- Hearing Scheduler -->
+  <section id="scheduler" class="container mt-5" style="display:none;">
+    <h2>Objection Hearing Scheduler</h2>
+    <div class="card">
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-2">
+            <label for="sch-ward" class="form-label">Ward</label>
+            <input type="number" id="sch-ward" class="form-control" min="1" />
+          </div>
+          <div class="col-md-3">
+            <label for="sch-from" class="form-label">From Final Property No</label>
+            <input type="text" id="sch-from" class="form-control" placeholder="e.g. 010001" />
+          </div>
+          <div class="col-md-3">
+            <label for="sch-to" class="form-label">To Final Property No</label>
+            <input type="text" id="sch-to" class="form-control" placeholder="e.g. 010050" />
+          </div>
+          <div class="col-md-2">
+            <label for="sch-date" class="form-label">Hearing Date</label>
+            <input type="date" id="sch-date" class="form-control" />
+          </div>
+          <div class="col-md-2">
+            <label for="sch-time" class="form-label">Start Time</label>
+            <input type="time" id="sch-time" class="form-control" />
+          </div>
+          <div class="col-md-2 mt-2">
+            <label for="sch-slot" class="form-label">Slot Minutes</label>
+            <input type="number" id="sch-slot" class="form-control" value="10" min="1" />
+          </div>
+          <div class="col-md-2 mt-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="sch-overwrite" />
+              <label class="form-check-label" for="sch-overwrite">Overwrite Existing</label>
+            </div>
+          </div>
+          <div class="col-md-5 mt-4 d-grid">
+            <button class="btn btn-secondary" onclick="previewHearingSchedule()">Preview</button>
+          </div>
+          <div class="col-md-5 mt-4 d-grid">
+            <button class="btn btn-primary" onclick="runHearingSchedule()">Schedule</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3" style="overflow-x:auto;">
+      <table class="table table-bordered table-hover" style="min-width:1000px; text-align:center;">
+        <thead class="thead-light">
+          <tr>
+            <th>#</th>
+            <th>Final Property No</th>
+            <th>New Property No</th>
+            <th>Owner</th>
+            <th>Existing Date</th>
+            <th>Existing Time</th>
+          </tr>
+        </thead>
+        <tbody id="schedulerResultBody"></tbody>
+      </table>
+    </div>
   </section>
 
   <section id="compareBeforeAfter" class="container mt-5" style="display:none;">
@@ -2469,7 +2533,6 @@
 
       <form id="arrearsTaxForm" class="needs-validation" novalidate>
         <input type="hidden" id="newPropertyNo" name="newPropertyNo" value="">
-
         <!-- वित्तीय वर्ष आणि स्थिती -->
         <h4 class="mt-4">Financial Year & Status / आर्थिक वर्ष व स्थिती</h4>
         <div class="form-row">
@@ -2486,6 +2549,11 @@
           <div class="form-group col-md-4">
             <label for="ownerName">Owner Name / मालकाचे नाव</label>
             <input type="text" id="ownerName" name="ownerName" class="form-control" placeholder="Enter Owner Name">
+          </div>
+
+          <div class="form-group col-md-4">
+            <label for="ward">Ward</label>
+            <input type="text" id="ward" name="ward" class="form-control" readonly>
           </div>
 
           <div class="form-group col-md-4">

@@ -73,6 +73,31 @@ th, td {
   text-align: center;
 }
 
+/* Header row colors for surrounding tables */
+/* Top header table */
+tr.table1 > th, tr.table1 > td {
+  background-color: #FFF0D3; /* soft amber */
+  font-weight: bold;
+}
+
+/* Proposed Ratable Values group heading */
+tr.table2 > th, tr.table2 > td {
+  background-color: #E8F4FD; /* light blue */
+  font-weight: bold;
+}
+
+/* Immediately following header row under the group heading */
+tr.table2 + tr > th {
+  background-color: #F4F9F4; /* pale green */
+  font-weight: bold;
+}
+
+/* Optional third header block if present */
+tr.table3 > th, tr.table3 > td {
+  background-color: #FDE2E2; /* light rose */
+  font-weight: bold;
+}
+
 
 body {
   font-family: 'Noto Sans Devanagari', sans-serif;

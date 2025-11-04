@@ -168,6 +168,46 @@ public class RegisterObjection_MasterServiceImpl implements RegisterObjection_Ma
         return true;
     }
 
+    // =============================
+    // Hearing Scheduler
+    // =============================
+    @Override
+    public List<RegisterObjection_Dto> findForScheduling(Integer wardNo, String fromFinal, String toFinal) {
+        List<RegisterObjection_Entity> rows = repository.findForScheduling(wardNo, fromFinal, toFinal);
+        return rows.stream().map(RegisterObjection_MasterServiceImpl::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<RegisterObjection_Dto> scheduleHearings(Integer wardNo,
+                                                        String fromFinal,
+                                                        String toFinal,
+                                                        String hearingDate,
+                                                        String startTime,
+                                                        Integer slotMinutes,
+                                                        boolean overwriteExisting) {
+        List<RegisterObjection_Entity> rows = repository.findForScheduling(wardNo, fromFinal, toFinal);
+        if (rows == null || rows.isEmpty()) return List.of();
+
+        java.time.LocalTime time = java.time.LocalTime.parse(startTime);
+        int minutes = (slotMinutes != null && slotMinutes > 0) ? slotMinutes : 10;
+
+        for (RegisterObjection_Entity e : rows) {
+            boolean hasExisting = e.getHearingDate() != null && !e.getHearingDate().isBlank()
+                    && e.getHearingTime() != null && !e.getHearingTime().isBlank();
+            if (hasExisting && !overwriteExisting) {
+                // skip
+                continue;
+            }
+            e.setHearingDate(hearingDate);
+            e.setHearingTime(time.toString());
+            e.setUpdatedAt(LocalDateTime.now());
+            repository.save(e);
+            time = time.plusMinutes(minutes);
+        }
+
+        return repository.findForScheduling(wardNo, fromFinal, toFinal)
+                .stream().map(RegisterObjection_MasterServiceImpl::toDto).collect(Collectors.toList());
+    }
 
 
 

@@ -247,7 +247,7 @@
 /* QR block (screen defaults) */
 .qr-block {
   position: absolute;
-  bottom: 1mm;
+  bottom: 3mm;
   right: 32mm;
   display: flex;
   flex-direction: column;

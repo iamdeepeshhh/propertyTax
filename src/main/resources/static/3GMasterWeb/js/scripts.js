@@ -1307,9 +1307,9 @@ function getActionButtons(actionType, item) {
 
     else if (actionType === 'objection') {
        return `
-           <button class="btn btn-primary" onclick="openAfterHearingProperty('${item.newPropertyNo}')">
-               After Hearing Decision
-           </button>
+           <button class="btn btn-primary mr-2" onclick="openAfterHearingProperty('${item.newPropertyNo}')">After Hearing Decision</button>
+           <button class="btn btn-warning mr-2" onclick="viewOrderSheet(null, '${item.newPropertyNo}')">Order Sheet</button>
+           <button class="btn btn-info" onclick="viewHearingNotice(null, '${item.newPropertyNo}')">Hearing Notice</button>
        `;
     }
     else if (actionType === 'arrears') {
@@ -1336,15 +1336,14 @@ function editArrears(newPropertyNo, finalPropertyNo, ownerName, ward) {
 
   document.getElementById("newPropertyNo").value = newPropertyNo || '';
   document.getElementById("finalPropertyNo").value = finalPropertyNo || '';
+  document.getElementById("ward").value = ward || '';
 
   document.getElementById("finalPropertyNo").value = finalPropertyNo || '';
   document.getElementById("ownerName").value = ownerName || '';
   document.getElementById("finalPropertyNo").readOnly = true;
   document.getElementById("ownerName").readOnly = true;
 
-  if (document.getElementById("ward")) {
-    document.getElementById("ward").value = ward || '';
-  }
+
 
   document.getElementById("arrears-tax").scrollIntoView({ behavior: "smooth" });
 }
@@ -1873,9 +1872,13 @@ function viewSecondaryBatchAssessmentReport(wardNo) {
     const url = `/secondaryBatchAssessmentReport?wardNo=${encodeURIComponent(wardNo)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
-function viewOrderSheet(wardNo) {
-
-    const url = `/orderSheet`;
+function viewOrderSheet(wardNo, newPropertyNo) {
+    let url = `/orderSheet`;
+    if (newPropertyNo) {
+        url += `?newPropertyNo=${encodeURIComponent(newPropertyNo)}`;
+    } else if (wardNo) {
+        url += `?wardNo=${encodeURIComponent(wardNo)}`;
+    }
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 function viewTaxBills(wardNo) {
@@ -2242,7 +2245,8 @@ async function saveArrearsTax() {
         "newPropertyNo",
         "finalPropertyNo",
         "financialYear",
-        "ownerName"
+        "ownerName",
+        "ward"
       ];
 
       if (keepAsString.includes(key)) {

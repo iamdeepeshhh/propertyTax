@@ -30,7 +30,7 @@
 
     <!-- Header Table -->
     <table>
-        <tr class="khushi">
+        <tr class="table1">
             <td>अक्षेप क्रमांक</td>
             <td>वार्ड क्र.</td>
             <td>झोन क्र.</td>
@@ -52,13 +52,12 @@
     </table>
 
     <!-- कर योग्य मूल्य Table -->
+    <h3 class="tight-heading"><b>सुतावणी आधीचे कर योग्य मूल्य</b></h3>
     <table>
-        <tr class="saniya">
-            <td colspan="15"><b>सुतावणी आधीचे कर योग्य मूल्य</b></td>
-        </tr>
+
         <th rowspan="2">निवासी </th>
-        <th rowspan="2"> वाणिज्य </th>
-        <th rowspan="2"> धार्मिक</th>
+        <th rowspan="2">वाणिज्य </th>
+        <th rowspan="2">धार्मिक</th>
         <th colspan="6">खुला भूखंड</th>
         <th rowspan="2">शैक्षणिक व वैद्यकीय संस्था</th>
         <th rowspan="2">शासकीय </th>
@@ -69,72 +68,40 @@
         </tr>
         <tr>
             <th>निवासी </th>
-            <th> वाणिज्य </th>
-            <th>  धार्मिक</th>
-            <th>श्री. व श्री.</th>
+            <th>वाणिज्य </th>
+            <th>धार्मिक</th>
+            <th>श्री.व श्री.</th>
             <th>भारतीय </th>
             <th> औद्योगिक</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td class="residentialFl"></td>
+            <td class="commercialFl"></td>
+            <td class="religiousFl"></td>
+            <td class="residentialOpenPlotFl"></td>
+            <td class="commercialOpenPlotFl"></td>
+            <td class="religiousOpenPlotFl"></td>
+            <td class="educationalInstituteOpenPlotFl"></td>
+            <td class="governmentOpenPlotFl"></td>
+            <td class="industrialOpenPlotFl"></td>
+            <td class="educationAndLegalInstituteOpenPlotFl"></td>
+            <td class="governmentFl"></td>
+            <td class="industrialFl"></td>
+            <td class="mobileTowerFl"></td>
+            <td class="electricSubstationFl"></td>
+            <td class="aggregateFl"></td>                 <!--Chane by Anand-->
         </tr>
         </tbody>
     </table>
 
-    <!-- कर विवरण Table -->
-    <table>
-        <tr class="ABCD">
-            <td colspan="12"><b>सुतावणी आधीचे कर विवरण</b></td>
-        </tr>
-        <tr class="sub-header green">
-            <th rowspan="2">मालमत्ता कर</th>
-            <th colspan="3">शिक्षण कर</th>
-            <th rowspan="2">रो.ह.रो. कर</th>
-            <th rowspan="2">दूध कर</th>
-            <th rowspan="2">पर्यावरण कर</th>
-            <th rowspan="2">उपयोगकर्ता शुल्क व इतर</th>
-            <th rowspan="2">दिवाळी कर</th>
-            <th rowspan="2">अभिसरण कर</th>
-            <th rowspan="2">एकूण कर</th>
-        </tr>
-        <!-- Second Header Row -->
-        <tr class="sub-header">
-            <th>निवासी</th>
-            <th>अनिवासी</th>
-            <th>एकूण</th>
-        </tr>
+    <!-- सुतावणी आधीचे कर विवरण (dynamic like Special Notice) -->
+    <div class="styled-table total-section">
+        <h3 class="tight-heading">सुतावणी आधीचे कर विवरण:</h3>
+        <table id="orderSheetBeforeTaxTable"></table>
+    </div>
 
-        <!-- Data Row -->
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-    </table>
     <p class="k1">
         <b> श्री/श्रीमती. माणिकगड सिमेंट कंपनी(कंपनी परिसर, औद्योगिक क्षेत्र,(कोळसा/जिप्सम/पोझोलोना गॅन्ट्री)सन २०२४-२५ ते २०२७-२८.</b> या काळाकरिता प्रसिद्ध करण्यात आलेल्या कर निर्धारण यादीतील यांच्या मालमत्तेच्या कर निर्धारणावर दि. 09-02-2024 रोजी आक्षेप/हरकत घेतली होती. आज दि. 11-06-2024 रोजी आक्षेप/हरकत अर्ज विचारात घेण्यात आला आक्षेप/हरकत घेणाऱ्याने स्वतः / अभिकर्त्यामार्फत बाजू मांडली.
     </p>
@@ -167,11 +134,11 @@
             <th colspan="15" class="title">सुनावणी आयोगाने ठरविलेल्या दराने भूमी मूल्य</th>
         </tr>
 
-        <div class="highlight">
+        <div class="table4">
             <tr>
                 <th rowspan="2">निवासी </th>
-                <th rowspan="2"> वाणिज्य </th>
-                <th rowspan="2"> धार्मिक</th>
+                <th rowspan="2">वाणिज्य </th>
+                <th rowspan="2">धार्मिक</th>
                 <th colspan="6">खुला भूखंड</th>
                 <th rowspan="2">शैक्षणिक व वैद्यकीय संस्था</th>
                 <th rowspan="2">शासकीय </th>
@@ -226,5 +193,6 @@
 </div>
 </body>
 <script src="/3GViewOrderSheet/js/scripts.js"></script>
+<script src="/3GViewOrderSheet/js/override-proposed.js"></script>
 </html>
 

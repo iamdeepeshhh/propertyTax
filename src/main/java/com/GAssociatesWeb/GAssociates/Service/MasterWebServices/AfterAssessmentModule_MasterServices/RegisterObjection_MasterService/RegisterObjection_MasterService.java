@@ -17,4 +17,15 @@ public interface RegisterObjection_MasterService {
     public List<RegisterObjection_Dto> searchObjectionRecords(String spn, String finalPropertyNo, String ownerName, Integer ward);
     public boolean updateHearingStatus(String newPropertyNo, String status, String changedValue);
 
+    // Hearing scheduler
+    List<RegisterObjection_Dto> findForScheduling(Integer wardNo, String fromFinal, String toFinal);
+
+    List<RegisterObjection_Dto> scheduleHearings(Integer wardNo,
+                                                 String fromFinal,
+                                                 String toFinal,
+                                                 String hearingDate,
+                                                 String startTime,
+                                                 Integer slotMinutes,
+                                                 boolean overwriteExisting);
+
 }

@@ -1,0 +1,233 @@
+
+// For the Council
+$(document).ready(function () {
+  $.ajax({
+    url: '/3g/getCouncilDetails',
+    type: 'GET',
+    success: function(data) {
+      if (data && data.length > 0) {
+        councilDetails = data[0];
+        $('.councilName').text((councilDetails.localName || '') + ' / ' + (councilDetails.standardName || ''));
+        if (councilDetails.imageBase64) {
+            $('.councilLogoLeft').attr('src', 'data:image/png;base64,' + councilDetails.imageBase64);
+        }
+        if (councilDetails.image2Base64 && councilDetails.image2Base64.trim() !== '') {
+            $('.councilLogoRight').attr('src', 'data:image/png;base64,' + councilDetails.image2Base64).show();
+        } else {
+            $('.councilLogoRight').hide();
+        }
+        $('.standardSiteNameVC').text(councilDetails.standardSiteNameVC || '');
+        $('.localSiteNameVC').text(councilDetails.localSiteNameVC || '');
+        $('.standardDistrictNameVC').text(councilDetails.standardDistrictNameVC || '');
+        $('.localDistrictNameVC').text(councilDetails.localDistrictNameVC || '');
+      }
+    }
+  });
+});
+
+// Fetch OrderSheet record(s) and fill page based on URL params
+$(document).ready(function() {
+  const qp = new URLSearchParams(window.location.search);
+  const newPropertyNo = qp.get('newPropertyNo');
+  const wardNo = qp.get('wardNo');
+
+  if (wardNo && !newPropertyNo) {
+    // Ward mode: render one sheet per property
+    $.ajax({
+      url: '/3g/orderSheet/byWard',
+      data: { wardNo },
+      type: 'GET',
+      success: function(list){
+        try{
+          const $template = $('.container').first();
+          if (!list || list.length === 0) return;
+          list.forEach((dto, idx) => {
+            const $root = idx === 0 ? $template : $template.clone(true);
+            // Build dynamic before-tax table like Special Notice inside this root
+            try { buildReportTaxTableInRoot($root, '#orderSheetBeforeTaxTable', 'ORDER_SHEET'); } catch(e){}
+            fillOrderSheet($root, dto);
+            if (idx > 0) {
+              // page break between sheets
+              $root.css('page-break-before', 'always');
+              $('body').append($root);
+            }
+          });
+        }catch(e){ console.warn('Ward OrderSheet render failed', e); }
+      },
+      error: function(err){ console.error('Failed to fetch OrderSheet by ward', err); }
+    });
+    return;
+  }
+
+  if (newPropertyNo) {
+    $.ajax({
+      url: '/3g/orderSheet',
+      data: { newPropertyNo },
+      type: 'GET',
+      success: function(dto){
+        try{
+          const $root = $('.container').first();
+          // Build dynamic before-tax table like Special Notice inside this root
+          try { buildReportTaxTableInRoot($root, '#orderSheetBeforeTaxTable', 'ORDER_SHEET'); } catch(e){}
+          fillOrderSheet($root, dto);
+        }catch(e){ console.warn('OrderSheet fill failed', e); }
+      },
+      error: function(err){ console.error('Failed to fetch OrderSheet', err); }
+    });
+  }
+});
+
+function fillOrderSheet($root, dto){
+  // Header table mapping
+  const headerTable = $root.find('table').eq(0);
+  const valueRow = headerTable.find('tr').eq(1).find('td');
+  if (valueRow && valueRow.length >= 7) {
+    valueRow.eq(0).text(dto.noticeNo || '');
+    valueRow.eq(1).text(dto.ownerName || '');
+    valueRow.eq(2).text(dto.applicationNo || '');
+    valueRow.eq(3).text(dto.newPropertyNo || '');
+    valueRow.eq(4).text(dto.oldPropertyNo || '');
+    valueRow.eq(5).text(dto.finalPropertyNo || '');
+    valueRow.eq(6).text(dto.surveyNo || '');
+  }
+
+  // Council header within this root (if details available)
+  try {
+    const c = window.councilDetails || {};
+    if (c) {
+      $root.find('.councilName').text(((c.localName||'') + ' / ' + (c.standardName||'')));
+      if (c.imageBase64) $root.find('.councilLogoLeft').attr('src','data:image/png;base64,'+c.imageBase64);
+      if (c.image2Base64 && c.image2Base64.trim() !== '') {
+        $root.find('.councilLogoRight').attr('src','data:image/png;base64,'+c.image2Base64).show();
+      } else {
+        $root.find('.councilLogoRight').hide();
+      }
+      $root.find('.localDistrictNameVC').text(c.localDistrictNameVC || '');
+    }
+  } catch(e){}
+
+  // Render configured taxes and proposed values inside root
+  renderTaxes(dto, $root);
+  renderProposedRValues(dto, $root);
+}
+
+// Build a dynamic tax table in the given root, following Special Notice layout
+function buildReportTaxTableInRoot($root, tableSelector, templateName = 'ORDER_SHEET'){
+  $.get('/3g/reportTaxConfigs?template=' + encodeURIComponent(templateName), function(configs){
+    if (!configs || configs.length === 0) {
+      console.warn('No tax configs for', templateName);
+      return;
+    }
+    const $table = $root.find(tableSelector);
+    if ($table.length === 0) return;
+    // Reset table (keep empty)
+    $table.empty();
+
+    const $headerRow1 = $('<tr class="t-a-c"></tr>').css('background-color', '#CEF6CE');
+    const $headerRow2 = $('<tr class="t-a-c"></tr>').css('background-color', '#F8E0F7');
+    const $valueRow   = $('<tr class="t-a-c"></tr>');
+    $table.append($headerRow1).append($headerRow2).append($valueRow);
+
+    // Build parent->children map
+    const parentMap = {};
+    configs.forEach(cfg => { if (!cfg.parentTaxKeyL) parentMap[cfg.taxKeyL] = { parent: cfg, children: [] }; });
+    configs.forEach(cfg => { if (cfg.parentTaxKeyL) (parentMap[cfg.parentTaxKeyL] ||= { parent:null, children:[] }).children.push(cfg); });
+    configs.sort((a,b) => (a.sequenceI||0) - (b.sequenceI||0));
+
+    configs.forEach(cfg => {
+      if (!cfg.parentTaxKeyL){
+        const group = parentMap[cfg.taxKeyL];
+        if (group && group.children && group.children.length > 0){
+          $headerRow1.append(`<th colspan="${group.children.length + (cfg.showTotalBl ? 1 : 0)}">${cfg.localNameVc||''}</th>`);
+          group.children.forEach(child => {
+            $headerRow2.append(`<th>${child.localNameVc||''}</th>`);
+            $valueRow.append(`<td id="tax-${child.taxKeyL}"><b>0</b></td>`);
+          });
+          if (cfg.showTotalBl){
+            $headerRow2.append('<th>एकूण</th>');
+            $valueRow.append(`<td id="tax-${cfg.taxKeyL}"><b>0</b></td>`);
+          }
+        } else {
+          $headerRow1.append(`<th rowspan="2">${cfg.localNameVc||''}</th>`);
+          $valueRow.append(`<td id="tax-${cfg.taxKeyL}"><b>0</b></td>`);
+        }
+      }
+    });
+
+    $headerRow1.append('<th rowspan="2">एकूण</th>');
+    $valueRow.append('<td id="totalTax"><b>0</b></td>');
+
+    // Hide any legacy static table for this section if present
+    try { $root.find('tr.table3').closest('table').hide(); } catch(e){}
+  });
+}
+
+async function fetchTaxConfigs(template){
+  try{
+    const res = await fetch('/3g/reportTaxConfigs?template=' + encodeURIComponent(template));
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    return await res.json();
+  }catch(e){ return []; }
+}
+
+async function renderTaxes(dto, $root){
+  try{
+    let configs = await fetchTaxConfigs('ORDER_SHEET');
+    if (!configs || configs.length === 0) configs = await fetchTaxConfigs('ASSESSMENT_REGISTER');
+    const map = (dto && dto.taxKeyValueMap) ? dto.taxKeyValueMap : {};
+
+    // Fill placeholders by id="tax-{key}" only (no auto table build)
+    let filledAny = false;
+    for(const c of configs){
+      const key = c.taxKeyL;
+      const amt = (map && map[key] != null) ? map[key] : 0;
+      const $el = $root.find('#tax-' + key);
+      if ($el.length){ $el.text(amt); filledAny = true; }
+    }
+    // Total (sum of provided values)
+    const total = Object.values(map || {}).reduce((s,v) => s + (Number(v)||0), 0);
+    const $totalEl = $root.find('#totalTax');
+    if ($totalEl.length){ $totalEl.text(total.toFixed(2)); }
+    // If no placeholders present, do nothing to preserve page layout
+  }catch(e){ console.warn('renderTaxes failed', e); }
+}
+
+function renderProposedRValues(dto, $root){
+  try{
+    const list = dto && dto.proposedRValues ? dto.proposedRValues : [];
+    if (!list || list.length === 0) return;
+    const sum = (arr, sel) => arr.reduce((s, x) => s + (Number(x[sel]||0)), 0);
+    const totalRV = sum(list, 'prTotalRatableValueFl');
+    const res = sum(list, 'prResidentialFl');
+    const comm = sum(list, 'prCommercialFl');
+    const ind = sum(list, 'prIndustrialFl');
+    const html = `<table style="width:100%; margin-top:6px; border-collapse:collapse;">
+      <thead><tr><th style=\"text-align:left; border-bottom:1px solid #ccc;\">Proposed RValues</th><th style=\"text-align:right; border-bottom:1px solid #ccc;\">Total</th></tr></thead>
+      <tbody>
+        <tr><td style=\"text-align:left; padding:4px 6px;\">Residential</td><td style=\"text-align:right; padding:4px 6px;\">${res.toFixed(2)}</td></tr>
+        <tr><td style=\"text-align:left; padding:4px 6px;\">Commercial</td><td style=\"text-align:right; padding:4px 6px;\">${comm.toFixed(2)}</td></tr>
+        <tr><td style=\"text-align:left; padding:4px 6px;\">Industrial</td><td style=\"text-align:right; padding:4px 6px;\">${ind.toFixed(2)}</td></tr>
+        <tr><td style=\"text-align:left; padding:4px 6px; font-weight:bold;\">Total Ratable Value</td><td style=\"text-align:right; padding:4px 6px; font-weight:bold;\">${totalRV.toFixed(2)}</td></tr>
+      </tbody>
+    </table>`;
+    const $after = $root.find('table').eq(1).length ? $root.find('table').eq(1) : $root.find('table').eq(0);
+    $after.after(html);
+  }catch(e){ console.warn('renderProposedRValues failed', e); }
+}
+
+ function formatYearRange(date) {
+     const year = parseInt(date.split('-')[0]);  // Extract the year from the date
+     const startYear = year;
+     const endYear = year + 3;
+     const startYearL = startYear + 1;
+     const endYearL = endYear + 1;
+     const startYearDev = convertToDevanagari(startYear.toString());
+     const endYearDev = convertToDevanagari(endYear.toString());
+
+     return `${startYearDev}-${convertToDevanagari(startYearL.toString())} ते ${endYearDev}-${convertToDevanagari(endYearL.toString())}`;
+ }
+
+ function convertToDevanagari(numberString) {
+     const devanagariDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+     return numberString.replace(/[0-9]/g, (digit) => devanagariDigits[digit]);
+}

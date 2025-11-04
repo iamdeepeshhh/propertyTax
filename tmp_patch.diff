@@ -1,0 +1,62 @@
+*** Begin Patch
+*** Update File: src/main/java/com/GAssociatesWeb/GAssociates/Service/MasterWebServices/AfterAssessmentModule_MasterServices/OrderSheet_MasterService/OrderSheet_MasterServiceImpl.java
+@@
+-package com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.OrderSheet_MasterService;
+-
+-import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.RegisterObjection_Dto.RegisterObjection_Dto;
+-import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.RegisterObjection_MasterService.RegisterObjection_MasterService;
+-import lombok.AllArgsConstructor;
+-import org.springframework.stereotype.Service;
+-
+-import java.util.List;
+-
+-@Service
+-@AllArgsConstructor
+-public class OrderSheet_MasterServiceImpl implements OrderSheet_MasterService {
+-
+-
+-}
++package com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.OrderSheet_MasterService;
++
++import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.OrderSheet_Dto.OrderSheet_Dto;
++import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.RegisterObjection_Dto.RegisterObjection_Dto;
++import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.RegisterObjection_MasterService.RegisterObjection_MasterService;
++import lombok.AllArgsConstructor;
++import org.springframework.stereotype.Service;
++
++@Service
++@AllArgsConstructor
++public class OrderSheet_MasterServiceImpl implements OrderSheet_MasterService {
++
++    private final RegisterObjection_MasterService registerObjectionService;
++
++    @Override
++    public OrderSheet_Dto getOrderSheetByNewPropertyNo(String newPropertyNo) {
++        RegisterObjection_Dto ro = registerObjectionService.getObjection(newPropertyNo);
++        if (ro == null) return null;
++
++        OrderSheet_Dto dto = new OrderSheet_Dto();
++        dto.setWardNo(ro.getWardNo());
++        dto.setZoneNo(ro.getZoneNo());
++        dto.setSurveyNo(ro.getSurveyNo());
++        dto.setFinalPropertyNo(ro.getFinalPropertyNo());
++        dto.setNewPropertyNo(ro.getNewPropertyNo());
++        dto.setOldPropertyNo(ro.getOldPropertyNo());
++
++        dto.setOwnerName(ro.getOwnerName());
++        dto.setApplicantName(ro.getRespondent());
++
++        dto.setNoticeNo(ro.getNoticeNo());
++        dto.setApplicationNo(ro.getApplicationNo());
++        dto.setObjectionDate(ro.getObjectionDate());
++        dto.setApplicationReceivedDate(ro.getApplicationReceivedDate());
++        dto.setHearingDate(ro.getHearingDate());
++        dto.setHearingTime(ro.getHearingTime());
++        dto.setHearingStatus(ro.getHearingStatus());
++        dto.setReasons(ro.getReasons());
++        dto.setOthers(ro.getOthers());
++        dto.setRespondent(ro.getRespondent());
++        return dto;
++    }
++}
+*** End Patch

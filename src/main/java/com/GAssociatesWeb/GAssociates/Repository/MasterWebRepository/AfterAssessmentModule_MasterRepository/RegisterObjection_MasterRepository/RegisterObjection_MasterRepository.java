@@ -23,12 +23,20 @@ public interface RegisterObjection_MasterRepository extends JpaRepository<Regist
     """)
     List<RegisterObjection_Entity> searchObjectionRecords(String spn, String finalPropertyNo, String ownerName, Integer ward);
 
-    // 🔹 Fetch all objections in a specific ward
+    // ðŸ”¹ Fetch all objections in a specific ward
     List<RegisterObjection_Entity> findByWardNo(Integer wardNo);
 
-    // 🔹 Fetch a single record using notice number (for print notice)
+    // ðŸ”¹ Fetch a single record using notice number (for print notice)
     RegisterObjection_Entity findByNoticeNo(String noticeNo);
 
-    // 🔹 Optional: fetch by final property number (if you need it later)
+    // ðŸ”¹ Optional: fetch by final property number (if you need it later)
     RegisterObjection_Entity findByFinalPropertyNo(String finalPropertyNo);
+    @Query("""
+        SELECT r FROM RegisterObjection_Entity r
+        WHERE (:wardNo IS NULL OR r.wardNo = :wardNo)
+          AND (:fromFinal IS NULL OR r.finalPropertyNo >= :fromFinal)
+          AND (:toFinal IS NULL OR r.finalPropertyNo <= :toFinal)
+        ORDER BY r.finalPropertyNo ASC
+    """)
+    List<RegisterObjection_Entity> findForScheduling(Integer wardNo, String fromFinal, String toFinal);
 }
