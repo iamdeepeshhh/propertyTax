@@ -260,6 +260,79 @@ async function renderBatchPreview(dataList) {
   console.log(`? Rendered ${dataList.length} tax bills`);
 }
 
+function numberToMarathiWords(n) {
+    if (n === 0) return 'शून्य रुपये मात्र';
+
+    const [integerPart, decimalPart] = String(Number(n).toFixed(2)).split('.');
+    let num = parseInt(integerPart);
+    let paisa = parseInt(decimalPart);
+
+    const numWords = [
+        '', 'एक', 'दोन', 'तीन', 'चार', 'पाच', 'सहा', 'सात', 'आठ', 'नऊ',
+        'दहा', 'अकरा', 'बारा', 'तेरा', 'चौदा', 'पंधरा', 'सोळा', 'सतरा', 'अठरा', 'एकोणीस',
+        'वीस', 'एकवीस', 'बावीस', 'तेवीस', 'चोवीस', 'पंचवीस', 'सव्वीस', 'सत्तावीस', 'अठ्ठावीस', 'एकोणतीस',
+        'तीस', 'एकतीस', 'बत्तीस', 'तेहतीस', 'चौतीस', 'पस्तीस', 'छत्तीस', 'सदतीस', 'अडतीस', 'एकोणचाळीस',
+        'चाळीस', 'एक्केचाळीस', 'बेचाळीस', 'त्रेचाळीस', 'चव्वेचाळीस', 'पंचेचाळीस', 'सेहेचाळीस', 'सत्तेचाळीस', 'अठ्ठेचाळीस', 'एकोणपन्नास',
+        'पन्नास', 'एक्कावन्न', 'बावन्न', 'त्रेपन्न', 'चोपन्न', 'पंचावन्न', 'छप्पन्न', 'सत्तावन्न', 'अठ्ठावन्न', 'एकोणसाठ',
+        'साठ', 'एकसष्ट', 'बासष्ट', 'त्रेसष्ट', 'चौसष्ट', 'पासष्ट', 'सहासष्ट', 'सत्त्यासष्ट', 'अडसष्ट', 'एकोणसत्तर',
+        'सत्तर', 'एकाहत्तर', 'बाहत्तर', 'त्र्याहत्तर', 'चौऱ्याहत्तर', 'पंच्याहत्तर', 'शहात्तर', 'सत्याहत्तर', 'अठ्ठ्याहत्तर', 'एकोणऐंशी',
+        'ऐंशी', 'एक्याऐंशी', 'ब्याऐंशी', 'त्र्याऐंशी', 'चौऱ्याऐंशी', 'पंच्याऐंशी', 'शहाऐंशी', 'सत्त्याऐंशी', 'अठ्ठ्याऐंशी', 'एकोणनव्वद',
+        'नव्वद', 'एक्क्याण्णव', 'ब्याण्णव', 'त्र्याण्णव', 'चौर्याण्णव', 'पंच्याण्णव', 'शहाण्णव', 'सत्त्याण्णव', 'अठ्ठ्याण्णव', 'नव्व्याण्णव'
+    ];
+
+    const places = ['शे', 'हजार', 'लाख', 'कोटी', 'अब्ज', 'खर्व']; // added Arab(Abja), Kharab
+
+    function convertGroup(n) {
+        if (n === 0) return '';
+        let str = '';
+        const h = Math.floor(n / 100);
+        const t = n % 100;
+
+        if (h > 0) {
+            str += (h === 1 ? 'शंभर' : numWords[h] + ' ' + places[0]);
+        }
+        if (t > 0) {
+            if (h > 0) str += ' ';
+            str += numWords[t];
+        }
+        return str.trim();
+    }
+
+    // Break number into Indian format groups
+    let parts = [];
+
+    let kharab = Math.floor(num / 1000000000000); // trillion
+    num %= 1000000000000;
+    let arab = Math.floor(num / 100000000); // hundred crore = arab
+    num %= 100000000;
+    let crore = Math.floor(num / 10000000);
+    num %= 10000000;
+    let lakh = Math.floor(num / 100000);
+    num %= 100000;
+    let thousand = Math.floor(num / 1000);
+    num %= 1000;
+    let hundredGroup = num;
+
+    if (kharab) parts.push(numWords[kharab] + ' ' + places[5]);
+    if (arab) parts.push(numWords[arab] + ' ' + places[4]);
+    if (crore) parts.push(numWords[crore] + ' ' + places[3]);
+    if (lakh) parts.push(numWords[lakh] + ' ' + places[2]);
+    if (thousand) parts.push(numWords[thousand] + ' ' + places[1]);
+    if (hundredGroup) parts.push(convertGroup(hundredGroup));
+
+    let result = parts.join(' ').trim();
+    if (result) result += ' रुपये';
+
+    if (paisa > 0) {
+        const paisaWords = numWords[paisa];
+        if (paisaWords) result += ` आणि ${paisaWords} पैसे`;
+    }
+
+    return (result + ' मात्र').replace(/\s{2,}/g, ' ');
+}
+
+window.numberToMarathiWords = numberToMarathiWords;
+
 // =============================== ?? Build Year-wise Tax Table ===============================
 function buildYearWiseTaxTable($page, dto) {
   const arrearsMap = dto.arrearsYearWiseMap || {};
@@ -285,7 +358,7 @@ function buildYearWiseTaxTable($page, dto) {
       arrearsYears.forEach(y => {
         html += `
           <th style="padding:0;">
-            <div style="background:#f4cccc; font-weight:600; padding:2px 4px;">थकबाकी रक्कम</div>
+            <div style="background:#f4cccc; font-weight:600; padding:2px 4px; border-bottom: 1px solid #333;">थकबाकी रक्कम</div>
             <div style="background:#c9daf8; padding:2px 4px;">${convertToDevanagariYear(y)}</div>
           </th>`;
       });
@@ -337,10 +410,27 @@ function buildYearWiseTaxTable($page, dto) {
       });
     }
     html += `<td class="t-c">${totalCurrent.toFixed(2)}</td>`;
-    html += `<td class="t-c">${totalOverall.toFixed(2)}</td></tr></tbody></table>`;
+    html += `<td class="t-c">${totalOverall.toFixed(2)}</td></tr>`;
+// === NEW ROW: Total in Words ===
+    const totalInWords = typeof window.numberToMarathiWords === 'function'
+                         ? window.numberToMarathiWords(totalOverall)
+                         : 'शब्दात रूपांतरण उपलब्ध नाही';
 
-    // Inject below the main tax section
+    // Calculate total columns for colspan:
+    // The details column + all Arrear columns + 'चालू मागणी' column = total columns to span
+    const totalColsToSpan = 1 + (showArrears ? arrearsYears.length : 0) + 1;
+
+    html += `
+      <tr>
+        <td colspan="${totalColsToSpan+1}" style="text-align: left; font-weight: 700; background: #f0f0f0; padding-left: 8px;">एकूण रक्कम (अक्षरी) : ${totalInWords}</td>
+
+      </tr>
+    `;
+
+    // Final closing tag
+    html += `</tbody></table>`;
+
+    // Inject the fully built table HTML
     $page.find('.taxBillTable').after(html);
   });
 }
-

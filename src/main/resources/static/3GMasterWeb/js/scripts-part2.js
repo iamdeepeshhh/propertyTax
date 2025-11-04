@@ -343,9 +343,8 @@ function getSchedulerForm() {
   const toFinal = _sel('sch-to')?.value?.trim() || null;
   const hearingDate = _sel('sch-date')?.value || null;
   const startTime = _sel('sch-time')?.value || null;
-  const slotMinutes = Number(_sel('sch-slot')?.value || 10);
-  const overwriteExisting = !!_sel('sch-overwrite')?.checked;
-  return { wardNo, fromFinal, toFinal, hearingDate, startTime, slotMinutes, overwriteExisting };
+  // expectedCount will be attached at schedule time from last preview
+  return { wardNo, fromFinal, toFinal, hearingDate, startTime };
 }
 
 function renderSchedulerRows(list) {
@@ -360,7 +359,7 @@ function renderSchedulerRows(list) {
     <tr>
       <td>${idx + 1}</td>
       <td>${r.finalPropertyNo || ''}</td>
-      <td>${r.newPropertyNo || ''}</td>
+
       <td>${r.ownerName || ''}</td>
       <td>${r.hearingDate || ''}</td>
       <td>${r.hearingTime || ''}</td>
@@ -751,6 +750,8 @@ window.previewHearingSchedule = async function previewHearingSchedule() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     renderSchedulerRows(data);
+    // store preview count for optimistic concurrency on schedule
+    window.__schedulerPreviewCount = Array.isArray(data) ? data.length : null;
   } catch (e) {
     console.error('Preview failed', e);
     alert('Preview failed');
@@ -763,6 +764,10 @@ window.runHearingSchedule = async function runHearingSchedule() {
     if (!f.wardNo || !f.hearingDate || !f.startTime) {
       alert('Ward, Hearing Date and Start Time are required');
       return;
+    }
+    // Attach expectedCount if we have a recent preview
+    if (typeof window.__schedulerPreviewCount === 'number') {
+      f.expectedCount = window.__schedulerPreviewCount;
     }
     const res = await fetch('/3g/objections/scheduler/schedule', {
       method: 'POST',

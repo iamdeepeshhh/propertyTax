@@ -183,26 +183,19 @@ public class RegisterObjection_MasterServiceImpl implements RegisterObjection_Ma
                                                         String toFinal,
                                                         String hearingDate,
                                                         String startTime,
-                                                        Integer slotMinutes,
                                                         boolean overwriteExisting) {
         List<RegisterObjection_Entity> rows = repository.findForScheduling(wardNo, fromFinal, toFinal);
         if (rows == null || rows.isEmpty()) return List.of();
 
         java.time.LocalTime time = java.time.LocalTime.parse(startTime);
-        int minutes = (slotMinutes != null && slotMinutes > 0) ? slotMinutes : 10;
 
         for (RegisterObjection_Entity e : rows) {
-            boolean hasExisting = e.getHearingDate() != null && !e.getHearingDate().isBlank()
-                    && e.getHearingTime() != null && !e.getHearingTime().isBlank();
-            if (hasExisting && !overwriteExisting) {
-                // skip
-                continue;
-            }
+            // Always overwrite hearing date/time for matching records
             e.setHearingDate(hearingDate);
             e.setHearingTime(time.toString());
             e.setUpdatedAt(LocalDateTime.now());
             repository.save(e);
-            time = time.plusMinutes(minutes);
+//            time = time.plusMinutes(10);
         }
 
         return repository.findForScheduling(wardNo, fromFinal, toFinal)

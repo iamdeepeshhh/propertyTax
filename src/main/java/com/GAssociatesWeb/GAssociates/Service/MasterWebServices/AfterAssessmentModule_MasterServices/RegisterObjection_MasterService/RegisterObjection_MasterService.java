@@ -21,11 +21,10 @@ public interface RegisterObjection_MasterService {
     List<RegisterObjection_Dto> findForScheduling(Integer wardNo, String fromFinal, String toFinal);
 
     List<RegisterObjection_Dto> scheduleHearings(Integer wardNo,
-                                                 String fromFinal,
-                                                 String toFinal,
-                                                 String hearingDate,
-                                                 String startTime,
-                                                 Integer slotMinutes,
-                                                 boolean overwriteExisting);
+                                                  String fromFinal,
+                                                  String toFinal,
+                                                  String hearingDate,
+                                                  String startTime,
+                                                  boolean overwriteExisting);
 
 }

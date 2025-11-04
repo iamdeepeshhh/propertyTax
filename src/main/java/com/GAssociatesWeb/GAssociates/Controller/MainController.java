@@ -54,4 +54,10 @@ public class MainController {
         model.addAttribute("newPropertyNumber", newPropertyNumber);
         return "3GRealtimeCC"; // Thymeleaf template or just HTML
     }
+
+    @GetMapping("/3g/batchSurveyReport/{wardNo}")
+    public String showBatchSurveyReport(@PathVariable("wardNo") String wardNo, Model model) {
+        model.addAttribute("wardNo", wardNo);
+        return "3GBatchViewSurveyFrom";
+    }
 }

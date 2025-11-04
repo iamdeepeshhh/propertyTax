@@ -498,7 +498,7 @@ public class MasterWebControllerII {
         public String toFinal;
         public String hearingDate; // yyyy-MM-dd
         public String startTime;   // HH:mm
-        public Integer slotMinutes;
+        public Integer expectedCount; // Optional: verify preview count
         public Boolean overwriteExisting;
     }
 
@@ -507,10 +507,19 @@ public class MasterWebControllerII {
         if (req == null || req.wardNo == null || req.hearingDate == null || req.startTime == null) {
             return ResponseEntity.badRequest().build();
         }
-        boolean overwrite = req.overwriteExisting != null && req.overwriteExisting.booleanValue();
+        // Pre-check: Only proceed if the number of records to schedule
+        // matches the client's expected count (when provided).
+        List<RegisterObjection_Dto> preview = registerObjection_masterService.findForScheduling(
+                req.wardNo, req.fromFinal, req.toFinal);
+        if (preview == null || preview.isEmpty()) return ResponseEntity.noContent().build();
+        if (req.expectedCount != null && !req.expectedCount.equals(preview.size())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        boolean overwrite = (req.overwriteExisting != null && req.overwriteExisting.booleanValue()) || (req.expectedCount != null && preview != null && req.expectedCount.equals(preview.size()));
         List<RegisterObjection_Dto> result = registerObjection_masterService.scheduleHearings(
-                req.wardNo, req.fromFinal, req.toFinal, req.hearingDate, req.startTime, req.slotMinutes, overwrite);
+                req.wardNo, req.fromFinal, req.toFinal, req.hearingDate, req.startTime, overwrite);
         if (result == null || result.isEmpty()) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(result);
     }
 }
+
