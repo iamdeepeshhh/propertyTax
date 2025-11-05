@@ -9,4 +9,10 @@ public interface PropertyTaxDetailArrears_MasterService {
     List<PropertyTaxDetailArrears_MasterDto> getAll();
     PropertyTaxDetailArrears_MasterDto getSingleArrearsTaxDetails(String newPropertyNo);
     PropertyTaxDetailArrears_MasterDto getArrearsByPropertyAndYear(String newPropertyNo, String financialYear);
+
+    // Apply interest = totalTax * (percent/100) and persist to interest field
+    PropertyTaxDetailArrears_MasterDto applyInterest(String newPropertyNo, String financialYear, Double percent);
+
+    // Apply interest to all arrears records having totalTax
+    int applyInterestBatch(Double percent);
 }

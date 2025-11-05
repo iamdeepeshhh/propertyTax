@@ -721,7 +721,7 @@
 
     <div class="mt-3" style="overflow-x:auto;">
       <table class="table table-bordered table-hover" style="min-width:1000px; text-align:center;">
-        <thead class="thead-light">
+        <thead class="thead-dark">
           <tr>
             <th>#</th>
             <th>Final Property No</th>
@@ -1757,6 +1757,15 @@
             </div>
             <button type="button" class="btn btn-primary" onclick="submitForm('oldWardsForm', ['wardCount'], '/3g/addOldWards')">Add</button>
         </form>
+        <div class="row g-3 align-items-end mt-2">
+          <div class="col-md-2">
+            <label for="arrears-interest-percent" class="form-label">Interest %</label>
+            <input type="number" min="0" step="0.01" id="arrears-interest-percent" class="form-control" placeholder="e.g. 2.0">
+          </div>
+          <div class="col-md-3 d-grid">
+            <button type="button" class="btn btn-primary" onclick="applyInterestToArrears()">Apply Interest to All</button>
+          </div>
+        </div>
         <div class="container mt-5 ">
             <h3>Existing Old Wards</h3>
             <table class="table table-bordered">
@@ -2824,7 +2833,7 @@
         </select>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-primary" id="confirmDecisionBtn">Proceed</button>
       </div>
     </div>

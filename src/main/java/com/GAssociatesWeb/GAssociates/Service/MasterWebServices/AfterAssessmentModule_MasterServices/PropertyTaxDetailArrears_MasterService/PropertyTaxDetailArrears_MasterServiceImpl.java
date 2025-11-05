@@ -49,6 +49,53 @@ public class PropertyTaxDetailArrears_MasterServiceImpl implements PropertyTaxDe
         return toDto(repository.findByNewPropertyNoAndFinancialYear(newPropertyNo, financialYear));
     }
 
+    @Override
+    public PropertyTaxDetailArrears_MasterDto applyInterest(String newPropertyNo, String financialYear, Double percent) {
+        if (newPropertyNo == null || newPropertyNo.isBlank() || financialYear == null || financialYear.isBlank()) return null;
+        if (percent == null) percent = 0.0;
+        if (percent < 0) percent = 0.0;
+
+        PropertyTaxDetailArrears_MasterEntity entity = repository.findByNewPropertyNoAndFinancialYear(newPropertyNo, financialYear);
+        if (entity == null) return null;
+
+        Double baseTotal = entity.getTotalTax();
+        if (baseTotal == null) {
+            double sum = 0.0;
+            Double[] parts = new Double[]{
+                    entity.getPropertyTax(), entity.getEducationTax(), entity.getTreeTax(), entity.getEnvironmentTax(),
+                    entity.getFireTax(), entity.getElectricityTax(), entity.getUserCharges(), entity.getLightTax(),
+                    entity.getCleanTax(), entity.getWaterTax(), entity.getEgcTax(), entity.getNoticeFee(),
+                    entity.getMiscellaneousTax(), entity.getOtherTax(), entity.getPenalty(), entity.getDiscount()
+            };
+            for (Double d : parts) { if (d != null) sum += d; }
+            baseTotal = sum;
+        }
+
+        double interest = Math.round((baseTotal * (percent / 100.0)) * 100.0) / 100.0;
+        entity.setInterest(interest);
+        entity.setUpdatedAt(java.time.LocalDateTime.now());
+        repository.save(entity);
+        return toDto(entity);
+    }
+
+    @Override
+    public int applyInterestBatch(Double percent) {
+        if (percent == null) percent = 0.0;
+        if (percent < 0) percent = 0.0;
+        List<PropertyTaxDetailArrears_MasterEntity> all = repository.findAll();
+        int updated = 0;
+        for (PropertyTaxDetailArrears_MasterEntity e : all) {
+            Double baseTotal = e.getTotalTax();
+            if (baseTotal == null) continue;
+            double interest = Math.round((baseTotal * (percent / 100.0)) * 100.0) / 100.0;
+            e.setInterest(interest);
+            e.setUpdatedAt(java.time.LocalDateTime.now());
+            updated++;
+        }
+        if (updated > 0) repository.saveAll(all);
+        return updated;
+    }
+
     // 🔹 ENTITY ➜ DTO
     public static PropertyTaxDetailArrears_MasterDto toDto(PropertyTaxDetailArrears_MasterEntity entity) {
         if (entity == null) return null;

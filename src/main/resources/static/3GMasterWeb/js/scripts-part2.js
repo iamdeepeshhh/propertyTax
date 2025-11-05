@@ -352,7 +352,7 @@ function renderSchedulerRows(list) {
   if (!body) return;
   body.innerHTML = '';
   if (!Array.isArray(list) || list.length === 0) {
-    body.innerHTML = '<tr><td colspan="6">No records</td></tr>';
+    body.innerHTML = '<tr><td colspan="5">No records</td></tr>';
     return;
   }
   body.innerHTML = list.map((r, idx) => `
@@ -722,14 +722,13 @@ function renderSchedulerRows(list) {
   if (!body) return;
   body.innerHTML = '';
   if (!Array.isArray(list) || list.length === 0) {
-    body.innerHTML = '<tr><td colspan="6">No records</td></tr>';
+    body.innerHTML = '<tr><td colspan="5">No records</td></tr>';
     return;
   }
   body.innerHTML = list.map((r, idx) => `
     <tr>
       <td>${idx + 1}</td>
       <td>${r.finalPropertyNo || ''}</td>
-      <td>${r.newPropertyNo || ''}</td>
       <td>${r.ownerName || ''}</td>
       <td>${r.hearingDate || ''}</td>
       <td>${r.hearingTime || ''}</td>

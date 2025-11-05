@@ -2282,3 +2282,28 @@ async function saveArrearsTax() {
 }
 
 
+async function applyInterestToArrears() {
+  try {
+    const input = document.getElementById('arrears-interest-percent');
+    if (!input) { alert('Interest % field not found'); return; }
+    const val = parseFloat(input.value);
+    if (isNaN(val) || val < 0) { alert('Enter a valid non-negative interest %'); return; }
+
+    const res = await fetch('/3g/arrears/applyInterestBatch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ percent: val })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json().catch(() => ({}));
+    const n = typeof data.updated === 'number' ? data.updated : 'some';
+    alert(`Applied interest to ${n} record(s).`);
+    // Optionally refresh listing
+    if (typeof loadArrearsProperties === 'function') {
+      try { loadArrearsProperties(); } catch (e) {}
+    }
+  } catch (e) {
+    console.error('Failed to apply interest batch', e);
+    alert('Failed to apply interest. Check console.');
+  }
+}

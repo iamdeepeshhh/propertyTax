@@ -7,6 +7,15 @@ body {
   line-height: 1.6;
 }
 
+body, p, div, span {
+  font-family: 'Arial Unicode MS';
+  font-feature-settings: "liga", "clig"; /* ensure ligatures combine correctly */
+  word-break: keep-all !important;       /* stops Devanagari syllable splitting */
+  white-space: normal !important;
+  overflow-wrap: normal !important;
+  line-height: 1.7;
+}
+
 .header h1{
       font-size: 36px;
 }
@@ -20,7 +29,7 @@ body {
     margin-right: 20px;        /* optional: space between logo and title text */
 }
 .container {
-  border: 4px solid #000; /* black solid border */
+  /* border: 4px solid #000; black solid border */
   padding: 20px;
   margin: auto;
 
@@ -31,13 +40,13 @@ body {
 /* Logo and header */
 .header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: center; /* Vertically aligns items in the center */
+  justify-content: space-between; /* Puts space between the logos and title */
   position: relative;
   font-size: 30px;
 }
 
-.header img { height: 60px; width: 60px; object-fit: contain; }
+.header img { height: 60px; width: 60px; object-fit: contain; margin: 0 10px;  }
 .header .center-title { flex: 1; text-align: center; font-size: 32px; }
 
 
@@ -50,7 +59,20 @@ body {
   text-align: center;
 }
 
-
+.k1 {
+  text-align: justify;     /* makes text align cleanly across width */
+  line-height: 1.6;
+  text-indent: 40px; /* first line indent */
+  font-size: 16px;         /* adjust as per print size */
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-weight: normal;
+  word-break: keep-all;         /* ✅ prevents breaking in the middle of words */
+  white-space: normal;
+}
+.k1 b {
+  font-weight: 700;        /* make bold parts stand out */
+}
 
 .subtext .highlight {
   font-size: 22px;
@@ -69,7 +91,7 @@ table {
 
 th, td {
   border: 1px solid #999;
-  padding: 10px;
+  padding: 7px;
   text-align: center;
 }
 
@@ -159,12 +181,6 @@ h1 {
   margin-top: 20px;
   text-align: left;
 }
-
-.dotted-line {
-  border-bottom: 1px dotted #333;
-  margin: 10px 0;
-  height: 15px;
-}
 .signature-section {
   display: flex;
   justify-content: space-between;
@@ -178,7 +194,7 @@ h1 {
 
 .dotted-line {
   border-bottom: 1px dotted black;
-  margin: 10px 0;
+  margin: 5px 0;
   width: 100%;
 }
 
@@ -190,7 +206,7 @@ p {
 
 /* Bold Key Points */
 p b {
-  display: block;
+
   margin: 5px 0;
 }
 
@@ -239,9 +255,9 @@ background-color: rgb(251, 251, 251);
 /* Media Query for smaller screens */
 @media print {
   body {
-    margin: 0;
+    margin: 10px;
     padding: 0;
-    zoom: 0.7; /* scale down to fit on one page */
+    zoom: 0.6; /* scale down to fit on one page */
   }
 
   * {
@@ -262,16 +278,5 @@ background-color: rgb(251, 251, 251);
   @page {
     size: A4 portrait;
     margin: 1cm;
-  }
-}
-@media print {
-  body {
-    background-color: white; /* or any color you want */
-    color: black; /* ensure text prints clearly */
-  }
-
-  .your-element {
-    background-color: #f0f0f0; /* light gray, for example */
-    color: #333;
   }
 }

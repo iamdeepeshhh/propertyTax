@@ -461,6 +461,22 @@ public class MasterWebControllerII {
         return ResponseEntity.ok(dto);
     }
 
+    // Apply interest to all arrears having totalTax
+    public static class ApplyInterestBatchRequest {
+        public Double percent;
+    }
+
+    @PostMapping("/arrears/applyInterestBatch")
+    public ResponseEntity<?> applyArrearsInterestBatch(@RequestBody ApplyInterestBatchRequest req) {
+        if (req == null || req.percent == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "percent is required"));
+        }
+        Double p = req.percent;
+        if (p < 0) p = 0.0;
+        int updated = propertyTaxDetailArrears_masterService.applyInterestBatch(p);
+        return ResponseEntity.ok(Map.of("updated", updated));
+    }
+
     @GetMapping("/hearingNotices")
     public ResponseEntity<List<RegisterObjection_Dto>> getHearingNoticesII(
             @RequestParam(required = false) Integer wardNo,

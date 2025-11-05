@@ -184,6 +184,7 @@ function submitObjection() {
 
     const data = {
         wardNo: form.objectionWardNo.value,
+        zoneNo: form.objectionZoneNo.value,
         finalPropertyNo: form.objectionFinalPropertyNo.value,
         ownerName: form.objectionOwnerName.value,
         respondent: form.respondentname.value,

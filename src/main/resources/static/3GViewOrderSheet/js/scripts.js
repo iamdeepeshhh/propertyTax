@@ -83,6 +83,9 @@ async function renderMultipleOrderSheets(list) {
 // 4️⃣  FILL ALL DETAILS
 // ──────────────────────────────
 function fillOrderSheet($root, dto) {
+
+  console.log(dto);
+
   if (!dto) return;
 
   // Fill first header table (7 columns)
@@ -101,12 +104,65 @@ function fillOrderSheet($root, dto) {
   $root.find('.ownerName').text(dto.ownerName || '');
   $root.find('.applicantName').text(dto.applicantName || '');
   $root.find('.applicationNo').text(dto.applicationNo || '');
-  $root.find('.hearingDate').text(formatDate(dto.hearingDate));
+  // $root.find('.hearingDate').text(formatDate(dto.hearingDate));
   $root.find('.hearingStatus').text(dto.hearingStatus || '');
+  $root.find('.objectionDate').text(formatDate(dto.objectionDate)||'--------');
+  $root.find('.hearingDate').text(formatDate(dto.hearingDate)||'--------');
+    const reasonsText = dto.reasons || '';
+    if (reasonsText.trim() !== '') {
+        const reasonsArray = reasonsText.split(',').map(r => r.trim()).filter(r => r !== '');
+        const formattedReasons = reasonsArray
+            .map((r, i) => `${i + 1}. ${r}`)
+            .join('  '); // two spaces between items or use '\n' for new lines
+        $root.find('.reasons').text(formattedReasons);
+    } else {
+        $root.find('.reasons').text('');
+    }
+
+
 
   // Render dynamic tax and R-values
   renderTaxes(dto, $root);
   renderProposedRValues(dto, $root);
+}
+
+
+let globalYearRange = '';
+document.addEventListener('DOMContentLoaded', () => {
+
+    fetch('/3g/getAllAssessmentDates', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+
+        const currentAssessmentDate = data[0].currentassessmentdate;
+        globalYearRange = formatYearRange(currentAssessmentDate);
+        $('.yearRange').text(globalYearRange);
+    })
+    .catch(error => console.error('Error fetching additional data:', error));
+});
+
+
+
+function formatYearRange(date) {
+    const year = parseInt(date.split('-')[0]);  // Extract the year from the date
+    const startYear = year;
+    const endYear = year + 3;
+    const startYearL = startYear + 1;
+    const endYearL = endYear + 1;
+    const startYearDev = convertToDevanagari(startYear.toString());
+    const endYearDev = convertToDevanagari(endYear.toString());
+
+    return `${startYearDev}-${convertToDevanagari(startYearL.toString())} ते ${endYearDev}-${convertToDevanagari(endYearL.toString())}`;
 }
 
 
@@ -176,14 +232,14 @@ function buildReportTaxTableInRootAsync($root, tableSelector, templateName = 'OR
       const $table = $root.find(tableSelector);
       if ($table.length === 0) { resolve(); return; }
       $table.empty();
-
+      const $rowMain =$('<tr><th colspan="15" style="text-align: left;background-color: rgb(161, 255, 255)">सुतावणी आधीचे कर विवरण</th></tr>');
       const $row1 = $('<tr class="t-a-c"></tr>');
       const $row2 = $('<tr class="t-a-c"></tr>');
       const $valRow = $('<tr class="t-a-c"></tr>');
       // Pleasant, readable header colors (align with Special Notice)
       $row1.css('background-color', '#CEF6CE');
       $row2.css('background-color', '#F8E0F7');
-      $table.append($row1).append($row2).append($valRow);
+      $table.append($rowMain).append($row1).append($row2).append($valRow);
 
       const parentMap = {};
       configs.forEach((c) => { if (!c.parentTaxKeyL) parentMap[c.taxKeyL] = { parent: c, children: [] }; });
@@ -316,4 +372,23 @@ function formatDate(dateStr) {
 function convertToDevanagari(num) {
   const map = ['०','१','२','३','४','५','६','७','८','९'];
   return num.toString().replace(/[0-9]/g, (d) => map[d]);
+}
+
+
+$(document).on('click', '#printBtn', function () {
+  printOrderSheets();
+});
+
+function printOrderSheets() {
+  // Optional: add a small delay to ensure all async data is rendered
+  setTimeout(() => {
+    // Remove button before printing
+    $('#printBtn').hide();
+
+    // Use print() for browser print dialog
+    window.print();
+
+    // Show button again after printing
+    setTimeout(() => $('#printBtn').show(), 500);
+  }, 500);
 }

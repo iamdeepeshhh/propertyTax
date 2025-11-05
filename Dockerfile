@@ -1,5 +1,5 @@
 # Start with a base image containing Java runtime
-FROM openjdk:17-jdk-alpine
+FROM eclipse-temurin:17-jdk-alpine
 
 # Install necessary packages
 RUN apk update && apk add --no-cache freetype
