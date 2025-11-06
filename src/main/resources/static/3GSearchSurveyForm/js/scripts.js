@@ -49,15 +49,24 @@ function renderSurveyRows(data, append) {
     if (data && data.length > 0) {
         $('.no-results').hide();
         data.sort((a, b) => {
-            function parseSurveyPropNo(propNo) {
-                const parts = String(propNo || '').split('/').map(Number);
-                return { prefix: parts[0] || 0, suffix: parts[1] || 0 };
-            }
-            const surveyA = parseSurveyPropNo(a.pdSurypropnoVc);
-            const surveyB = parseSurveyPropNo(b.pdSurypropnoVc);
-            if (surveyA.prefix !== surveyB.prefix) return surveyA.prefix - surveyB.prefix;
-            return surveyA.suffix - surveyB.suffix;
-        });
+                function parseSurveyPropNo(propNo) {
+                    // Handle + sign: only take the first part before +
+                    const mainPart = String(propNo || '').split('+')[0].trim();
+                    
+                    // Split on '/' if present (e.g., "123/4" → [123,4])
+                    const parts = mainPart.split('/').map(Number);
+                    return { prefix: parts[0] || 0, suffix: parts[1] || 0 };
+                }
+
+                const surveyA = parseSurveyPropNo(a.pdSurypropnoVc);
+                const surveyB = parseSurveyPropNo(b.pdSurypropnoVc);
+
+                // Compare prefix first
+                if (surveyA.prefix !== surveyB.prefix) return surveyA.prefix - surveyB.prefix;
+                // Then suffix
+                return surveyA.suffix - surveyB.suffix;
+                });
+
         const existingCount = append ? tbody.find('tr').length : 0;
         data.forEach(function(item, idx) {
             var deleteButton = isDeProfile ? '' : `<button class="btn btn-danger delete-btn" 

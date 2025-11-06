@@ -58,16 +58,6 @@ function showTab(tabId) {
     }
 }
 
-// Show a specific master child section by id (used by new Master menu)
-function showMaster(childId) {
-    // Reuse showTab behavior: hide all and show only requested child
-    document.querySelectorAll('section').forEach(section => {
-        section.style.display = 'none';
-    });
-    const target = document.getElementById(childId);
-    if (target) target.style.display = 'block';
-}
-
 function populateDropdown(selectId, endpointUrl, displayProperty, idProperty = null) {
     // selectID is the name of the dropdown element
     // endpointUrl is the URL to fetch data from backend(controller)
@@ -179,7 +169,7 @@ var form = document.getElementById(formId);
 var isValid = true;
 var formData = {};
 
-if (false && !input) {
+if (!input) {
     console.warn(`⚠️ Input with ID '${inputId}' not found in the form '${formId}'.`);
     return;
 }
@@ -187,11 +177,6 @@ if (false && !input) {
 // Collect static form fields
 inputIds.forEach(function(inputId) {
     var input = document.getElementById(inputId);
-    if (!input) {
-        console.warn(`Input with ID '${inputId}' not found in the form '${formId}'.`);
-        isValid = false;
-        return;
-    }
     if (input.type === 'checkbox') {
         formData[input.name] = input.checked;
     } else {
@@ -403,15 +388,10 @@ fetchAndPopulateTable('/3g/getAllUnitUsageSubTypes', 'existingUnitUsageSubtypesT
 fetchAndPopulateTable('/3g/constructionClassMasters', 'existingConstructionClassesTableBody', ['englishname', 'marathiname', 'Deduction'],'deleteConstructionClassMastersById');
 fetchAndPopulateTable('/3g/getAllAssessmentDates', 'existingAssessmentDatesTableBody', ['firstassessmentdate', 'currentassessmentdate', 'lastassessmentdate'], '/3g/deleteAssessmentById');
 fetchAndPopulateTable('/3g/occupancyMasters', 'existingOccupanciesTableBody', ['standardName', 'localName', 'id']);
-
-// Initialize Report Tax Config editor
-initReportTaxConfig();
 fetchAndPopulateTable('/3g/roomTypes', 'existingRoomTypesTableBody', ['englishname', 'room']);
 fetchAndPopulateTable('/3g/getAllZones', 'existingZonesTableBody', ['name']);
 fetchAndPopulateTable('/3g/getAllRemarks', 'existingRemarksTableBody', ['remark']);
 fetchAndPopulateTable('/3g/constructionAgeFactor', 'existingConstructionAgeFactorsTableBody', ['afm_agefactorid_i','afm_agefactornameeng_vc', 'afm_agefactornamell_vc', 'afm_ageminage_vc', 'afm_agemaxage_vc', 'afm_remarks_vc']);
-  // Initialize Report Tax Config editor
-  initReportTaxConfig();
 initializePropertyTypesAndCaptureSelection('uusc-property-type-select', 'propertytypes');
 initializePropertyTypesAndCaptureSelection('uuc-property-type-select', 'propertytypes');
 initializePropertyTypesAndCaptureSelection('property-type-select', '/3g/propertytypes');
@@ -423,171 +403,6 @@ initializePropertySubtypesBasedOnType('uusc-property-type-select', 'uusc-propert
 initializePropertyUsageTypesBasedOnSubtype('pusc-property-subtype-select','pusc-property-usage-type-select','usageTypes');
 initializePropertyUsageTypesBasedOnSubtype('uusc-property-subtype-select','uusc-property-usage-type-select','usageTypes');
 initializeUnitUsageTypesBasedOnPropertyUsage('uuc-property-subtype-select','uuc-property-usage-type-select','usageTypes');
-
-// ---------------- Report Tax Config Editor -----------------
-function initReportTaxConfig() {
-  const tplSel = document.getElementById('rtc-template');
-  const taxSel = document.getElementById('rtc-taxselect');
-  const stdInp = document.getElementById('rtc-standard');
-  const locInp = document.getElementById('rtc-local');
-  const seqInp = document.getElementById('rtc-sequence');
-  function buildSeqOptions(rows) {
-    const sel = seqInp;
-    if (!sel) return;
-    const max = Math.max(1, (rows || []).length);
-    let html = '';
-    for (let i = 1; i <= max; i++) {
-      html += `<option value="${i}">${i}</option>`;
-    }
-    sel.innerHTML = html;
-  }
-  const visChk = document.getElementById('rtc-visible');
-  const parentKeyHidden = document.getElementById('rtc-parentkey');
-  const showTotalHidden = document.getElementById('rtc-showtotal');
-  const tableBody = document.getElementById('rtc-table-body');
-  const saveBtn = document.getElementById('rtc-save-btn');
-
-  if (!tplSel || !taxSel) return; // section not on page
-
-  const state = { all: [], byTemplate: new Map(), current: null };
-
-  function loadAll() {
-    fetch('/3g/reportTaxConfigs/all')
-      .then(r => r.json())
-      .then(rows => {
-        state.all = Array.isArray(rows) ? rows : [];
-        state.byTemplate.clear();
-        for (const row of state.all) {
-          const t = row.template;
-          if (!state.byTemplate.has(t)) state.byTemplate.set(t, []);
-          state.byTemplate.get(t).push(row);
-        }
-        refreshUI();
-      })
-      .catch(err => console.error('Failed to load report tax configs', err));
-  }
-
-  function refreshUI() {
-    const tpl = tplSel.value;
-    const rows = (state.byTemplate.get(tpl) || []).sort((a,b)=> (a.sequence||0) - (b.sequence||0));
-
-    // populate tax dropdown
-    taxSel.innerHTML = '<option value="">Select Tax</option>' +
-      rows.map(r => `<option value="${r.taxKey}">${r.englishname || r.marathiname || r.taxKey}</option>`).join('');
-
-    // populate table
-    if (tableBody) {
-      tableBody.innerHTML = rows.map((r, idx) => `
-        <tr data-taxkey="${r.taxKey}">
-          <td>${idx+1}</td>
-          <td>${r.template}</td>
-          <td>${r.sequence ?? ''}</td>
-          <td>${r.englishname ?? ''}</td>
-          <td>${r.marathiname ?? ''}</td>
-          <td>${r.visible ? 'Yes' : 'No'}</td>
-          <td>${r.showTotal ? 'Yes' : 'No'}</td>
-        </tr>
-      `).join('');
-    }
-
-    // auto-select first tax
-    if (rows.length > 0) {
-      // build sequence options for this template
-      buildSeqOptions(rows);
-      taxSel.value = rows[0].taxKey;
-      fillFormFromSelection();
-    } else {
-      buildSeqOptions([]);
-      clearForm();
-    }
-  }
-
-  function clearForm() {
-    state.current = null;
-    stdInp.value = '';
-    locInp.value = '';
-    seqInp.value = '';
-    visChk.checked = true;
-    parentKeyHidden.value = '';
-    showTotalHidden.value = '';
-  }
-
-  function fillFormFromSelection() {
-    const tpl = tplSel.value;
-    const key = taxSel.value ? Number(taxSel.value) : null;
-    if (!key) { clearForm(); return; }
-    const row = (state.byTemplate.get(tpl) || []).find(r => Number(r.taxKey) === key);
-    if (!row) { clearForm(); return; }
-    state.current = row;
-    stdInp.value = row.englishname || '';
-    locInp.value = row.marathiname || '';
-    // ensure sequence dropdown has options for current template
-    buildSeqOptions((state.byTemplate.get(tpl) || []));
-    seqInp.value = row.sequence != null ? row.sequence : 1;
-    visChk.checked = !!row.visible;
-    parentKeyHidden.value = row.parentKey != null ? row.parentKey : '';
-    showTotalHidden.value = row.showTotal ? 'true' : 'false';
-  }
-
-  function onSave() {
-    if (!state.current) { alert('Select a tax'); return; }
-
-    // Auto-indexing: rebuild full order for the selected template
-    const tpl = tplSel.value;
-    const rows = (state.byTemplate.get(tpl) || []).slice();
-    const targetKey = Number(state.current.taxKey);
-    const desiredSeq = Math.max(1, Number(seqInp.value || 1));
-
-    // Keep names if inputs empty (do not null/blank them)
-    const stdName = (stdInp.value || '').trim() || (state.current.englishname || '');
-    const locName = (locInp.value || '').trim() || (state.current.marathiname || '');
-
-    rows.sort((a,b)=> (a.sequence||0) - (b.sequence||0));
-    const others = rows.filter(r => Number(r.taxKey) !== targetKey);
-    const insertIdx = Math.min(Math.max(desiredSeq-1, 0), others.length);
-    const newOrder = others.slice(0, insertIdx)
-      .concat([state.current])
-      .concat(others.slice(insertIdx));
-
-    const payload = newOrder.map((r, i) => ({
-      id: r.id,
-      templateVc: tpl,
-      taxKeyL: r.taxKey,
-      parentTaxKeyL: r.parentKey || null,
-      isParentBl: null,
-      showTotalBl: r.showTotal || false,
-      standardNameVc: Number(r.taxKey) === targetKey ? stdName : (r.englishname || ''),
-      localNameVc: Number(r.taxKey) === targetKey ? locName  : (r.marathiname || ''),
-      sequenceI: i + 1,
-      visibleB: Number(r.taxKey) === targetKey ? visChk.checked : !!r.visible
-    }));
-
-    fetch('/3g/reportTaxConfigs/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }).then(res => {
-      if (!res.ok) throw new Error('Save failed');
-      loadAll();
-    }).catch(err => {
-      console.error(err);
-      alert('Failed to save.');
-    });
-  }
-
-  tplSel.addEventListener('change', refreshUI);
-  taxSel.addEventListener('change', fillFormFromSelection);
-  document.addEventListener('click', function(ev){
-    if (ev.target && ev.target.classList.contains('rtc-edit')) {
-      const key = ev.target.getAttribute('data-taxkey');
-      taxSel.value = key;
-      fillFormFromSelection();
-    }
-  });
-  if (saveBtn) saveBtn.addEventListener('click', onSave);
-
-  loadAll();
-}
 initializeUnitUsageTypesBasedOnPropertyUsage('uusc-property-usage-type-select', 'uusc-unit-usage-type-select', 'getUnitUsageByPropUsageId');
 initializeBuildingTypesAndCaptureSelection('building-type-select', 'getBuildingTypes');
 initializePropertyTypesAndCaptureSelection('bt-property-type-select', 'propertytypes');
@@ -604,7 +419,7 @@ fetchAndPopulateTable('/3g/getAllPropertyRates', 'existingPropertyRatesTableBody
 fetchAndPopulateTable('/3g/getAllCessRates', 'existingCessRatesTableBody', ['minTaxableValueFl','maxTaxableValueFl','residentialRateFl','commercialRateFl','egcRateFl'],'/3g/deleteCessRate');
 fetchAndPopulateTable('/3g/getDepreciationRates', 'existingDepreciationRatesTableBody', ['constructionClassVc','minAgeI','maxAgeI','depreciationPercentageI'],'/3g/deleteDepreciationRate');
 fetchAndPopulateTable('/3g/getCouncilDetails','councilDetailsTableBody', ['standardName', 'localName'], '/3g/deleteCouncilDetails');
-// (rendered by initReportTaxConfig)
+fetchAndPopulateTable('/3g/reportTaxConfigs/all','rtc-table-body', ['template', 'sequence', 'englishname', 'marathiname', 'visible', 'showTotal']);
 
 fetchAllRateTypes();
 });
@@ -892,37 +707,39 @@ async function fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEn
                 row.appendChild(cell);
             });
 
-    // Add action buttons only if endpoints provided
-    if (deleteEndpointUrl || updateEndpointUrl) {
-        const actionsCell = document.createElement('td');
+            // Add action buttons
+            const actionsCell = document.createElement('td');
 
-        if (deleteEndpointUrl) {
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
-            deleteButton.classList.add('btn', 'btn-danger', 'mr-2');
-            deleteButton.onclick = function() {
-                deleteRecord(item.id, deleteEndpointUrl, () => {
-                    fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEndpointUrl, updateEndpointUrl);
-                });
-            };
-            actionsCell.appendChild(deleteButton);
-        }
+            // Add delete button if deleteEndpointUrl is provided
+            if (deleteEndpointUrl) {
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.classList.add('btn', 'btn-danger', 'mr-2');
+                deleteButton.onclick = function() {
+                    deleteRecord(item.id, deleteEndpointUrl, () => {// here we would require id to be changed to value and all should be uniform like value in usm psm n all
+                        // Refresh the table after successful deletion
+                        fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEndpointUrl, updateEndpointUrl);
+                    });
+                };
+                actionsCell.appendChild(deleteButton);
+            }
 
-        if (updateEndpointUrl) {
-            const editButton = document.createElement('button');
-            editButton.textContent = 'Edit';
-            editButton.classList.add('btn', 'btn-warning');
-            editButton.onclick = function() {
-                editRecord(row, item, columns, updateEndpointUrl, () => {
-                    fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEndpointUrl, updateEndpointUrl);
-                });
-            };
-            actionsCell.appendChild(editButton);
-        }
+            // Add edit button if updateEndpointUrl is provided
+            if (updateEndpointUrl) {
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.classList.add('btn', 'btn-warning');
+                editButton.onclick = function() {
+                    editRecord(row, item, columns, updateEndpointUrl, () => {
+                        // Refresh the table after successful update
+                        fetchAndPopulateTable(endpointUrl, tableBodyId, columns, deleteEndpointUrl, updateEndpointUrl);
+                    });
+                };
+                actionsCell.appendChild(editButton);
+            }
 
-        actionsCell.style.textAlign = 'center';
-        row.appendChild(actionsCell);
-    }
+            actionsCell.style.textAlign = 'center'; // Center align
+            row.appendChild(actionsCell);
 
             tableBody.appendChild(row);
         });
@@ -1178,36 +995,10 @@ if (confirm('Are you sure you want to delete this record?')) {
 
 
 // fetchPropertyRecords is the method getting used for searching the properties and setting them into the table
-// Keep state for paginated property searches
-window.propertySearchState = window.propertySearchState || {};
-
-function fetchPropertyRecords(endpointUrl, queryParams, tableBodyId, actionType, columns, append = false) {
+function fetchPropertyRecords(endpointUrl, queryParams, tableBodyId, actionType, columns) {
     const url = new URL(endpointUrl, window.location.origin);
-    const isPropertySearch = endpointUrl.includes('/3g/searchNewProperties');
-    // Apply default paging for heavy property searches if not provided
-    if (isPropertySearch) {
-        if (!('page' in queryParams)) queryParams.page = 0;
-        if (!('size' in queryParams)) queryParams.size = 200;
-
-        // Maintain paging state per table
-        try {
-            const pg = Number(queryParams.page || 0);
-            const sz = Number(queryParams.size || 200);
-            const base = JSON.parse(JSON.stringify(queryParams));
-            delete base.page; delete base.size;
-            window.propertySearchState[tableBodyId] = {
-                endpoint: endpointUrl,
-                base,
-                page: pg,
-                size: sz,
-                actionType,
-                columns
-            };
-        } catch (e) { /* ignore state errors */ }
-    }
-
     Object.keys(queryParams).forEach(key => url.searchParams.append(key, queryParams[key]));
-
+    
     fetch(url)
     .then(response => {
         if (!response.ok) {
@@ -1222,7 +1013,7 @@ function fetchPropertyRecords(endpointUrl, queryParams, tableBodyId, actionType,
     })
     .then(data => {
         const tableBody = document.getElementById(tableBodyId);
-        if (!append) tableBody.innerHTML = '';
+        tableBody.innerHTML = '';
 
 
         if (data && data.length > 0) {
@@ -1232,10 +1023,9 @@ function fetchPropertyRecords(endpointUrl, queryParams, tableBodyId, actionType,
                 return valA.localeCompare(valB); // ascending order
             });
 
-            const existingCount = append ? tableBody.querySelectorAll('tr').length : 0;
             data.forEach((item, index) => {
                 const row = document.createElement('tr');
-                row.innerHTML = `<td>${existingCount + index + 1}</td>` +
+                row.innerHTML = `<td>${index + 1}</td>` +
                     columns.map(col => `<td>${item[col] || ''}</td>`).join('') +
                     `<td>` + getActionButtons(actionType, item) + `</td>`;
                 tableBody.appendChild(row);
@@ -1243,41 +1033,8 @@ function fetchPropertyRecords(endpointUrl, queryParams, tableBodyId, actionType,
         } else {
             tableBody.innerHTML = '<tr><td colspan="' + (columns.length + 2) + '">No results found.</td></tr>';
         }
-
-        // Render or hide pager for property search
-        if (isPropertySearch) {
-            const st = window.propertySearchState[tableBodyId];
-            const pagerId = tableBodyId + '-pager';
-            const tableEl = tableBody.closest('table');
-            if (tableEl) {
-                let pager = document.getElementById(pagerId);
-                if (!pager) {
-                    pager = document.createElement('div');
-                    pager.id = pagerId;
-                    pager.style.textAlign = 'center';
-                    pager.style.margin = '8px 0 16px 0';
-                    tableEl.parentNode.insertBefore(pager, tableEl.nextSibling);
-                }
-                const hasMore = Array.isArray(data) && data.length >= (st && st.size ? st.size : Number(queryParams.size || 200));
-                if (hasMore) {
-                    pager.innerHTML = `<button class="btn btn-secondary" onclick="loadMoreProperties('${tableBodyId}')">Load More</button>`;
-                } else {
-                    pager.innerHTML = '';
-                }
-            }
-        }
     })
     .catch(error => console.error('Error fetching property records:', error));
-}
-
-function loadMoreProperties(tableBodyId) {
-    const st = window.propertySearchState && window.propertySearchState[tableBodyId];
-    if (!st) return;
-    const nextPage = (st.page || 0) + 1;
-    const params = Object.assign({}, st.base, { page: nextPage, size: st.size });
-    // Update state before fetch to keep continuity if user clicks fast
-    st.page = nextPage;
-    fetchPropertyRecords(st.endpoint, params, tableBodyId, st.actionType, st.columns, true);
 }
 // getActionButtons is getting used to segregate the buttons for uploading cad images and property images
 // and viewing survey report,calculationsheet also deleting reports
@@ -1301,15 +1058,14 @@ function getActionButtons(actionType, item) {
     else if (actionType === 'notices') {
         return `
             <button class="btn btn-warning mr-2" onclick="viewSpecialNotice(null, '${item.pdNewpropertynoVc}')">Special Notice</button>
-            <button class="btn btn-info" onclick="viewTaxBill('${item.pdNewpropertynoVc}')">Tax Bill</button>
         `;
     }
 
     else if (actionType === 'objection') {
        return `
-           <button class="btn btn-primary mr-2" onclick="openAfterHearingProperty('${item.newPropertyNo}')">After Hearing Decision</button>
-           <button class="btn btn-warning mr-2" onclick="viewOrderSheet(null, '${item.newPropertyNo}')">Order Sheet</button>
-           <button class="btn btn-info" onclick="viewHearingNotice(null, '${item.newPropertyNo}')">Hearing Notice</button>
+           <button class="btn btn-primary" onclick="openAfterHearingProperty('${item.pdNewpropertynoVc}')">
+               After Hearing Decision
+           </button>
        `;
     }
     else if (actionType === 'arrears') {
@@ -1336,14 +1092,15 @@ function editArrears(newPropertyNo, finalPropertyNo, ownerName, ward) {
 
   document.getElementById("newPropertyNo").value = newPropertyNo || '';
   document.getElementById("finalPropertyNo").value = finalPropertyNo || '';
-  document.getElementById("ward").value = ward || '';
 
   document.getElementById("finalPropertyNo").value = finalPropertyNo || '';
   document.getElementById("ownerName").value = ownerName || '';
   document.getElementById("finalPropertyNo").readOnly = true;
   document.getElementById("ownerName").readOnly = true;
 
-
+  if (document.getElementById("ward")) {
+    document.getElementById("ward").value = ward || '';
+  }
 
   document.getElementById("arrears-tax").scrollIntoView({ behavior: "smooth" });
 }
@@ -1360,10 +1117,6 @@ function performSearch(sectionId, columns) {
     if (ownerName) searchParams.ownerName = ownerName;
     if (wardNumber) searchParams.wardNo = wardNumber;
     if (finalPropertyNo) searchParams.finalPropertyNo = finalPropertyNo;
-
-    // Default pagination for heavy queries
-    searchParams.page = 0;
-    searchParams.size = 200; // increase default page size from backend 50 to 200
 
     let tableBodyId, actionType;
     if (sectionId === 'surveyReports') {
@@ -1688,18 +1441,14 @@ async function fetchAndPopulateWardsForBatch(endpointUrl, tableBodyId) {
             // Add actions
             const actionsCell = document.createElement('td');
             actionsCell.className = "text-center";
-            // "Process Ward" button (shown only if permitted by server)
-            const allowProcEl = document.getElementById('perm-controls');
-            const allowProcess = allowProcEl && allowProcEl.dataset && allowProcEl.dataset.allowProcess === 'true';
-            if (allowProcess) {
-                const processButton = document.createElement('button');
-                processButton.textContent = 'Process Ward';
-                processButton.classList.add('btn', 'btn-success', 'mr-2');
-                processButton.onclick = function() {
-                    processBatchForWard(ward.wardNo, row);
-                };
-                actionsCell.appendChild(processButton);
-            }
+            // "Process Ward" button
+            const processButton = document.createElement('button');
+            processButton.textContent = 'Process Ward';
+            processButton.classList.add('btn', 'btn-success', 'mr-2');
+            processButton.onclick = function() {
+                processBatchForWard(ward.wardNo, row);
+            };
+            actionsCell.appendChild(processButton);
 
             // "View Batch Report" button
             const viewBatchReportButton = document.createElement('button');
@@ -1854,31 +1603,17 @@ function viewSpecialNotice(wardNo, newPropertyNo) {
     }
     window.open(url, '_blank', 'noopener,noreferrer');
 }
-function viewTaxBill(newPropertyNo) {
-    if (!newPropertyNo) return;
-    // Open mapped route without dummy ward; query param drives single-bill mode
-    window.open(`/taxBill?newPropertyNo=${encodeURIComponent(newPropertyNo)}`, '_blank', 'noopener,noreferrer');
-}
-function viewHearingNotice(wardNo, newPropertyNo) {
-    let url = `/hearingNotices`;
-    if (newPropertyNo) {
-        url += `?newPropertyNo=${encodeURIComponent(newPropertyNo)}`;
-    } else if (wardNo) {
-        url += `?wardNo=${encodeURIComponent(wardNo)}`;
-    }
+function viewHearingNotice(wardNo) {
+    const url = `/hearingNotice`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 function viewSecondaryBatchAssessmentReport(wardNo) {
-    const url = `/secondaryBatchAssessmentReport?wardNo=${encodeURIComponent(wardNo)}`;
+    const url = `/secondaryBatchAssessmentReport`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
-function viewOrderSheet(wardNo, newPropertyNo) {
-    let url = `/orderSheet`;
-    if (newPropertyNo) {
-        url += `?newPropertyNo=${encodeURIComponent(newPropertyNo)}`;
-    } else if (wardNo) {
-        url += `?wardNo=${encodeURIComponent(wardNo)}`;
-    }
+function viewOrderSheet(wardNo) {
+
+    const url = `/orderSheet`;
     window.open(url, '_blank', 'noopener,noreferrer');
 }
 function viewTaxBills(wardNo) {
@@ -1914,11 +1649,7 @@ function submitCouncilDetailsForm() {
     // Get form inputs
     const standardNameInput = document.getElementById('standardName');
     const localNameInput = document.getElementById('localName');
-    const imageInput = document.getElementById('councilImage'); // File input for logo
-    const image2Input = document.getElementById('councilImage2'); // Second council image
-    const qrImageInput = document.getElementById('qrImage'); // QR image
-    const chiefSignInput = document.getElementById('chiefOfficerSign'); // File input for chief officer sign
-    const companySignInput = document.getElementById('companySign'); // File input for company sign
+    const imageInput = document.getElementById('councilImage');// File input for image
 
     // Field created by Himanshu for standardization and localization of site and district
     const standardSiteNameInput = document.getElementById('standardSiteName');
@@ -1926,8 +1657,9 @@ function submitCouncilDetailsForm() {
     const standardDistrictName = document.getElementById('standardDistrictName');
     const localDistrictName = document.getElementById('localDistrictName');
 
-    // Helper to build and submit regardless of logo presence
-    const buildAndSubmit = (logoBlob) => {
+    // Compress the image and then submit
+    const file = imageInput.files[0];
+    compressImage(file,525,700, null, (compressedBlob) => {
         const formData = new FormData();
         formData.append('standardName', standardNameInput.value);
         formData.append('localName', localNameInput.value);
@@ -1935,25 +1667,16 @@ function submitCouncilDetailsForm() {
         formData.append('localSiteNameVc', localSiteNameInput.value);
         formData.append('standardDistrictNameVc' , standardDistrictName.value);
         formData.append('localDistrictNameVc' , localDistrictName.value);
-        if (logoBlob) {
-            const fileRef = imageInput.files && imageInput.files[0];
-            formData.append('councilImage', logoBlob, (fileRef && fileRef.name) ? fileRef.name : 'council.png');
-        }
-        // Append optional council image 2 and QR image
-        const image2File = image2Input && image2Input.files ? image2Input.files[0] : null;
-        if (image2File) formData.append('councilImage2', image2File, image2File.name);
-        const qrFile = qrImageInput && qrImageInput.files ? qrImageInput.files[0] : null;
-        if (qrFile) formData.append('qrImage', qrFile, qrFile.name);
-        // Append signatures if provided (no compression for simplicity)
-        const chiefFile = chiefSignInput && chiefSignInput.files ? chiefSignInput.files[0] : null;
-        if (chiefFile) formData.append('chiefOfficerSign', chiefFile, chiefFile.name);
-        const companyFile = companySignInput && companySignInput.files ? companySignInput.files[0] : null;
-        if (companyFile) formData.append('companySign', companyFile, companyFile.name);
-        fetch('/3g/updateCouncilDetails', { method: 'POST', body: formData })
+        formData.append('councilImage', compressedBlob, file.name); // Use the original filename
+        // Submit the form data via fetch
+        fetch('/3g/saveCouncilDetails', {
+            method: 'POST',
+            body: formData,
+        })
             .then((response) => {
                 if (response.ok) {
                     alert('Council details submitted successfully!');
-                    document.getElementById('councilDetailsForm').reset();
+                    document.getElementById('councilDetailsForm').reset(); // Reset the form
                 } else {
                     alert('Failed to submit council details. Please try again.');
                 }
@@ -1962,17 +1685,7 @@ function submitCouncilDetailsForm() {
                 console.error('Error occurred while submitting council details:', error);
                 alert('An unexpected error occurred. Please try again later.');
             });
-    };
-    const file = imageInput.files && imageInput.files[0];
-    if (file) {
-        // Compress the image and then submit
-        compressImage(file, 525, 700, null, (compressedBlob) => {
-            buildAndSubmit(compressedBlob);
-        });
-    } else {
-        // No logo selected; still submit other fields and signatures
-        buildAndSubmit(null);
-    }
+    });
 }
 function compressImage(file,maxWidth,maxHeight, previewId, callback) {
     if (!file) return;  // Exit if no file is selected
@@ -2079,7 +1792,7 @@ function loadObjectionTakenProperties() {
         queryParams,
         'objection-searchResults',
         'objection',
-        ['finalPropertyNo', 'ownerName', 'wardNo', 'reasons', 'hearingStatus', 'objectionDate']
+        ['finalPropertyNo', 'ownerName', 'wardNo', 'zoneNo', 'reasons', 'hearingStatus', 'objectionDate']
     );
 }
 
@@ -2100,16 +1813,19 @@ function loadArrearsProperties() {
 }
 
 function openAfterHearingProperty(newPropertyNo) {
+  // store globally for re-use
   window.selectedPropertyNo = newPropertyNo;
-  console.log("thisisnew " + newPropertyNo);
 
-  document.getElementById("decisionSelect").value = "";
+  // reset dropdowns
+  document.getElementById('decisionSelect').value = '';
 
-  const decisionModal = new bootstrap.Modal(document.getElementById("hearingDecisionModal"));
+  // show first modal
+  const decisionModal = new bootstrap.Modal(document.getElementById('hearingDecisionModal'));
   decisionModal.show();
 
-  document.getElementById("confirmDecisionBtn").onclick = function () {
-    const decision = document.getElementById("decisionSelect").value;
+  // handle confirm button
+  document.getElementById('confirmDecisionBtn').onclick = function() {
+    const decision = document.getElementById('decisionSelect').value;
     if (!decision) {
       alert("Please select a decision before proceeding.");
       return;
@@ -2117,27 +1833,25 @@ function openAfterHearingProperty(newPropertyNo) {
 
     decisionModal.hide();
 
-    if (decision === "retained" || decision === "absent") {
-      // Immediate backend update (no data changes)
+    if (decision === 'retained' || decision === 'absent') {
       markObjectionStatus(newPropertyNo, decision.toUpperCase());
-    } else if (decision === "changed") {
-      // If changed — open 2nd modal
+    } else if (decision === 'changed') {
       openChangeTypeModal(newPropertyNo);
     }
   };
 }
 
 // =======================
-// 🔹 Step 2: Select Change Type (RV / Assessment)
+// 🔹 Open Change Type Modal
 // =======================
 function openChangeTypeModal(newPropertyNo) {
-  document.getElementById("changeTypeSelect").value = "";
+  document.getElementById('changeTypeSelect').value = '';
 
-  const changeModal = new bootstrap.Modal(document.getElementById("changeTypeModal"));
+  const changeModal = new bootstrap.Modal(document.getElementById('changeTypeModal'));
   changeModal.show();
 
-  document.getElementById("confirmChangeTypeBtn").onclick = function () {
-    const changeType = document.getElementById("changeTypeSelect").value;
+  document.getElementById('confirmChangeTypeBtn').onclick = function() {
+    const changeType = document.getElementById('changeTypeSelect').value;
     if (!changeType) {
       alert("Please select a change type before proceeding.");
       return;
@@ -2145,89 +1859,60 @@ function openChangeTypeModal(newPropertyNo) {
 
     changeModal.hide();
 
-    // ✅ Simple boolean logic — no need toUpperCase()
-    const byRv = (changeType === "RV");
-    const byAssessment = (changeType === "ASSESSMENT");
+    // 🔹 First update the status in backend
+    fetch(`/3g/afterHearing/markStatus`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        newPropertyNo: newPropertyNo,
+        status: "CHANGED",
+        changeType: changeType // "rv" or "assessment"
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log("✅ Hearing status updated:", data);
 
-
-    localStorage.setItem("afterHearingDecision", "CHANGED");
-    localStorage.setItem("afterHearingChangeType", changeType);
-    localStorage.setItem("afterHearingByRv", byRv);
-    localStorage.setItem("afterHearingByAssessment", byAssessment);
-    localStorage.setItem("afterHearingProperty", newPropertyNo);
-
-    // 🟢 Open edit form
-    editAssessment(newPropertyNo);
+      // 🔹 Then open the assessment form
+      editAssessment(newPropertyNo);
+    })
+    .catch(err => {
+      console.error("❌ Failed to update hearing status:", err);
+      alert("Error updating hearing status!");
+    });
   };
 }
 
-
 // =======================
-// 🔹 Mark Retained / Absent (immediate update)
+// 🔹 Mark Retained / Absent
 // =======================
 function markObjectionStatus(newPropertyNo, status) {
   fetch(`/3g/afterHearing/markStatus`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       newPropertyNo: newPropertyNo,
       status: status
     })
   })
-    .then(response => {
-      if (!response.ok) throw new Error("Failed to update status");
-      return response.json();
-    })
-    .then(data => {
-      alert(`Property marked as ${status}.`);
-      window.location.reload();
-    })
-    .catch(err => alert(err.message));
+  .then(response => {
+    if (!response.ok) throw new Error('Failed to update status');
+    return response.json();
+  })
+  .then(data => {
+    alert(`Property marked as ${status}.`);
+    window.location.reload();
+  })
+  .catch(err => alert(err.message));
 }
 
 // =======================
-// 🔹 Open Edit Form
+// 🔹 Existing function (unchanged)
 // =======================
 function editAssessment(newPropertyNo) {
   const url = `/3gSurvey/editSurveyForm?newpropertyno=${newPropertyNo}&mode=assessment`;
-  window.open(url, "_blank");
+  window.open(url, '_blank');
 }
-
-// =======================
-// 🔹 Called AFTER officer saves modified data
-// =======================
-async function finalizeAfterHearingStatus(newPropertyNo) {
-  try {
-    if (!window.afterHearingDecision || !window.afterHearingChangeType) {
-      console.warn("⚠️ No hearing decision stored for property " + newPropertyNo);
-      return;
-    }
-
-    const payload = {
-      newPropertyNo: newPropertyNo,
-      status: window.afterHearingDecision,
-      changeType: window.afterHearingChangeType
-    };
-
-    const res = await fetch(`/3g/afterHearing/markStatus`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) throw new Error("Server error updating status");
-
-    const data = await res.json();
-    console.log("✅ Hearing status finalized:", data);
-
-    alert("After Hearing status marked as CHANGED successfully!");
-
-  } catch (error) {
-    console.error("❌ Failed to finalize hearing status:", error);
-    alert("Error marking After Hearing status. Please check console.");
-  }
-}
-
 async function saveArrearsTax() {
   try {
     const form = document.getElementById("arrearsTaxForm");
@@ -2236,41 +1921,39 @@ async function saveArrearsTax() {
       return;
     }
 
+    // 🧩 Collect all form data dynamically
     const formData = new FormData(form);
     const jsonData = {};
 
     formData.forEach((value, key) => {
-      // 🔒 Do not convert IDs or codes to numbers
-      const keepAsString = [
-        "newPropertyNo",
-        "finalPropertyNo",
-        "financialYear",
-        "ownerName",
-        "ward"
-      ];
-
-      if (keepAsString.includes(key)) {
-        jsonData[key] = value.trim(); // preserve leading zeros
-      } else if (!isNaN(value) && value.trim() !== "") {
+      // Convert numeric fields properly
+      if (!isNaN(value) && value.trim() !== "") {
         jsonData[key] = parseFloat(value);
       } else {
         jsonData[key] = value;
       }
     });
 
-    console.log("Submitting arrears tax data:", jsonData);
+    console.log("📤 Submitting arrears tax data:", jsonData);
 
+    // 🛰️ Send POST request
     const response = await fetch("/3g/addPropertyArrearsTax", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(jsonData),
     });
 
-    if (!response.ok) throw new Error(`Server error: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
 
     const result = await response.json();
+    // console.log("✅ Arrears Tax Saved:", result);
     alert("✅ Arrears Tax Saved Successfully!");
 
+    // Optionally reset the form or switch view
     form.reset();
     document.getElementById("arrears-tax").style.display = "none";
     document.getElementById("arrears").style.display = "block";
@@ -2282,28 +1965,6 @@ async function saveArrearsTax() {
 }
 
 
-async function applyInterestToArrears() {
-  try {
-    const input = document.getElementById('arrears-interest-percent');
-    if (!input) { alert('Interest % field not found'); return; }
-    const val = parseFloat(input.value);
-    if (isNaN(val) || val < 0) { alert('Enter a valid non-negative interest %'); return; }
 
-    const res = await fetch('/3g/arrears/applyInterestBatch', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ percent: val })
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json().catch(() => ({}));
-    const n = typeof data.updated === 'number' ? data.updated : 'some';
-    alert(`Applied interest to ${n} record(s).`);
-    // Optionally refresh listing
-    if (typeof loadArrearsProperties === 'function') {
-      try { loadArrearsProperties(); } catch (e) {}
-    }
-  } catch (e) {
-    console.error('Failed to apply interest batch', e);
-    alert('Failed to apply interest. Check console.');
-  }
-}
+
+

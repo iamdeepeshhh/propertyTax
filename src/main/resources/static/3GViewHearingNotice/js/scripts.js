@@ -35,17 +35,24 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function formatYearRange(date) {
-  const year = parseInt(date.split('-')[0]);
-  const start = convertToDevanagari((year).toString());
-  const end = convertToDevanagari((year + 3).toString());
-  return `${start}-${end}`;
+  const year = parseInt(date.split('-')[0]); // e.g., 2024
+  const startNext = year + 1;                // e.g., 2025
+  const endYear = year + 3;                  // e.g., 2027
+  const endNext = year + 4;                  // e.g., 2028
+
+  // ✅ Always pass strings to convertToDevanagari
+  const startPart = `${convertToDevanagari(year.toString())}-${convertToDevanagari(startNext.toString().slice(-2))}`;
+  const endPart = `${convertToDevanagari(endYear.toString())}-${convertToDevanagari(endNext.toString().slice(-2))}`;
+
+  return `${startPart} ते ${endPart}`;
 }
 
 function convertToDevanagari(numStr) {
+  if (numStr == null) return ''; // null/undefined safety
+  numStr = numStr.toString();    // ensure it's a string
   const digits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
   return numStr.replace(/[0-9]/g, (d) => digits[d]);
 }
-
 // ==========================================
 // 📜 Fetch Hearing Notices and Print
 // ==========================================
@@ -115,20 +122,43 @@ function addHearingPrintButton(wardNo) {
 // 🧾 Render Single Hearing Notice
 // ==========================================
 function renderHearingNoticeSingle(dto) {
+  console.log(dto);
+  
   const $page = $('.container').first();
 
-  // Fill Table Data
-  $page.find('tbody tr td').eq(0).text(dto.applicationNo || '');
-  $page.find('tbody tr td').eq(1).text(dto.zoneNo || '');
-  $page.find('tbody tr td').eq(2).text(dto.wardNo || '');
-  $page.find('tbody tr td').eq(3).text(dto.finalPropertyNo || '');
-  $page.find('tbody tr td').eq(4).text(dto.oldPropertyNo || '');
+  // --- Fill both tables ---
+  $page.find('table').each(function() {
+    const $table = $(this);
+    $table.find('tbody tr td').eq(0).text(dto.applicationNo || '');
+    $table.find('tbody tr td').eq(1).text(dto.zoneNo || '');
+    $table.find('tbody tr td').eq(2).text(dto.wardNo || '');
+    $table.find('tbody tr td').eq(3).text(dto.finalPropertyNo || '');
+    $table.find('tbody tr td').eq(4).text(dto.oldPropertyNo || '');
+  });
 
-  // Dynamic Content Binding (support both legacy and new selectors)
+  // --- Dynamic text binding for both content blocks ---
   $page.find('.ownerName, .pdOwnernameVc').text(dto.ownerName || '');
   $page.find('.hearingDate').text(dto.hearingDate || '');
-  $page.find('.hearingTime').text(dto.hearingTime || '');
+  $page.find('.hearingTime').text(formatTo12Hour(dto.hearingTime) || '');
   $page.find('.noticeNo, .pdNoticenoVc').text(dto.noticeNo || '');
+  $page.find('.applicationReceivedDate').text(dto.applicationReceivedDate || '');
+}
+
+
+function formatTo12Hour(time24) {
+  if (!time24) return '';
+  
+  // Split "HH:mm"
+  const [hours, minutes] = time24.split(':').map(Number);
+  
+  // Determine AM/PM
+  const period = hours >= 12 ? 'PM' : 'AM';
+  
+  // Convert to 12-hour format (0 → 12, 13 → 1, etc.)
+  const hours12 = hours % 12 || 12;
+  
+  // Return formatted string
+  return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
 }
 
 // ==========================================
@@ -137,10 +167,15 @@ function renderHearingNoticeSingle(dto) {
 function renderAndPrintHearingChunk() {
   const chunk = hnDataList.slice(hnCurrentChunk * hnChunkSize, (hnCurrentChunk + 1) * hnChunkSize);
   if (chunk.length === 0) {
-
-//    $('#startHearingPrint').show();
-    return;
+  // ✅ All chunks rendered – show Print All button
+  if (!$('#hn-final-print').length) {
+    $('body').append(
+      '<button id="hn-final-print" style="margin:10px;padding:8px 16px;background:#28a745;color:#fff;border:none;border-radius:4px;cursor:pointer;">🖨️ Print All</button>'
+    );
+    $('#hn-final-print').on('click', () => window.print());
   }
+  return;
+}
 
   let $wrap = $('#hn-report');
   if (!$wrap.length) {
@@ -151,17 +186,17 @@ function renderAndPrintHearingChunk() {
     const $p = $hnOriginalPage.clone(false);
 
     // Fill Table
-    $p.find('tbody tr td').eq(0).text(dto.applicationNo || '');
-    $p.find('tbody tr td').eq(1).text(dto.zoneNo || '');
-    $p.find('tbody tr td').eq(2).text(dto.wardNo || '');
-    $p.find('tbody tr td').eq(3).text(dto.newPropertyNo || '');
-    $p.find('tbody tr td').eq(4).text(dto.oldPropertyNo || '');
+    $p.find('tbody tr td').eq(0).text(dto.applicationNo || '-');
+    $p.find('tbody tr td').eq(1).text(dto.zoneNo || '-');
+    $p.find('tbody tr td').eq(2).text(dto.wardNo || '-');
+    $p.find('tbody tr td').eq(3).text(dto.newPropertyNo || '-');
+    $p.find('tbody tr td').eq(4).text(dto.oldPropertyNo || '-');
 
     // Dynamic Text Fill (support both legacy and new selectors)
-    $p.find('.noticeNo, .pdNoticenoVc').text(dto.noticeNo || '');
-    $p.find('.ownerName, .pdOwnernameVc').text(dto.ownerName || '');
-    $p.find('.hearingDate').text(dto.hearingDate || '');
-    $p.find('.hearingTime').text(dto.hearingTime || '');
+    $p.find('.noticeNo, .pdNoticenoVc').text(dto.noticeNo || '-');
+    $p.find('.ownerName, .pdOwnernameVc').text(dto.ownerName || '-');
+    $p.find('.hearingDate').text(dto.hearingDate || '-');
+    $p.find('.hearingTime').text(dto.hearingTime || '-');
 
     $wrap.append($p);
   });
@@ -176,5 +211,20 @@ function renderAndPrintHearingChunk() {
   hnCurrentChunk++;
   renderAndPrintHearingChunk();
 }
+
+
+// ==========================================
+// 🖨️ Add Global Print Button (works for single & multi)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.createElement('button');
+  btn.textContent = '🖨️ Print Page';
+  btn.id = 'globalPrintBtn';
+  btn.style.cssText =
+    'position:fixed;top:10px;right:20px;padding:8px 16px;background:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;z-index:9999;';
+  document.body.appendChild(btn);
+  btn.addEventListener('click', () => window.print());
+});
+
 
 
