@@ -83,9 +83,6 @@ async function renderMultipleOrderSheets(list) {
 // 4️⃣  FILL ALL DETAILS
 // ──────────────────────────────
 function fillOrderSheet($root, dto) {
-
-  console.log(dto);
-
   if (!dto) return;
 
   // Fill first header table (7 columns)
@@ -107,6 +104,7 @@ function fillOrderSheet($root, dto) {
   // $root.find('.hearingDate').text(formatDate(dto.hearingDate));
   $root.find('.hearingStatus').text(dto.hearingStatus || '');
   $root.find('.objectionDate').text(formatDate(dto.objectionDate)||'--------');
+  $root.find('.hearingDate').text(formatDate(dto.hearingDate)||'--------');
   $root.find('.hearingDate').text(formatDate(dto.hearingDate)||'--------');
     const reasonsText = dto.reasons || '';
     if (reasonsText.trim() !== '') {
