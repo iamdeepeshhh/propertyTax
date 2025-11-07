@@ -8,6 +8,7 @@
   <title>3G Associates</title>
   <!-- Bootstrap CSS -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
@@ -321,6 +322,7 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownPropertyDetails">
             <a class="dropdown-item" href="#" onclick="showTab('notices')">Notices</a>
+            <a class="dropdown-item" href="#" onclick="showTab('registerObjection')">Register Objection</a>
             <a class="dropdown-item" href="#" onclick="showTab('objections')">Objection Status</a>
             <a class="dropdown-item" href="#" onclick="showTab('scheduler')">Objection Scheduler</a>
           </div>
@@ -680,6 +682,136 @@
     <div style="height: 40px;"></div>
     <div style="height: 40px;"></div>
     <div style="height: 40px;"></div>
+  </section>
+
+  <!-- Register Objection (search) -->
+  <section id="registerObjection" class="container mt-5" style="display:none;">
+    <h2>Register Objection</h2>
+
+    <div class="row align-items-end">
+      <div class="col-md-3 mx-2">
+        <label for="registerObjection-wardNumberInput" class="sr-only">Ward Number:</label>
+        <input type="number" class="form-control mb-2" id="registerObjection-wardNumberInput" placeholder="Enter Ward Number...">
+      </div>
+      <div class="col-md-3 mx-2">
+        <label for="registerObjection-finalPropertyNoInput" class="sr-only">Property:</label>
+        <input type="text" class="form-control mb-2" id="registerObjection-finalPropertyNoInput" placeholder="Enter Final Property No...">
+      </div>
+      <div class="col-md-4 d-flex mb-3">
+        <button type="button" class="btn btn-primary mr-2 w-50" id="registerObjection-searchButton"><i class="fas fa-search"></i> Search</button>
+        <button type="button" class="btn btn-secondary w-50" id="registerObjection-cancelBtn"><i class="fas fa-times"></i> Cancel</button>
+      </div>
+    </div>
+
+    <h5 class="mb-3">Search Results</h5>
+    <div style="width: 90vw; margin-left: calc(-45vw + 50%); overflow-x: auto; max-height: 600px;">
+      <table class="table table-bordered table-hover text-center w-100">
+        <thead class="thead-light">
+        <tr>
+          <th>#</th>
+          <th>Property No</th>
+          <th style="width: 200px;">Owner Name</th>
+          <th>Property Address</th>
+          <th>Old Property No</th>
+          <th>Zone</th>
+          <th>Survey No</th>
+          <th>Objection</th>
+        </tr>
+        </thead>
+        <tbody id="registerObjection-results"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Register Objection (form identical to Citizen) -->
+  <section id="objectionSection" class="container my-5" style="display:none;">
+    <h5 class="mb-3">Register Objection (आक्षेप अर्ज)</h5>
+    <form id="objectionForm" method="POST">
+      <div class="form-row mb-3">
+        <input type="hidden" id="objectionSurveyNo" name="objectionSurveyNo">
+        <div class="col-md-2">
+          <label>वार्ड क्र</label>
+          <input type="text" class="form-control" id="objectionWardNo" name="objectionWardNo" readonly>
+        </div>
+        <div class="col-md-2">
+          <label>झोन क्र</label>
+          <input type="text" class="form-control" id="objectionZoneNo" name="objectionZoneNo" readonly>
+        </div>
+        <div class="col-md-2">
+          <label>सूचना क्र.</label>
+          <input type="text" class="form-control" id="objectionNoticeNo" name="objectionNoticeNo" readonly>
+        </div>
+        <div class="col-md-3">
+          <label>मालमत्ता क्र</label>
+          <input type="text" class="form-control" id="objectionFinalPropertyNo" name="objectionFinalPropertyNo" readonly>
+        </div>
+        <div class="col-md-5">
+          <label>मालमत्ता धारकाचे नाव</label>
+          <input type="text" class="form-control" id="objectionOwnerName" name="objectionOwnerName" readonly>
+        </div>
+      </div>
+      <div class="form-row mb-3">
+        <div class="col-md-6">
+          <label>अर्जदाराचे नाव</label>
+          <input type="text" class="form-control" name="respondentname" required>
+        </div>
+        <div class="col-md-6">
+          <label>संपर्क क्र</label>
+          <input type="text" class="form-control" name="contactno" required>
+        </div>
+      </div>
+      <div class="form-row mb-4">
+        <div class="col-md-6">
+          <label>विशेष नोटीस प्राप्त दिनांक</label>
+          <input type="date" class="form-control" name="userdate">
+        </div>
+        <div class="col-md-6">
+          <label>अर्ज प्राप्त दिनांक</label>
+          <input type="date" class="form-control" name="applicationdate">
+        </div>
+      </div>
+      <h6>आक्षेपाची खालील कारणे टिक करा / Tick the reason for objection</h6>
+      <input type="hidden" id="reasons" name="reasons">
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-6">
+            <ul class="list-unstyled">
+              <li><input type="checkbox" class="chk" value="मालमत्तेचे क्षेत्रफळ चुकीचे दर्शविण्यात आलेले आहे."> 1. क्षेत्रफळ चुकीचे</li>
+              <li><input type="checkbox" class="chk" value="बांधकाम दर्जा चुकीचा दर्शविलेला आहे."> 2. बांधकाम दर्जा चुकीचा</li>
+              <li><input type="checkbox" class="chk" value="विशिष्ट बांधकाम दर्ज्याचे क्षेत्रफळ चुकीचे दर्शविले आहे."> 3. विशिष्ट क्षेत्रफळ चुकीचे</li>
+              <li><input type="checkbox" class="chk" value="मालमत्तेचा वापर चुकीचा दर्शविला आहे."> 4. वापर चुकीचा</li>
+              <li><input type="checkbox" class="chk" value="मालमत्तेचे वय चुकीचे दर्शविले आहे."> 5. वय चुकीचे</li>
+              <li><input type="checkbox" class="chk" value="भाडेकरू वास्तव्यास नाही."> 6. भाडेकरू नाही</li>
+              <li><input type="checkbox" class="chk" value="मालमत्तेतील विशिष्ट भाडेकरूचे वापरातील क्षेत्रफळ चुकीचे दर्शविण्यात आलेले आहे."> 7. भाडेकरू क्षेत्रफळ चुकीचे</li>
+              <li><input type="checkbox" class="chk" value="विशिष्ट भाडेकरूचे भाडे चुकीचे दर्शविण्यात आलेले आहे."> 8. भाडे चुकीचे</li>
+              <li><input type="checkbox" class="chk" value="मजल्यांची संख्या चुकीची दर्शविण्यात आलेली आहे."> 9. मजल्यांची संख्या चुकीची</li>
+              <li><input type="checkbox" class="chk" value="खोल्यांची संख्या चुकीची दर्शविण्यात आलेली आहे."> 10. खोल्यांची संख्या चुकीची</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <ul class="list-unstyled">
+              <li><input type="checkbox" class="chk" value="मोजमाप बरोबर घेण्यात आलेले नाही."> 11. मोजमाप चुकीचे</li>
+              <li><input type="checkbox" class="chk" value="कर खूप जास्त लावण्यात आलेला आहे."> 12. कर जास्त</li>
+              <li><input type="checkbox" class="chk" value="मालमत्ता रिकामी आहे."> 13. रिकामी मालमत्ता</li>
+              <li><input type="checkbox" class="chk" value="मालमत्ता सामान्य स्थितीत नाही संपवण्याच्या स्थितीत आहे."> 14. स्थिती सामान्य नाही</li>
+              <li><input type="checkbox" class="chk" value="मोक्यावर ईमारत नाही खुला भूखंड आहे."> 15. फक्त भूखंड</li>
+              <li><input type="checkbox" class="chk" value="मोक्यावर खुला भूखंड नाही ईमारत आहे."> 16. फक्त ईमारत</li>
+              <li><input type="checkbox" class="chk" value="मालकाचे नाव चुकीचे दर्शविण्यात आलेले आहे."> 17. मालकाचे नाव चुकीचे</li>
+              <li><input type="checkbox" class="chk" value="मालमत्तेचा संपूर्ण निवासी वापर आहे."> 18. निवासी वापर</li>
+              <li><input type="checkbox" class="chk" value="मालमत्तेचा वाणिज्यिक वापर आहे."> 19. वाणिज्यिक वापर</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label><strong>आक्षेपाची वरील व्यतिरिक्त कारणे</strong></label>
+        <textarea class="form-control" name="others" rows="4"></textarea>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn btn-success" onclick="submitObjection()">Submit Objection</button>
+        <button id="" type="reset" class="btn btn-danger" onclick="cancelObjection()">Cancel</button>
+      </div>
+    </form>
   </section>
 
   <!-- Hearing Scheduler -->

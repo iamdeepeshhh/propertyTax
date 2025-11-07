@@ -102,3 +102,28 @@ function fetchObjectionDetails(newPropertyNo) {
         }
     });
 }
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth() + 1)
+    .toString()
+    .padStart(2, '0')}-${d.getFullYear()}`;
+}
+
+function convertToDevanagari(num) {
+  const map = ['०','१','२','३','४','५','६','७','८','९'];
+  return num.toString().replace(/[0-9]/g, (d) => map[d]);
+}
+
+function formatYearRange(date) {
+    const year = parseInt(date.split('-')[0]);  // Extract the year from the date
+    const startYear = year;
+    const endYear = year + 3;
+    const startYearL = startYear + 1;
+    const endYearL = endYear + 1;
+    const startYearDev = convertToDevanagari(startYear.toString());
+    const endYearDev = convertToDevanagari(endYear.toString());
+
+    return `${startYearDev}-${convertToDevanagari(startYearL.toString())} ते ${endYearDev}-${convertToDevanagari(endYearL.toString())}`;
+}

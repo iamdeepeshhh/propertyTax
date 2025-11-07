@@ -1312,6 +1312,16 @@ function getActionButtons(actionType, item) {
            <button class="btn btn-info" onclick="viewHearingNotice(null, '${item.newPropertyNo}')">Hearing Notice</button>
        `;
     }
+    else if (actionType === 'registerObjection') {
+        const newPropNo = item.pdNewpropertynoVc || item.newPropertyNo || item.pdNewPropertyNo || item.pdnewpropertynoVc || '';
+        const btnId = `btn-${newPropNo}`;
+        const viewBtnId = `view-${newPropNo}`;
+        setTimeout(() => checkObjectionStatus(newPropNo, btnId, viewBtnId), 0);
+        return `
+            <button id="${btnId}" class="btn btn-primary mr-2">Register Objection</button>
+            <button id="${viewBtnId}" class="btn btn-info" style="display:none;">View Objection</button>
+        `;
+    }
     else if (actionType === 'arrears') {
         return `
             <button class="btn btn-primary"
@@ -1328,6 +1338,128 @@ function getActionButtons(actionType, item) {
 
 
     return '';
+}
+
+// ================= Register Objection (Citizen-like) =================
+function registerObjectionSearch() {
+    const finalProperty = (document.getElementById('registerObjection-finalPropertyNoInput') || {}).value?.trim?.() || '';
+    const wardNumber = (document.getElementById('registerObjection-wardNumberInput') || {}).value?.trim?.() || '';
+    if (!finalProperty || !wardNumber) { alert('No Records Can Be Found.'); return; }
+    const params = { finalPropertyNo: finalProperty, wardNo: wardNumber };
+    fetchPropertyRecords('/3g/searchByFinalPropertyNoAndWardNo', params, 'registerObjection-results', 'registerObjection', ['pdFinalpropnoVc', 'pdOwnernameVc','pdPropertyaddressVc','pdOldpropnoVc', 'pdZoneI', 'pdSurypropnoVc']);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const roSearchBtn = document.getElementById('registerObjection-searchButton');
+    if (roSearchBtn) {
+        roSearchBtn.addEventListener('click', (e) => { e.preventDefault(); registerObjectionSearch(); });
+    }
+    const roCancelBtn = document.getElementById('registerObjection-cancelBtn');
+    if (roCancelBtn) {
+        roCancelBtn.addEventListener('click', () => {
+            const ward = document.getElementById('registerObjection-wardNumberInput');
+            const fp = document.getElementById('registerObjection-finalPropertyNoInput');
+            if (ward) ward.value = '';
+            if (fp) fp.value = '';
+            const body = document.getElementById('registerObjection-results');
+            if (body) body.innerHTML = '';
+        });
+    }
+});
+
+function checkObjectionStatus(newPropertyNo, btnId, viewBtnId) {
+    fetch(`/3g/checkObjectionExists/${encodeURIComponent(newPropertyNo)}`)
+        .then(res => res.json())
+        .then(exists => {
+            const registerBtn = document.getElementById(btnId);
+            const viewBtn = document.getElementById(viewBtnId);
+            if (!registerBtn || !viewBtn) return;
+            if (exists) {
+                registerBtn.disabled = true;
+                registerBtn.style.opacity = '0.5';
+                registerBtn.style.visibility = 'hidden';
+                registerBtn.innerText = 'Objection Exists';
+                viewBtn.style.display = 'inline-block';
+                viewBtn.onclick = () => window.location.href = `/objectionReciept?newPropertyNo=${encodeURIComponent(newPropertyNo)}`;
+            } else {
+                registerBtn.disabled = false;
+                registerBtn.style.opacity = '1';
+                registerBtn.style.visibility = 'visible';
+                registerBtn.innerText = 'Register Objection';
+                registerBtn.onclick = () => viewRegisterObjectionSection(newPropertyNo);
+                viewBtn.style.display = 'none';
+            }
+        })
+        .catch(err => console.error('Error checking objection:', err));
+}
+
+let RO_newPropertyNo = null;
+function viewRegisterObjectionSection(newPropertyNo) {
+    RO_newPropertyNo = newPropertyNo;
+    const searchSec = document.getElementById('registerObjection');
+    if (searchSec) searchSec.style.display = 'none';
+    const formSec = document.getElementById('objectionSection');
+    if (formSec) formSec.style.display = 'block';
+    const apiUrl = '/3gSurvey/detailsComplete/' + newPropertyNo;
+    fetch(apiUrl)
+        .then(resp => resp.json())
+        .then(data => {
+            const pd = data.propertyDetails || {};
+            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+            setVal('objectionWardNo', pd.pdWardI);
+            setVal('objectionZoneNo', pd.pdZoneI);
+            setVal('objectionNoticeNo', pd.pdNoticenoVc);
+            setVal('objectionFinalPropertyNo', pd.pdFinalpropnoVc);
+            setVal('objectionSurveyNo', pd.pdSurypropnoVc);
+            setVal('objectionOwnerName', pd.pdOwnernameVc);
+        })
+        .catch(err => console.error(err));
+}
+
+function cancelObjection() {
+    const formSec = document.getElementById('objectionSection');
+    if (formSec) formSec.style.display = 'none';
+    const searchSec = document.getElementById('registerObjection');
+    if (searchSec) searchSec.style.display = 'block';
+    const form = document.getElementById('objectionForm');
+    if (form) form.reset();
+}
+
+async function submitObjection() {
+    try {
+        const form = document.getElementById('objectionForm');
+        if (!form) return;
+        const reasons = Array.from(document.querySelectorAll('.chk:checked')).map(cb => cb.value).join(', ');
+        const data = {
+            wardNo: form.objectionWardNo.value,
+            zoneNo: form.objectionZoneNo.value,
+            finalPropertyNo: form.objectionFinalPropertyNo.value,
+            ownerName: form.objectionOwnerName.value,
+            respondent: form.respondentname.value,
+            phoneNo: form.contactno.value,
+            userDate: form.userdate.value,
+            applicationReceivedDate: form.applicationdate.value,
+            others: form.others.value,
+            noticeNo: form.objectionNoticeNo.value,
+            surveyNo: form.objectionSurveyNo.value,
+            newPropertyNo: RO_newPropertyNo,
+            reasons,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        if (!data.respondent || !data.phoneNo) { alert('Please enter respondent name and contact number.'); return; }
+        const existsRes = await fetch(`/3g/checkObjectionExists/${encodeURIComponent(RO_newPropertyNo)}`);
+        const exists = await existsRes.json();
+        if (exists) { alert('An objection already exists for this property.'); return; }
+        const res = await fetch('/3g/submitObjection', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+        if (!res.ok) { alert('Failed to submit objection.'); return; }
+        alert('Objection submitted successfully!');
+        form.reset();
+        window.location.replace('/objectionReciept?newPropertyNo=' + encodeURIComponent(RO_newPropertyNo));
+    } catch (e) {
+        console.error(e);
+        alert('An error occurred while submitting objection.');
+    }
 }
 
 function editArrears(newPropertyNo, finalPropertyNo, ownerName, ward) {
