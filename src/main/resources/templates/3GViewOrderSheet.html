@@ -2,38 +2,35 @@
 <html lang="mr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Order Sheet</title>
     <link rel="stylesheet" href="/3GViewOrderSheet/css/styles.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
-        body, p, div, span ,b{
-        font-family: 'Noto Sans Devanagari', 'Arial Unicode MS', sans-serif;
-        font-feature-settings: "liga", "clig";
-        word-break: keep-all !important;
-        white-space: normal !important;
-        overflow-wrap: normal !important;
-        line-height: 1.7;
+        body, p, div, span ,b {
+            font-family: 'Noto Sans Devanagari', 'Arial Unicode MS', sans-serif;
+            font-feature-settings: "liga", "clig";
+            white-space: normal;
+            line-height: 1.7;
         }
-
 
         .k1 {
-        font-family: 'Noto Sans Devanagari', 'Arial Unicode MS', sans-serif;
-        text-align: justify;
-        line-height: 1.8;
-        text-indent: 40px;
-        font-size: 20px;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        font-weight: normal;
-        word-break: keep-all;
-        white-space: normal;
-        overflow-wrap: normal;
+            font-family: 'Noto Sans Devanagari', 'Arial Unicode MS', sans-serif;
+            text-align: justify;
+            line-height: 1.8;
+            text-indent: 40px;
+            font-size: 20px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            font-weight: normal;
         }
 
+        .k1 b { font-weight: 700; }
 
-        .k1 b {
-        font-weight: 700;
+        /* Mobile overrides to avoid overflow */
+        @media (max-width: 768px) {
+            .k1 { word-break: break-word; overflow-wrap: anywhere; }
         }
     </style>
 </head>
