@@ -56,7 +56,7 @@ function fetchObjectionDetails(newPropertyNo) {
             if (data) {
                 console.log("Fetched objection details:", data);
 
-                // ✅ Table population
+                // ✅ Table population (Looks fine)
                 const tableRow = `
                     <tr class="h-25 t-c">
                         <td>${data.wardNo || ''}</td>
@@ -71,27 +71,50 @@ function fetchObjectionDetails(newPropertyNo) {
                 `;
                 $('#fifthDiv table').find('tr:gt(0)').remove();
                 $('#fifthDiv table').append(tableRow);
+                
+                // 🛑 FIXED: Added dot for class selector
+                $('.yearRange').text(formatYearRange(data.hearingDate));
+
 
                 // ✅ Replace dynamic fields based on your JSON
                 const ownerName = data.ownerName || '';
                 const noticeNo = data.noticeNo || '';
-                const date = data.applicationReceivedDate || '';
+                const applicationDate = data.applicationReceivedDate ? formatDate(data.applicationReceivedDate) : ''; // Use formatDate
+                const hearingDateFormatted = data.hearingDate ? formatDate(data.hearingDate) : ''; // New variable for hearing date
                 const reasons = data.reasons || '';
                 const time = data.userTime || '';
                 const appNo = data.applicationNo || '';
 
                 // Applicant name replacements
-                $('span[style*="border-bottom"][style*="font-weight:bold"]').eq(0).text(ownerName);
-                $('span[style*="border-bottom"]').eq(1).text(noticeNo);
-                $('span[style*="border-bottom"]').eq(2).text(date);
+                // 🛑 FIXED: Removed undefined $page and used standard selector
+                $('.ownerName').text(ownerName); 
+                $('.noticeNo').text(noticeNo);
+                $('.applicationReceivedDate').text(applicationDate);
+                $('.totalRValue').text(data.totalRValue);
+                $('.totalTax').text(data.totalTax);
                 
-                // Replace reasons text
-                $('#usercomments').text(reasons);
+                
+                
+                const reasonsArray = reasons.split(',').map(reason => reason.trim()); 
+
+            
+                const numberedReasonsArray = reasonsArray.map((reason, index) => {
+                    return `${index + 1}. ${reason}`;
+                });
+
+                const formattedReasonsHTML = numberedReasonsArray.join('<br>'); // Simplified join string
+
+                $('.reasons').html(formattedReasonsHTML);
+
+                const formattedReasonsHTML2 = numberedReasonsArray.join(' ');
+
+                $('.reasons2').text(formattedReasonsHTML2);
 
                 // Replace footer details
-                $('#lastDiv td:contains("दिनांक")').next().text(date || '');
-                $('#lastDiv td:contains("वेळ")').next().text(time || '');
-                $('#lastDiv td:contains("अर्ज क्र.")').next().text(appNo || '');
+                // 🛑 FIXED: Use two different selectors to avoid overwriting (or adjust your HTML)
+                $('.hearingDate').text(hearingDateFormatted || ''); // Assuming a new class .hearingDate
+                $('.hearingTime').text(time || ''); 
+                $('.applicationNo').text(appNo || '');
 
             } else {
                 console.warn('No objection data received');

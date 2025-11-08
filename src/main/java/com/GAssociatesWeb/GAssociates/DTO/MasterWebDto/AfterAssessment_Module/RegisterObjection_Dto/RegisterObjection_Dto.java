@@ -37,6 +37,8 @@ public class RegisterObjection_Dto {
     private LocalDateTime updatedAt;
     private String applicationReceivedDate;
     private String changedValue;
+    private Double totalTax;
+    private Double totalRValue;
 
 }
 

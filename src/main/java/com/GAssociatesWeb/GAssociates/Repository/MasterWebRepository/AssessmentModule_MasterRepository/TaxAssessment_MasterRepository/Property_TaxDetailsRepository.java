@@ -12,6 +12,8 @@ public interface Property_TaxDetailsRepository extends JpaRepository<Property_Ta
      */
     List<Property_TaxDetails> findAllByPtFinalPropertyNoVc(String finalPropertyNo);
 
+   Property_TaxDetails findByPtNewPropertyNoVc(String newPropertyNoVc);
+
     /**
      * 🔹 Find all tax records for a specific financial year.
      */

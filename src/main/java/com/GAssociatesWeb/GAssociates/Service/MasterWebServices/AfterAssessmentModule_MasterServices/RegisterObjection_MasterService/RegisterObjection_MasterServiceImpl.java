@@ -3,7 +3,12 @@ package com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessment
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.RegisterObjection_Dto.RegisterObjection_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.AssessmentResultsDto;
 import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AfterAsessment_Module.RegisterObjection_Entity.RegisterObjection_Entity;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxAssessment_Module.Property_TaxDetails;
+import com.GAssociatesWeb.GAssociates.Entity.MasterWebEntity.AssessmentModule_MasterEntity.TaxAssessment_Module.Proposed_RValues;
+import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AfterAssessmentModule_MasterRepository.PropertyTaxDetailArrears_MasterRepository.PropertyTaxDetailArrears_MasterRepository;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AfterAssessmentModule_MasterRepository.RegisterObjection_MasterRepository.RegisterObjection_MasterRepository;
+import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.TaxAssessment_MasterRepository.Property_TaxDetailsRepository;
+import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AssessmentModule_MasterRepository.TaxAssessment_MasterRepository.Proposed_RValuesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -19,17 +24,23 @@ public class RegisterObjection_MasterServiceImpl implements RegisterObjection_Ma
 
     @Autowired
     private RegisterObjection_MasterRepository repository;
+    @Autowired
+    private Property_TaxDetailsRepository taxDetailsRepository;
+    @Autowired
+    private Proposed_RValuesRepository proposed_rValuesRepository;
+
 
     public boolean existsObjection(String newPropertyNo){
        return  repository.existsByNewPropertyNo(newPropertyNo);
     }
 
-
+    private Integer applicationNo = 0;
     @Override
     public void saveObjection(RegisterObjection_Dto dto) {
 
 
             RegisterObjection_Entity entity = new RegisterObjection_Entity();
+            entity.setApplicationNo((++applicationNo).toString());
             entity.setWardNo(dto.getWardNo());
             entity.setFinalPropertyNo(dto.getFinalPropertyNo());
             entity.setSurveyNo(dto.getSurveyNo());
@@ -66,6 +77,12 @@ public class RegisterObjection_MasterServiceImpl implements RegisterObjection_Ma
 //        RegisterObjection_Entity byApplicationNo = repository.findByNewPropertyNo(newPropertyNo);
 
         RegisterObjection_Dto dto = toDto(repository.findByNewPropertyNo(newPropertyNo));
+
+        Property_TaxDetails byPtNewPropertyNoVc = taxDetailsRepository.findByPtNewPropertyNoVc(newPropertyNo);
+        List<Proposed_RValues> byPrNewPropertyNoVc = proposed_rValuesRepository.findByPrNewPropertyNoVc(newPropertyNo);
+
+        dto.setTotalRValue(byPrNewPropertyNoVc.get(0).getPrTotalRatableValueFl());
+        dto.setTotalTax(byPtNewPropertyNoVc.getPtFinalTaxFl());
 
       return dto;
     }

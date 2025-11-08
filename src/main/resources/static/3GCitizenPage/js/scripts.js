@@ -190,6 +190,7 @@ function submitObjection() {
         respondent: form.respondentname.value,
         phoneNo: form.contactno.value,
         userDate: form.userdate.value,
+        userTime:form.usertime.value,
         applicationReceivedDate: form.applicationdate.value,
         others: form.others.value,
         noticeNo: form.objectionNoticeNo.value,
