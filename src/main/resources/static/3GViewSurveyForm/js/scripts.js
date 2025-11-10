@@ -6,7 +6,7 @@ $(document).ready(function() {
       success: function (data) {
         if (data && data.length > 0) {
           const council = data[0];
-
+                
           // 🏛 Council Names and Districts
           $('.councilLocalName').text(council.localName || '');
           $('.standardDistrictNameVC').text(council.standardDistrictNameVC || '');
@@ -28,6 +28,13 @@ $(document).ready(function() {
             $('.councilLogoTopRight, .councilLogoBottomRight').hide();
           }
 
+          // 🖼️ CompanySign 
+          if (council.companySignBase64 && council.companySignBase64.trim() !== '') {
+            $('.companySign').attr('src', 'data:image/png;base64,' + council.companySignBase64).show();
+          } else {
+            $('.companySign').hide();
+          }
+
           // 🧭 Align title properly
           $('.logo-title').each(function () {
             const rightLogoVisible = $(this).find('.councilLogoTopRight:visible, .councilLogoBottomRight:visible').length > 0;
@@ -43,7 +50,6 @@ $(document).ready(function() {
 
 // Retrieve the property number from local storage
 var propertyId = window.location.pathname.split('/').pop();
-console.log(propertyId);
 if (!propertyId) {
     alert('No property number found.');
     return; // Exit if no property number is found
@@ -58,7 +64,6 @@ $.ajax({
     success: function(data) {
         // Check if data is available
         if(data) {
-            console.log(data.propertyDetails)
             // Populating table data
             $('#wardNo').text(data.propertyDetails.pdWardI || '-');
             $('#zoneNo').text(data.propertyDetails.pdZoneI || '-');
@@ -161,7 +166,6 @@ $.ajax({
             $('#newownername').text(data.propertyDetails.pdAddnewownernameVc || '-');
 
                 if(data.propertyDetails.createddateVc) {
-                    console.log(data.propertyDetails.createddateVc);
                     var dateTimeParts = data.propertyDetails.createddateVc.split(', ');
                     var timePart = dateTimeParts[0];
                     var datePart = dateTimeParts[1];
@@ -193,8 +197,6 @@ $.ajax({
                     $('#pdPropimage2T').append(imgElement4);
                 }
 
-
-            console.log('Data fetched successfully:', data);
             if (data.unitDetails && data.unitDetails.length > 0) {
                 populateUnitsTable(data.unitDetails);
                 populateBuiltups(data.unitDetails);
