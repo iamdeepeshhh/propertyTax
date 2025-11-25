@@ -68,6 +68,14 @@ function showMaster(childId) {
     if (target) target.style.display = 'block';
 }
 
+function openSectionDropdown(sectionCode) {
+    if (sectionCode === '124') {
+        window.location.href = '/3gSurvey/newRegistration?sectionToken=124';
+        return;
+    }
+    alert(`Section ${sectionCode} is not configured yet.`);
+}
+
 function populateDropdown(selectId, endpointUrl, displayProperty, idProperty = null) {
     // selectID is the name of the dropdown element
     // endpointUrl is the URL to fetch data from backend(controller)

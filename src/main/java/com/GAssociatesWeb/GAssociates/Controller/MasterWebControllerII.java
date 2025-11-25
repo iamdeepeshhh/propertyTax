@@ -7,6 +7,9 @@ import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.Ta
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AssessmentModule_MasterDto.TaxAssessment_MasterDto.AssessmentResultsDto;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearingPropertyManagement_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.PropertyManagement_Service;
+import com.GAssociatesWeb.GAssociates.Service.CompletePropertySurveyService.PropertyNumberGenerator_Service.UniqueIdGenerator;
+import com.GAssociatesWeb.GAssociates.Service.ImageUtils;
+import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AssessmentModule_MasterServices.TaxAssessment_MasterService.TaxAssessmentRealtime.TaxAssessment_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearingUnitDetails_Service.AfterHearingUnitDetails_Service;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearingUnitBuiltupDetails_Service.AfterHearingUnitBuiltupDetails_Service;
 import com.GAssociatesWeb.GAssociates.Repository.MasterWebRepository.AfterAssessmentModule_MasterRepository.AfterHearing_MasterRepository.AfterHearingPropertyTaxDetails_MasterRepository;
@@ -19,6 +22,7 @@ import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.UnitDetails_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.PropertySurveyDto.UnitBuiltUp_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.RegisterObjection_Dto.RegisterObjection_Dto;
 import com.GAssociatesWeb.GAssociates.DTO.MasterWebDto.AfterAssessment_Module.AfterHearing_Dto.AfterHearing_PropertyTaxDetailsDto;
+import com.GAssociatesWeb.GAssociates.Entity.PropertySurveyEntity.CompletePropertySurvey_Entity.PropertyDetails_Entity.PropertyDetails_Entity;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.PropertyTaxDetailArrears_MasterService.PropertyTaxDetailArrears_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.RegisterObjection_MasterService.RegisterObjection_MasterService;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.OrderSheet_MasterService.OrderSheet_MasterService;
@@ -29,6 +33,9 @@ import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentM
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.GAssociatesWeb.GAssociates.Service.MasterWebServices.AfterAssessmentModule_MasterServices.AfterHearing_Services.AfterHearingPropertyDetails_Service.AfterHearingPropertyDetails_Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.GAssociatesWeb.GAssociates.Repository.PropertySurveyRepository.PropertyDetails_Repository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +65,9 @@ public class MasterWebControllerII {
     private final AfterHearingUnitBuiltupDetails_Service afterHearingUnitBuiltupDetailsService;
     private final AfterHearingPropertyTaxDetails_MasterRepository afterHearingPropertyTaxRepo;
     private final AfterHearingProposedRvalues_MasterRepository afterHearingProposedRvRepo;
+    private final UniqueIdGenerator uniqueIdGenerator;
+    private final TaxAssessment_MasterService taxAssessmentMasterService;
+    private final PropertyDetails_Repository propertyDetailsRepository;
 
     @GetMapping("/orderSheet")
     public ResponseEntity<?> getOrderSheet(@RequestParam String newPropertyNo) {
@@ -241,6 +251,168 @@ public class MasterWebControllerII {
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
         return dto;
+    }
+
+    @PostMapping(value = "/sections/124/submitSurvey", consumes = {"multipart/form-data"})
+    public ResponseEntity<?> submitSection124Survey(
+            @RequestParam("jsonData") String jsonData,
+            @RequestParam(value = "previewPropertyImage", required = false) MultipartFile pdPropimageT,
+            @RequestParam(value = "previewPropertyImage2", required = false) MultipartFile pdPropimage2T,
+            @RequestParam(value = "previewHousePlan1", required = false) MultipartFile pdHouseplanT,
+            @RequestParam(value = "previewHousePlan2", required = false) MultipartFile pdHouseplan2T,
+            @RequestParam(value = "sectionToken", required = false) String sectionToken,
+            HttpServletRequest request) {
+
+        if (!"124".equals(sectionToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Invalid or missing section token."));
+        }
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            CompleteProperty_Dto dto = mapper.readValue(jsonData, CompleteProperty_Dto.class);
+            if (dto == null || dto.getPropertyDetails() == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Property details are required."));
+            }
+
+            String wardNo = dto.getPropertyDetails().getPdWardI();
+            String zoneNo = dto.getPropertyDetails().getPdZoneI();
+            if (wardNo == null || wardNo.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Ward is required to generate survey number."));
+            }
+            String surveyPropNo = dto.getPropertyDetails().getPdSurypropnoVc();
+            boolean hasOccupier = dto.getPropertyDetails().getPdOccupinameF() != null
+                    && !dto.getPropertyDetails().getPdOccupinameF().trim().isEmpty();
+            surveyPropNo = generateSection124SurveyNo(wardNo, zoneNo, surveyPropNo, hasOccupier);
+            dto.getPropertyDetails().setPdSurypropnoVc(surveyPropNo);
+
+            if (pdPropimageT != null && !pdPropimageT.isEmpty()) {
+                dto.getPropertyDetails().setPdPropimageT(ImageUtils.convertToBase64(pdPropimageT));
+            }
+            if (pdPropimage2T != null && !pdPropimage2T.isEmpty()) {
+                dto.getPropertyDetails().setPdPropimage2T(ImageUtils.convertToBase64(pdPropimage2T));
+            }
+            if (pdHouseplanT != null && !pdHouseplanT.isEmpty()) {
+                dto.getPropertyDetails().setPdHouseplanT(ImageUtils.convertToBase64(pdHouseplanT));
+            }
+            if (pdHouseplan2T != null && !pdHouseplan2T.isEmpty()) {
+                dto.getPropertyDetails().setPdHouseplan2T(ImageUtils.convertToBase64(pdHouseplan2T));
+            }
+
+            HttpSession session = request.getSession(false);
+            if (session != null && session.getAttribute("username") != null) {
+                dto.getPropertyDetails().setUser_id(String.valueOf(session.getAttribute("username")));
+            }
+
+            CompleteProperty_Dto saved = propertyManagementService.createCompleteProperty(dto);
+            if (saved == null || saved.getPropertyDetails() == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("message", "Failed to create property record."));
+            }
+
+            String newPropertyNo = saved.getPropertyDetails().getPdNewpropertynoVc();
+            String wardNoSaved = saved.getPropertyDetails().getPdWardI();
+
+            String finalPropertyNo = null;
+            try {
+                if (wardNoSaved != null && !wardNoSaved.trim().isEmpty()) {
+                    uniqueIdGenerator.assignFinalPropertyNumbers(wardNoSaved);
+                }
+                CompleteProperty_Dto refreshed = propertyManagementService.getCompletePropertyByNewPropertyNo(newPropertyNo);
+                if (refreshed != null && refreshed.getPropertyDetails() != null) {
+                    PropertyDetails_Dto pd = refreshed.getPropertyDetails();
+                    if (pd.getPdFinalpropnoVc() != null && !pd.getPdFinalpropnoVc().trim().isEmpty()) {
+                        finalPropertyNo = pd.getPdFinalpropnoVc();
+                    } else {
+                        finalPropertyNo = pd.getPdNewfinalpropnoVc();
+                    }
+                }
+            } catch (Exception ignored) {
+                // best-effort assignment; continue with available data
+            }
+
+            boolean assessmentDone = false;
+            String assessmentError = null;
+            try {
+                AssessmentResultsDto assessmentResultsDto = taxAssessmentMasterService.performAssessment(newPropertyNo, false);
+                assessmentDone = assessmentResultsDto != null;
+            } catch (Exception e) {
+                assessmentError = e.getMessage();
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Section 124 survey submitted successfully.");
+            response.put("newPropertyNo", newPropertyNo);
+            if (finalPropertyNo != null) {
+                response.put("finalPropertyNo", finalPropertyNo);
+            }
+            response.put("assessmentDone", assessmentDone);
+            if (assessmentError != null && !assessmentError.isEmpty()) {
+                response.put("assessmentError", assessmentError);
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to submit section 124 survey", "error", String.valueOf(e.getMessage())));
+        }
+    }
+
+    private String generateSection124SurveyNo(String wardNo, String zoneNo, String current, boolean hasOccupier) {
+        String ward = wardNo.trim();
+        String wardPrefix;
+        try {
+            int wardInt = Integer.parseInt(ward);
+            wardPrefix = String.format("%04d", wardInt);
+        } catch (Exception e) {
+            wardPrefix = ward.length() == 1 ? "000" + ward : String.format("%4s", ward).replace(' ', '0');
+        }
+
+        // If a current value is already in desired format, keep it
+        if (current != null && current.contains("/")) {
+            return current.trim();
+        }
+
+        String last = null;
+        try {
+            Integer wardInt = Integer.valueOf(ward);
+            PropertyDetails_Entity lastEntity = propertyDetailsRepository.findTopByPdWardIOrderByPdSurypropnoVcDesc(wardInt);
+            if (lastEntity != null) last = lastEntity.getPdSurypropnoVc();
+        } catch (Exception ignored) {
+            // best effort; ignore lookup failures
+        }
+
+        if (hasOccupier) {
+            if (last != null) {
+                if (last.contains("/")) {
+                    String[] parts = last.split("/", 2);
+                    String prefix = parts[0];
+                    String seqPart = parts.length > 1 ? parts[1] : "0000";
+                    int width = seqPart.length() > 0 ? seqPart.length() : 4;
+                    long base = 0L;
+                    try { base = Long.parseLong(seqPart); } catch (Exception ignored) {}
+                    long next = base + 1;
+                    return prefix + "/" + String.format("%0" + width + "d", next);
+                } else {
+                    // First occupier variant for an SPN without slash
+                    String prefix = last.trim().isEmpty() ? wardPrefix : last.trim();
+                    return prefix + "/" + String.format("%04d", 1);
+                }
+            }
+            return wardPrefix + "/" + String.format("%04d", 1);
+        }
+
+        if (last != null) {
+            String prefix = last.contains("/") ? last.split("/", 2)[0] : last;
+            int width = prefix.length() > 0 ? prefix.length() : 4;
+            long base = 0L;
+            try { base = Long.parseLong(prefix.replaceAll("\\D", "")); } catch (Exception ignored) {}
+            long next = base + 1;
+            return String.format("%0" + Math.max(4, width) + "d", next);
+        }
+
+        // default when no occupier: new base number without right part
+        return wardPrefix;
     }
 
     @PostMapping(value = "/createCompletePropertyAfterHearing", consumes = {"multipart/form-data"})

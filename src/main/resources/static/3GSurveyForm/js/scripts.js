@@ -3,6 +3,8 @@ input.value = input.value.replace(/\s+/g, '');
 checkSurveyPropNo();
 }
 
+const sectionToken = new URLSearchParams(window.location.search).get('sectionToken');
+
 function checkPodRef() {
 document.getElementById('newOwnerName').disabled = document.getElementById('podRef').value.trim() === '';
 }
@@ -209,6 +211,13 @@ return `
 let isSurveyPropNoValid = false;
 
 async function checkSurveyPropNo() {
+if (sectionToken === '124') {
+    // Backend will generate; bypass front-end uniqueness check
+    const messageElement = document.getElementById('surveyPropNoMessage');
+    if (messageElement) messageElement.style.display = 'none';
+    isSurveyPropNoValid = true;
+    return;
+}
 console.log("Checking Survey Property Number");
 const surveyPropNo = document.getElementById('surveyPropNo').value;
 const ward = document.getElementById('ward').value;
@@ -1630,6 +1639,9 @@ let isValid = true;
 let missingFields = [];
 document.querySelectorAll('.mandatory').forEach((field) => {
 let input = document.getElementById(field.htmlFor);
+if (sectionToken === '124' && field.htmlFor === 'surveyPropNo') {
+    return; // SPN will be generated server-side for section 124
+}
 if (input && !input.disabled && !input.value.trim()) {
     isValid = false;
     missingFields.push(field.textContent);
@@ -1642,11 +1654,16 @@ return false;
 }
 
 // Check the survey property number validity
-await checkSurveyPropNo();
+if (sectionToken !== '124') {
+    await checkSurveyPropNo();
 
-if (!isSurveyPropNoValid) {
-alert("The Survey Property Number already exists or is invalid.");
-return false;
+    if (!isSurveyPropNoValid) {
+        alert("The Survey Property Number already exists or is invalid.");
+        return false;
+    }
+} else {
+    // Section 124 auto-generates SPN on server; treat as valid
+    isSurveyPropNoValid = true;
 }
 
 return true;
@@ -1657,10 +1674,16 @@ if (!await validateForm()) {
 return;
 }
 const formDataToSend = collectFormData();
+const endpoint = sectionToken === '124'
+    ? '/3g/sections/124/submitSurvey'
+    : '/3gSurvey/submitNewPropertyDetails';
+if (sectionToken) {
+    formDataToSend.append('sectionToken', sectionToken);
+}
 
 document.getElementById('loadingSpinner').style.display = 'flex';
 try {
-const response = await fetch('/3gSurvey/submitNewPropertyDetails', {
+const response = await fetch(endpoint, {
     method: 'POST',
     body: formDataToSend, // Send the FormData object directly
     // Do not set Content-Type header; let the browser handle it
@@ -1673,11 +1696,37 @@ if (!response.ok) {
 const result = await response.json();
 console.log('Submission successful:', result);
 
-alert(result.message || "Form submitted successfully!");
+const messages = [];
+if (result.message) {
+    messages.push(result.message);
+}
+if (result.finalPropertyNo) {
+    messages.push(`Final Property No: ${result.finalPropertyNo}`);
+} else if (result.pdFinalpropnoVc) {
+    messages.push(`Final Property No: ${result.pdFinalpropnoVc}`);
+}
+if (result.newPropertyNo) {
+    messages.push(`New Property No: ${result.newPropertyNo}`);
+}
+if (sectionToken === '124') {
+    if (result.assessmentDone === false) {
+        messages.push('Assessment could not be completed automatically.');
+    } else if (result.assessmentDone) {
+        messages.push('Assessment completed.');
+    }
+}
+if (result.assessmentError) {
+    messages.push(`Assessment note: ${result.assessmentError}`);
+}
+
+alert(messages.length ? messages.join('\n') : "Form submitted successfully!");
 
 window.removeEventListener('beforeunload', handleBeforeUnload);
 
-window.location.href = "/3gSurvey/newRegistration";
+const redirectUrl = sectionToken === '124'
+    ? "/3gSurvey/newRegistration?sectionToken=124"
+    : "/3gSurvey/newRegistration";
+window.location.href = redirectUrl;
 } catch (error) {
 console.error('Submission failed:', error);
 alert('Form could not be submitted');

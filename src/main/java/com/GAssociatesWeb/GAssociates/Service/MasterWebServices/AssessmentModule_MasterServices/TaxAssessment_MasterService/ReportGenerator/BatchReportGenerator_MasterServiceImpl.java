@@ -87,7 +87,7 @@ public class BatchReportGenerator_MasterServiceImpl implements BatchReportGenera
                     "ROUND(pt.pt_final_tax_fl) AS totaltax, " +
                     "old.pod_totalratablevalue_i AS oldrv, " +
                     "old.pod_totaltax_fl AS oldtax, " +
-                    "old.pod_oldpropno_vc AS oldpropertyno, " +
+                    "COALESCE(old.pod_oldpropno_vc, p.pd_oldpropno_vc) AS oldpropertyno, " +
                     "old.pod_zone_i AS oldpropertyzone, " +
                     "u.ud_unitno_vc AS unitNo " +
 
